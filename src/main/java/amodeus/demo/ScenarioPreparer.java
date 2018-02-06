@@ -1,4 +1,4 @@
-package demo;
+package amodeus.demo;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -17,6 +17,7 @@ import ch.ethz.idsc.aviantools.options.ScenarioOptions;
 import ch.ethz.idsc.aviantools.prep.FacilitiesPreparer;
 import ch.ethz.idsc.aviantools.prep.NetworkPreparer;
 import ch.ethz.idsc.aviantools.prep.PopulationPreparer;
+import ch.ethz.idsc.aviantools.prep.VirtualNetworkPreparer;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of
@@ -53,7 +54,7 @@ public enum ScenarioPreparer {
         FacilitiesPreparer.run(facilities, population, scenarioOptions);
 
         // 4) create virtual Network
-        // VirtualNetworkPreparer.run(network, population, scenarioOptions);
+        VirtualNetworkPreparer.run(network, population, scenarioOptions);
 
         // 5) save a simulation config file
         // IncludeActTypeOf.BaselineCH(config); // Only needed in Some Scenarios

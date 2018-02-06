@@ -1,4 +1,4 @@
-package demo;
+package amodeus.demo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,6 +16,7 @@ import ch.ethz.idsc.aviantools.gfx.MatsimViewerFrame;
 import ch.ethz.idsc.aviantools.net.MatsimStaticDatabase;
 import ch.ethz.idsc.aviantools.options.ScenarioOptions;
 import ch.ethz.idsc.aviantools.utils.NetworkLoader;
+import ch.ethz.idsc.aviantools.virtualnetwork.VirtualNetworkGet;
 import ch.ethz.idsc.owly.data.GlobalAssert;
 
 /** the viewer allows to connect to the scenario server or to view saved
@@ -68,7 +69,7 @@ public enum ScenarioViewer {
 
         /** this is optional and should not cause problems if file does not
          * exist. temporary solution */
-        // matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
+        matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
         MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer, outputDirectory);
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);

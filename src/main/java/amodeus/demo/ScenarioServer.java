@@ -1,10 +1,11 @@
-package demo;
+package amodeus.demo;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Objects;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -19,8 +20,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
+import ch.ethz.idsc.aviantools.analysis.AnalyzeAll;
+import ch.ethz.idsc.aviantools.analysis.AnalyzeSummary;
 import ch.ethz.idsc.aviantools.data.ReferenceFrame;
 import ch.ethz.idsc.aviantools.filehandling.MultiFileTools;
+import ch.ethz.idsc.aviantools.html.DataCollector;
+import ch.ethz.idsc.aviantools.html.ReportGenerator;
 import ch.ethz.idsc.aviantools.matsim_decoupling.IDSCDispatcherModule;
 import ch.ethz.idsc.aviantools.matsim_decoupling.IDSCGeneratorModule;
 import ch.ethz.idsc.aviantools.matsim_decoupling.qsim.qsim.IDSCQSimProvider;
@@ -28,6 +33,10 @@ import ch.ethz.idsc.aviantools.net.DatabaseModule;
 import ch.ethz.idsc.aviantools.net.MatsimStaticDatabase;
 import ch.ethz.idsc.aviantools.net.SimulationServer;
 import ch.ethz.idsc.aviantools.options.ScenarioOptions;
+import ch.ethz.idsc.aviantools.traveldata.TravelData;
+import ch.ethz.idsc.aviantools.traveldata.TravelDataGet;
+import ch.ethz.idsc.aviantools.virtualnetwork.VirtualNetwork;
+import ch.ethz.idsc.aviantools.virtualnetwork.VirtualNetworkGet;
 import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
@@ -123,36 +132,33 @@ public enum ScenarioServer {
         // exception.printStackTrace();
         // }
 
-        // AnalyzeAll analyzeAll = new AnalyzeAll();
-        // AnalyzeSummary analyzeSummary = analyzeAll.analyze(configFile,
-        // outputdirectory, population, referenceFrame);
-        // VirtualNetwork<Link> virtualNetwork =
-        // VirtualNetworkGet.readDefault(scenario.getNetwork());
+        AnalyzeSummary analyzeSummary = AnalyzeAll.analyzeNow(configFile, outputdirectory, population, referenceFrame);
+        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         //
         // MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
         // PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
-        // TravelData travelData = null;
-        // if (virtualNetwork != null) {
-        // minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
-        // performanceFleetSizeCalculator =
-        // PerformanceFleetSizeGet.readDefault();
-        // if (performanceFleetSizeCalculator != null) {
-        // String dataFolderName = outputdirectory + "/data";
-        // File relativeDirectory = new File(dataFolderName);
-        // performanceFleetSizeCalculator.saveAndPlot(dataFolderName,
-        // relativeDirectory);
-        // }
-        //
-        // travelData = TravelDataGet.readDefault(virtualNetwork);
-        // }
-        //
-        // new DataCollector(configFile, outputdirectory, controler, //
-        // minimumFleetSizeCalculator, analyzeSummary, network, population,
-        // travelData);
-        //
-        // // generate report
-        // ReportGenerator reportGenerator = new ReportGenerator();
-        // reportGenerator.from(configFile, outputdirectory);
+        TravelData travelData = null;
+        if (virtualNetwork != null) {
+            // minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
+            // performanceFleetSizeCalculator =
+            // PerformanceFleetSizeGet.readDefault();
+            // if (performanceFleetSizeCalculator != null) {
+            // String dataFolderName = outputdirectory + "/data";
+            // File relativeDirectory = new File(dataFolderName);
+            // performanceFleetSizeCalculator.saveAndPlot(dataFolderName,
+            // relativeDirectory);
+            // }
+
+            travelData = TravelDataGet.readDefault(virtualNetwork);
+        }
+
+        new DataCollector(configFile, outputdirectory, controler, //
+                // minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
+                analyzeSummary, network, population, travelData);
+
+        // generate report
+        ReportGenerator reportGenerator = new ReportGenerator();
+        reportGenerator.from(configFile, outputdirectory);
 
     }
 
