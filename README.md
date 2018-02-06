@@ -1,11 +1,11 @@
-# avian
-Autonomous Vehicles Intelligence Analysis
+# amodeus
+AMoD test bed
 
 TODO list (not comprehensive):
 
-1) Include a basic version of the report functionality.
+
 2) Streamline the viewer and remove some parts.
-3) Include the LPFB Dispatcher.
+
 4) Include an empty dispatcher on avian itself (not aviantools)
 5) Include the SF Scenario and all needed parts. 
 6) Do the homepage including the ranking.
@@ -13,7 +13,7 @@ TODO list (not comprehensive):
 8) Document the code
 9) Add authorship and licensing information everywhere. 
 10) Add maven testing
-11) Thorough refactoring of avian, aviantools, av 
+11) Thorough refactoring of avian, aviantools, av --> old TODOS completed.
 12) finish the paper. 
 
 
