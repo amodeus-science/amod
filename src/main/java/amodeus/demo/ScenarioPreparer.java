@@ -12,12 +12,12 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 
-import ch.ethz.idsc.aviantools.filehandling.MultiFileTools;
-import ch.ethz.idsc.aviantools.options.ScenarioOptions;
-import ch.ethz.idsc.aviantools.prep.FacilitiesPreparer;
-import ch.ethz.idsc.aviantools.prep.NetworkPreparer;
-import ch.ethz.idsc.aviantools.prep.PopulationPreparer;
-import ch.ethz.idsc.aviantools.prep.VirtualNetworkPreparer;
+import ch.ethz.idsc.amodeustools.filehandling.MultiFileTools;
+import ch.ethz.idsc.amodeustools.options.ScenarioOptions;
+import ch.ethz.idsc.amodeustools.prep.FacilitiesPreparer;
+import ch.ethz.idsc.amodeustools.prep.NetworkPreparer;
+import ch.ethz.idsc.amodeustools.prep.PopulationPreparer;
+import ch.ethz.idsc.amodeustools.prep.VirtualNetworkPreparer;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of
