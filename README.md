@@ -16,6 +16,12 @@ TODO list (not comprehensive):
 11) Thorough refactoring of avian, aviantools, av --> old TODOS completed.
 12) finish the paper. 
 
+- Solve the problem, that GLPK highly limits the easiness of use and isntallation. New solver? Try- catch and message to user? ... 
+- Problem: Current implemntation of Hungarian matching too slow to allow many iterations. Go from o(n3) to o(n) implementation. 
+- all input settings into one file (av_config.xml, av.xml, IDSCoptions)
+- make one superfile "amodeus Start" with input options and output, input: pop-size, dispatcher, ... all in one config object,  output visualizer, report and data 
+
+
 
 -- hand-out and publication --
 

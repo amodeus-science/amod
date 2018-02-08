@@ -20,6 +20,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
+import amodeus.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeustools.analysis.AnalyzeAll;
 import ch.ethz.idsc.amodeustools.analysis.AnalyzeSummary;
 import ch.ethz.idsc.amodeustools.data.ReferenceFrame;
@@ -40,6 +41,7 @@ import ch.ethz.idsc.amodeustools.virtualnetwork.VirtualNetworkGet;
 import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.framework.AVUtils;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
@@ -114,6 +116,13 @@ public enum ScenarioServer {
             @Override
             public void install() {
                 bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
+            }
+        });
+        
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerDispatcherFactory(binder(), "DemoDispatcher", DemoDispatcher.Factory.class);
             }
         });
 
