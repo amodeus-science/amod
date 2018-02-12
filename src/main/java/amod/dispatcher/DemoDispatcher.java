@@ -1,4 +1,4 @@
-package amodeus.dispatcher;
+package amod.dispatcher;
 
 
 import java.util.ArrayList;

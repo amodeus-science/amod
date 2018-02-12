@@ -1,4 +1,4 @@
-package amodeus.demo;
+package amod.demo;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -20,7 +20,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
-import amodeus.dispatcher.DemoDispatcher;
+import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeustools.analysis.AnalyzeAll;
 import ch.ethz.idsc.amodeustools.analysis.AnalyzeSummary;
 import ch.ethz.idsc.amodeustools.data.ReferenceFrame;

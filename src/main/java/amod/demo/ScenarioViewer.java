@@ -1,4 +1,4 @@
-package amodeus.demo;
+package amod.demo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
