@@ -13,6 +13,7 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -81,6 +82,11 @@ public enum ScenarioServer {
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
+        config.planCalcScore().addActivityParams(new ActivityParams("activity"));
+        for(ActivityParams activityParams : config.planCalcScore().getActivityParams()){
+            activityParams.setTypicalDuration(3600.0); //TODO fix this to meaningful values            
+        }
+        
         // IncludeActTypeOf.zurichConsensus(config);
         // IncludeActTypeOf.artificial(config);
 
