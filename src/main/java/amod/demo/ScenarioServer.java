@@ -1,4 +1,4 @@
-package amodeus.demo;
+package amod.demo;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -20,26 +20,28 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
-import ch.ethz.idsc.aviantools.analysis.AnalyzeAll;
-import ch.ethz.idsc.aviantools.analysis.AnalyzeSummary;
-import ch.ethz.idsc.aviantools.data.ReferenceFrame;
-import ch.ethz.idsc.aviantools.filehandling.MultiFileTools;
-import ch.ethz.idsc.aviantools.html.DataCollector;
-import ch.ethz.idsc.aviantools.html.ReportGenerator;
-import ch.ethz.idsc.aviantools.matsim_decoupling.IDSCDispatcherModule;
-import ch.ethz.idsc.aviantools.matsim_decoupling.IDSCGeneratorModule;
-import ch.ethz.idsc.aviantools.matsim_decoupling.qsim.qsim.IDSCQSimProvider;
-import ch.ethz.idsc.aviantools.net.DatabaseModule;
-import ch.ethz.idsc.aviantools.net.MatsimStaticDatabase;
-import ch.ethz.idsc.aviantools.net.SimulationServer;
-import ch.ethz.idsc.aviantools.options.ScenarioOptions;
-import ch.ethz.idsc.aviantools.traveldata.TravelData;
-import ch.ethz.idsc.aviantools.traveldata.TravelDataGet;
-import ch.ethz.idsc.aviantools.virtualnetwork.VirtualNetwork;
-import ch.ethz.idsc.aviantools.virtualnetwork.VirtualNetworkGet;
+import amod.dispatcher.DemoDispatcher;
+import ch.ethz.idsc.amodeus.analysis.AnalyzeAll;
+import ch.ethz.idsc.amodeus.analysis.AnalyzeSummary;
+import ch.ethz.idsc.amodeus.data.ReferenceFrame;
+import ch.ethz.idsc.amodeus.filehandling.MultiFileTools;
+import ch.ethz.idsc.amodeus.html.DataCollector;
+import ch.ethz.idsc.amodeus.html.ReportGenerator;
+import ch.ethz.idsc.amodeus.matsim_decoupling.IDSCDispatcherModule;
+import ch.ethz.idsc.amodeus.matsim_decoupling.IDSCGeneratorModule;
+import ch.ethz.idsc.amodeus.matsim_decoupling.qsim.IDSCQSimProvider;
+import ch.ethz.idsc.amodeus.net.DatabaseModule;
+import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
+import ch.ethz.idsc.amodeus.net.SimulationServer;
+import ch.ethz.idsc.amodeus.options.ScenarioOptions;
+import ch.ethz.idsc.amodeus.traveldata.TravelData;
+import ch.ethz.idsc.amodeus.traveldata.TravelDataGet;
+import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
+import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
 import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.framework.AVUtils;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
@@ -114,6 +116,13 @@ public enum ScenarioServer {
             @Override
             public void install() {
                 bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
+            }
+        });
+        
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerDispatcherFactory(binder(), "DemoDispatcher", DemoDispatcher.Factory.class);
             }
         });
 
