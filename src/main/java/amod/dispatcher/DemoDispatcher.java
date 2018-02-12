@@ -15,13 +15,14 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import ch.ethz.idsc.amodeustools.dispatcher.core.DispatcherUtils;
-import ch.ethz.idsc.amodeustools.dispatcher.core.RebalancingDispatcher;
-import ch.ethz.idsc.amodeustools.dispatcher.core.RoboTaxi;
-import ch.ethz.idsc.amodeustools.dispatcher.utils.DrivebyRequestStopper;
-import ch.ethz.idsc.amodeustools.utils.SafeConfig;
+import ch.ethz.idsc.amodeus.dispatcher.core.DispatcherUtils;
+import ch.ethz.idsc.amodeus.dispatcher.core.RebalancingDispatcher;
+import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
+import ch.ethz.idsc.amodeus.dispatcher.utils.DrivebyRequestStopper;
+import ch.ethz.idsc.amodeus.utils.SafeConfig;
 import ch.ethz.matsim.av.config.AVDispatcherConfig;
 import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher.AVDispatcherFactory;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 

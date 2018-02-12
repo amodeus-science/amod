@@ -9,14 +9,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
-import ch.ethz.idsc.amodeustools.data.ReferenceFrame;
-import ch.ethz.idsc.amodeustools.filehandling.MultiFileTools;
-import ch.ethz.idsc.amodeustools.gfx.MatsimMapComponent;
-import ch.ethz.idsc.amodeustools.gfx.MatsimViewerFrame;
-import ch.ethz.idsc.amodeustools.net.MatsimStaticDatabase;
-import ch.ethz.idsc.amodeustools.options.ScenarioOptions;
-import ch.ethz.idsc.amodeustools.utils.NetworkLoader;
-import ch.ethz.idsc.amodeustools.virtualnetwork.VirtualNetworkGet;
+import ch.ethz.idsc.amodeus.data.ReferenceFrame;
+import ch.ethz.idsc.amodeus.filehandling.MultiFileTools;
+import ch.ethz.idsc.amodeus.gfx.MatsimMapComponent;
+import ch.ethz.idsc.amodeus.gfx.MatsimViewerFrame;
+import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
+import ch.ethz.idsc.amodeus.options.ScenarioOptions;
+import ch.ethz.idsc.amodeus.utils.NetworkLoader;
+import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
 import ch.ethz.idsc.owly.data.GlobalAssert;
 
 /** the viewer allows to connect to the scenario server or to view saved
