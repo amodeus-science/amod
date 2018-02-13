@@ -1,3 +1,6 @@
+/target/
+.settings/org.eclipse.jdt.ui.prefs
+
 # intellij idea
 amod.iml
 .idea/
