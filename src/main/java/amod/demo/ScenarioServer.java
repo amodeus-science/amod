@@ -83,10 +83,10 @@ public enum ScenarioServer {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
         config.planCalcScore().addActivityParams(new ActivityParams("activity"));
-        for(ActivityParams activityParams : config.planCalcScore().getActivityParams()){
-            activityParams.setTypicalDuration(3600.0); //TODO fix this to meaningful values            
+        for (ActivityParams activityParams : config.planCalcScore().getActivityParams()) {
+            activityParams.setTypicalDuration(3600.0); // TODO fix this to meaningful values
         }
-        
+
         // IncludeActTypeOf.zurichConsensus(config);
         // IncludeActTypeOf.artificial(config);
 
@@ -124,7 +124,7 @@ public enum ScenarioServer {
                 bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
             }
         });
-        
+
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
