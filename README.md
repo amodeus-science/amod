@@ -1,6 +1,7 @@
 # ch.ethz.idsc.amod
 
-code format: `amod-code-style.xml`
+The code format of the `amod` repository is specified in the `amodeus` profile
+that you can import from `amodeus-code-style.xml` in the the `amodeus` repository.
 
 AMoD test bed
 
