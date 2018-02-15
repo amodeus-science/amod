@@ -11,8 +11,8 @@ import org.matsim.core.config.ConfigUtils;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.filehandling.MultiFileTools;
-import ch.ethz.idsc.amodeus.gfx.MatsimMapComponent;
-import ch.ethz.idsc.amodeus.gfx.MatsimViewerFrame;
+import ch.ethz.idsc.amodeus.gfx.AmodeusComponent;
+import ch.ethz.idsc.amodeus.gfx.AmodeusViewerFrame;
 import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.utils.NetworkLoader;
@@ -65,13 +65,14 @@ public enum ScenarioViewer {
 
         // load viewer
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-        MatsimMapComponent matsimJMapViewer = new MatsimMapComponent(MatsimStaticDatabase.INSTANCE);
+
+        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(MatsimStaticDatabase.INSTANCE);
 
         /** this is optional and should not cause problems if file does not
          * exist. temporary solution */
-        matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
+        amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
-        MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer, outputDirectory);
+        AmodeusViewerFrame matsimViewer = new AmodeusViewerFrame(amodeusComponent, outputDirectory);
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
         matsimViewer.jFrame.setSize(900, 900);
         matsimViewer.jFrame.setVisible(true);
