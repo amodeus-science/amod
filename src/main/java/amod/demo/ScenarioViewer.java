@@ -10,14 +10,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-import ch.ethz.idsc.amodeus.filehandling.MultiFileTools;
 import ch.ethz.idsc.amodeus.gfx.AmodeusComponent;
 import ch.ethz.idsc.amodeus.gfx.AmodeusViewerFrame;
+import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.utils.NetworkLoader;
+import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
-import ch.ethz.idsc.owly.data.GlobalAssert;
 
 /** the viewer allows to connect to the scenario server or to view saved
  * simulation results. */

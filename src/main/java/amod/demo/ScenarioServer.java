@@ -22,12 +22,9 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 import amod.dispatcher.DemoDispatcher;
-import ch.ethz.idsc.amodeus.analysis.AnalyzeAll;
-import ch.ethz.idsc.amodeus.analysis.AnalyzeSummary;
+import ch.ethz.idsc.amodeus.analysis.Analysis;
+import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-import ch.ethz.idsc.amodeus.filehandling.MultiFileTools;
-import ch.ethz.idsc.amodeus.html.DataCollector;
-import ch.ethz.idsc.amodeus.html.ReportGenerator;
 import ch.ethz.idsc.amodeus.matsim_decoupling.IDSCDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim_decoupling.IDSCGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim_decoupling.qsim.IDSCQSimProvider;
@@ -37,9 +34,10 @@ import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.traveldata.TravelData;
 import ch.ethz.idsc.amodeus.traveldata.TravelDataGet;
+import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
-import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.framework.AVUtils;
@@ -147,11 +145,11 @@ public enum ScenarioServer {
         // exception.printStackTrace();
         // }
 
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyzeNow(configFile, outputdirectory, population, referenceFrame);
+        AnalysisSummary analyzeSummary = Analysis.now(configFile, outputdirectory, population, referenceFrame);
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         //
         // MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
-        // PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
+        // Performa nceFleetSizeCalculator performanceFleetSizeCalculator = null;
         TravelData travelData = null;
         if (virtualNetwork != null) {
             // minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
@@ -167,13 +165,13 @@ public enum ScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        new DataCollector(configFile, outputdirectory, controler, //
-                // minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
-                analyzeSummary, network, population, travelData);
-
-        // generate report
-        ReportGenerator reportGenerator = new ReportGenerator();
-        reportGenerator.from(configFile, outputdirectory);
+        // new DataCollector(configFile, outputdirectory, controler, //
+        // minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
+        // analyzeSummary, network, population, travelData);
+        //
+        // // generate report
+        // Report reportGenerator = new Report();
+        // reportGenerator.from(configFile, outputdirectory);
 
     }
 
