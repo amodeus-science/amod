@@ -1,10 +1,14 @@
-# amodeus
+# ch.ethz.idsc.amod
+
+The code format of the `amod` repository is specified in the `amodeus` profile
+that you can import from `amodeus-code-style.xml` in the the `amodeus` repository.
+
 AMoD test bed
 
 TODO list (not comprehensive):
 
 
-CODE
+## CODE
 0) Remove extra code from amodeustools
 1) Streamline the viewer and remove some parts.
 2) Streamline report and remove some parts.
@@ -20,17 +24,17 @@ CODE
 12) More commenting and Javadoc, code documentation.
 
 
-API
+## API
 1) Do the homepage including the ranking.
 2) Provide basic installation guidelines
 3) Make public for test customers (or add them to github)
 
 
-PUBLICATION
+## PUBLICATION
 1) Finish the paper. 
 
 
-INTEGRATION
+## INTEGRATION
 1) Make matsim private and conserve history
 2) For as many pieces as meaningful: test in amodeus, then make sure tests are written in amodeus, delete from matsim and add references to amodeus.
 

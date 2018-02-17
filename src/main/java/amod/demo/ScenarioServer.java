@@ -25,7 +25,6 @@ import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-
 import ch.ethz.idsc.amodeus.html.DataCollector;
 import ch.ethz.idsc.amodeus.html.Report;
 import ch.ethz.idsc.amodeus.matsim_decoupling.IDSCDispatcherModule;
@@ -38,9 +37,11 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.traveldata.TravelData;
 import ch.ethz.idsc.amodeus.traveldata.TravelDataGet;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
-import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.framework.AVUtils;
@@ -152,7 +153,7 @@ public enum ScenarioServer {
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         //
         // MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
-        // PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
+        // Performa nceFleetSizeCalculator performanceFleetSizeCalculator = null;
         TravelData travelData = null;
         if (virtualNetwork != null) {
             // minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
@@ -168,6 +169,7 @@ public enum ScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
         GlobalAssert.that(!Objects.isNull(travelData));
+
 
         new DataCollector(configFile, outputdirectory,analyzeSummary);
 

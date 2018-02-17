@@ -16,8 +16,8 @@ import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
-import ch.ethz.idsc.owly.data.GlobalAssert;
 
 /** the viewer allows to connect to the scenario server or to view saved
  * simulation results. */
@@ -65,14 +65,14 @@ public enum ScenarioViewer {
 
         // load viewer
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-        AmodeusComponent matsimJMapViewer = new AmodeusComponent(MatsimStaticDatabase.INSTANCE);
+
+        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(MatsimStaticDatabase.INSTANCE);
 
         /** this is optional and should not cause problems if file does not
          * exist. temporary solution */
-        // TODO this fails, because of new Tensor imports, please fix.
-        // matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
+        amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
-        AmodeusViewerFrame matsimViewer = new AmodeusViewerFrame(matsimJMapViewer, outputDirectory);
+        AmodeusViewerFrame matsimViewer = new AmodeusViewerFrame(amodeusComponent, outputDirectory);
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
         matsimViewer.jFrame.setSize(900, 900);
         matsimViewer.jFrame.setVisible(true);
