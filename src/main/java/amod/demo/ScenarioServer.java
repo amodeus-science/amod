@@ -25,6 +25,8 @@ import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
+import ch.ethz.idsc.amodeus.html.DataCollector;
+import ch.ethz.idsc.amodeus.html.Report;
 import ch.ethz.idsc.amodeus.matsim_decoupling.IDSCDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim_decoupling.IDSCGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim_decoupling.qsim.IDSCQSimProvider;
@@ -35,7 +37,9 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.traveldata.TravelData;
 import ch.ethz.idsc.amodeus.traveldata.TravelDataGet;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
@@ -164,14 +168,13 @@ public enum ScenarioServer {
 
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
+        GlobalAssert.that(!Objects.isNull(travelData));
 
-        // new DataCollector(configFile, outputdirectory, controler, //
-        // minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
-        // analyzeSummary, network, population, travelData);
-        //
-        // // generate report
-        // Report reportGenerator = new Report();
-        // reportGenerator.from(configFile, outputdirectory);
+
+        new DataCollector(configFile, outputdirectory,analyzeSummary);
+
+        // generate report
+        Report.using(configFile, outputdirectory).generate();
 
     }
 

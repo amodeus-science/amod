@@ -86,7 +86,7 @@
 		</repository>
 		<repository>
 			<id>owly-mvn-repo</id>
-			<url>https://raw.github.com/idsc-frazzoli/owly/mvn-repo/</url>
+			<url>https://raw.github.com/idsc-frazzoli/owl/mvn-repo/</url>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
