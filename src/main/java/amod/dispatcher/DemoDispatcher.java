@@ -1,6 +1,5 @@
 package amod.dispatcher;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,10 +18,9 @@ import ch.ethz.idsc.amodeus.dispatcher.core.DispatcherUtils;
 import ch.ethz.idsc.amodeus.dispatcher.core.RebalancingDispatcher;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.utils.DrivebyRequestStopper;
-import ch.ethz.idsc.amodeus.utils.SafeConfig;
+import ch.ethz.idsc.amodeus.matsim.SafeConfig;
 import ch.ethz.matsim.av.config.AVDispatcherConfig;
 import ch.ethz.matsim.av.dispatcher.AVDispatcher;
-import ch.ethz.matsim.av.dispatcher.AVDispatcher.AVDispatcherFactory;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 

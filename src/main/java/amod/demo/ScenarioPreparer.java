@@ -12,12 +12,12 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 
-import ch.ethz.idsc.amodeus.filehandling.MultiFileTools;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.prep.FacilitiesPreparer;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.amodeus.prep.PopulationPreparer;
 import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
+import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of
