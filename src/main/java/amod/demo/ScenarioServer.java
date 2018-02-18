@@ -24,6 +24,7 @@ import com.google.inject.name.Names;
 import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
+import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.html.DataCollector;
 import ch.ethz.idsc.amodeus.html.Report;
@@ -37,9 +38,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.traveldata.TravelData;
 import ch.ethz.idsc.amodeus.traveldata.TravelDataGet;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
@@ -65,11 +64,10 @@ public enum ScenarioServer {
          * instance viewer client */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
         File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
-        ReferenceFrame referenceFrame = scenarioOptions.getReferenceFrame();
-        // Referenceframe needs to be set manually in IDSCOptions.properties
-        GlobalAssert.that(!Objects.isNull(referenceFrame));
         // Locationspec needs to be set manually in IDSCOptions.properties
-        GlobalAssert.that(!Objects.isNull(scenarioOptions.getLocationSpec()));
+        // Referenceframe needs to be set manually in IDSCOptions.properties
+        LocationSpec locationSpec = scenarioOptions.getLocationSpec();
+        ReferenceFrame referenceFrame = locationSpec.referenceFrame();
 
         // open server port for clients to connect to
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
@@ -99,7 +97,7 @@ public enum ScenarioServer {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
-        GlobalAssert.that(scenario != null && network != null && population != null);
+        GlobalAssert.that(network != null && population != null);
 
         // load linkSpeedData
         // File linkSpeedDataFile = new File(workingDirectory,
@@ -170,8 +168,7 @@ public enum ScenarioServer {
         }
         GlobalAssert.that(!Objects.isNull(travelData));
 
-
-        new DataCollector(configFile, outputdirectory,analyzeSummary);
+        new DataCollector(configFile, outputdirectory, analyzeSummary);
 
         // generate report
         Report.using(configFile, outputdirectory).generate();
