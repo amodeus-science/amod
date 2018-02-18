@@ -3,12 +3,12 @@ package amod.demo;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Objects;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
+import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.gfx.AmodeusComponent;
 import ch.ethz.idsc.amodeus.gfx.AmodeusViewerFrame;
@@ -53,11 +53,10 @@ public enum ScenarioViewer {
         // System.out.println("showing simulation results stored in folder: " +
         // outputDirectory.getName());
 
-        ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
-        /** reference frame needs to be set manually in IDSCOptions.properties
-         * file */
-        GlobalAssert.that(Objects.nonNull(referenceFrame));
-        GlobalAssert.that(Objects.nonNull(simOptions.getLocationSpec()));
+        /** reference frame needs to be set manually in IDSCOptions.properties file */
+        LocationSpec locationSpec = simOptions.getLocationSpec();
+        ReferenceFrame referenceFrame = locationSpec.referenceFrame();
+
         Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("simuConfig")));
         System.out.println("INFO network loaded");
         System.out.println("INFO total links " + network.getLinks().size());
