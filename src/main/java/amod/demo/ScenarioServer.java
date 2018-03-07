@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -28,9 +27,9 @@ import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.html.DataCollector;
 import ch.ethz.idsc.amodeus.html.Report;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.IDSCDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.IDSCGeneratorModule;
-import ch.ethz.idsc.amodeus.matsim.mod.IDSCQSimProvider;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -112,7 +111,6 @@ public enum ScenarioServer {
         // controler.addControlerListener(new ControlerDebugger(controler));
         // controler.addOverridingModule(new TrafficDataModule(lsData));
         controler.addOverridingModule(new DvrpTravelTimeModule());
-        controler.addOverridingModule(new DynQSimModule<>(IDSCQSimProvider.class));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
         // controler.addOverridingModule(new AVTravelTimeModule());
@@ -124,6 +122,7 @@ public enum ScenarioServer {
                 bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
             }
         });
+        controler.addOverridingModule(new AmodeusModule());
 
         controler.addOverridingModule(new AbstractModule() {
             @Override
