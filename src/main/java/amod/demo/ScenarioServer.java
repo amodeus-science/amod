@@ -28,6 +28,7 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.html.DataCollector;
 import ch.ethz.idsc.amodeus.html.Report;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
+import ch.ethz.idsc.amodeus.matsim.mod.DefaultVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.matsim.mod.IDSCDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.IDSCGeneratorModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
@@ -131,6 +132,10 @@ public enum ScenarioServer {
             }
         });
 
+        if (false) { // You need to activate this if you want to use a dispatcher that needs a virtual network!
+        	controler.addOverridingModule(new DefaultVirtualNetworkModule());
+        }
+        
         // run simulation
         controler.run();
 
