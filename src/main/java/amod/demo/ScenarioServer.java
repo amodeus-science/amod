@@ -170,7 +170,7 @@ public enum ScenarioServer {
         new DataCollector(configFile, outputdirectory, analyzeSummary);
 
         // generate report
-        Report.using(configFile, outputdirectory).generate();
+        Report.using(configFile, outputdirectory,scenarioOptions).generate();
 
     }
 
