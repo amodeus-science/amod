@@ -22,11 +22,8 @@ import com.google.inject.name.Names;
 
 import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
-import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-import ch.ethz.idsc.amodeus.html.DataCollector;
-import ch.ethz.idsc.amodeus.html.Report;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.IDSCDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.IDSCGeneratorModule;
@@ -146,7 +143,9 @@ public enum ScenarioServer {
         // exception.printStackTrace();
         // }
 
-        AnalysisSummary analyzeSummary = Analysis.now(configFile, outputdirectory, population, referenceFrame);
+        Analysis analysis = new Analysis(configFile, null, outputdirectory, referenceFrame);
+        analysis.run();
+
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         //
         // MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
@@ -167,10 +166,10 @@ public enum ScenarioServer {
         }
         GlobalAssert.that(!Objects.isNull(travelData));
 
-        new DataCollector(configFile, outputdirectory, analyzeSummary);
+        // new DataCollector(configFile, outputdirectory, analyzeSummary);
 
         // generate report
-        Report.using(configFile, outputdirectory,scenarioOptions).generate();
+        // Report.using(configFile, outputdirectory,scenarioOptions).generate();
 
     }
 
