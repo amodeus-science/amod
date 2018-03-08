@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
+import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.gfx.AmodeusComponent;
@@ -54,6 +55,7 @@ public enum ScenarioViewer {
         // outputDirectory.getName());
 
         /** reference frame needs to be set manually in IDSCOptions.properties file */
+        Static.setup();
         LocationSpec locationSpec = simOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
 

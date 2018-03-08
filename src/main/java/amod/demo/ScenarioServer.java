@@ -20,6 +20,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
+import amod.demo.ext.Static;
 import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
@@ -62,6 +63,7 @@ public enum ScenarioServer {
         File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
         // Locationspec needs to be set manually in IDSCOptions.properties
         // Referenceframe needs to be set manually in IDSCOptions.properties
+        Static.setup();
         LocationSpec locationSpec = scenarioOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
 

@@ -9,7 +9,7 @@ import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.ReferenceFrames;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 
-enum AnalysisDemo {
+enum StandaloneAnalysis {
     ;
 
     /** to be executed in simulation directory to perform analysis

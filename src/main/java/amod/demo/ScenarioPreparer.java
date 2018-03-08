@@ -12,6 +12,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 
+import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.prep.FacilitiesPreparer;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
@@ -33,6 +34,7 @@ public enum ScenarioPreparer {
     }
 
     public static void run(File workingDirectory) throws MalformedURLException, Exception {
+        Static.setup();
 
         // run preparer in simulation working directory
         ScenarioOptions scenarioOptions = ScenarioOptions.load(workingDirectory);
