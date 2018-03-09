@@ -62,20 +62,21 @@ public enum ScenarioPreparer {
 
     }
 
-    public static void createSimulationConfigFile(Config fullConfig, ScenarioOptions scenOptions) {
-
-        // change population and network such that converted is loaded
-        fullConfig.network().setInputFile(scenOptions.getPreparedNetworkName() + ".xml.gz");
-        fullConfig.plans().setInputFile(scenOptions.getPreparedPopulationName() + ".xml.gz");
-        fullConfig.facilities().setInputFile(scenOptions.getPreparedFacilitiesName() + ".xml.gz");
-
-        // // Add activities which are not set. (SCenario dependant)
-        // IncludeActTypeOf.baselineCH(fullConfig);
-
-        AVConfigGroup avConfigGroup = new AVConfigGroup();
-        fullConfig.addModule(avConfigGroup);
-
-        // save under correct name
-        new ConfigWriter(fullConfig).writeFileV2(scenOptions.getSimulationConfigName());
-    }
+    // TODO use amodeus ConfigCreator
+//    public static void createSimulationConfigFile(Config fullConfig, ScenarioOptions scenOptions) {
+//
+//        // change population and network such that converted is loaded
+//        fullConfig.network().setInputFile(scenOptions.getPreparedNetworkName() + ".xml.gz");
+//        fullConfig.plans().setInputFile(scenOptions.getPreparedPopulationName() + ".xml.gz");
+//        fullConfig.facilities().setInputFile(scenOptions.getPreparedFacilitiesName() + ".xml.gz");
+//
+//        // // Add activities which are not set. (SCenario dependant)
+//        // IncludeActTypeOf.baselineCH(fullConfig);
+//
+//        AVConfigGroup avConfigGroup = new AVConfigGroup();
+//        fullConfig.addModule(avConfigGroup);
+//
+//        // save under correct name
+//        new ConfigWriter(fullConfig).writeFileV2(scenOptions.getSimulationConfigName());
+//    }
 }
