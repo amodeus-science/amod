@@ -5,8 +5,8 @@ import java.io.File;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
+import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
-import ch.ethz.idsc.amodeus.data.ReferenceFrames;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 
 enum StandaloneAnalysis {
@@ -16,18 +16,14 @@ enum StandaloneAnalysis {
      * 
      * @throws Exception */
     public static void main(String[] args) throws Exception {
+        Static.setup();
         File workingDirectory = new File("").getCanonicalFile();
         ScenarioOptions scenOptions = ScenarioOptions.load(workingDirectory);
         File configFile = new File(workingDirectory, scenOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(configFile.toString());
         String outputdirectory = config.controler().getOutputDirectory();
-        // Analysis.now(configFile, outputdirectory, null, ReferenceFrames.IDENTITY);
 
-        Analysis analysis = new Analysis( //
-                configFile, //
-                workingDirectory, //
-                outputdirectory, //
-                ReferenceFrames.IDENTITY);
+        Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory));
         analysis.run();
     }
 
