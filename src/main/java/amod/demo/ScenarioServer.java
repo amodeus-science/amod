@@ -145,7 +145,7 @@ public enum ScenarioServer {
         // exception.printStackTrace();
         // }
 
-        Analysis analysis = new Analysis(configFile, null, outputdirectory, referenceFrame);
+        Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory));
         analysis.run();
 
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
