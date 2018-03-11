@@ -1,4 +1,4 @@
-package amod.demo;
+package amod.demo.analysis;
 
 import java.io.File;
 
@@ -9,7 +9,7 @@ import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 
-enum StandaloneAnalysis {
+enum CustomAnalysis {
     ;
 
     /** to be executed in simulation directory to perform analysis
@@ -24,6 +24,10 @@ enum StandaloneAnalysis {
         String outputdirectory = config.controler().getOutputDirectory();
 
         Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory));
+        SingleCarElement singleCarElement = new SingleCarElement();
+        analysis.addAnalysisElement(singleCarElement);
+        SingleCarHtml singleCarHtml = new SingleCarHtml(singleCarElement);
+        analysis.addHtmlElement(singleCarHtml);
         analysis.run();
     }
 
