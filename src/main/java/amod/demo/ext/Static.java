@@ -12,10 +12,9 @@ public enum Static {
         for (LocationSpec locationSpec : UserLocationSpecs.values())
             LocationSpecs.DATABASE.put(locationSpec);
 
-        checkGLPKLib();
     }
 
-    private static void checkGLPKLib() {
+    public static void checkGLPKLib() {
         try {
             System.out.println("Working with GLPK version " + GLPK.glp_version());
         } catch (Exception e) {
