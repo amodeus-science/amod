@@ -52,6 +52,7 @@ public enum ScenarioServer {
      * @throws Exception */
     /* package */ public static void simulate() throws MalformedURLException, Exception {
         Static.setup();
+        Static.checkGLPKLib();
 
         /** working directory and options */
         File workingDirectory = MultiFileTools.getWorkingDirectory();
