@@ -16,6 +16,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 import amod.demo.ext.Static;
