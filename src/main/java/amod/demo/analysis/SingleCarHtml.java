@@ -3,9 +3,10 @@ package amod.demo.analysis;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.w3c.dom.html.HTMLBodyElement;
+
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.report.BodyElementKeys;
-import ch.ethz.idsc.amodeus.analysis.report.HTMLBodyElement;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlReportElement;
 
 public class SingleCarHtml implements HtmlReportElement {
