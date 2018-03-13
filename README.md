@@ -1,4 +1,4 @@
-# ch.ethz.idsc.amod
+# ch.ethz.idsc.amod <a href="https://travis-ci.org/idsc-frazzoli/amod"><img src="https://travis-ci.org/idsc-frazzoli/amod.svg?branch=master" alt="Build Status"></a>
 
 The code format of the `amod` repository is specified in the `amodeus` profile that you can import from `amodeus-code-style.xml` in the the `amodeus` repository.
 
