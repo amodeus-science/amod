@@ -37,6 +37,7 @@ public enum ScenarioPreparer {
      * @throws Exception */
     public static void run(File workingDirectory) throws MalformedURLException, Exception {
         Static.setup();
+        Static.checkGLPKLib();
 
         /** amodeus options */
         ScenarioOptions scenarioOptions = ScenarioOptions.load(workingDirectory);
