@@ -5,7 +5,7 @@ import java.util.Map;
 
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.report.BodyElementKeys;
-import ch.ethz.idsc.amodeus.analysis.report.HTMLBodyElement;
+import ch.ethz.idsc.amodeus.analysis.report.HtmlBodyElement;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlReportElement;
 
 public class SingleCarHtml implements HtmlReportElement {
@@ -19,9 +19,9 @@ public class SingleCarHtml implements HtmlReportElement {
     }
 
     @Override
-    public Map<String, HTMLBodyElement> process(AnalysisSummary analysisSummary) {
-        Map<String, HTMLBodyElement> bodyElements = new HashMap<>();
-        HTMLBodyElement aRElement = new HTMLBodyElement();
+    public Map<String, HtmlBodyElement> process(AnalysisSummary analysisSummary) {
+        Map<String, HtmlBodyElement> bodyElements = new HashMap<>();
+        HtmlBodyElement aRElement = new HtmlBodyElement();
         aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + STATUSDISTRIBUTIONFILENAME + ".png", 800, 600);
         bodyElements.put(BodyElementKeys.FLEETEFFICIENCY, aRElement);
         return bodyElements;

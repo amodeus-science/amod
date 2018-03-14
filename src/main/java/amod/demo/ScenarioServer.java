@@ -24,10 +24,10 @@ import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.DefaultVirtualNetworkModule;
-import ch.ethz.idsc.amodeus.matsim.mod.IDSCDispatcherModule;
-import ch.ethz.idsc.amodeus.matsim.mod.IDSCGeneratorModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -108,8 +108,8 @@ public enum ScenarioServer {
         controler.addOverridingModule(new DvrpTravelTimeModule());
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
-        controler.addOverridingModule(new IDSCGeneratorModule());
-        controler.addOverridingModule(new IDSCDispatcherModule());
+        controler.addOverridingModule(new AmodeusGeneratorModule());
+        controler.addOverridingModule(new AmodeusDispatcherModule());
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
