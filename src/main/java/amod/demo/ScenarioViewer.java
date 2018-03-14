@@ -20,8 +20,7 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
 
-/** the viewer allows to connect to the scenario server or to view saved
- * simulation results. */
+/** the viewer allows to connect to the scenario server or to view saved simulation results. */
 public enum ScenarioViewer {
     ;
 
@@ -30,11 +29,9 @@ public enum ScenarioViewer {
         run(workingDirectory);
     }
 
-    /** Execute in simulation folder to view past results or connect to
-     * simulation s
+    /** Execute in simulation folder to view past results or connect to simulation server
      * 
-     * @param args
-     *            not used
+     * @param args not used
      * @throws FileNotFoundException
      * @throws IOException */
     public static void run(File workingDirectory) throws FileNotFoundException, IOException {
@@ -69,10 +66,10 @@ public enum ScenarioViewer {
         amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
         /** starting the viewer */
-        AmodeusViewerFrame matsimViewer = new AmodeusViewerFrame(amodeusComponent, outputDirectory);
-        matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
-        matsimViewer.jFrame.setSize(900, 900);
-        matsimViewer.jFrame.setVisible(true);
+        AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory);
+        amodeusViewerFrame.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
+        amodeusViewerFrame.jFrame.setSize(900, 900);
+        amodeusViewerFrame.jFrame.setVisible(true);
     }
 
 }
