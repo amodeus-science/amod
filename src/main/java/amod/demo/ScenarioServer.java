@@ -25,6 +25,7 @@ import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
+import ch.ethz.idsc.amodeus.matsim.mod.DefaultVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.matsim.mod.IDSCDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.IDSCGeneratorModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
@@ -50,7 +51,8 @@ public enum ScenarioServer {
      * 
      * @throws MalformedURLException
      * @throws Exception */
-    /* package */ public static void simulate() throws MalformedURLException, Exception {
+    @SuppressWarnings("unused")
+    public static void simulate() throws MalformedURLException, Exception {
         Static.setup();
         Static.checkGLPKLib();
 
@@ -122,6 +124,10 @@ public enum ScenarioServer {
                 AVUtils.registerDispatcherFactory(binder(), "DemoDispatcher", DemoDispatcher.Factory.class);
             }
         });
+
+        if (false) { // You need to activate this if you want to use a dispatcher that needs a virtual network!
+            controler.addOverridingModule(new DefaultVirtualNetworkModule());
+        }
 
         /** run simulation */
         controler.run();
