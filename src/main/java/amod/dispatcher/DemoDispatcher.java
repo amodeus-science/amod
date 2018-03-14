@@ -97,6 +97,7 @@ public class DemoDispatcher extends RebalancingDispatcher {
         private EventsManager eventsManager;
 
         @Inject
+        @Named(AVModule.AV_MODE)
         private Network network;
 
         @Inject
