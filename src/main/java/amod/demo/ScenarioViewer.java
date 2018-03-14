@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
+import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.gfx.AmodeusComponent;
@@ -37,8 +38,9 @@ public enum ScenarioViewer {
      * @throws FileNotFoundException
      * @throws IOException */
     public static void run(File workingDirectory) throws FileNotFoundException, IOException {
+        Static.setup();
 
-        // load options
+        /** load options */
         ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
         Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
         System.out.println(simOptions.getSimulationConfigName());
@@ -47,30 +49,26 @@ public enum ScenarioViewer {
         System.out.println("outputSubDirectory=" + outputSubDirectory);
         System.out.println(outputSubDirectory.getAbsolutePath());
         File outputDirectory = outputSubDirectory.getParentFile();
-        System.out.println("outputDirectory=" + outputDirectory);
+        System.out.println("showing simulation results from outputDirectory=" + outputDirectory);
 
-        System.out.println(outputSubDirectory.getAbsolutePath());
-        // System.out.println("showing simulation results stored in folder: " +
-        // outputDirectory.getName());
-
-        /** reference frame needs to be set manually in IDSCOptions.properties file */
+        /** geopgrahic information, .e.g., coordinate system */
         LocationSpec locationSpec = simOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
 
+        /** MATSim simulation network */
         Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("simuConfig")));
         System.out.println("INFO network loaded");
         System.out.println("INFO total links " + network.getLinks().size());
         System.out.println("INFO total nodes " + network.getNodes().size());
 
-        // load viewer
+        /** initializing the viewer */
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-
         AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(MatsimStaticDatabase.INSTANCE);
 
-        /** this is optional and should not cause problems if file does not
-         * exist. temporary solution */
+        /** virtual network layer, should not cause problems if layer does not exist */
         amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
+        /** starting the viewer */
         AmodeusViewerFrame matsimViewer = new AmodeusViewerFrame(amodeusComponent, outputDirectory);
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
         matsimViewer.jFrame.setSize(900, 900);

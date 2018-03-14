@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.util.Objects;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -20,13 +19,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
+import amod.demo.ext.Static;
 import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
-import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-import ch.ethz.idsc.amodeus.html.DataCollector;
-import ch.ethz.idsc.amodeus.html.Report;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.DefaultVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.matsim.mod.IDSCDispatcherModule;
@@ -35,12 +32,8 @@ import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.traveldata.TravelData;
-import ch.ethz.idsc.amodeus.traveldata.TravelDataGet;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
-import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.framework.AVUtils;
@@ -54,31 +47,35 @@ public enum ScenarioServer {
         simulate();
     }
 
-    /* package */ public static void simulate() throws MalformedURLException, Exception {
-        // load options
+    /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml
+     * 
+     * @throws MalformedURLException
+     * @throws Exception */
+    @SuppressWarnings("unused")
+    public static void simulate() throws MalformedURLException, Exception {
+        Static.setup();
+        Static.checkGLPKLib();
+
+        /** working directory and options */
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         ScenarioOptions scenarioOptions = ScenarioOptions.load(workingDirectory);
-        System.out.println("Start--------------------"); // added no
 
         /** set to true in order to make server wait for at least 1 client, for
-         * instance viewer client */
+         * instance viewer client, for fals the ScenarioServer starts the simulation
+         * immediately */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
         File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
-        // Locationspec needs to be set manually in IDSCOptions.properties
-        // Referenceframe needs to be set manually in IDSCOptions.properties
+
+        /** geographic information */
         LocationSpec locationSpec = scenarioOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
 
-        // open server port for clients to connect to
+        /** open server port for clients to connect to */
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
         SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
-        // load MATSim configs - including av.xml where dispatcher is selected.
-        System.out.println("loading config file " + configFile.getAbsoluteFile());
-
-        GlobalAssert.that(configFile.exists()); // Test whether the config file
-                                                // directory exists
-
+        /** load MATSim configs - including av.xml configurations, load routing packages */
+        GlobalAssert.that(configFile.exists());
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
@@ -87,18 +84,17 @@ public enum ScenarioServer {
             activityParams.setTypicalDuration(3600.0); // TODO fix this to meaningful values
         }
 
-        // IncludeActTypeOf.zurichConsensus(config);
-        // IncludeActTypeOf.artificial(config);
-
+        /** output directory for saving results */
         String outputdirectory = config.controler().getOutputDirectory();
-        System.out.println("outputdirectory = " + outputdirectory);
 
-        // load scenario for simulation
+        /** load MATSim scenario for simulation */
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
-        GlobalAssert.that(network != null && population != null);
+        GlobalAssert.that(Objects.nonNull(network));
+        GlobalAssert.that(Objects.nonNull(population));
 
+        // TODO ensure that Linkspeed info properly included
         // load linkSpeedData
         // File linkSpeedDataFile = new File(workingDirectory,
         // scenarioOptions.getLinkSpeedDataName());
@@ -109,12 +105,9 @@ public enum ScenarioServer {
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
-        // controler.addControlerListener(new ControlerDebugger(controler));
-        // controler.addOverridingModule(new TrafficDataModule(lsData));
         controler.addOverridingModule(new DvrpTravelTimeModule());
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
-        // controler.addOverridingModule(new AVTravelTimeModule());
         controler.addOverridingModule(new IDSCGeneratorModule());
         controler.addOverridingModule(new IDSCDispatcherModule());
         controler.addOverridingModule(new AbstractModule() {
@@ -133,55 +126,23 @@ public enum ScenarioServer {
         });
 
         if (false) { // You need to activate this if you want to use a dispatcher that needs a virtual network!
-        	controler.addOverridingModule(new DefaultVirtualNetworkModule());
+            controler.addOverridingModule(new DefaultVirtualNetworkModule());
         }
-        
-        // run simulation
+
+        /** run simulation */
         controler.run();
 
-        // close port for visualization
+        /** close port for visualizaiton */
         SimulationServer.INSTANCE.stopAccepting();
 
-        // perform analysis of results
-        // try {
-        // // FIXME this should never crash
-        // new TrainXTravelTime(population).plotHistogram(workingDirectory);
-        // } catch (Exception exception) {
-        // System.err.println("something went wrong");
-        // exception.printStackTrace();
-        // }
-
-        AnalysisSummary analyzeSummary = Analysis.now(configFile, outputdirectory, population, referenceFrame);
-        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
-        //
-        // MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
-        // Performa nceFleetSizeCalculator performanceFleetSizeCalculator = null;
-        TravelData travelData = null;
-        if (virtualNetwork != null) {
-            // minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
-            // performanceFleetSizeCalculator =
-            // PerformanceFleetSizeGet.readDefault();
-            // if (performanceFleetSizeCalculator != null) {
-            // String dataFolderName = outputdirectory + "/data";
-            // File relativeDirectory = new File(dataFolderName);
-            // performanceFleetSizeCalculator.saveAndPlot(dataFolderName,
-            // relativeDirectory);
-            // }
-
-            travelData = TravelDataGet.readDefault(virtualNetwork);
-        }
-        GlobalAssert.that(!Objects.isNull(travelData));
-
-        new DataCollector(configFile, outputdirectory, analyzeSummary);
-
-        // generate report
-        Report.using(configFile, outputdirectory).generate();
+        /** perform analysis of simulation */
+        Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory));
+        // TODO put sample of custom analysis element
+        analysis.run();
 
     }
 
     public static void clearMemory() {
-        // ToDO Clear the memory for the sequential Server such that the RAM is
-        // not limited.
-
+        // TODO clear memory for the sequential server such that RAM is not limiting
     }
 }

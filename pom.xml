@@ -16,7 +16,7 @@
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>amodeus</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
@@ -58,6 +58,11 @@
 			<artifactId>jaxb-api</artifactId>
 			<version>2.2.8</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>4.1.0</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -90,6 +95,14 @@
 		<repository>
 			<id>jmex-mvn-repo</id>
 			<url>https://raw.github.com/idsc-frazzoli/jmex/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>amodeus-mvn-repo</id>
+			<url>https://raw.github.com/idsc-frazzoli/amodeus/mvn-repo/</url>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
