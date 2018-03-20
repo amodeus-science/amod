@@ -3,33 +3,90 @@
 The code format of the `amod` repository is specified in the `amodeus` profile that you can import from `amodeus-code-style.xml` in the the `amodeus` repository.
 
 
-## CODE
 
-0) ensure maven tests are working properly
-1) Eliminate all TODOs, partly completed.
-2) Include the SF Scenario and all needed parts, included, but still problem with distances to be solved by Claudio, initial scneario based on 100 taxi traces completed. 
-3) Remove all notions of AV and replace with robotaxi, partly completed.
-4) Add authorship and licensing information everywhere. CLAUDIO
-5) Add maven testing, partly completed, not running on all machines, e.g., on Claudio's machine. Should run on all machines. 
-5) Solve GLPK problem: GLPK highly limits the easiness of use and installation. New solver? Try- catch and message to user? ...
-6) Ensure that 3rd party code is labelled, used corectly. 
-7) Move all input settings to one place: av_config.xml, av.xml, IDSCoptions
-8) Make one superfile "amod Start" with input options and output, input: pop-size, dispatcher, ... all in one config object,  output visualizer, report and data 
-9) More commenting and Javadoc, code documentation.
-10) Remove extra code from amodeustools, partly completed.
 
-## API
-1) Do the homepage including the ranking.
-2) Provide basic installation guidelines
-3) Make public for test customers (or add them to github)
 
-## PUBLICATION
-* Finish the paper. 
+Sample usage of amodeus, the autonomous mobility-on-demand simulation library, version `1.0.0`
+(https://github.com/idsc-frazzoli/amodeus)
 
-## INTEGRATION
-1) Claudio: integrate local files into amodidsc, started
-2) For as many pieces as meaningful: test in amodeus, then make sure tests are written in amodeus, delete from matsim and add references to amodeus, started
+## Purpose
 
-## COMPLETED
-1) Make matsim private and conserve history
+This library offers a basic code implementation that allows to run an autonomous mobility-on-demand scenario with the amodeus library.
+
+Try it, orchestrate your own fleet of amod-taxis!
+
+## Getting Started
+
+
+- You may work on a Linux, Mac or Windows OS with a set of different possible IDEs. The combination Ubuntu, Eclipse has worked well. 
+- Install Java SE Development Kit X (preferably most recent) 
+- Install Apache Maven
+- Install IDE (Ideally Eclipse)
+- Install GLPK and GLPK for Java (Ensure your install compatible versions)
+
+
+## Installation guidelines for amod repository
+
+1. Clone amod
+2. Import to eclipse as existing maven project using the pom.xml in the top folder.
+3. Set up Run Configurations for: (ScenarioPreparer; ScenarioServer; ScenarioViewer), chose the Working Directory to be the top Simulation Folder directory.
+4. Add JAVA VM arguments if necessary, e.g., -Xmx10000m to run with 10 GB of RAM. 
+5. Run the ScenarioPreparer main Function
+6. Run the ScenarioServer main Function, the simulation should run.
+7. Run the ScenarioViewer main Function, a viewer should open that allows visualization of the scenario.
+
+
+
+
+## Gallery
+
+<table>
+<tr>
+<td>
+
+![usecase_amodeus](https://user-images.githubusercontent.com/4012178/35968174-668b6e54-0cc3-11e8-9c1b-a3e011fa0600.png)
+
+Zurich
+
+<td>
+
+![San Francisco](https://user-images.githubusercontent.com/4012178/37365948-4ab45794-26ff-11e8-8e2d-ceb1b526e962.png)
+
+San Francisco
+
+</table>
+
+## Integration
+
+Specify `repository` and `dependency` of the amodeus library in the `pom.xml` file of your maven project:
+
+    <repositories>
+      <repository>
+        <id>amodeus-mvn-repo</id>
+        <url>https://raw.github.com/idsc-frazzoli/amodeus/mvn-repo/</url>
+        <snapshots>
+          <enabled>true</enabled>
+          <updatePolicy>always</updatePolicy>
+        </snapshots>
+      </repository>
+    </repositories>
+    
+    <dependencies>
+      <dependency>
+        <groupId>ch.ethz.idsc</groupId>
+        <artifactId>amodeus</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+    </dependencies>
+
+The source code is attached to every release.
+
+
+
+
+
+
+
+
+
 
