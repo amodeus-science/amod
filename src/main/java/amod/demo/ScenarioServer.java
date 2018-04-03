@@ -20,6 +20,7 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 import amod.demo.ext.Static;
+import amod.demo.ext.UserLocationSpecsTest;
 import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
@@ -27,6 +28,9 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
+//import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
+//import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
+//import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
@@ -97,7 +101,7 @@ public enum ScenarioServer {
         GlobalAssert.that(Objects.nonNull(network));
         GlobalAssert.that(Objects.nonNull(population));
 
-        // load linkSpeedData
+//        // load linkSpeedData
         File linkSpeedDataFile = new File(workingDirectory, scenarioOptions.getLinkSpeedDataName());
         System.out.println(linkSpeedDataFile.toString());
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
