@@ -22,7 +22,9 @@ Try it, orchestrate your own fleet of amod-taxis!
 - Install Java SE Development Kit X (preferably most recent) 
 - Install Apache Maven
 - Install IDE (Ideally Eclipse)
-- Install GLPK and GLPK for Java (Ensure your install compatible versions)
+- Install GLPK and GLPK for Java (Ensure you install compatible versions, e.g. [here](http://glpk-java.sourceforge.net/gettingStarted.html))
+	- Prerequisites are: GCC, Libtool, Swig and Subversion
+- Install Git and connect to GitHub with [SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 
 
 ## Installation guidelines for amod repository
