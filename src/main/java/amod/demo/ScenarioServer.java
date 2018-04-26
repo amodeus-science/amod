@@ -116,7 +116,7 @@ public enum ScenarioServer {
                 bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
             }
         });
-        controler.addOverridingModule(new AmodeusModule());
+        controler.addOverridingModule(new AmodeusModule(scenarioOptions));
 
         controler.addOverridingModule(new AbstractModule() {
             @Override
