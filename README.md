@@ -2,7 +2,7 @@
 
 This repository allows to run an autonomous mobility-on-demand scenario using the amodeus library (https://github.com/idsc-frazzoli/amodeus).
 
-Try it, orchestrate your own fleet of amod-taxis!
+Try it, orchestrate your own fleet of amod-taxis! Watch a [visualization](https://www.youtube.com/watch?v=QkFtIQQSHto) of a traffic simulation in San Francisco generated using this repository.
 
 <table><tr>
 <td>
