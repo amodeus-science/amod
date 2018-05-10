@@ -30,7 +30,7 @@ The code format of the `amod` repository is specified in the `amodeus` profile t
 - You may work on a Linux, Mac or Windows OS with a set of different possible IDEs. The combination Ubuntu, Eclipse has worked well. 
 - Install Java SE Development Kit X (preferably most recent) 
 - Install Apache Maven
-- Install IDE (Ideally Eclipse)
+- Install IDE (ideally Eclipse)
 - Install GLPK and GLPK for Java (Ensure you install compatible versions, e.g. [here](http://glpk-java.sourceforge.net/gettingStarted.html))
 	- Prerequisites are: GCC, Libtool, Swig and Subversion
 - Install Git and connect to GitHub with [SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
@@ -40,7 +40,7 @@ The code format of the `amod` repository is specified in the `amodeus` profile t
 
 1. Clone amod
 2. Import to eclipse as existing maven project using the pom.xml in the top folder.
-3. Set up Run Configurations for: (ScenarioPreparer; ScenarioServer; ScenarioViewer), chose the Working Directory to be the top Simulation Folder directory.
+3. Set up Run Configurations for: (ScenarioPreparer; ScenarioServer; ScenarioViewer), chose the Working Directory to be the top Simulation Folder directory. You can get a sample simulation scenario at http://www.idsc.ethz.ch/research-frazzoli/amodeus.html
 4. Add JAVA VM arguments if necessary, e.g., -Xmx10000m to run with 10 GB of RAM. 
 5. Run the ScenarioPreparer main Function
 6. Run the ScenarioServer main Function, the simulation should run.
