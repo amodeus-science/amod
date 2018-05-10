@@ -101,7 +101,7 @@ public enum ScenarioServer {
         GlobalAssert.that(Objects.nonNull(network));
         GlobalAssert.that(Objects.nonNull(population));
 
-//        // load linkSpeedData
+        // load linkSpeedData
         File linkSpeedDataFile = new File(workingDirectory, scenarioOptions.getLinkSpeedDataName());
         System.out.println(linkSpeedDataFile.toString());
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
