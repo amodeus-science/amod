@@ -24,6 +24,9 @@ import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
+import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
+import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
+import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
@@ -94,18 +97,18 @@ public enum ScenarioServer {
         GlobalAssert.that(Objects.nonNull(network));
         GlobalAssert.that(Objects.nonNull(population));
 
-        // TODO ensure that Linkspeed info properly included
+        
         // load linkSpeedData
-        // File linkSpeedDataFile = new File(workingDirectory,
-        // scenarioOptions.getLinkSpeedDataName());
-        // System.out.println(linkSpeedDataFile.toString());
-        // LinkSpeedDataContainer lsData =
-        // LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
-
+        File linkSpeedDataFile = new File(workingDirectory, scenarioOptions.getLinkSpeedDataName());
+        System.out.println(linkSpeedDataFile.toString());
+        LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
+        
+        
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(new DvrpTravelTimeModule());
+        controler.addOverridingModule(new TrafficDataModule(lsData));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusGeneratorModule());
