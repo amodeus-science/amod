@@ -1,3 +1,4 @@
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.demo;
 
 import java.io.File;
@@ -97,13 +98,11 @@ public enum ScenarioServer {
         GlobalAssert.that(Objects.nonNull(network));
         GlobalAssert.that(Objects.nonNull(population));
 
-        
         // load linkSpeedData
         File linkSpeedDataFile = new File(workingDirectory, scenarioOptions.getLinkSpeedDataName());
         System.out.println(linkSpeedDataFile.toString());
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
-        
-        
+
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
