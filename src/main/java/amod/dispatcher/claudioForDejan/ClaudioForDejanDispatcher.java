@@ -1,6 +1,7 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.dispatcher.claudioForDejan;
 
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,9 @@ import ch.ethz.idsc.amodeus.matsim.SafeConfig;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
+import ch.ethz.idsc.jmex.Container;
+import ch.ethz.idsc.jmex.java.JavaContainerSocket;
+import ch.ethz.idsc.jmex.matlab.MfileContainerServer;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.matsim.av.config.AVDispatcherConfig;
@@ -37,10 +41,8 @@ import ch.ethz.matsim.av.dispatcher.AVDispatcher;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
-/** Implementation of the "Adaptive Real-Time Rebalancing Policy" presented in
- * Pavone, M., Smith, S.L., Frazzoli, E. and Rus, D., 2012. Robotic load balancing for mobility-on-demand systems.
- * The International Journal of Robotics
- * Research, 31(7), pp.839-854. */
+
+/*claudio wrapper for dejan*/
 public class ClaudioForDejanDispatcher extends PartitionedDispatcher {
     private final int rebalancingPeriod;
     private final int dispatchPeriod;
@@ -53,6 +55,8 @@ public class ClaudioForDejanDispatcher extends PartitionedDispatcher {
     private final DistanceFunction distanceFunction;
     private final DistanceHeuristics distanceHeuristics;
     private final Network network;
+    
+    final JavaContainerSocket javaContainerSocket;
 
     public ClaudioForDejanDispatcher( //
             Config config, AVDispatcherConfig avconfig, //
@@ -68,6 +72,16 @@ public class ClaudioForDejanDispatcher extends PartitionedDispatcher {
         virtualNodeDest = abstractVirtualNodeDest;
         vehicleDestMatcher = abstractVehicleDestMatcher;
         numRobotaxi = (int) generatorConfig.getNumberOfVehicles();
+        try {
+            javaContainerSocket = new JavaContainerSocket(new Socket("localhost", MfileContainerServer.DEFAULT_PORT));
+
+            Container container = ClaudioForDejanUtils.getContainerInit();
+            javaContainerSocket.writeContainer(container);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new RuntimeException(); // dispatcher will not work if
+                                          // constructor has issues
+        }        
         lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
@@ -100,6 +114,14 @@ public class ClaudioForDejanDispatcher extends PartitionedDispatcher {
             Map<VirtualLink<Link>,Integer> rebalanceVehicles = new HashMap<>(); 
             //TODO fill me proplerly
             rebalanceVehicles.put(virtualNetwork.getVirtualLinks().iterator().next(), 1);
+            
+            // TODO send proper stuff
+            javaContainerSocket.writeContainer(ClaudioForDejanUtils.getContainerInit());
+
+            // TODO here your code in the other tool should run
+            
+            Container container = javaContainerSocket.blocking_getContainer();
+            System.out.println("received: " + container);
             
             
             // implement rebalancing and dispatching
