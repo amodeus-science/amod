@@ -11,6 +11,9 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrames;
     SANFRANCISCO( //
             ReferenceFrames.SANFRANCISCO, //
             new Coord(-122.4363005, 37.7511686)), // <- no cutting
+    BERLIN( //
+            UserReferenceFrames.BERLIN, //
+            new Coord(-122.4363005, 37.7511686)), //
     ;
 
     private final ReferenceFrame referenceFrame;
