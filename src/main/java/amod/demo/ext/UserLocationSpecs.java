@@ -5,11 +5,10 @@ import org.matsim.api.core.v01.Coord;
 
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-import ch.ethz.idsc.amodeus.data.ReferenceFrames;
 
 /* package */ enum UserLocationSpecs implements LocationSpec {
     SANFRANCISCO( //
-            ReferenceFrames.SANFRANCISCO, //
+            UserReferenceFrames.SANFRANCISCO, //
             new Coord(-122.4363005, 37.7511686)), // <- no cutting
     BERLIN( //
             UserReferenceFrames.BERLIN, //
