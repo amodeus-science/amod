@@ -4,14 +4,14 @@ package amod.demo.ext;
 import org.gnu.glpk.GLPK;
 
 import ch.ethz.idsc.amodeus.data.LocationSpec;
-import ch.ethz.idsc.amodeus.data.LocationSpecs;
+import ch.ethz.idsc.amodeus.data.LocationSpecDatabase;
 
 public enum Static {
     ;
 
     public static void setup() {
         for (LocationSpec locationSpec : UserLocationSpecs.values())
-            LocationSpecs.DATABASE.put(locationSpec);
+            LocationSpecDatabase.INSTANCE.put(locationSpec);
 
     }
 
