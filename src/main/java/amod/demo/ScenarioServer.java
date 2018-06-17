@@ -112,6 +112,7 @@ public enum ScenarioServer {
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusGeneratorModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
+        controler.addOverridingModule(new DefaultVirtualNetworkModule());        // Added by Lukas June 06, 2018
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
