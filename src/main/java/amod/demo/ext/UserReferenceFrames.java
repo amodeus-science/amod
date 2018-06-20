@@ -16,6 +16,13 @@ public enum UserReferenceFrames implements ReferenceFrame {
 	BERLIN( //
 			new GeotoolsTransformation("EPSG:31468", "WGS84"), //
 			new GeotoolsTransformation("WGS84", "EPSG:31468")), //
+    SANTIAGO_DE_CHILE( //
+            new GeotoolsTransformation("EPSG:32719", "WGS84"), //
+            new GeotoolsTransformation("WGS84", "EPSG:32719")),//
+
+    TEL_AVIV( //
+            new GeotoolsTransformation("EPSG:2039", "WGS84"), //
+            new GeotoolsTransformation("WGS84", "EPSG:2039")),//
 	;
 	// ---
 	private final CoordinateTransformation coords_toWGS84;
