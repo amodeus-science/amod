@@ -58,6 +58,7 @@ public enum ScenarioServer {
     @SuppressWarnings("unused")
     public static void simulate() throws MalformedURLException, Exception {
         Static.setup();
+
         Static.checkGLPKLib();
 
         /** working directory and options */
@@ -69,7 +70,6 @@ public enum ScenarioServer {
          * immediately */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
         File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
-
         /** geographic information */
         LocationSpec locationSpec = scenarioOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
