@@ -40,10 +40,11 @@ The code format of the `amod` repository is specified in the `amodeus` profile t
 1. Clone amod
 2. Import to eclipse as existing maven project using the pom.xml in the top folder.
 3. Set up Run Configurations for: (ScenarioPreparer; ScenarioServer; ScenarioViewer), chose the Working Directory to be the top Simulation Folder directory. You can get a sample simulation scenario at http://www.idsc.ethz.ch/research-frazzoli/amodeus.html
-4. Add JAVA VM arguments if necessary, e.g., `-Xmx10000m` to run with 10 GB of RAM. 
-5. Run the `ScenarioPreparer` as a Java application: wait until termination
-6. Run the `ScenarioServer` as a Java application: the simulation should run
-7. Run the `ScenarioViewer` as a Java application: the visualization of the scenario should open in a separate window
+4. Adjust the simulation settings in the 3 Config files: av.xml for av fleet values (e.g. number vehicles), AmodeusOptions.properties for AMoDeus settings (e.g. max number of people) and config.xml for Matsim settings (e.g. output directory). 
+5. Add JAVA VM arguments if necessary, e.g., `-Xmx10000m` to run with 10 GB of RAM and '-Dmatsim.preferLocalDtds=true' to prefer the local Dtds. 
+6. Run the `ScenarioPreparer` as a Java application: wait until termination
+7. Run the `ScenarioServer` as a Java application: the simulation should run
+8. Run the `ScenarioViewer` as a Java application: the visualization of the scenario should open in a separate window
 
 ## Gallery
 
