@@ -25,6 +25,7 @@ import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.amodeus.net.StorageSupplier;
 import ch.ethz.idsc.amodeus.net.StorageUtils;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
+import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.video.AmodeusComponentUtil;
@@ -44,7 +45,7 @@ public enum SimulationVideoLukas {
         File simOutputDir = new File(workingDirectory, "output/TrainDispatcherLukas/10000_0047");
 
         // load options
-        ScenarioOptions scenarioOptions = ScenarioOptions.load(workingDirectory);
+        ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
         Config config = ConfigUtils.loadConfig(scenarioOptions.getSimulationConfigName());
         final File outputSubDirectory = new File(config.controler().getOutputDirectory()).getAbsoluteFile();
         GlobalAssert.that(outputSubDirectory.isDirectory());
@@ -100,7 +101,7 @@ public enum SimulationVideoLukas {
         Dimension resolution = SimulationObjectsVideo.RESOLUTION_FullHD;
         amodeusComponent.setSize(resolution);
         AmodeusComponentUtil.adjustMapZoom(amodeusComponent, network, scenarioOptions);
-//        amodeusComponent.zoomIn();
+        // amodeusComponent.zoomIn();
         amodeusComponent.zoomIn();
         amodeusComponent.zoomIn();
         amodeusComponent.moveMap(0, 60);

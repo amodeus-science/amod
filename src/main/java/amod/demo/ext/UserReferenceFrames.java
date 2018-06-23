@@ -1,3 +1,4 @@
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.demo.ext;
 
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -7,15 +8,15 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 
 public enum UserReferenceFrames implements ReferenceFrame {
+    BERLIN( //
+            new GeotoolsTransformation("EPSG:31468", "WGS84"), //
+            new GeotoolsTransformation("WGS84", "EPSG:31468")), //
     IDENTITY( //
             new IdentityTransformation(), //
             new IdentityTransformation()), //
     SANFRANCISCO( //
             new GeotoolsTransformation("EPSG:26743", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:26743")), //
-    BERLIN( //
-            new GeotoolsTransformation("EPSG:31468", "WGS84"), //
-            new GeotoolsTransformation("WGS84", "EPSG:31468")), //
     SANTIAGO_DE_CHILE( //
             new GeotoolsTransformation("EPSG:32719", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:32719")), //
