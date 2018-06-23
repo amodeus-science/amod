@@ -13,6 +13,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
+import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.amodeus.prep.PopulationPreparer;
@@ -41,7 +42,7 @@ public enum ScenarioPreparer {
         Static.checkGLPKLib();
 
         /** amodeus options */
-        ScenarioOptions scenarioOptions = ScenarioOptions.load(workingDirectory);
+        ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** MATSim config */
         Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName());
