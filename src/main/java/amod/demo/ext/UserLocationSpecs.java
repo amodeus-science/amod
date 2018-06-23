@@ -12,7 +12,7 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
             new Coord(-122.4363005, 37.7511686)), //
     BERLIN( //
             UserReferenceFrames.BERLIN, //
-            new Coord(-122.4363005, 37.7511686)), //
+            new Coord(4595438.15, 5821747.77)), //
     SANTIAGO_DE_CHILE( //
     		UserReferenceFrames.SANTIAGO_DE_CHILE, //
             new Coord(-3956418.76, -7864204.17 )), //   
