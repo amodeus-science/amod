@@ -13,33 +13,33 @@ public enum UserReferenceFrames implements ReferenceFrame {
     SANFRANCISCO( //
             new GeotoolsTransformation("EPSG:26743", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:26743")), //
-	BERLIN( //
-			new GeotoolsTransformation("EPSG:31468", "WGS84"), //
-			new GeotoolsTransformation("WGS84", "EPSG:31468")), //
+    BERLIN( //
+            new GeotoolsTransformation("EPSG:31468", "WGS84"), //
+            new GeotoolsTransformation("WGS84", "EPSG:31468")), //
     SANTIAGO_DE_CHILE( //
             new GeotoolsTransformation("EPSG:32719", "WGS84"), //
-            new GeotoolsTransformation("WGS84", "EPSG:32719")),//
+            new GeotoolsTransformation("WGS84", "EPSG:32719")), //
 
     TEL_AVIV( //
             new GeotoolsTransformation("EPSG:2039", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:2039")),//
-	;
-	// ---
-	private final CoordinateTransformation coords_toWGS84;
-	private final CoordinateTransformation coords_fromWGS84;
+    ;
+    // ---
+    private final CoordinateTransformation coords_toWGS84;
+    private final CoordinateTransformation coords_fromWGS84;
 
-	private UserReferenceFrames(CoordinateTransformation c1, CoordinateTransformation c2) {
-		coords_toWGS84 = c1;
-		coords_fromWGS84 = c2;
-	}
+    private UserReferenceFrames(CoordinateTransformation c1, CoordinateTransformation c2) {
+        coords_toWGS84 = c1;
+        coords_fromWGS84 = c2;
+    }
 
-	@Override
-	public CoordinateTransformation coords_fromWGS84() {
-		return coords_fromWGS84;
-	}
+    @Override
+    public CoordinateTransformation coords_fromWGS84() {
+        return coords_fromWGS84;
+    }
 
-	@Override
-	public CoordinateTransformation coords_toWGS84() {
-		return coords_toWGS84;
-	}
+    @Override
+    public CoordinateTransformation coords_toWGS84() {
+        return coords_toWGS84;
+    }
 }

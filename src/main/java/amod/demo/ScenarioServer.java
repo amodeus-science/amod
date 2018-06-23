@@ -36,6 +36,7 @@ import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
+import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
@@ -62,7 +63,7 @@ public enum ScenarioServer {
 
         /** working directory and options */
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        ScenarioOptions scenarioOptions = ScenarioOptions.load(workingDirectory);
+        ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** set to true in order to make server wait for at least 1 client, for
          * instance viewer client, for fals the ScenarioServer starts the simulation
@@ -112,7 +113,7 @@ public enum ScenarioServer {
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusGeneratorModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
-        controler.addOverridingModule(new DefaultVirtualNetworkModule());        // Added by Lukas June 06, 2018
+        controler.addOverridingModule(new DefaultVirtualNetworkModule()); // Added by Lukas June 06, 2018
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

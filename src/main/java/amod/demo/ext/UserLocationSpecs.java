@@ -14,11 +14,11 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
             UserReferenceFrames.BERLIN, //
             new Coord(-122.4363005, 37.7511686)), //
     SANTIAGO_DE_CHILE( //
-    		UserReferenceFrames.SANTIAGO_DE_CHILE, //
-            new Coord(-3956418.76, -7864204.17 )), //   
+            UserReferenceFrames.SANTIAGO_DE_CHILE, //
+            new Coord(-3956418.76, -7864204.17)), //
     TEL_AVIV( //
             UserReferenceFrames.TEL_AVIV, //
-            new Coord(179549.58, 665848.14)), // 
+            new Coord(179549.58, 665848.14)), //
     ;
 
     private final ReferenceFrame referenceFrame;

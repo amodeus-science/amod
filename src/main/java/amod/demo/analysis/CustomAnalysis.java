@@ -9,6 +9,7 @@ import org.matsim.core.config.ConfigUtils;
 import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
+import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 
 enum CustomAnalysis {
     ;
@@ -19,7 +20,7 @@ enum CustomAnalysis {
     public static void main(String[] args) throws Exception {
         Static.setup();
         File workingDirectory = new File("").getCanonicalFile();
-        ScenarioOptions scenOptions = ScenarioOptions.load(workingDirectory);
+        ScenarioOptions scenOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
         File configFile = new File(workingDirectory, scenOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(configFile.toString());
         String outputdirectory = config.controler().getOutputDirectory();
