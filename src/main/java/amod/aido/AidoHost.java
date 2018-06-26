@@ -3,7 +3,7 @@ package amod.aido;
 
 import java.io.File;
 
-import amod.demo.ScenarioServer;
+import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
 import ch.ethz.idsc.amodeus.aido.StringClientSocket;
 import ch.ethz.idsc.amodeus.aido.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
@@ -12,13 +12,19 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
 public class AidoHost {
+    
+
+    
+    
     public static void main(String[] args) throws Exception {
 
         /** open String server and wait for initial command */
         StringServerSocket serverSocket = new StringServerSocket(9382, StringClientSocket::new);
-        StringClientSocket clientSocket = serverSocket.getSocketWait();
-        String readLine = clientSocket.reader.readLine(); // TODO reader private
+        AidoDispatcherHost.Factory.stringSocket = serverSocket.getSocketWait();
+        String readLine = AidoDispatcherHost.Factory.stringSocket.reader.readLine(); // TODO reader private
         Tensor config = Tensors.fromString(readLine);
+        System.out.println("AidoHost config: " + config);
+        Thread.sleep(3000);
 
         String scenarioTag = config.Get(0).toString();
         double populRed = config.Get(1).number().doubleValue();
@@ -32,15 +38,15 @@ public class AidoHost {
         Tensor initialInfo = AidoPreparer.run(workingDirectory, populRed);
         
         /** send initial data (bounding box) */
-        clientSocket.write(initialInfo.toString());
+        AidoDispatcherHost.Factory.stringSocket.write(initialInfo.toString()+"\n");
 
         /** run with AIDO dispatcher */
         StaticHelper.changeDispatcherTo("AidoDispatcherHost", workingDirectory);
-        StaticHelper.changeVehicleNumberTo(fleetSize, workingDirectory);        
-        ScenarioServer.simulate();
+        StaticHelper.changeVehicleNumberTo(fleetSize, workingDirectory);
+        AidoServer.simulate();
 
         /** run with AIDO dispatcher */
-        clientSocket.write(RealScalar.ZERO.toString()); // TODO something useful
+        AidoDispatcherHost.Factory.stringSocket.write(RealScalar.ZERO.toString()); // TODO something useful
 
     }
 
