@@ -3,6 +3,8 @@ package amod.aido;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
 import ch.ethz.idsc.tensor.RealScalar;
@@ -13,11 +15,7 @@ import ch.ethz.idsc.tensor.sca.Round;
 
 /* package */ class BasicDispatchingTestLogic {
 
-    private Set<Scalar> matchedReq = new HashSet();
-
-    public BasicDispatchingTestLogic() {
-
-    }
+    private Set<Scalar> matchedReq = new HashSet<>();
 
     public Tensor of(Tensor status) {
         Tensor pickup = Tensors.empty();
@@ -25,35 +23,31 @@ import ch.ethz.idsc.tensor.sca.Round;
 
         Scalar time = status.Get(0);
         if (Round.toMultipleOf(RealScalar.of(60)).apply(time).equals(time)) { // every minute
-
             int index = 0;
 
+            /** sort requests according to submission time*/
+            SortedMap<Scalar, Tensor> requests = new TreeMap<>();
             for (Tensor request : status.get(2)) {
+                requests.put(request.Get(1), request);
+            }
+
+            /** for each unassinged request, add a taxi in STAY mode*/
+            for (Tensor request : requests.values()) {
                 if (!matchedReq.contains(request.Get(0))) {
                     while (index < status.get(1).length()) {
-
                         Tensor roboTaxi = status.get(1, index);
-
-                        if (RoboTaxiStatus.valueOf(roboTaxi.Get(2).toString()).equals(RoboTaxiStatus.STAY)) {
+                        if (RoboTaxiStatus.valueOf(roboTaxi.Get(2).toString())//
+                                .equals(RoboTaxiStatus.STAY)) {
                             pickup.append(Tensors.of(roboTaxi.Get(0), request.Get(0)));
                             matchedReq.add(request.Get(0));
                             ++index;
                             break;
                         }
                         ++index;
-
                     }
-
                 }
-
             }
-            // find open requests
-
-            // assing available vehicle to every request
-
         }
-
         return Tensors.of(pickup, rebalance);
     }
-
 }
