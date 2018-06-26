@@ -28,12 +28,16 @@ public class AidoGuest {
         Tensor initialInfo = Tensors.fromString(clientSocket.readLine());
         Tensor minX = initialInfo.get(0);
         Tensor minY = initialInfo.get(1);
+        System.out.println("minX: " + minX);
+        System.out.println("minY: " + minY);
 
         /** receive dispatching status and send dispatching command */
         BasicDispatchingTestLogic bdl = new BasicDispatchingTestLogic();
 
         while (true) {
             Tensor status = Tensors.fromString(clientSocket.readLine());
+            Tensor score = status.Get(3);
+            System.out.println("score (mean waiting time) = " + score + " at " + status.Get(0));
             if (Tensors.isEmpty(status))
                 break;
             Tensor command = bdl.of(status);
