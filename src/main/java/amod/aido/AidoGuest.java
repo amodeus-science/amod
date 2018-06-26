@@ -10,34 +10,38 @@ import ch.ethz.idsc.tensor.Tensors;
 
 public class AidoGuest {
 
+    /** @param args 1 entry which is IP address
+     * @throws Exception */
     public static void main(String[] args) throws Exception {
 
         /** connect to AidoGuest */
-        StringClientSocket clientSocket = new StringClientSocket(new Socket("localhost", 9382)); // TODO
+        String address = args.length == 0 ? "localhost" : args[0];
+        StringClientSocket clientSocket = new StringClientSocket(new Socket(address, 9382));
 
         /** send initial command */
         Tensor config = Tensors.fromString("{SanFrancisco}");
         config.append(RealScalar.of(0.4));
         config.append(RealScalar.of(177));
-        clientSocket.write(config.toString() + "\n");
-        System.out.println("AidoGuest config: " + config);
+        clientSocket.writeln(config);
 
         /** receive initial information */
-        Tensor initialInfo = Tensors.fromString(clientSocket.reader.readLine());
-        System.out.println("AidoGuest initialInfo: " + initialInfo);
+        Tensor initialInfo = Tensors.fromString(clientSocket.readLine());
         Tensor minX = initialInfo.get(0);
         Tensor minY = initialInfo.get(1);
 
         /** receive dispatching status and send dispatching command */
-        while (true) { // TODO how to exit
-            Tensor status = Tensors.fromString(clientSocket.reader.readLine());
-            System.out.println("AidoGuest status: " + status);
+        BasicDispatchingTestLogic bdl = new BasicDispatchingTestLogic();
 
-            // TODO create dispatching command from status
-            Tensor command = Tensors.fromString("{{},{}}");
-            clientSocket.write(command.toString() + "\n");
-            System.out.println("AidoGuest command: " + command);
+        while (true) {
+            Tensor status = Tensors.fromString(clientSocket.readLine());
+            if (Tensors.isEmpty(status))
+                break;
+            Tensor command = bdl.of(status);
+            clientSocket.writeln(command);
         }
+
+        Tensor finalInfo = Tensors.fromString(clientSocket.readLine());
+        System.out.println("finalInfo: " + finalInfo);
 
     }
 

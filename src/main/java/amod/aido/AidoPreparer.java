@@ -25,7 +25,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
 public class AidoPreparer {
-    
+
     /** loads scenario preparer in the {@link File} workingDirectory
      * 
      * @param workingDirectory
@@ -56,7 +56,7 @@ public class AidoPreparer {
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(configMatsim, scenarioOptions);
-        
+
         /** send initial data (bounding box) */
         double[] bounding = NetworkUtils.getBoundingBox(network.getNodes().values()); // {minX,
                                                                                       // minY, maxX,
@@ -68,9 +68,7 @@ public class AidoPreparer {
         initialInfo.append(
                 TensorCoords.toTensor(scenarioOptions.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bounding[2], bounding[3]))));
 
-
         return initialInfo;
     }
-
 
 }

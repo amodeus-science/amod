@@ -1,7 +1,6 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido;
 
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Objects;
@@ -22,7 +21,6 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 import amod.demo.ext.Static;
-import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
@@ -33,7 +31,6 @@ import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
-import ch.ethz.idsc.amodeus.matsim.mod.DefaultVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -50,7 +47,6 @@ import ch.ethz.matsim.av.framework.AVUtils;
 public enum AidoServer {
     ;
 
-
     /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml
      * 
      * @throws MalformedURLException
@@ -58,7 +54,6 @@ public enum AidoServer {
     @SuppressWarnings("unused")
     public static void simulate() throws MalformedURLException, Exception {
         Static.setup();
-
 
         /** working directory and options */
         File workingDirectory = MultiFileTools.getWorkingDirectory();
@@ -126,7 +121,6 @@ public enum AidoServer {
             }
         });
 
-
         /** run simulation */
         controler.run();
 
@@ -140,7 +134,4 @@ public enum AidoServer {
 
     }
 
-    public static void clearMemory() {
-        // TODO clear memory for the sequential server such that RAM is not limiting
-    }
 }

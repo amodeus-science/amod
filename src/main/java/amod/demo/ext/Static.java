@@ -21,9 +21,11 @@ public enum Static {
         } catch (Exception e) {
             System.err.println("GLPK for java is not installed which is necessary to run the preparer or server. \n "
                     + "In order to install it, follow the instructions provided at\n: " + "http://glpk-java.sourceforge.net/gettingStarted.html \n"
-                    + "In order to work properly, either the location of the GLPK library must be  specified in \n" + "the environment variable, using for instance the command"
-                    + "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/jni \n" + "where /usr/local/lib/jni  is the path where the file libglpk_java.so is located \n"
-                    + "in your installation. Alternatively, the path can also be supplied as a JAVA runtime \n" + "argument, e.g., -Djava.library.path=/usr/local/lib/jni");
+                    + "In order to work properly, either the location of the GLPK library must be  specified in \n"
+                    + "the environment variable, using for instance the command" + "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/jni \n"
+                    + "where /usr/local/lib/jni  is the path where the file libglpk_java.so is located \n"
+                    + "in your installation. Alternatively, the path can also be supplied as a JAVA runtime \n"
+                    + "argument, e.g., -Djava.library.path=/usr/local/lib/jni");
         }
     }
 }

@@ -7,7 +7,7 @@ public enum AidoScenarioDownload {
     ;
 
     /* package */ static void download(String tag) throws IOException {
-        
+
         // TODO download the right scenario
 
     }

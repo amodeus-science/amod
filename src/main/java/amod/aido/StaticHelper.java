@@ -48,7 +48,7 @@ public class StaticHelper {
         xmlOutput.output(doc, new FileWriter(xmlFile));
 
     }
-    
+
     public static void changeVehicleNumberTo(int vehicleNumber, File simFolder) //
             throws JDOMException, IOException {
         System.out.println("changing vehicle number to " + vehicleNumber);
@@ -58,7 +58,6 @@ public class StaticHelper {
         System.out.println("looking for av.xml file at " + xmlFile.getAbsolutePath());
 
         GlobalAssert.that(xmlFile.exists());
-        // TODO Extract to Function
         SAXBuilder builder = new SAXBuilder();
         builder.setValidation(false);
         builder.setFeature("http://xml.org/sax/features/validation", false);
@@ -88,6 +87,5 @@ public class StaticHelper {
         xmlOutput.output(doc, new FileWriter(xmlFile));
 
     }
-
 
 }

@@ -113,7 +113,8 @@ public enum ScenarioServer {
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusGeneratorModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
-        controler.addOverridingModule(new DefaultVirtualNetworkModule()); // Added by Lukas June 06, 2018
+        controler.addOverridingModule(new DefaultVirtualNetworkModule()); // Added by Lukas June 06,
+                                                                          // 2018
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -129,7 +130,8 @@ public enum ScenarioServer {
             }
         });
 
-        if (false) { // You need to activate this if you want to use a dispatcher that needs a virtual network!
+        if (false) { // You need to activate this if you want to use a dispatcher that needs a
+                     // virtual network!
             controler.addOverridingModule(new DefaultVirtualNetworkModule());
         }
 

@@ -8,7 +8,8 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkReaderMatsimV2;
 
 /** @author onicolo 06-2018
- *         Created temporarily for running AmodScenarioVideoMaker -> to load v2 network. Copy from NetworkLoader in Amodidsc */
+ *         Created temporarily for running AmodScenarioVideoMaker -> to load v2 network. Copy from
+ *         NetworkLoader in Amodidsc */
 /* package */ enum StaticHelper {
     ;
 
