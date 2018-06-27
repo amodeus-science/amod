@@ -17,8 +17,8 @@ public class AidoHost {
 
         /** open String server and wait for initial command */
         StringServerSocket serverSocket = new StringServerSocket(9382, StringClientSocket::new);
-        AidoDispatcherHost.Factory.stringSocket = serverSocket.getSocketWait();
-        String readLine = AidoDispatcherHost.Factory.stringSocket.readLine();
+        StringClientSocket stringSocket = serverSocket.getSocketWait();
+        String readLine = stringSocket.readLine();
         Tensor config = Tensors.fromString(readLine);
         System.out.println("AidoHost config: " + config);
         Thread.sleep(3000);
@@ -35,16 +35,16 @@ public class AidoHost {
         Tensor initialInfo = AidoPreparer.run(workingDirectory, populRed);
 
         /** send initial data (bounding box) */
-        AidoDispatcherHost.Factory.stringSocket.writeln(initialInfo);
+        stringSocket.writeln(initialInfo);
 
         /** run with AIDO dispatcher */
         StaticHelper.changeDispatcherTo("AidoDispatcherHost", workingDirectory);
         StaticHelper.changeVehicleNumberTo(fleetSize, workingDirectory);
-        AidoServer.simulate();
+        AidoServer.simulate(stringSocket);
 
         /** run with AIDO dispatcher */
-        AidoDispatcherHost.Factory.stringSocket.writeln(Tensors.empty());
-        AidoDispatcherHost.Factory.stringSocket.writeln(RealScalar.ZERO); // TODO something useful
+        stringSocket.writeln(Tensors.empty());
+        stringSocket.writeln(RealScalar.ZERO); // TODO something useful
 
     }
 
