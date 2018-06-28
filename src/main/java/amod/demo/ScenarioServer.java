@@ -20,6 +20,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
+import amod.demo.analysis.CustomAnalysis;
 import amod.demo.ext.Static;
 import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
@@ -141,10 +142,14 @@ public enum ScenarioServer {
 
         /** perform analysis of simulation */
         Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory));
-        // TODO put sample of custom analysis element
+        CustomAnalysis.addCustomElementsTo(analysis);
         analysis.run();
 
     }
+    
+    public static void analyze() {
+		
+	}
 
     public static void clearMemory() {
         // TODO clear memory for the sequential server such that RAM is not limiting

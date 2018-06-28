@@ -8,10 +8,12 @@ import org.matsim.core.config.ConfigUtils;
 
 import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
+import ch.ethz.idsc.amodeus.analysis.cost.RoboTaxiCostFunctionsAmodeus;
+import ch.ethz.idsc.amodeus.analysis.cost.RoboTaxiCostParametersImplAmodeus;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 
-enum CustomAnalysis {
+public enum CustomAnalysis {
     ;
 
     /** to be executed in simulation directory to perform analysis
@@ -26,11 +28,16 @@ enum CustomAnalysis {
         String outputdirectory = config.controler().getOutputDirectory();
 
         Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory));
-        SingleCarElement singleCarElement = new SingleCarElement();
+        addCustomElementsTo(analysis);
+        analysis.run();
+    }
+    
+    public static void addCustomElementsTo(Analysis analysis) {
+    	SingleCarElement singleCarElement = new SingleCarElement();
         analysis.addAnalysisElement(singleCarElement);
         SingleCarHtml singleCarHtml = new SingleCarHtml(singleCarElement);
         analysis.addHtmlElement(singleCarHtml);
-        analysis.run();
-    }
+        analysis.addCostAnalysis(RoboTaxiCostFunctionsAmodeus.COST_PER_DISTANCE_ONLY, new RoboTaxiCostParametersImplAmodeus(1.5));
+	}
 
 }
