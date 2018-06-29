@@ -9,12 +9,14 @@ import org.matsim.core.controler.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
-import ch.ethz.idsc.amodeus.aido.StringClientSocket;
+import ch.ethz.idsc.amodeus.aido.StringSocket;
+
+
 
 public class AidoModule extends AbstractModule {
-    private final StringClientSocket stringSocket;
+    private final StringSocket stringSocket;
     
-    public AidoModule(StringClientSocket stringSocket) {
+    public AidoModule(StringSocket stringSocket) {
         Objects.requireNonNull(stringSocket);
         this.stringSocket = stringSocket;
     }
@@ -27,7 +29,7 @@ public class AidoModule extends AbstractModule {
     
     @Provides
     @Singleton
-    public StringClientSocket provideStringSocket(Network network) {
+    public StringSocket provideStringSocket(Network network) {
         return stringSocket;
     }
 }
