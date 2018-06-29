@@ -148,10 +148,10 @@ public enum ScenarioServer {
         analysis.run();
 
     }
-    
+
     public static void analyze() {
-		
-	}
+
+    }
 
     public static void clearMemory() {
         // TODO clear memory for the sequential server such that RAM is not limiting

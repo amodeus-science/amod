@@ -31,13 +31,13 @@ public enum CustomAnalysis {
         addCustomElementsTo(analysis);
         analysis.run();
     }
-    
+
     public static void addCustomElementsTo(Analysis analysis) {
-    	SingleCarElement singleCarElement = new SingleCarElement();
+        SingleCarElement singleCarElement = new SingleCarElement();
         analysis.addAnalysisElement(singleCarElement);
         SingleCarHtml singleCarHtml = new SingleCarHtml(singleCarElement);
         analysis.addHtmlElement(singleCarHtml);
         analysis.addCostAnalysis(RoboTaxiCostFunctionsAmodeus.COST_PER_DISTANCE_ONLY, new RoboTaxiCostParametersImplAmodeus(1.5));
-	}
+    }
 
 }

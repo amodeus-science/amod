@@ -25,13 +25,13 @@ import ch.ethz.idsc.tensor.sca.Round;
         if (Round.toMultipleOf(RealScalar.of(60)).apply(time).equals(time)) { // every minute
             int index = 0;
 
-            /** sort requests according to submission time*/
+            /** sort requests according to submission time */
             SortedMap<Scalar, Tensor> requests = new TreeMap<>();
             for (Tensor request : status.get(2)) {
                 requests.put(request.Get(1), request);
             }
 
-            /** for each unassinged request, add a taxi in STAY mode*/
+            /** for each unassinged request, add a taxi in STAY mode */
             for (Tensor request : requests.values()) {
                 if (!matchedReq.contains(request.Get(0))) {
                     while (index < status.get(1).length()) {
