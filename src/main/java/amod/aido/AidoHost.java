@@ -28,10 +28,10 @@ public class AidoHost {
         int fleetSize = config.Get(2).number().intValue();
 
         /** download the chosen scenario */
-        AidoScenarioDownload.download(scenarioTag);
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        AidoScenarioDownload.download(scenarioTag, workingDirectory.getAbsolutePath());
 
         /** scenario preparer */
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
         Tensor initialInfo = AidoPreparer.run(workingDirectory, populRed);
 
         /** send initial data (bounding box) */
@@ -45,6 +45,8 @@ public class AidoHost {
         /** run with AIDO dispatcher */
         stringSocket.writeln(Tensors.empty());
         stringSocket.writeln(RealScalar.ZERO); // TODO something useful
+
+        // TODO three scores, fleet size, efficiency and waiting time, weighted
 
     }
 

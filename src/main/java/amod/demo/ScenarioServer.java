@@ -50,6 +50,12 @@ public enum ScenarioServer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
         simulate();
+        // General todos to be completed: 
+        // TODO Ridesharing API suppport. (capacity >= 1)
+        // TODO enable external routing
+        // TODO sample for generator
+        // TODO add time-varying dispatcher
+        
     }
 
     /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml

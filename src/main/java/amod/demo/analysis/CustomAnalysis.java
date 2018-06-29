@@ -13,6 +13,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 
 enum CustomAnalysis {
     ;
+    // TODO document and improve demo
 
     /** to be executed in simulation directory to perform analysis
      * 

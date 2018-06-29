@@ -36,8 +36,8 @@ public class AidoGuest {
 
         while (true) {
             Tensor status = Tensors.fromString(clientSocket.readLine());
-            Tensor score = status.Get(3);
-            System.out.println("score (mean waiting time) = " + score + " at " + status.Get(0));
+            Tensor score = status.get(3);
+            System.out.println("score = " + score + " at " + status.Get(0));
             if (Tensors.isEmpty(status))
                 break;
             Tensor command = bdl.of(status);
