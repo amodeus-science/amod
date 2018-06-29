@@ -56,7 +56,8 @@ public enum SimulationVideoLukas {
         ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
         /** reference frame needs to be set manually in IDSCOptions.properties file */
 
-        // Update AMODEUS so that networkUtils can load .v2dtd networks. -> Already present in Amodidsc
+        // Update AMODEUS so that networkUtils can load .v2dtd networks. -> Already present in
+        // Amodidsc
         Network network = StaticHelper.loadNetwork(new File(workingDirectory, config.network().getInputFile()));
 
         GlobalAssert.that(Objects.nonNull(network));
@@ -108,7 +109,8 @@ public enum SimulationVideoLukas {
 
         StorageUtils storageUtils = new StorageUtils(simOutputDir);
         IterationFolder iterationFolder = storageUtils.getAvailableIterations().get(0);
-        StorageSupplier storageSupplier = iterationFolder.storageSupplier(); // typically has size = 10800
+        StorageSupplier storageSupplier = iterationFolder.storageSupplier(); // typically has size =
+                                                                             // 10800
 
         int count = 0;
         int base = 1;
