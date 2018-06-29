@@ -2,6 +2,7 @@
 package amod.aido;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -15,7 +16,26 @@ import ch.ethz.idsc.tensor.sca.Round;
 
 /* package */ class BasicDispatchingTestLogic {
 
+    private final Random random = new Random(1234);
     private Set<Scalar> matchedReq = new HashSet<>();
+    private Set<Scalar> matchedTax = new HashSet<>();
+    private final Scalar latMin;
+    private final Scalar latMax;
+    private final Scalar lngMin;
+    private final Scalar lngMax;
+
+    public BasicDispatchingTestLogic(Tensor bottomLeft, Tensor topRight) {
+        this.latMin = bottomLeft.Get(1);
+        this.latMax = topRight.Get(1);
+        this.lngMin = bottomLeft.Get(0);
+        this.lngMax = topRight.Get(0);
+
+        System.out.println("minimum latitude  in network: " + latMin);
+        System.out.println("maximum latitude  in network: " + latMax);
+        System.out.println("minimum longitude in network: " + lngMin);
+        System.out.println("maximum longitude in network: " + lngMax);
+
+    }
 
     public Tensor of(Tensor status) {
         Tensor pickup = Tensors.empty();
@@ -25,13 +45,13 @@ import ch.ethz.idsc.tensor.sca.Round;
         if (Round.toMultipleOf(RealScalar.of(60)).apply(time).equals(time)) { // every minute
             int index = 0;
 
-            /** sort requests according to submission time*/
+            /** sort requests according to submission time */
             SortedMap<Scalar, Tensor> requests = new TreeMap<>();
             for (Tensor request : status.get(2)) {
                 requests.put(request.Get(1), request);
             }
 
-            /** for each unassinged request, add a taxi in STAY mode*/
+            /** for each unassinged request, add a taxi in STAY mode */
             for (Tensor request : requests.values()) {
                 if (!matchedReq.contains(request.Get(0))) {
                     while (index < status.get(1).length()) {
@@ -40,6 +60,7 @@ import ch.ethz.idsc.tensor.sca.Round;
                                 .equals(RoboTaxiStatus.STAY)) {
                             pickup.append(Tensors.of(roboTaxi.Get(0), request.Get(0)));
                             matchedReq.add(request.Get(0));
+                            matchedTax.add(roboTaxi.Get(0));
                             ++index;
                             break;
                         }
@@ -47,7 +68,32 @@ import ch.ethz.idsc.tensor.sca.Round;
                     }
                 }
             }
+
+            /** rebalance 1 of the remaining and unmatched STAY taxis */
+            for (int i = 0; i < status.get(1).length(); ++i) {
+                Tensor roboTaxi = status.get(1, i);
+                if (RoboTaxiStatus.valueOf(roboTaxi.Get(2).toString())//
+                        .equals(RoboTaxiStatus.STAY)) {
+                    if (!matchedTax.contains(roboTaxi.Get(0))) {
+                        Tensor rebalanceLocation = getRandomRebalanceLocation();
+                        rebalance.append(Tensors.of(roboTaxi.Get(0), rebalanceLocation));
+                        break;
+                    }
+                }
+            }
         }
         return Tensors.of(pickup, rebalance);
+    }
+
+    private Tensor getRandomRebalanceLocation() {
+        double latRand = latMin.number().doubleValue() + //
+                random.nextDouble() * ((latMax.subtract(latMin)).number().doubleValue());
+
+        double lngRand = lngMin.number().doubleValue() + //
+                random.nextDouble() * ((lngMax.subtract(lngMin)).number().doubleValue());
+
+        /** ATTENTION: AMoDeus internally uses the convention (longitude, latutide) for a WGS:84
+         * pair, not (latitude, longitude) as in some other cases. */
+        return Tensors.vector(lngRand, latRand);
     }
 }

@@ -26,13 +26,14 @@ public class AidoGuest {
 
         /** receive initial information */
         Tensor initialInfo = Tensors.fromString(clientSocket.readLine());
-        Tensor minX = initialInfo.get(0);
-        Tensor minY = initialInfo.get(1);
-        System.out.println("minX: " + minX);
-        System.out.println("minY: " + minY);
+
+        /** the city grid is inside the WGS:84 coordinates bounded by the box
+         * bottomLeft, topRight */
+        Tensor bottomLeft = initialInfo.get(0);
+        Tensor topRight = initialInfo.get(1);
 
         /** receive dispatching status and send dispatching command */
-        BasicDispatchingTestLogic bdl = new BasicDispatchingTestLogic();
+        BasicDispatchingTestLogic bdl = new BasicDispatchingTestLogic(bottomLeft, topRight);
 
         while (true) {
             Tensor status = Tensors.fromString(clientSocket.readLine());
