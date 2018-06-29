@@ -15,7 +15,7 @@ import ch.ethz.idsc.tensor.sca.Round;
 
 /* package */ class BasicDispatchingTestLogic {
 
-    private Set<Scalar> matchedReq = new HashSet<>();
+    private final Set<Scalar> matchedReq = new HashSet<>();
 
     public Tensor of(Tensor status) {
         Tensor pickup = Tensors.empty();

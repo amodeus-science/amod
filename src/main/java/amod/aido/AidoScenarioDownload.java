@@ -3,7 +3,7 @@ package amod.aido;
 
 import java.io.IOException;
 
-public enum AidoScenarioDownload {
+enum AidoScenarioDownload {
     ;
 
     /* package */ static void download(String tag) throws IOException {
