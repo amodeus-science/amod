@@ -46,15 +46,17 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
-public enum AidoServer {
+enum AidoServer {
     ;
 
     /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml
      * 
      * @throws MalformedURLException
      * @throws Exception */
-    @SuppressWarnings("unused")
+
+
     public static void simulate(StringClientSocket stringSocket) throws MalformedURLException, Exception {
+
         Static.setup();
 
         /** working directory and options */

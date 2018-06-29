@@ -16,7 +16,8 @@ import org.jdom.output.XMLOutputter;
 
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-public class StaticHelper {
+enum StaticHelper {
+    ;
 
     public static void changeDispatcherTo(String newDispatcher, File simFolder) //
             throws JDOMException, IOException {

@@ -20,11 +20,11 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.amodeus.prep.PopulationPreparer;
-import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-public class AidoPreparer {
+enum AidoPreparer {
+    ;
 
     /** loads scenario preparer in the {@link File} workingDirectory
      * 
@@ -62,11 +62,9 @@ public class AidoPreparer {
                                                                                       // minY, maxX,
                                                                                       // maxY}
         Tensor initialInfo = Tensors.empty();
-        initialInfo.append(
-                TensorCoords.toTensor(scenarioOptions.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bounding[0], bounding[1]))));
+        initialInfo.append(TensorCoords.toTensor(scenarioOptions.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bounding[0], bounding[1]))));
 
-        initialInfo.append(
-                TensorCoords.toTensor(scenarioOptions.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bounding[2], bounding[3]))));
+        initialInfo.append(TensorCoords.toTensor(scenarioOptions.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bounding[2], bounding[3]))));
 
         return initialInfo;
     }

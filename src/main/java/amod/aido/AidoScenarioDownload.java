@@ -5,30 +5,31 @@ import java.io.IOException;
 
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-public enum AidoScenarioDownload {
+/*package*/ enum AidoScenarioDownload {
+
     ;
 
     /* package */ static void download(String tag, String saveDir) throws IOException {
 
-//        // String fileURL =
-//        // "https://www.ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Research_Frazzoli/AMoDeusScenarioSanFrancisco.zip";
-//        String fileURL = null;
-//
-//        if (tag.equals("SanFrancisco")) {
-//            fileURL = "https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWSGmy/download";
-//        }
-//        if (tag.equals("Berlin")) {
-//            fileURL = "https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWSGmy/download";
-//        }
-//        if (tag.equals("SantiagoDeChile")) {
-//            fileURL = "https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWSGmy/download";
-//        }
-//        if (tag.equals("TelAviv")) {
-//            fileURL = "https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWSGmy/download";
-//        }
-//        HttpDownloader.download(fileURL).to(saveDir);
+        // // String fileURL =
+        // //
+        // "https://www.ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Research_Frazzoli/AMoDeusScenarioSanFrancisco.zip";
+        // String fileURL = null;
+        //
+        // if (tag.equals("SanFrancisco")) {
+        // fileURL = "https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWSGmy/download";
+        // }
+        // if (tag.equals("Berlin")) {
+        // fileURL = "https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWSGmy/download";
+        // }
+        // if (tag.equals("SantiagoDeChile")) {
+        // fileURL = "https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWSGmy/download";
+        // }
+        // if (tag.equals("TelAviv")) {
+        // fileURL = "https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWSGmy/download";
+        // }
+        // HttpDownloader.download(fileURL).to(saveDir);
 
-        
         // TODO unzip and move into saveDir
     }
 

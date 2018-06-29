@@ -3,12 +3,13 @@ package amod.aido;
 
 import java.net.Socket;
 
-import ch.ethz.idsc.amodeus.aido.StringClientSocket;
+import ch.ethz.idsc.amodeus.aido.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-public class AidoGuest {
+public enum AidoGuest {
+    ;
 
     /** @param args 1 entry which is IP address
      * @throws Exception */
@@ -16,7 +17,7 @@ public class AidoGuest {
 
         /** connect to AidoGuest */
         String address = args.length == 0 ? "localhost" : args[0];
-        StringClientSocket clientSocket = new StringClientSocket(new Socket(address, 9382));
+        StringSocket clientSocket = new StringSocket(new Socket(address, 9382));
 
         /** send initial command */
         Tensor config = Tensors.fromString("{SanFrancisco}");
