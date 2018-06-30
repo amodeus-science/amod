@@ -23,6 +23,7 @@ import com.google.inject.name.Names;
 import amod.demo.analysis.CustomAnalysis;
 import amod.demo.ext.Static;
 import amod.dispatcher.DemoDispatcher;
+import amod.dispatcher.claudioForDejan.ClaudioForDejanDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
@@ -130,6 +131,16 @@ public enum ScenarioServer {
                 AVUtils.registerDispatcherFactory(binder(), "DemoDispatcher", DemoDispatcher.Factory.class);
             }
         });
+        
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerDispatcherFactory(binder(), "ClaudioForDejanDispatcher", ClaudioForDejanDispatcher.Factory.class);
+            }
+        });
+        
+        
+        
 
         if (false) { // You need to activate this if you want to use a dispatcher that needs a
                      // virtual network!

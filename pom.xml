@@ -33,6 +33,11 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>ch.ethz.idsc</groupId>
+			<artifactId>jmex</artifactId>
+			<version>0.0.2</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -47,6 +52,14 @@
 		<repository>
 			<id>amodeus-mvn-repo</id>
 			<url>https://raw.github.com/idsc-frazzoli/amodeus/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>jmex-mvn-repo</id>
+			<url>https://raw.github.com/idsc-frazzoli/jmex/mvn-repo/</url>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
