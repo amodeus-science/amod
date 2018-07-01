@@ -1,13 +1,11 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido;
 
-import java.io.IOException;
-
-/*package*/ enum AidoScenarioDownload {
+/* package */ enum AidoScenarioDownload {
 
     ;
 
-    /* package */ static void download(String tag, String saveDir) throws IOException {
+    /* package */ static void download(String tag, String saveDir) {
 
         // // String fileURL =
         // //
@@ -31,7 +29,7 @@ import java.io.IOException;
         // TODO unzip and move into saveDir
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         download("SanFrancisco", "/home/clruch");
     }
 

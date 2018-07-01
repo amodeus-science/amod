@@ -51,20 +51,19 @@ import java.net.URL;
             System.out.println("fileName = " + fileName);
 
             // opens input stream from the HTTP connection
-            InputStream inputStream = httpConn.getInputStream();
-            String saveFilePath = saveDir + File.separator + fileName;
+            try (InputStream inputStream = httpConn.getInputStream()) {
+                String saveFilePath = saveDir + File.separator + fileName;
 
-            // opens an output stream to save into file
-            FileOutputStream outputStream = new FileOutputStream(saveFilePath);
+                // opens an output stream to save into file
+                try (FileOutputStream outputStream = new FileOutputStream(saveFilePath)) {
 
-            int bytesRead = -1;
-            byte[] buffer = new byte[BUFFER_SIZE];
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
+                    int bytesRead = -1;
+                    byte[] buffer = new byte[BUFFER_SIZE];
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+                }
             }
-
-            outputStream.close();
-            inputStream.close();
 
             System.out.println("File downloaded");
         } else {
