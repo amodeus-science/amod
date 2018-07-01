@@ -9,13 +9,13 @@ import ch.ethz.idsc.amodeus.analysis.report.BodyElementKeys;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlBodyElement;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlReportElement;
 
-public class SingleCarHtml implements HtmlReportElement {
+public class RoboTaxiRequestRecorderHtml implements HtmlReportElement {
     private static final String IMAGE_FOLDER = "../data"; // relative to report folder
     private static final String STATUSDISTRIBUTIONFILENAME = "statusDistribution";
 
-    SingleCarElement sce;
+    RoboTaxiRequestRecorder sce;
 
-    public SingleCarHtml(SingleCarElement sce) {
+    public RoboTaxiRequestRecorderHtml(RoboTaxiRequestRecorder sce) {
         this.sce = sce;
     }
 

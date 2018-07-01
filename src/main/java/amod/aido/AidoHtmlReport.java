@@ -32,7 +32,7 @@ public class AidoHtmlReport implements HtmlReportElement {
         this.numberOfVehicles = RealScalar.of(analysisSummary.getSimulationInformationElement().vehicleSize());
         
         HtmlBodyElement aRElement = new HtmlBodyElement();
-        aRElement.getHTMLGenerator().insertTextLeft(aRElement.getHTMLGenerator().bold("Aido Scores") + //
+        aRElement.getHTMLGenerator().insertTextLeft(aRElement.getHTMLGenerator().bold("Individual Scores") + //
                 "\n\t" + "mean waiting time:" + //
                 "\n\t" + "empty distance / total distance:" + //
                 "\n\t" + "number of RoboTaxis:" //

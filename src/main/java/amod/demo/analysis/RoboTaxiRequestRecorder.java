@@ -5,7 +5,7 @@ import ch.ethz.idsc.amodeus.analysis.element.AnalysisElement;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.amodeus.net.VehicleContainer;
 
-public class SingleCarElement implements AnalysisElement {
+public class RoboTaxiRequestRecorder implements AnalysisElement {
 
     @Override
     public void register(SimulationObject simulationObject) {
