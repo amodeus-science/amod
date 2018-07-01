@@ -118,6 +118,17 @@
 						<transformer
 							implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 					</transformers>
+					<!-- Exclude all signature files to avoid java.lang.SecurityException: Invalid signature file digest -->
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+							</excludes>
+						</filter>
+					</filters>
 				</configuration>
 				<executions>
 					<execution>
