@@ -137,8 +137,8 @@ public enum ScenarioServer {
             }
         });
 
-        if (false) { // You need to activate this if you want to use a dispatcher that needs a
-                     // virtual network!
+        // You need to activate this if you want to use a dispatcher that needs a virtual network!
+        if (false) {
             controler.addOverridingModule(new DefaultVirtualNetworkModule());
         }
 
@@ -152,10 +152,6 @@ public enum ScenarioServer {
         Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory));
         CustomAnalysis.addCustomElementsTo(analysis);
         analysis.run();
-
-    }
-
-    public static void analyze() {
 
     }
 

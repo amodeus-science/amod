@@ -1,5 +1,5 @@
-/* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.aido;
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
+package amod.aido.demo;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -14,7 +14,8 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.sca.Round;
 
-/* package */ class BasicDispatchingTestLogic {
+/** demo of dispatching logic to instruct aido host */
+/* package */ class DispatchingLogic {
 
     private final Random random = new Random(1234);
     private Set<Scalar> matchedReq = new HashSet<>();
@@ -24,7 +25,7 @@ import ch.ethz.idsc.tensor.sca.Round;
     private final Scalar lngMin;
     private final Scalar lngMax;
 
-    public BasicDispatchingTestLogic(Tensor bottomLeft, Tensor topRight) {
+    public DispatchingLogic(Tensor bottomLeft, Tensor topRight) {
         this.latMin = bottomLeft.Get(1);
         this.latMax = topRight.Get(1);
         this.lngMin = bottomLeft.Get(0);

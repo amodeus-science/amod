@@ -16,33 +16,30 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 
 // TODO document and improve demo
 public enum CustomAnalysis {
-	;
+    ;
 
-	/**
-	 * to be executed in simulation directory to perform analysis
-	 * 
-	 * @throws Exception
-	 */
-	public static void main(String[] args) throws Exception {
-		Static.setup();
-		File workingDirectory = new File("").getCanonicalFile();
-		ScenarioOptions scenOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
-		File configFile = new File(workingDirectory, scenOptions.getString("simuConfig"));
-		Config config = ConfigUtils.loadConfig(configFile.toString());
-		String outputdirectory = config.controler().getOutputDirectory();
+    /** to be executed in simulation directory to perform analysis
+     * 
+     * @throws Exception */
+    public static void main(String[] args) throws Exception {
+        Static.setup();
+        File workingDirectory = new File("").getCanonicalFile();
+        ScenarioOptions scenOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
+        File configFile = new File(workingDirectory, scenOptions.getString("simuConfig"));
+        Config config = ConfigUtils.loadConfig(configFile.toString());
+        String outputdirectory = config.controler().getOutputDirectory();
 
-		Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory));
-		addCustomElementsTo(analysis);
-		analysis.run();
-	}
+        Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory));
+        addCustomElementsTo(analysis);
+        analysis.run();
+    }
 
-	public static void addCustomElementsTo(Analysis analysis) {
-		SingleCarElement singleCarElement = new SingleCarElement();
-		analysis.addAnalysisElement(singleCarElement);
-		SingleCarHtml singleCarHtml = new SingleCarHtml(singleCarElement);
-		analysis.addHtmlElement(singleCarHtml);
-		analysis.addCostAnalysis(new CostFunctionLinearCombination(TotalValueIdentifiersAmodeus.ANNUALFLEETCOST),
-				new RoboTaxiCostParametersImplAmodeus(1.5));
-	}
+    public static void addCustomElementsTo(Analysis analysis) {
+        SingleCarElement singleCarElement = new SingleCarElement();
+        analysis.addAnalysisElement(singleCarElement);
+        SingleCarHtml singleCarHtml = new SingleCarHtml(singleCarElement);
+        analysis.addHtmlElement(singleCarHtml);
+        analysis.addCostAnalysis(new CostFunctionLinearCombination(TotalValueIdentifiersAmodeus.ANNUALFLEETCOST), new RoboTaxiCostParametersImplAmodeus(1.5));
+    }
 
 }

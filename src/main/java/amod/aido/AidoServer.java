@@ -1,4 +1,4 @@
-/* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido;
 
 import java.io.File;
@@ -22,7 +22,6 @@ import com.google.inject.name.Names;
 
 import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
-import ch.ethz.idsc.amodeus.aido.StringSocket;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
@@ -39,6 +38,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.framework.AVUtils;
@@ -52,7 +52,6 @@ enum AidoServer {
      * 
      * @throws MalformedURLException
      * @throws Exception */
-
 
     public static void simulate(StringSocket stringSocket) throws MalformedURLException, Exception {
 
