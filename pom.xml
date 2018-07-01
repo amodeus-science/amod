@@ -139,6 +139,63 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- TODO: ETHZ file servers do not like wget's default headers, and this plugin does not support custom headers. Need to find a workaround.
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<id>install-berlin</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://www.ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Research_Frazzoli/BerlinAMoDeus.zip</url>
+							<unpack>true</unpack>
+							<outputDirectory>${project.build.directory}/berlin</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-san-fransisco</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://www.ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Research_Frazzoli/AMoDeusScenarioSanFrancisco.zip</url>
+							<unpack>true</unpack>
+							<outputDirectory>${project.build.directory}/sanfransisco</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-santiago</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://www.ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Research_Frazzoli/SantiagoAMoDeus.zip</url>
+							<unpack>true</unpack>
+							<outputDirectory>${project.build.directory}/santiago</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-tel-aviv</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://www.ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Research_Frazzoli/TelavivAMoDeus.zip</url>
+							<unpack>true</unpack>
+							<outputDirectory>${project.build.directory}/telaviv</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			-->
 		</plugins>
 	</build>
 

@@ -1,12 +1,14 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido;
 
+import ch.ethz.idsc.amodeus.aido.StringSocket;
+import ch.ethz.idsc.tensor.*;
+
 import java.net.Socket;
 
-import ch.ethz.idsc.amodeus.aido.StringSocket;
-import ch.ethz.idsc.tensor.RealScalar;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
+/**
+ * Usage: java -cp target/amod-VERSION.jar amod.aido.AidoGuest [network]
+ */
 
 public enum AidoGuest {
     ;

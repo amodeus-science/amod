@@ -5,10 +5,11 @@ services:
     image: duckietown/amod
     expose:
     - 9382
-    command: java -cp target/amod-1.2.2.jar amod.aido.AidoHost
+    # TODO: Either omit version from JAR name or pass as ENV variable
+    command: java -cp amod-1.2.2.jar amod.aido.AidoHost
   aido-guest:
     build: .
     image: duckietown/amod
     links:
       - aido-host
-    command: java -cp target/amod-1.2.2.jar amod.aido.AidoGuest aido-host
+    command: java -cp amod-1.2.2.jar amod.aido.AidoGuest aido-host #SantiagoAMoDFinal
