@@ -7,6 +7,12 @@ import ch.ethz.idsc.tensor.*;
 
 import java.io.File;
 import java.util.*;
+import ch.ethz.idsc.amodeus.aido.StringServerSocket;
+import ch.ethz.idsc.amodeus.aido.StringSocket;
+import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 
 /**
  * Usage: java -cp target/amod-VERSION.jar amod.aido.AidoHost [city]
@@ -18,37 +24,41 @@ public enum AidoHost {
     public static void main(String[] args) throws Exception {
         /** open String server and wait for initial command */
         try (StringServerSocket serverSocket = new StringServerSocket(9382)) {
-            AidoDispatcherHost.Factory.stringSocket = serverSocket.getSocketWait();
-            String readLine = AidoDispatcherHost.Factory.stringSocket.readLine();
+            StringSocket stringSocket = serverSocket.getSocketWait();
+            String readLine = stringSocket.readLine();
             Tensor config = Tensors.fromString(readLine);
             System.out.println("AidoHost config: " + config);
-            // Thread.sleep(3000);
+            Thread.sleep(3000);
 
             String scenarioTag = config.Get(0).toString();
             double populRed = config.Get(1).number().doubleValue();
             int fleetSize = config.Get(2).number().intValue();
 
             /** download the chosen scenario */
-            AidoScenarioDownload.download(scenarioTag);
+            File workingDirectory = MultiFileTools.getWorkingDirectory();
+            AidoScenarioDownload.download(scenarioTag, workingDirectory.getAbsolutePath());
 
             /** scenario preparer */
             String scenarioName = getScenarioName(args);
             String scenarioPath = MultiFileTools.getWorkingDirectory().getAbsolutePath() + "/" + scenarioName + "/";
             System.out.println("Using scenario directory: " + scenarioPath);
             File workingDirectory = new File(scenarioPath);
+
             Tensor initialInfo = AidoPreparer.run(workingDirectory, populRed);
 
             /** send initial data (bounding box) */
-            AidoDispatcherHost.Factory.stringSocket.writeln(initialInfo);
+            stringSocket.writeln(initialInfo);
 
             /** run with AIDO dispatcher */
             StaticHelper.changeDispatcherTo("AidoDispatcherHost", workingDirectory);
             StaticHelper.changeVehicleNumberTo(fleetSize, workingDirectory);
-            AidoServer.simulate();
+            AidoServer.simulate(stringSocket);
 
             /** run with AIDO dispatcher */
-            AidoDispatcherHost.Factory.stringSocket.writeln(Tensors.empty());
-            AidoDispatcherHost.Factory.stringSocket.writeln(RealScalar.ZERO); // TODO something useful
+            stringSocket.writeln(Tensors.empty());
+            stringSocket.writeln(RealScalar.ZERO); // TODO something useful
+
+            // TODO three scores, fleet size, efficiency and waiting time, weighted
         }
     }
 
