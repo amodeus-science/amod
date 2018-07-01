@@ -22,6 +22,7 @@ import com.google.inject.name.Names;
 
 import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
+import ch.ethz.idsc.amodeus.aido.StringSocket;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
@@ -51,7 +52,10 @@ enum AidoServer {
      * 
      * @throws MalformedURLException
      * @throws Exception */
-    public static void simulate() throws MalformedURLException, Exception {
+
+
+    public static void simulate(StringSocket stringSocket) throws MalformedURLException, Exception {
+
         Static.setup();
 
         /** working directory and options */
@@ -105,6 +109,7 @@ enum AidoServer {
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusGeneratorModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
+        controler.addOverridingModule(new AidoModule(stringSocket));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

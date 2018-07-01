@@ -13,6 +13,7 @@ import ch.ethz.idsc.amodeus.analysis.cost.RoboTaxiCostParametersImplAmodeus;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 
+// TODO document and improve demo
 public enum CustomAnalysis {
     ;
 
