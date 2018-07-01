@@ -1,0 +1,16 @@
+version: '3'
+services:
+  aido-host:
+    build: .
+    image: duckietown/amod
+    expose:
+     - "9382"
+    command: java -cp target/amod-1.2.2.jar amod.aido.AidoHost
+  aido-guest:
+    build: .
+    image: duckietown/amod
+    expose:
+    - "9382"
+    command: java -cp target/amod-1.2.2.jar amod.aido.AidoGuest
+    links:
+    - aido-host
