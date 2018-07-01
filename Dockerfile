@@ -13,4 +13,6 @@ WORKDIR /amod/target/
 # TODO: This should really be moved to into pom.xml
 RUN curl -O "https://www.ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Research_Frazzoli/{AMoDeusScenarioSanFrancisco,BerlinAMoDeus,SantiagoAMoDeus,TelavivAMoDeus}.zip" && \
     unzip \*.zip -d . && \
+    # TODO: Remove this ugly hack for MultiFileTools.getWorkingDirectory()
+    cp SanFransisco/* . && \
     rm *.zip

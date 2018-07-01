@@ -33,7 +33,7 @@ public enum AidoHost {
 
             /** scenario preparer */
             String scenarioName = getScenarioName(args);
-            String scenarioPath = MultiFileTools.getWorkingDirectory().getAbsolutePath() + "/" + scenarioName;
+            String scenarioPath = MultiFileTools.getWorkingDirectory().getAbsolutePath() + "/" + scenarioName + "/";
             System.out.println("Using scenario directory: " + scenarioPath);
             File workingDirectory = new File(scenarioPath);
             Tensor initialInfo = AidoPreparer.run(workingDirectory, populRed);
