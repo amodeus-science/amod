@@ -4,8 +4,7 @@ COPY . amod
 
 RUN mvn -f amod install 
 
-WORKDIR /amod/
+WORKDIR /amod/target/
 
-RUN curl -O https://www.ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Research_Frazzoli/AMoDeusScenarioSanFrancisco.zip
-
-RUN unzip AMoDeusScenarioSanFrancisco.zip -d .
+RUN curl -O "https://www.ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Research_Frazzoli/{AMoDeusScenarioSanFrancisco,BerlinAMoDeus,SantiagoAMoDeus,TelavivAMoDeus}.zip" && \
+    unzip \*.zip -d . && mv SanFransisco/* .

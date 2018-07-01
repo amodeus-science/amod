@@ -68,3 +68,7 @@ San Francisco
 San Francisco
 
 </tr></table>
+
+## Docker
+
+Run `docker-compose up` to run the San Fransisco simulation.
