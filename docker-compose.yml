@@ -1,0 +1,16 @@
+version: '3'
+services:
+  aido-host:
+    build: .
+    image: duckietown/amod
+    expose:
+    - 9382
+    # TODO: Either omit version from JAR name or pass as ENV variable
+    # TODO: Set heap size somewhere besides the command line argument?
+    command: java -Xmx10000m -cp amod-1.2.2.jar amod.aido.AidoHost -Dmatsim.preferLocalDtds=true
+  aido-guest:
+    build: .
+    image: duckietown/amod
+    links:
+      - aido-host
+    command: java -Xmx10000m -cp amod-1.2.2.jar amod.aido.AidoGuest aido-host -Dmatsim.preferLocalDtds=true #SantiagoAMoDFinal
