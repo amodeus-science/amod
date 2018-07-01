@@ -1,9 +1,7 @@
-/* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido;
 
 import java.io.IOException;
-
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
 /*package*/ enum AidoScenarioDownload {
 

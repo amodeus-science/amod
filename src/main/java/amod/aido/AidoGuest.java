@@ -1,14 +1,14 @@
-/* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido;
-
-import ch.ethz.idsc.amodeus.aido.StringSocket;
-import ch.ethz.idsc.tensor.*;
 
 import java.net.Socket;
 
-/**
- * Usage: java -cp target/amod-VERSION.jar amod.aido.AidoGuest [network]
- */
+import ch.ethz.idsc.amodeus.util.net.StringSocket;
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
+
+/** Usage: java -cp target/amod-VERSION.jar amod.aido.AidoGuest [network] */
 
 public enum AidoGuest {
     ;
@@ -19,7 +19,7 @@ public enum AidoGuest {
 
         /** connect to AidoGuest */
         String address = args.length == 0 ? "localhost" : args[0];
-        StringSocket clientSocket = new StringSocket(new Socket(address, 9382));
+        StringSocket clientSocket = new StringSocket(new Socket(address, AidoHost.PORT));
 
         /** send initial command */
         Tensor config = Tensors.fromString("{SanFrancisco}");

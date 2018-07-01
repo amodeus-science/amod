@@ -1,29 +1,26 @@
-/* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido;
 
-import ch.ethz.idsc.amodeus.aido.*;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.tensor.*;
-
 import java.io.File;
-import java.util.*;
-import ch.ethz.idsc.amodeus.aido.StringServerSocket;
-import ch.ethz.idsc.amodeus.aido.StringSocket;
+import java.util.Arrays;
+import java.util.List;
+
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
+import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-/**
- * Usage: java -cp target/amod-VERSION.jar amod.aido.AidoHost [city]
- */
+/** Usage: java -cp target/amod-VERSION.jar amod.aido.AidoHost [city] */
 
 public enum AidoHost {
     ;
+    static final int PORT = 9382;
 
     public static void main(String[] args) throws Exception {
         /** open String server and wait for initial command */
-        try (StringServerSocket serverSocket = new StringServerSocket(9382)) {
+        try (StringServerSocket serverSocket = new StringServerSocket(PORT)) {
             StringSocket stringSocket = serverSocket.getSocketWait();
             String readLine = stringSocket.readLine();
             Tensor config = Tensors.fromString(readLine);
@@ -42,7 +39,7 @@ public enum AidoHost {
             String scenarioName = getScenarioName(args);
             String scenarioPath = MultiFileTools.getWorkingDirectory().getAbsolutePath() + "/" + scenarioName + "/";
             System.out.println("Using scenario directory: " + scenarioPath);
-            File workingDirectory = new File(scenarioPath);
+            workingDirectory = new File(scenarioPath); // TODO check
 
             Tensor initialInfo = AidoPreparer.run(workingDirectory, populRed);
 

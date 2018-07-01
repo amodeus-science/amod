@@ -1,4 +1,4 @@
-/* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido;
 
 import java.io.File;
@@ -10,17 +10,19 @@ import java.net.URL;
 
 /* package */ class HttpDownloader {
     private static final int BUFFER_SIZE = 4096;
-    private final String fileURL;
 
     public static HttpDownloader download(String fileURL) {
         return new HttpDownloader(fileURL);
     }
 
+    // ---
+    private final String fileURL;
+
     private HttpDownloader(String fileURL) {
         this.fileURL = fileURL;
     }
 
-    public  void to(String saveDir) throws IOException {
+    public void to(String saveDir) throws IOException {
         URL url = new URL(fileURL);
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
         int responseCode = httpConn.getResponseCode();
