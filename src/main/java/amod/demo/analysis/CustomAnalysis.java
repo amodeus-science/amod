@@ -36,6 +36,14 @@ public enum CustomAnalysis {
         /** the analysis is created */
         Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory));
 
+        /** create and add a custom element */
+        addTo(analysis);
+
+        /** finally, the analysis is run with the introduced custom element */
+        analysis.run();
+    }
+
+    public static void addTo(Analysis analysis) {
         /** first an element to gather the necessary data is defined, it is an implementation of the
          * interface AnalysisElement */
         RoboTaxiRequestRecorder roboTaxiRequestRecorder = new RoboTaxiRequestRecorder();
@@ -54,8 +62,6 @@ public enum CustomAnalysis {
         analysis.addAnalysisExport(roboTaxiRequestExport);
         analysis.addHtmlElement(roboTaxiRequestRecorderHtml);
 
-        /** finally, the analysis is run with the introduced custom element */
-        analysis.run();
     }
 
 }
