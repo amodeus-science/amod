@@ -1,4 +1,4 @@
-/* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido;
 
 import java.util.HashMap;
@@ -14,6 +14,7 @@ import ch.ethz.idsc.tensor.Tensors;
 
 public class AidoHtmlReport implements HtmlReportElement {
 
+    @SuppressWarnings("unused")
     private final AidoAnalysisElement aidoAnalysis;
     private Scalar totalMeanWaitingTime;
     private Scalar totalEfficiencyRatio; /* empty distance divided by total distance */
@@ -30,7 +31,7 @@ public class AidoHtmlReport implements HtmlReportElement {
         this.totalEfficiencyRatio = RealScalar.of((analysisSummary.getDistanceElement().totalDistancePicku + //
                 analysisSummary.getDistanceElement().totalDistanceRebal) / analysisSummary.getDistanceElement().totalDistance);
         this.numberOfVehicles = RealScalar.of(analysisSummary.getSimulationInformationElement().vehicleSize());
-        
+
         HtmlBodyElement aRElement = new HtmlBodyElement();
         aRElement.getHTMLGenerator().insertTextLeft(aRElement.getHTMLGenerator().bold("Individual Scores") + //
                 "\n\t" + "mean waiting time:" + //
@@ -40,10 +41,10 @@ public class AidoHtmlReport implements HtmlReportElement {
         aRElement.getHTMLGenerator().insertTextLeft(" " + //
                 "\n" + totalMeanWaitingTime + //
                 "\n" + totalEfficiencyRatio + //
-                "\n" + numberOfVehicles  //
+                "\n" + numberOfVehicles //
         );
         aRElement.getHTMLGenerator().newLine();
-        
+
         Map<String, HtmlBodyElement> bodyElements = new HashMap<>();
         bodyElements.put("Aido Scores", aRElement);
         return bodyElements;

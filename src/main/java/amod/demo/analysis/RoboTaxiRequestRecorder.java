@@ -4,7 +4,9 @@ package amod.demo.analysis;
 import java.util.HashMap;
 import java.util.Map;
 
+import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisElement;
+import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.tensor.RealScalar;
