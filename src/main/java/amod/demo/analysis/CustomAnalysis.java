@@ -62,5 +62,5 @@ public enum CustomAnalysis {
         analysis.addHtmlElement(roboTaxiRequestRecorderHtml);
 
     }
-    
+
 }
