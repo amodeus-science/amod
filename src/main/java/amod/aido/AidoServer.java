@@ -22,7 +22,6 @@ import com.google.inject.name.Names;
 
 import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
-import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
@@ -45,15 +44,17 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
-enum AidoServer {
-    ;
+/* package */ class AidoServer {
+
+    private File configFile;
+    private File outputDirectory;
 
     /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml
      * 
      * @throws MalformedURLException
      * @throws Exception */
 
-    public static void simulate(StringSocket stringSocket) throws MalformedURLException, Exception {
+    public void simulate(StringSocket stringSocket) throws MalformedURLException, Exception {
 
         Static.setup();
 
@@ -65,7 +66,7 @@ enum AidoServer {
          * instance viewer client, for fals the ScenarioServer starts the simulation
          * immediately */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
-        File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
+        configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
         /** geographic information */
         LocationSpec locationSpec = scenarioOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
@@ -83,9 +84,6 @@ enum AidoServer {
         for (ActivityParams activityParams : config.planCalcScore().getActivityParams()) {
             activityParams.setTypicalDuration(3600.0); // TODO fix this to meaningful values
         }
-
-        /** output directory for saving results */
-        String outputdirectory = config.controler().getOutputDirectory();
 
         /** load MATSim scenario for simulation */
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -131,10 +129,17 @@ enum AidoServer {
         SimulationServer.INSTANCE.stopAccepting();
 
         /** perform analysis of simulation */
-        Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory));
-        // TODO put sample of custom analysis element
-        analysis.run();
+        /** output directory for saving results */
+        outputDirectory = new File(config.controler().getOutputDirectory());
 
+    }
+
+    /* package */ File getOutputDirectory() {
+        return outputDirectory;
+    }
+
+    /* package */ File getConfigFile() {
+        return configFile;
     }
 
 }
