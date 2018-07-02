@@ -8,15 +8,15 @@ import org.matsim.core.config.ConfigUtils;
 
 import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
-import ch.ethz.idsc.amodeus.analysis.cost.CostFunctionLinearCombination;
-import ch.ethz.idsc.amodeus.analysis.cost.RoboTaxiCostParametersImplAmodeus;
-import ch.ethz.idsc.amodeus.analysis.report.TotalValueIdentifiersAmodeus;
+import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
+import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 
 /** This is a demonstration of the functionality of AMoDeus that customized analysis and reporting
  * elements can be easily added. In this example, we present the case in which for every
- * {@link RoboTaxi} the number of served requests should be recorded. */
+ * {@link RoboTaxi} the number of served requests is recorded and then a Histogram image is added
+ * to the HTML report */
 public enum CustomAnalysis {
     ;
 
@@ -36,12 +36,23 @@ public enum CustomAnalysis {
         /** the analysis is created */
         Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory));
 
-        /** here we define and add a custom element to the analysis */
+        /** first an element to gather the necessary data is defined, it is an implementation of the
+         * interface AnalysisElement */
         RoboTaxiRequestRecorder roboTaxiRequestRecorder = new RoboTaxiRequestRecorder();
+
+        /** next an element to export the processed data to an image or other element is defined, it
+         * is an implementation of the interface AnalysisExport */
+        RoboTaxiRequestHistoGramExport roboTaxiRequestExport = new RoboTaxiRequestHistoGramExport(roboTaxiRequestRecorder);
+
+        /** finally a section for the HTML report is defined, which is an implementation of the
+         * interface
+         * HtmlReportElement */
+        RoboTaxiRequestRecorderHtml roboTaxiRequestRecorderHtml = new RoboTaxiRequestRecorderHtml(roboTaxiRequestRecorder);
+
+        /** all are added to the Analysis before running */
         analysis.addAnalysisElement(roboTaxiRequestRecorder);
-        RoboTaxiRequestRecorderHtml singleCarHtml = new RoboTaxiRequestRecorderHtml(roboTaxiRequestRecorder);
-        analysis.addHtmlElement(singleCarHtml);
-        analysis.addCostAnalysis(new CostFunctionLinearCombination(TotalValueIdentifiersAmodeus.ANNUALFLEETCOST), new RoboTaxiCostParametersImplAmodeus(1.5));
+        analysis.addAnalysisExport(roboTaxiRequestExport);
+        analysis.addHtmlElement(roboTaxiRequestRecorderHtml);
 
         /** finally, the analysis is run with the introduced custom element */
         analysis.run();
