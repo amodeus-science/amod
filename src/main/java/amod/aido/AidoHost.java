@@ -3,10 +3,10 @@ package amod.aido;
 
 import java.io.File;
 
+import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
-import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
@@ -53,23 +53,23 @@ public enum AidoHost {
             /** run with AIDO dispatcher */
             StaticHelper.changeDispatcherTo("AidoDispatcherHost", workingDirectory);
             StaticHelper.changeVehicleNumberTo(fleetSize, workingDirectory);
-            AidoServer.simulate(stringSocket);
+            AidoServer aidoServer = new AidoServer();
+            aidoServer.simulate(stringSocket);
+            stringSocket.writeln(Tensors.empty()); // send empty string to stop
 
-            /** run with AIDO dispatcher */
-            stringSocket.writeln(Tensors.empty());
-            stringSocket.writeln(RealScalar.ZERO); // TODO something useful
+            /** analyze and send final score */
+            Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
+                    aidoServer.getOutputDirectory());
+            AidoAnalysisElement aidoAnalysis = new AidoAnalysisElement();
+            analysis.addAnalysisElement(aidoAnalysis);
+            AidoHtmlReport aidoHtmlReport = new AidoHtmlReport(aidoAnalysis);
+            analysis.addHtmlElement(aidoHtmlReport);
+            analysis.run();
 
-            // TODO three scores, fleet size, efficiency and waiting time, weighted
+            /** send final score, currently {mean waiting time, share of empty distance, number of
+             * taxis} */
+            stringSocket.writeln(aidoHtmlReport.getFinalScore());
+
         }
     }
-
-    // private static String getScenarioName(String[] args) {
-    // String cityDir = args.length == 0 ? "SanFrancisco" : args[0];
-    // List<AidoScenarioTitle> validCities = Arrays.asList(AidoScenarioTitle.values());
-    // String usage = "AidoHost takes a single city in :" + validCities.toString();
-    // AidoScenarioTitle scenarioTitle = AidoScenarioTitle.valueOf(cityDir);
-    // if (Objects.isNull(scenarioTitle))
-    // throw new IllegalArgumentException(usage);
-    // return cityDir;
-    // }
 }

@@ -14,7 +14,8 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.sca.Round;
 
-/** demo of dispatching logic to instruct aido host */
+/** dispatching logic in the AidoGuest demo to compute dispatching instructions
+ * that are forwarded to the AidoHost */
 /* package */ class DispatchingLogic {
 
     private final Random random = new Random(1234);
