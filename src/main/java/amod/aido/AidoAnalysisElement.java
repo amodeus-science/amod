@@ -2,7 +2,7 @@
 package amod.aido;
 
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisElement;
-import ch.ethz.idsc.amodeus.net.SimulationObject;
+import ch.ethz.idsc.amodeus.net.simobj.SimulationObject;
 
 public class AidoAnalysisElement implements AnalysisElement {
 

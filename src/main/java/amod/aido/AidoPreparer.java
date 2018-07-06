@@ -48,7 +48,8 @@ enum AidoPreparer {
         /** adaption of MATSim population, e.g., radius cutting */
         Population population = scenario.getPopulation();
         scenarioOptions.setMaxPopulationSize((int) (population.getPersons().size() * populRed));
-        PopulationPreparer.run(network, population, scenarioOptions, configMatsim);
+        long apoSeed = 1234;
+        PopulationPreparer.run(network, population, scenarioOptions, configMatsim, apoSeed);
 
         // /** creating a virtual network, e.g., for dispatchers using a graph structure on the city
         // */

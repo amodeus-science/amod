@@ -54,7 +54,8 @@ public enum ScenarioPreparer {
 
         /** adaption of MATSim population, e.g., radius cutting */
         Population population = scenario.getPopulation();
-        PopulationPreparer.run(network, population, scenarioOptions, config);
+        long apoSeed = 1234;
+        PopulationPreparer.run(network, population, scenarioOptions, config, apoSeed);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
         VirtualNetworkPreparer.run(network, population, scenarioOptions);

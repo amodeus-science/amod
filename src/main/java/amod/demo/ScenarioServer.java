@@ -33,6 +33,7 @@ import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusRouterModule;
 import ch.ethz.idsc.amodeus.matsim.mod.DefaultVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
@@ -147,7 +148,8 @@ public enum ScenarioServer {
             }
         });
 
-        /** You need to activate this if you want to use a dispatcher that needs a virtual network! */
+        /** You need to activate this if you want to use a dispatcher that needs a virtual
+         * network! */
         if (false) {
             controler.addOverridingModule(new DefaultVirtualNetworkModule());
         }
