@@ -8,12 +8,14 @@ import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
 import ch.ethz.idsc.amodeus.analysis.plot.ColorScheme;
 import ch.ethz.idsc.amodeus.analysis.plot.DiagramSettings;
 import ch.ethz.idsc.amodeus.analysis.plot.HistogramPlot;
+import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.pdf.BinCounts;
 import ch.ethz.idsc.tensor.red.Total;
+import ch.ethz.matsim.av.passenger.AVRequest;
 
 /** This class generates a png Histogram image of the number of {@link AVRequest} served by each
  * {@link RoboTaxi} */
