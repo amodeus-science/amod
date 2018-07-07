@@ -23,6 +23,7 @@ import com.google.inject.name.Names;
 import amod.demo.analysis.CustomAnalysis;
 import amod.demo.ext.Static;
 import amod.demo.generator.DemoGenerator;
+import amod.demo.router.CustomRouter;
 import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
@@ -121,6 +122,19 @@ public enum ScenarioServer {
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusGeneratorModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
+
+        /** uncomment to include custom routers
+         * controler.addOverridingModule(new AbstractModule() {
+         * 
+         * @Override
+         *           public void install() {
+         *           bind(CustomRouter.Factory.class);
+         *           AVUtils.bindRouterFactory(binder(),
+         *           CustomRouter.class.getSimpleName()).to(CustomRouter.Factory.class);
+         * 
+         *           }
+         *           }); */
+
         controler.addOverridingModule(new DefaultVirtualNetworkModule()); // Added by Lukas June 06,
                                                                           // 2018
         controler.addOverridingModule(new AbstractModule() {

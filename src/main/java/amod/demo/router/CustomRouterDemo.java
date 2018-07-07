@@ -9,9 +9,19 @@ public class CustomRouterDemo {
         /** In order to include a custom router, you should add this line in ScenarioServer
          * before starting the simualtion:
          * 
-         * controler.addOverridingModule(new AmodeusRouterModule());
+         *   controler.addOverridingModule(new AbstractModule() {
+         *    @Override
+         *    public void install() {
+         *        bind(CustomRouter.Factory.class);
+         *        AVUtils.bindRouterFactory(binder(), CustomRouter.class.getSimpleName()).to(CustomRouter.Factory.class);
+         *    }
+         * });
+         *
          * 
          * Then, in av.xml, specify your custom router as follows:
+         * 
+         * <?xml version="1.0" encoding="UTF-8"?>
+         * <!DOCTYPE av SYSTEM "https://www.matsim.org/files/dtd/av_v1.dtd">
          * 
          * <av>
          * <param name="marginalUtilityOfWaitingTime" value="-12.86" />
@@ -21,14 +31,15 @@ public class CustomRouterDemo {
          * <param name="dropoffDurationPerStop" value="10.0" />
          * <param name="dropoffDurationPerPassenger" value="0.0" />
          * </timing>
-         * <parm name="routerName" value="CustomRouter"/>
          * <operator id="op1">
+         * <param name="routerName" value="CustomRouter"/>
          * <generator strategy="PopulationDensity">
-         * <param name="numberOfVehicles" value="60" />
+         * <param name="numberOfVehicles" value="5" />
          * </generator>
-         * <dispatcher strategy="SelfishDispatcher">
+         * <dispatcher strategy="GlobalBipartiteMatchingDispatcher">
          * <param name="dispatchPeriod" value="30" />
-         * <param name="fareRatio" value="100.0" />
+         * <param name="distanceHeuristics" value="EUCLIDEAN"/>
+         * 
          * </dispatcher>
          * <pricing>
          * <param name="pricePerKm" value="0.001" />
