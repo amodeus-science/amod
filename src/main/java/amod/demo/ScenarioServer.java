@@ -120,6 +120,19 @@ public enum ScenarioServer {
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusGeneratorModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
+
+        /** uncomment to include custom routers
+         * controler.addOverridingModule(new AbstractModule() {
+         * 
+         * @Override
+         *           public void install() {
+         *           bind(CustomRouter.Factory.class);
+         *           AVUtils.bindRouterFactory(binder(),
+         *           CustomRouter.class.getSimpleName()).to(CustomRouter.Factory.class);
+         * 
+         *           }
+         *           }); */
+
         controler.addOverridingModule(new DefaultVirtualNetworkModule()); // Added by Lukas June 06,
                                                                           // 2018
         controler.addOverridingModule(new AbstractModule() {
@@ -147,7 +160,8 @@ public enum ScenarioServer {
             }
         });
 
-        /** You need to activate this if you want to use a dispatcher that needs a virtual network! */
+        /** You need to activate this if you want to use a dispatcher that needs a virtual
+         * network! */
         if (false) {
             controler.addOverridingModule(new DefaultVirtualNetworkModule());
         }
