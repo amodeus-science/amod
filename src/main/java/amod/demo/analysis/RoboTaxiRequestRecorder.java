@@ -8,7 +8,7 @@ import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisElement;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
-import ch.ethz.idsc.amodeus.net.simobj.SimulationObject;
+import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
