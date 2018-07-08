@@ -3,7 +3,10 @@ package amod.aido;
 
 import java.io.File;
 
+import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
+import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
+import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
@@ -51,8 +54,9 @@ public enum AidoHost {
             stringSocket.writeln(initialInfo);
 
             /** run with AIDO dispatcher */
-            StaticHelper.changeDispatcherTo("AidoDispatcherHost", workingDirectory);
-            StaticHelper.changeVehicleNumberTo(fleetSize, workingDirectory);
+
+            XmlDispatcherChanger.of(workingDirectory, AidoDispatcherHost.class.getSimpleName());
+            XmlNumberOfVehiclesChanger.of(workingDirectory, fleetSize);
             AidoServer aidoServer = new AidoServer();
             aidoServer.simulate(stringSocket);
             stringSocket.writeln(Tensors.empty()); // send empty string to stop
