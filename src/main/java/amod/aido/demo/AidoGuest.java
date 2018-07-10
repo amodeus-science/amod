@@ -55,14 +55,22 @@ public class AidoGuest {
             /** receive dispatching status and send dispatching command */
             DispatchingLogic bdl = new DispatchingLogic(bottomLeft, topRight);
 
+            int count = 0;
             while (true) {
                 String string = clientSocket.readLine();
                 if (Objects.nonNull(string)) { // when the server
                     Tensor status = Tensors.fromString(string);
-                    Tensor score = status.get(3);
-                    System.out.println("score = " + score + " at " + status.Get(0));
-                    if (Tensors.isEmpty(status))
+                    if (Tensors.isEmpty(status)) // signal to exit
                         break;
+
+                    if (status.length() < 4) {
+                        System.out.println("status has unexpected format");
+                        System.out.println(status);
+                        break;
+                    }
+                    Tensor score = status.get(3);
+                    if (++count % 100 == 0)
+                        System.out.println("score = " + score + " at " + status.Get(0));
                     Tensor command = bdl.of(status);
                     clientSocket.writeln(command);
                 } else {
