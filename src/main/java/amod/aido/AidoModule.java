@@ -15,8 +15,7 @@ public class AidoModule extends AbstractModule {
     private final StringSocket stringSocket;
 
     public AidoModule(StringSocket stringSocket) {
-        Objects.requireNonNull(stringSocket);
-        this.stringSocket = stringSocket;
+        this.stringSocket = Objects.requireNonNull(stringSocket);
     }
 
     @Override

@@ -19,8 +19,8 @@ import ch.ethz.idsc.tensor.sca.Round;
 /* package */ class DispatchingLogic {
 
     private final Random random = new Random(1234);
-    private Set<Scalar> matchedReq = new HashSet<>();
-    private Set<Scalar> matchedTax = new HashSet<>();
+    private final Set<Scalar> matchedReq = new HashSet<>();
+    private final Set<Scalar> matchedTax = new HashSet<>();
     private final Scalar latMin;
     private final Scalar latMax;
     private final Scalar lngMin;
