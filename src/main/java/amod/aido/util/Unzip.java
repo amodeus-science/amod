@@ -13,11 +13,10 @@ import java.util.zip.ZipInputStream;
 public enum Unzip {
     ;
 
-    /** Unzip it
-     * 
-     * @param zipFile input zip file
-     * @param output zip file output folder
-     * @param ignoreFirst
+    /** @param file to unzip
+     * @param output folder
+     * @param ignoreFirst applies only to zip files that has a single folder at the root level
+     *            if ignoreFirst is true, this base folder can be skipped when restoring the compressed files.
      * @throws IOException
      * @throws FileNotFoundException */
     public static void of(File file, File outputFolder, boolean ignoreFirst) //
