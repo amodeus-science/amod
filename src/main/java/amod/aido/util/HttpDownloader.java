@@ -12,15 +12,19 @@ import java.net.URL;
 public class HttpDownloader {
     private static final int BUFFER_SIZE = 4096;
 
-    public static HttpDownloader download(String fileURL) {
-        return new HttpDownloader(fileURL);
+    public static HttpDownloader download(String fileURL, ContentType contentType) {
+        return new HttpDownloader(fileURL, contentType);
     }
 
     // ---
     private final String fileURL;
+    private final ContentType contentType;
 
-    private HttpDownloader(String fileURL) {
+    /** @param fileURL
+     * @param contentType */
+    private HttpDownloader(String fileURL, ContentType contentType) {
         this.fileURL = fileURL;
+        this.contentType = contentType;
     }
 
     public void to(File file) throws IOException {
@@ -32,25 +36,29 @@ public class HttpDownloader {
         if (responseCode == HttpURLConnection.HTTP_OK) {
             // tests show that often: disposition == null
             String disposition = httpURLConnection.getHeaderField("Content-Disposition");
-            String contentType = httpURLConnection.getContentType();
-            int contentLength = httpURLConnection.getContentLength();
+            String content_type = httpURLConnection.getContentType();
+            if (contentType.matches(content_type)) {
+                int contentLength = httpURLConnection.getContentLength();
 
-            System.out.println("Content-Type = " + contentType);
-            System.out.println("Content-Disposition = " + disposition);
-            System.out.println("Content-Length = " + contentLength);
+                System.out.println("Content-Type = " + content_type);
+                System.out.println("Content-Disposition = " + disposition);
+                System.out.println("Content-Length = " + contentLength);
 
-            byte[] buffer = new byte[BUFFER_SIZE];
-            // opens input stream from the HTTP connection
-            try (InputStream inputStream = httpURLConnection.getInputStream()) {
-                // opens an output stream to save into file
-                try (OutputStream outputStream = new FileOutputStream(file)) {
-                    int bytesRead = -1;
-                    while ((bytesRead = inputStream.read(buffer)) != -1)
-                        outputStream.write(buffer, 0, bytesRead);
+                byte[] buffer = new byte[BUFFER_SIZE];
+                // opens input stream from the HTTP connection
+                try (InputStream inputStream = httpURLConnection.getInputStream()) {
+                    // opens an output stream to save into file
+                    try (OutputStream outputStream = new FileOutputStream(file)) {
+                        int bytesRead = -1;
+                        while ((bytesRead = inputStream.read(buffer)) != -1)
+                            outputStream.write(buffer, 0, bytesRead);
 
+                    }
                 }
+            } else {
+                httpURLConnection.disconnect();
+                throw new RuntimeException(content_type);
             }
-
             System.out.println("File downloaded");
         } else {
             System.out.println("No file to download. Server replied HTTP code: " + responseCode);

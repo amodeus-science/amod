@@ -39,7 +39,7 @@ public enum AidoHost {
 
             /** download the chosen scenario */
             File workingDirectory = MultiFileTools.getWorkingDirectory();
-            AidoScenarioDownload.download(scenarioTag, workingDirectory.getAbsolutePath());
+            AidoScenarioDownload.download(scenarioTag, workingDirectory.getAbsoluteFile());
 
             /** scenario preparer */
             // String scenarioName = getScenarioName(args);
@@ -74,6 +74,9 @@ public enum AidoHost {
              * taxis} */
             stringSocket.writeln(aidoHtmlReport.getFinalScore());
 
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw exception;
         }
     }
 }

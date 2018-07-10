@@ -12,7 +12,7 @@ public class HttpDownloaderTest extends TestCase {
         File file = UserHome.file("favicon.ico");
         assertFalse(file.exists());
 
-        HttpDownloader.download("http://www.djtascha.de/favicon.ico").to(file);
+        HttpDownloader.download("http://www.djtascha.de/favicon.ico", ContentType.IMAGE_XICON).to(file);
         assertTrue(file.isFile());
 
         file.delete();
@@ -22,11 +22,25 @@ public class HttpDownloaderTest extends TestCase {
         File file = UserHome.file("scenario.zip");
         assertFalse(file.exists());
 
-        HttpDownloader.download("https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWSGmy/download").to(file);
+        HttpDownloader.download("https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWSGmy/download", ContentType.APPLICATION_ZIP).to(file);
 
         assertTrue(file.isFile());
         assertEquals(file.length(), 5310145);
 
         file.delete();
+    }
+
+    public void testFail() {
+        File file = UserHome.file("scenario-does-not-exist.zip");
+        assertFalse(file.exists());
+        try {
+            HttpDownloader.download( //
+                    "https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWS1Gmy/download123", //
+                    ContentType.APPLICATION_ZIP).to(file);
+            assertTrue(false);
+        } catch (Exception exception) {
+            // ---
+        }
+        assertFalse(file.exists());
     }
 }

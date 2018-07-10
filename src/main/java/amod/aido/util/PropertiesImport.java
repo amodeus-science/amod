@@ -13,6 +13,10 @@ import ch.ethz.idsc.tensor.io.ResourceData;
 // TODO JAN obsolete with tensor 057  
 public enum PropertiesImport {
     ;
+    /** load from resources
+     * 
+     * @param string
+     * @return properties loaded from resource */
     public static Properties properties(String string) {
         try (InputStream inputStream = ResourceData.class.getResourceAsStream(string)) {
             return properties(inputStream);
@@ -22,13 +26,17 @@ public enum PropertiesImport {
         return null;
     }
 
+    /** @param file
+     * @return properties loaded from given file
+     * @throws FileNotFoundException
+     * @throws IOException */
     public static Properties properties(File file) throws FileNotFoundException, IOException {
         try (InputStream inputStream = new FileInputStream(file)) {
             return properties(inputStream);
         }
     }
 
-    static Properties properties(InputStream inputStream) throws IOException {
+    private static Properties properties(InputStream inputStream) throws IOException {
         Properties properties = new Properties();
         properties.load(inputStream);
         return properties;
