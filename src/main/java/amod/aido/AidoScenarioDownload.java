@@ -1,11 +1,19 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido;
 
+import java.util.Properties;
+
+import amod.aido.util.PropertiesImport;
+
 /* package */ enum AidoScenarioDownload {
 
     ;
 
     /* package */ static void download(String tag, String saveDir) {
+
+        Properties properties = PropertiesImport.properties("/aido/scenarios.properties");
+
+        properties.list(System.out);
 
         // // String fileURL =
         // //
