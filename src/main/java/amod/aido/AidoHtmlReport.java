@@ -12,16 +12,17 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-public class AidoHtmlReport implements HtmlReportElement {
+/* package */ class AidoHtmlReport implements HtmlReportElement {
 
     @SuppressWarnings("unused")
-    private final AidoAnalysisElement aidoAnalysis;
+    private final AidoAnalysisElement aidoAnalysisElement;
     private Scalar totalMeanWaitingTime;
     private Scalar totalEfficiencyRatio; /* empty distance divided by total distance */
     private Scalar numberOfVehicles;
 
-    /* package */ public AidoHtmlReport(AidoAnalysisElement aidoAnalysis) {
-        this.aidoAnalysis = aidoAnalysis;
+    // TODO figure out if input param is needed, otherwise remove
+    /* package */ public AidoHtmlReport(AidoAnalysisElement aidoAnalysisElement) {
+        this.aidoAnalysisElement = aidoAnalysisElement;
     }
 
     @Override

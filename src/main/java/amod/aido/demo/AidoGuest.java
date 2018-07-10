@@ -42,19 +42,19 @@ public class AidoGuest {
 
     public void run(String scenario, double populationRatio, int numberOfVehicles) throws UnknownHostException, IOException, Exception {
         /** connect to AidoGuest */
-        try (StringSocket clientSocket = new StringSocket(new Socket(ip, AidoHost.PORT))) {
+        try (StringSocket stringSocket = new StringSocket(new Socket(ip, AidoHost.PORT))) {
 
             /** send initial command {"SanFrancisco", 0.4, 177} */
             Tensor config = Tensors.of( //
                     StringScalar.of(scenario), // scenario name
                     RealScalar.of(populationRatio), // ratio of population
                     RealScalar.of(numberOfVehicles)); // number of vehicles
-            clientSocket.writeln(config);
+            stringSocket.writeln(config);
 
             final DispatchingLogic dispatchingLogic;
             {
                 /** receive initial information */
-                Tensor initialInfo = Tensors.fromString(clientSocket.readLine());
+                Tensor initialInfo = Tensors.fromString(stringSocket.readLine());
 
                 /** the city grid is inside the WGS:84 coordinates bounded by the box
                  * bottomLeft, topRight */
@@ -67,23 +67,18 @@ public class AidoGuest {
 
             int count = 0;
             while (true) {
-                String string = clientSocket.readLine();
+                String string = stringSocket.readLine();
                 if (Objects.nonNull(string)) { // when the server closed prematurely
                     Tensor status = Tensors.fromString(string);
                     if (Tensors.isEmpty(status)) // server signal that simulation is finished
                         break;
 
-                    // if (status.length() < 4) {
-                    // System.err.println("status has unexpected format");
-                    // System.err.println(status);
-                    // break;
-                    // }
                     Tensor score = status.get(3);
                     if (++count % PRINT_SCORE_PERIOD == 0)
                         System.out.println("score = " + score + " at " + status.Get(0));
 
                     Tensor command = dispatchingLogic.of(status);
-                    clientSocket.writeln(command);
+                    stringSocket.writeln(command);
                 } else {
                     System.err.println("server terminated prematurely?");
                     break;
@@ -92,12 +87,12 @@ public class AidoGuest {
 
             {
                 /** recieve final performance score/stats */
-                Tensor finalInfo = Tensors.fromString(clientSocket.readLine());
+                Tensor finalInfo = Tensors.fromString(stringSocket.readLine());
                 // {2712.6744186046512, 0.6200892616333414, 5}
                 System.out.println("finalInfo: " + finalInfo);
                 // TODO decode numbers in finalInfo and print with interpretation
             }
-        }
+        } // <- closing string socket
     }
 
 }

@@ -23,7 +23,7 @@ import ch.ethz.idsc.amodeus.prep.PopulationPreparer;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-enum AidoPreparer {
+/* package */ enum AidoPreparer {
     ;
 
     /** loads scenario preparer in the {@link File} workingDirectory

@@ -12,11 +12,9 @@ import amod.aido.util.Unzip;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 
 /* package */ enum AidoScenarioDownload {
-
     ;
 
     /** @param key for instance "SanFrancisco"
-     * @param file
      * @throws IOException */
     /* package */ static void download(String key) throws IOException {
 
@@ -24,6 +22,7 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
         if (properties.containsKey(key)) {
             String value = properties.getProperty(key);
             System.out.println(value);
+            // file name is arbitrary, file will be deleted after un-zipping
             File file = new File(MultiFileTools.getWorkingDirectory(), "scenario.zip");
             HttpDownloader.download(value, ContentType.APPLICATION_ZIP).to(file);
 
