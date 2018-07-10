@@ -38,15 +38,14 @@ public enum AidoHost {
             int fleetSize = config.Get(2).number().intValue();
 
             /** download the chosen scenario */
-            File workingDirectory = MultiFileTools.getWorkingDirectory();
-            AidoScenarioDownload.download(scenarioTag, workingDirectory.getAbsolutePath());
+            AidoScenarioDownload.download(scenarioTag);
 
             /** scenario preparer */
             // String scenarioName = getScenarioName(args);
             // String scenarioPath = MultiFileTools.getWorkingDirectory().getAbsolutePath();
             // + "/" + scenarioName + "/";
+            File workingDirectory = MultiFileTools.getWorkingDirectory();
             System.out.println("Using scenario directory: " + workingDirectory);
-            // workingDirectory = new File(scenarioPath);
 
             Tensor initialInfo = AidoPreparer.run(workingDirectory, populRed);
 
@@ -74,6 +73,9 @@ public enum AidoHost {
              * taxis} */
             stringSocket.writeln(aidoHtmlReport.getFinalScore());
 
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw exception;
         }
     }
 }

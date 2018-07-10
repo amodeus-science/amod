@@ -1,5 +1,5 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.dispatcher;
+package amod.demo.dispatcher;
 
 import java.util.ArrayList;
 import java.util.Collections;

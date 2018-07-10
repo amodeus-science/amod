@@ -21,9 +21,9 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 import amod.demo.analysis.CustomAnalysis;
+import amod.demo.dispatcher.DemoDispatcher;
 import amod.demo.ext.Static;
 import amod.demo.generator.DemoGenerator;
-import amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
