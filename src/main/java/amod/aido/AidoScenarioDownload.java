@@ -8,7 +8,8 @@ import java.util.Properties;
 import amod.aido.util.ContentType;
 import amod.aido.util.HttpDownloader;
 import amod.aido.util.PropertiesImport;
-import ch.ethz.idsc.amodeus.util.math.UserHome;
+import amod.aido.util.Unzip;
+import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 
 /* package */ enum AidoScenarioDownload {
 
@@ -17,30 +18,18 @@ import ch.ethz.idsc.amodeus.util.math.UserHome;
     /** @param key for instance "SanFrancisco"
      * @param file
      * @throws IOException */
-    /* package */ static void download(String key, File file) throws IOException {
+    /* package */ static void download(String key) throws IOException {
 
         Properties properties = PropertiesImport.properties("/aido/scenarios.properties");
-
-        properties.list(System.out);
-
         if (properties.containsKey(key)) {
-
             String value = properties.getProperty(key);
             System.out.println(value);
+            File file = new File(MultiFileTools.getWorkingDirectory(), "scenario.zip");
             HttpDownloader.download(value, ContentType.APPLICATION_ZIP).to(file);
+
+            Unzip.of(file, MultiFileTools.getWorkingDirectory(), true);
+
+            file.delete();
         }
-
-        // TODO unzip and move into saveDir
     }
-
-    public static void main(String[] args) throws Exception {
-        try {
-            download("SanFrancisco2", UserHome.file("aido-scenario.zip"));
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            throw exception;
-        }
-
-    }
-
 }

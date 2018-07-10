@@ -27,6 +27,8 @@ public class HttpDownloader {
         this.contentType = contentType;
     }
 
+    /** @param file
+     * @throws IOException */
     public void to(File file) throws IOException {
         URL url = new URL(fileURL);
         HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
