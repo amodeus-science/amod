@@ -12,6 +12,5 @@ enum UnzipDemo {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         File file = UserHome.file("aido-scenario.zip");
         Unzip.of(file, UserHome.file("SCEN_OUT"), true);
-
     }
 }
