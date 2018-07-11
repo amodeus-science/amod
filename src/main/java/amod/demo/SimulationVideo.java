@@ -50,7 +50,7 @@ public enum SimulationVideo {
         final File outputSubDirectory = new File(config.controler().getOutputDirectory()).getAbsoluteFile();
         GlobalAssert.that(outputSubDirectory.isDirectory());
         System.out.println(outputSubDirectory.getAbsolutePath());
-        // FIXME This dous only work if a sub directory is present.
+        // FIXME This only works if a sub directory is present.
         // File outputDirectory = outputSubDirectory.getParentFile();
 
         ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();

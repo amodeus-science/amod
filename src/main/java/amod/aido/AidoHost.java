@@ -53,24 +53,22 @@ public enum AidoHost {
             stringSocket.writeln(initialInfo);
 
             /** run with AIDO dispatcher */
-
             XmlDispatcherChanger.of(workingDirectory, AidoDispatcherHost.class.getSimpleName());
             XmlNumberOfVehiclesChanger.of(workingDirectory, fleetSize);
             AidoServer aidoServer = new AidoServer();
             aidoServer.simulate(stringSocket);
-            stringSocket.writeln(Tensors.empty()); // send empty string to stop
+
+            /** send empty tensor "{}" to stop */
+            stringSocket.writeln(Tensors.empty());
 
             /** analyze and send final score */
             Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
                     aidoServer.getOutputDirectory());
-            AidoAnalysisElement aidoAnalysisElement = new AidoAnalysisElement();
-            analysis.addAnalysisElement(aidoAnalysisElement);
-            AidoHtmlReport aidoHtmlReport = new AidoHtmlReport(aidoAnalysisElement);
+            AidoHtmlReport aidoHtmlReport = new AidoHtmlReport();
             analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
 
-            /** send final score, currently {mean waiting time, share of empty distance, number of
-             * taxis} */
+            /** send final score, currently {mean waiting time, share of empty distance, number of taxis} */
             stringSocket.writeln(aidoHtmlReport.getFinalScore());
 
         } catch (Exception exception) {
