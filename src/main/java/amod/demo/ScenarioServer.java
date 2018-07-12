@@ -24,6 +24,7 @@ import amod.demo.analysis.CustomAnalysis;
 import amod.demo.dispatcher.DemoDispatcher;
 import amod.demo.ext.Static;
 import amod.demo.generator.DemoGenerator;
+import amod.demo.router.IAMoDRouter;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
@@ -165,6 +166,14 @@ public enum ScenarioServer {
         if (false) {
             controler.addOverridingModule(new DefaultVirtualNetworkModule());
         }
+        
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(IAMoDRouter.Factory.class);
+                AVUtils.bindRouterFactory(binder(), IAMoDRouter.class.getSimpleName()).to(IAMoDRouter.Factory.class);
+            }
+         });
 
         /** run simulation */
         controler.run();
