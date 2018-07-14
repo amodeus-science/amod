@@ -32,7 +32,7 @@ public class AidoStarterHelperTest extends TestCase {
 
     public void testSanFrancisco() throws UnknownHostException, IOException, Exception {
 
-        List<Integer> list = IntStream.range(0, 2).boxed().collect(Collectors.toList());
+        List<Integer> list = IntStream.range(0, 3).boxed().collect(Collectors.toList());
         Collections.shuffle(list);
 
         // TODO if i put 2 instead of 1 -> doesn't finish but exception in traffic link data
@@ -45,6 +45,9 @@ public class AidoStarterHelperTest extends TestCase {
                 break;
             case 1:
                 guest().run("TelAviv", 0.001, 6);
+                break;
+            case 2:
+                guest().run("Santiago", 0.001, 10);
                 break;
             default:
                 throw new RuntimeException("out of range");
