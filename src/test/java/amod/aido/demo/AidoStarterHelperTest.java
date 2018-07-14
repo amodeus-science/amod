@@ -9,6 +9,9 @@ import junit.framework.TestCase;
 
 public class AidoStarterHelperTest extends TestCase {
     public void testSimple() throws UnknownHostException, IOException, Exception {
+
+        StaticHelper.setup();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
