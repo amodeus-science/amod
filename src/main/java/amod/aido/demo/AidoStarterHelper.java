@@ -13,8 +13,8 @@ public enum AidoStarterHelper {
             public void run() {
                 try {
                     AidoHost.main(args);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
             }
         }).start();

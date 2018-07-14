@@ -20,7 +20,7 @@ import ch.ethz.idsc.tensor.io.StringScalar;
 public class AidoGuest {
 
     /** default values for demo */
-    private static final String SCENARIO = "SanFrancisco";
+    private static final String SCENARIO = "TelAviv";
     private static final double POPULATION_RATIO = 0.4;
     private static final int NUMBER_OF_VEHICLES = 177;
     private static final int PRINT_SCORE_PERIOD = 200;
