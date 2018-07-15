@@ -10,7 +10,7 @@ import ch.ethz.idsc.amodeus.analysis.report.HtmlReportElement;
 
 /** This class adds a histogram image to the AMoDeus HTML report which was previously
  * compiled in the class {@link RoboTaxiRequestHistoGramExport} */
-public class RoboTaxiRequestRecorderHtml implements HtmlReportElement {
+/* package */ class RoboTaxiRequestRecorderHtml implements HtmlReportElement {
     private static final String IMAGE_FOLDER = "../data"; // relative to report folder
 
     RoboTaxiRequestRecorder roboTaxiRequestRecorder;

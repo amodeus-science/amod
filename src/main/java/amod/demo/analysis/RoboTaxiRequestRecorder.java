@@ -16,7 +16,7 @@ import ch.ethz.idsc.tensor.Tensors;
 /** this class records the number of requests served by each {@link RoboTaxi} bases on the
  * {@link SimulationObject} which are loaded during the {@link Analysis} of an AMoDeus
  * simulation run. */
-public class RoboTaxiRequestRecorder implements AnalysisElement {
+/* package */ class RoboTaxiRequestRecorder implements AnalysisElement {
 
     private Map<Integer, Integer> vehicleRequestCount = new HashMap<>();
     private Map<Integer, RoboTaxiStatus> prevStatus = new HashMap<>();
