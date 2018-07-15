@@ -55,7 +55,7 @@ public enum ScenarioViewer {
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
 
         /** MATSim simulation network */
-        Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("simuConfig")));
+        Network network = NetworkLoader.fromConfigFile(new File(workingDirectory, simOptions.getString("simuConfig")));
         System.out.println("INFO network loaded");
         System.out.println("INFO total links " + network.getLinks().size());
         System.out.println("INFO total nodes " + network.getNodes().size());
