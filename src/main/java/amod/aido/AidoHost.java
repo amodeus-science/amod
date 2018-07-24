@@ -65,6 +65,7 @@ public enum AidoHost {
             Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
                     aidoServer.getOutputDirectory());
             AidoHtmlReport aidoHtmlReport = new AidoHtmlReport();
+            analysis.addAnalysisExport(new AidoDataExport());
             analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
 
