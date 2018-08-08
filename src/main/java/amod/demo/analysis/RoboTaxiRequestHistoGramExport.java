@@ -19,7 +19,7 @@ import ch.ethz.matsim.av.passenger.AVRequest;
 
 /** This class generates a png Histogram image of the number of {@link AVRequest} served by each
  * {@link RoboTaxi} */
-public class RoboTaxiRequestHistoGramExport implements AnalysisExport {
+/* package */ class RoboTaxiRequestHistoGramExport implements AnalysisExport {
     public final static String FILENAME = "requestsPerRoboTaxi";
     private final RoboTaxiRequestRecorder roboTaxiRequestRecorder;
 

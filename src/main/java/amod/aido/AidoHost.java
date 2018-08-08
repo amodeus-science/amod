@@ -40,10 +40,10 @@ public enum AidoHost {
             /** download the chosen scenario */
             AidoScenarioDownload.download(scenarioTag);
 
+            /** setup environment variables */
+            StaticHelper.setup();
+
             /** scenario preparer */
-            // String scenarioName = getScenarioName(args);
-            // String scenarioPath = MultiFileTools.getWorkingDirectory().getAbsolutePath();
-            // + "/" + scenarioName + "/";
             File workingDirectory = MultiFileTools.getWorkingDirectory();
             System.out.println("Using scenario directory: " + workingDirectory);
 
