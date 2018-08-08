@@ -73,3 +73,12 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# Simulation data
+simulation/
+
+# Matlab data too big
+matlab/
+
+# output data too big
+output/
+virtualNetwork/

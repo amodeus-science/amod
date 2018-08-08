@@ -53,7 +53,7 @@ public class IAMoDRouter implements AVRouter {
         @Override
         public AVRouter createRouter() {
             return new IAMoDRouter(DefaultParallelLeastCostPathCalculator.create((int) config.getParallelRouters(),
-                    new DijkstraFactory(), network, new FlowDependentTravelDisutility(travelTime), travelTime));
+                    new DijkstraFactory(), network, new OnlyTimeDependentTravelDisutility(travelTime), travelTime));
         }
     }
 }

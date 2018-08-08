@@ -22,6 +22,9 @@ import com.google.inject.name.Names;
 
 import amod.demo.analysis.CustomAnalysis;
 import amod.demo.dispatcher.DemoDispatcher;
+import amod.demo.dispatcher.SMPCDispatcher;
+import amod.demo.dispatcher.CarPooling2Dispatcher;
+import amod.demo.dispatcher.claudioForDejan.ClaudioForDejanDispatcher;
 import amod.demo.ext.Static;
 import amod.demo.generator.DemoGenerator;
 import amod.demo.router.IAMoDRouter;
@@ -149,9 +152,28 @@ public enum ScenarioServer {
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "DemoDispatcher", DemoDispatcher.Factory.class);
+                AVUtils.registerDispatcherFactory(binder(), "SMPCDispatcher", SMPCDispatcher.Factory.class);
             }
         });
+        
+        /** here an additional user-defined dispatcher is added, functionality in class
+         * DemoDispatcher */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerDispatcherFactory(binder(), "ClaudioForDejanDispatcher", ClaudioForDejanDispatcher.Factory.class);                
+            }
+        });
+        
+        /** here an additional user-defined dispatcher is added, functionality in class
+         * DemoDispatcher */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerDispatcherFactory(binder(), "CarPooling2Dispatcher", CarPooling2Dispatcher.Factory.class);                
+            }
+        });
+        
         /** here an additional user-defined initial placement logic called generator is added,
          * functionality in class DemoGenerator */
         controler.addOverridingModule(new AbstractModule() {
@@ -163,7 +185,7 @@ public enum ScenarioServer {
 
         /** You need to activate this if you want to use a dispatcher that needs a virtual
          * network! */
-        if (false) {
+        if (true) {
             controler.addOverridingModule(new DefaultVirtualNetworkModule());
         }
         
