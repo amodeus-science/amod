@@ -20,9 +20,9 @@ import ch.ethz.idsc.tensor.io.StringScalar;
 public class AidoGuest {
 
     /** default values for demo */
-    private static final String SCENARIO = "Santiago";
-    private static final double POPULATION_RATIO = 0.4;
-    private static final int NUMBER_OF_VEHICLES = 177;
+    static final String SCENARIO = "Santiago";
+    static final double POPULATION_RATIO = 0.4;
+    static final int NUMBER_OF_VEHICLES = 177;
     private static final int PRINT_SCORE_PERIOD = 200;
 
     /** @param args 1 entry which is IP address
@@ -44,7 +44,7 @@ public class AidoGuest {
         /** connect to AidoGuest */
         try (StringSocket stringSocket = new StringSocket(new Socket(ip, AidoHost.PORT))) {
 
-            /** send initial command {"SanFrancisco", 0.4, 177} */
+            /** send initial command {SanFrancisco, 0.4, 177} */
             Tensor config = Tensors.of( //
                     StringScalar.of(scenario), // scenario name
                     RealScalar.of(populationRatio), // ratio of population
