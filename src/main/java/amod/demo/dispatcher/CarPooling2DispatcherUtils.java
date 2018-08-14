@@ -1,11 +1,27 @@
 package amod.demo.dispatcher;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.PtConstants;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiPlanEntry;
@@ -58,8 +74,9 @@ public enum CarPooling2DispatcherUtils {
     }
 
     public static double[][] getRState(double Time, int PlanningHorizon,
-            Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi, Map<VirtualNode<Link>, List<RoboTaxi>> RebalanceRoboTaxi,
-            Map<VirtualNode<Link>, List<RoboTaxi>> SORoboTaxi, Map<VirtualNode<Link>, List<RoboTaxi>> DORoboTaxi) {
+            Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi,
+            Map<VirtualNode<Link>, List<RoboTaxi>> RebalanceRoboTaxi, Map<VirtualNode<Link>, List<RoboTaxi>> SORoboTaxi,
+            Map<VirtualNode<Link>, List<RoboTaxi>> DORoboTaxi) {
 
         int NumberNodes = StayRoboTaxi.keySet().size();
 
@@ -97,7 +114,7 @@ public enum CarPooling2DispatcherUtils {
                 } else {
                     numberSO = getNumberCarsAbailableAtTime(Time, t, SOCarsAtNode);
                 }
-                
+
                 if (DOCarsAtNode.isEmpty() == true) {
                     numberDO = 0;
                 } else {
@@ -117,10 +134,12 @@ public enum CarPooling2DispatcherUtils {
         return TotalAvailableCars;
 
     }
-    
+
+    // TODO Get plans of double occupied cars
     public static double[][] getXState(double Time, int PlanningHorizon,
-            Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi, Map<VirtualNode<Link>, List<RoboTaxi>> RebalanceRoboTaxi,
-            Map<VirtualNode<Link>, List<RoboTaxi>> SORoboTaxi, Map<VirtualNode<Link>, List<RoboTaxi>> DORoboTaxi) {
+            Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi,
+            Map<VirtualNode<Link>, List<RoboTaxi>> RebalanceRoboTaxi, Map<VirtualNode<Link>, List<RoboTaxi>> SORoboTaxi,
+            Map<VirtualNode<Link>, List<RoboTaxi>> DORoboTaxi) {
 
         int NumberNodes = StayRoboTaxi.keySet().size();
 
@@ -158,7 +177,7 @@ public enum CarPooling2DispatcherUtils {
                 } else {
                     numberSO = getNumberCarsAbailableAtTime(Time, t, SOCarsAtNode);
                 }
-                
+
                 if (DOCarsAtNode.isEmpty() == true) {
                     numberDO = 0;
                 } else {
@@ -176,6 +195,62 @@ public enum CarPooling2DispatcherUtils {
         }
 
         return TotalAvailableCars;
+
+    }
+
+    public static List<double[][]> getFlowsOut(Network network, VirtualNetwork virtualNetwork, int PlanningHorizon,
+            Config config, double round_now) {
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        Population population = scenario.getPopulation();
+        StageActivityTypes stageActivityTypes = new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
+        List<double[][]> dataList = new ArrayList<>();
+
+        int helper = 0;
+        int FromnodeIndex = 0;
+        int TonodeIndex = 0;
+        int numberVirtualNodes = virtualNetwork.getVirtualNodes().size();
+        double[][] FlowsOutMatrix = new double[numberVirtualNodes][numberVirtualNodes];
+
+        for (int i = 0; i < PlanningHorizon; i++) {
+            for (Person person : population.getPersons().values()) {
+                for (Plan plan : person.getPlans()) {
+                    for (PlanElement planElement : plan.getPlanElements()) {
+                        if (planElement instanceof Activity) {
+                            Activity activity = (Activity) planElement;
+
+                            if (activity.getEndTime() >= (round_now + i * 5 * 60)
+                                    && activity.getEndTime() <= (round_now + (i + 1) * 5 * 60)) {
+                                if (!stageActivityTypes.isStageActivity(activity.getType())) {
+                                    Link link = network.getLinks().getOrDefault(activity.getLinkId(), null);
+                                    if (link != null) {
+                                        VirtualNode FromVirtualNode = virtualNetwork.getVirtualNode(link);
+                                        FromnodeIndex = FromVirtualNode.getIndex();
+                                        helper = 1;
+                                    }
+                                }
+                            }
+
+                            if (activity.getStartTime() != Double.NEGATIVE_INFINITY && helper == 1) {
+                                if (!stageActivityTypes.isStageActivity(activity.getType())) {
+                                    Link link = network.getLinks().getOrDefault(activity.getLinkId(), null);
+                                    if (link != null) {
+                                        VirtualNode ToVirtualNode = virtualNetwork.getVirtualNode(link);
+                                        TonodeIndex = ToVirtualNode.getIndex();
+                                        FlowsOutMatrix[FromnodeIndex][TonodeIndex] = FlowsOutMatrix[FromnodeIndex][TonodeIndex]
+                                                + 1;
+                                        helper = 0;
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+            }
+            dataList.add(i, FlowsOutMatrix);
+        }
+        return dataList;
 
     }
 

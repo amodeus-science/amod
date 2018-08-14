@@ -7,7 +7,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 
-/* package */ enum UserReferenceFrames implements ReferenceFrame {
+/* package */ public enum UserReferenceFrames implements ReferenceFrame {
     BERLIN( //
             new GeotoolsTransformation("EPSG:31468", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:31468")), //
