@@ -72,3 +72,5 @@ San Francisco
 ## Docker
 
 Run `docker-compose up` to run the San Fransisco simulation. This will run two services, `aido-host` and `aido-guest`, which will communicate over port `9382`.
+
+The protocol is specified [here](https://github.com/idsc-frazzoli/amod/blob/master/doc/aido-client-protocol.md).
