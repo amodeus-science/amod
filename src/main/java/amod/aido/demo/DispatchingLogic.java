@@ -26,6 +26,8 @@ import ch.ethz.idsc.tensor.sca.Round;
     private final Scalar lngMin;
     private final Scalar lngMax;
 
+    /** @param bottomLeft {lngMin, latMin}
+     * @param topRight {lngMax, latMax} */
     public DispatchingLogic(Tensor bottomLeft, Tensor topRight) {
         this.latMin = bottomLeft.Get(1);
         this.latMax = topRight.Get(1);
@@ -37,6 +39,11 @@ import ch.ethz.idsc.tensor.sca.Round;
         System.out.println("minimum longitude in network: " + lngMin);
         System.out.println("maximum longitude in network: " + lngMax);
 
+        // Example:
+        // minimum latitude in network: -33.869660953686626
+        // maximum latitude in network: -33.0303523690584
+        // minimum longitude in network: -71.38020297181387
+        // maximum longitude in network: -70.44406349551404
     }
 
     public Tensor of(Tensor status) {
