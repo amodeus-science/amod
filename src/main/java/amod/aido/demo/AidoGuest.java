@@ -20,10 +20,10 @@ import ch.ethz.idsc.tensor.io.StringScalar;
 public class AidoGuest {
 
     /** default values for demo */
-    private static final String SCENARIO = "SanFrancisco";
-    private static final double POPULATION_RATIO = 0.2;
-    private static final int NUMBER_OF_VEHICLES = 200;
-    private static final int PRINT_SCORE_PERIOD = 1;
+    static final String SCENARIO = "SanFrancisco";
+    static final double POPULATION_RATIO = 0.2;
+    static final int NUMBER_OF_VEHICLES = 200;
+    static final int PRINT_SCORE_PERIOD = 1;
 
     /** @param args 1 entry which is IP address
      * @throws Exception */

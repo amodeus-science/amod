@@ -68,7 +68,7 @@ public enum ScenarioViewer {
         amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
         /** starting the viewer */
-        AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory);
+        AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory, network);
         amodeusViewerFrame.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
         amodeusViewerFrame.jFrame.setSize(900, 900);
         amodeusViewerFrame.jFrame.setVisible(true);
