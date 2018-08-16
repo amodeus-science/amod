@@ -3,6 +3,8 @@ package amod.demo.dispatcher;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,14 +27,13 @@ public class PZOSelector {
     List<Triple<RoboTaxi, AVRequest, AVRequest>> getPZOCommands(VirtualNetwork<Link> virtualNetwork,
             Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi,
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests,
-            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests, List<Pair<Integer, Link>> listpair)
-            throws Exception {
+            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests) throws Exception {
 
         List<Triple<RoboTaxi, AVRequest, AVRequest>> pZOCommandsList = new ArrayList<>();
 
         for (VirtualNode<Link> position : virtualNetwork.getVirtualNodes()) {
+            
             List<AVRequest> fromRequest = VirtualNodeAVFromRequests.get(position);
-            List<double[]> controlLawFirstDestination = controlLaw.get(position.getIndex());
             List<RoboTaxi> availableCars = StayRoboTaxi.get(position);
 
             if (availableCars.isEmpty()) {
@@ -45,176 +46,85 @@ public class PZOSelector {
                 continue;
             }
 
+            List<List<AVRequest>> fromToRequestList = getFromToAVRequests(virtualNetwork, fromRequest, VirtualNodeAVToRequests);
+            List<double[]> controlLawFirstDestination = controlLaw.get(position.getIndex());
+            
             for (int i = 0; i < controlLawFirstDestination.size(); ++i) {
                 double[] controlLawSecondDestination = controlLawFirstDestination.get(i);
-
+                
                 int toFirstNodeIndex = i;
-                List<AVRequest> fromToFirstRequests = (List<AVRequest>) fromRequest.stream()
-                        .filter(rt -> VirtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(toFirstNodeIndex))
-                                .contains(rt));
+                List<AVRequest> fromToFirstRequests = fromToRequestList.get(i);
                 if (fromToFirstRequests.isEmpty()) {
                     continue;
                 }
-                if (availableCars.size() >= controlLawSecondDestination.length
-                        && fromToFirstRequests.size() >= controlLawSecondDestination.length) {
-                    int car = 0;
+                
+                
+                
+                    
                     int iteration = 0;
                     int[] removeElements = null;
                     for (double node : controlLawSecondDestination) {
                         node = node - 1;
-                        if (node < 0) {
-                            return null;
-                        }
                         int indexNode = (int) node;
-                        List<AVRequest> fromToSecondRequests = (List<AVRequest>) fromRequest.stream()
-                                .filter(rt -> VirtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(indexNode))
-                                        .contains(rt));
-                        if (fromToSecondRequests.isEmpty()) {
-                            iteration = iteration + 1;
-                            continue;
-                        }
-                        RoboTaxi RoboTaxi = availableCars.get(car);
-                        Triple<RoboTaxi, AVRequest, AVRequest> pZOCommands = Triple.of(RoboTaxi,
-                                fromToFirstRequests.get(car), fromToSecondRequests.get(0));
-                        pZOCommandsList.add(pZOCommands);
-                        car = car + 1;
-                        ArrayUtils.add(removeElements, iteration);
                         
-                    }
-                    ArrayUtils.removeAll(controlLawSecondDestination, removeElements);
 
-                    controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
-
-                } else if (availableCars.size() < controlLawSecondDestination.length
-                        && fromToFirstRequests.size() >= controlLawSecondDestination.length) {
-                    double node;
-                    int iteration = 0;
-                    int[] removeElements = null;
-                    for (int icar = 0; icar < availableCars.size(); ++icar) {
-                        node = controlLawSecondDestination[icar] - 1;
-                        if (node < 0) {
-                            return null;
+                        if(availableCars.isEmpty()) {
+                            break;
                         }
-                        int indexNode = (int) node;
-                        List<AVRequest> fromToSecondRequests = (List<AVRequest>) fromRequest.stream()
-                                .filter(rt -> VirtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(indexNode))
-                                        .contains(rt));
+                        
+                        if (fromToFirstRequests.isEmpty()) {
+                            break;
+                        }
+                        
+                        AVRequest avRequestFirst = fromToFirstRequests.get(0);
+                        fromToFirstRequests.remove(avRequestFirst);
+                        fromToRequestList.set(i, fromToFirstRequests);
+                        
+                        RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequestFirst, availableCars);
+                        availableCars.remove(closestRoboTaxi);
+                        
+                        List<AVRequest> fromToSecondRequests = fromToRequestList.get(indexNode);
                         
                         if (fromToSecondRequests.isEmpty()) {
                             iteration = iteration + 1;
                             continue;
                         }
-                        RoboTaxi RoboTaxi = availableCars.get(icar);
-                        Triple<RoboTaxi, AVRequest, AVRequest> pZOCommands = Triple.of(RoboTaxi,
-                                fromToFirstRequests.get(icar), fromToSecondRequests.get(0));
+                        
+                        AVRequest avRequestSecond = fromToSecondRequests.get(0);
+                        fromToSecondRequests.remove(avRequestSecond);
+                        fromToRequestList.set(indexNode, fromToSecondRequests);
+                        
+                        
+                        Triple<RoboTaxi, AVRequest, AVRequest> pZOCommands = Triple.of(closestRoboTaxi,
+                                avRequestFirst, avRequestSecond);
+                        
                         pZOCommandsList.add(pZOCommands);
                         ArrayUtils.add(removeElements, iteration);
-                        iteration = iteration + 1;
+
                     }
                     ArrayUtils.removeAll(controlLawSecondDestination, removeElements);
+
                     controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
 
-                }
-
-                else if (availableCars.size() >= controlLawSecondDestination.length
-                        && fromToFirstRequests.size() < controlLawSecondDestination.length) {
-                    double node;
-                    int iteration = 0;
-                    int[] removeElements = null;
-                    for (int ireq = 0; ireq < fromToFirstRequests.size(); ++ireq) {
-                        node = controlLawSecondDestination[ireq] - 1;
-                        if (node < 0) {
-                            return null;
-                        }
-                        int indexNode = (int) node;
-                        List<AVRequest> fromToSecondRequests = (List<AVRequest>) fromRequest.stream()
-                                .filter(rt -> VirtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(indexNode))
-                                        .contains(rt));
-                        if (fromToSecondRequests.isEmpty()) {
-                            iteration = iteration + 1;
-                            continue;
-                        }
-                        RoboTaxi RoboTaxi = availableCars.get(ireq);
-                        Triple<RoboTaxi, AVRequest, AVRequest> pZOCommands = Triple.of(RoboTaxi,
-                                fromToFirstRequests.get(ireq), fromToSecondRequests.get(ireq));
-                        pZOCommandsList.add(pZOCommands);
-                        ArrayUtils.add(removeElements, iteration);
-                        iteration = iteration + 1;
-                    }
-                    ArrayUtils.removeAll(controlLawSecondDestination, removeElements);
-                    controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
-
-                }
-
-                else if (availableCars.size() < controlLawSecondDestination.length
-                        && fromToFirstRequests.size() < controlLawSecondDestination.length && availableCars.size() >= fromToFirstRequests.size()) {
-                    double node;
-                    int iteration = 0;
-                    int[] removeElements = null;
-                    for (int ireq = 0; ireq < fromToFirstRequests.size(); ++ireq) {
-                        node = controlLawSecondDestination[ireq] - 1;
-                        if (node < 0) {
-                            return null;
-                        }
-                        int indexNode = (int) node;
-                        List<AVRequest> fromToSecondRequests = (List<AVRequest>) fromRequest.stream()
-                                .filter(rt -> VirtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(indexNode))
-                                        .contains(rt));
-                        if (fromToSecondRequests.isEmpty()) {
-                            iteration = iteration + 1;
-                            continue;
-                        }
-                        RoboTaxi RoboTaxi = availableCars.get(ireq);
-                        Triple<RoboTaxi, AVRequest, AVRequest> pZOCommands = Triple.of(RoboTaxi,
-                                fromToFirstRequests.get(ireq), fromToSecondRequests.get(ireq));
-                        pZOCommandsList.add(pZOCommands);
-                        ArrayUtils.add(removeElements, iteration);
-                        iteration = iteration + 1;
-                    }
-                    ArrayUtils.removeAll(controlLawSecondDestination, removeElements);
-                    controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
-
-                }
                 
-                else if (availableCars.size() < controlLawSecondDestination.length
-                        && fromToFirstRequests.size() < controlLawSecondDestination.length && availableCars.size() <= fromToFirstRequests.size()) {
-                    double node;
-                    int iteration = 0;
-                    int[] removeElements = null;
-                    for (int icar = 0; icar < availableCars.size(); ++icar) {
-                        node = controlLawSecondDestination[icar] - 1;
-                        if (node < 0) {
-                            return null;
-                        }
-                        int indexNode = (int) node;
-                        List<AVRequest> fromToSecondRequests = (List<AVRequest>) fromRequest.stream()
-                                .filter(rt -> VirtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(indexNode))
-                                        .contains(rt));
-                        if (fromToSecondRequests.isEmpty()) {
-                            iteration = iteration + 1;
-                            continue;
-                        }
-                        RoboTaxi RoboTaxi = availableCars.get(icar);
-                        Triple<RoboTaxi, AVRequest, AVRequest> pZOCommands = Triple.of(RoboTaxi,
-                                fromToFirstRequests.get(icar), fromToSecondRequests.get(icar));
-                        pZOCommandsList.add(pZOCommands);
-                        ArrayUtils.add(removeElements, iteration);
-                        iteration = iteration + 1;
-                    }
-                    ArrayUtils.removeAll(controlLawSecondDestination, removeElements);
-                    controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
-
-                }
             }
         }
 
         return pZOCommandsList;
     }
 
-    private static Link getLink(int node, List<Pair<Integer, Link>> listpair) throws Exception {
-        for (Pair<Integer, Link> pair : listpair)
-            if (pair.getLeft() == node)
-                return pair.getRight();
-        throw new Exception("No equal node");
+    private List<List<AVRequest>> getFromToAVRequests(VirtualNetwork<Link> virtualNetwork, List<AVRequest> fromRequest,
+            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests) {
+        List<List<AVRequest>> fromToAVRequests = new ArrayList<>();
+
+        for (VirtualNode<Link> node : virtualNetwork.getVirtualNodes()) {
+            @SuppressWarnings("unchecked")
+            List<AVRequest> fromToRequests = (List<AVRequest>) fromRequest.stream()
+                    .filter(rt -> VirtualNodeAVToRequests.get(node).contains(rt));
+            fromToAVRequests.add(node.getIndex(), fromToRequests);
+        }
+
+        return fromToAVRequests;
+
     }
 }

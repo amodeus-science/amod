@@ -121,8 +121,8 @@ public class SMPCDispatcher extends PartitionedDispatcher {
         final long round_now = Math.round(now);
         
         if (round_now % dispatchPeriod == 0) {
-          printVals = BipartiteMatchingUtils.executePickup(this, getDivertableRoboTaxis(), getAVRequests(), //
-          distanceFunction, network, false);
+//          printVals = BipartiteMatchingUtils.executePickup(this, getDivertableRoboTaxis(), getAVRequests(), //
+//          distanceFunction, network, false);
             List<Id<Node>> listNodesInter = ClaudioForDejanUtils.getNetworkReducedNodeList(network);
             List<double[]> networkIAMoD = ClaudioForDejanUtils.getReducedNetwork(network, listNodesInter);
             Node nodetest = network.getNodes().get(listNodesInter.get(60));

@@ -6,7 +6,9 @@ import java.util.Collection;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -52,7 +54,7 @@ public enum CarPooling2DispatcherUtils {
 
     }
 
-    public static double[][] getTravelTimesVirtualNetworkForMatlab(VirtualNetwork<Link> virtualNetwork,
+    public static double[][] getTravelTimesVirtualNetworkForMatlab(VirtualNetwork<Link> virtualNetwork, int timeStep,
             Map<VirtualLink<Link>, Double> TravelTimes) {
 
         int NodeNumber = virtualNetwork.getVirtualNodes().size();
@@ -61,7 +63,7 @@ public enum CarPooling2DispatcherUtils {
         for (VirtualLink<Link> link : TravelTimes.keySet()) {
             int FromNode = link.getFrom().getIndex();
             int ToNode = link.getTo().getIndex();
-            travelTimesMat[FromNode][ToNode] = Math.round(TravelTimes.get(link) / (5 * 60));
+            travelTimesMat[FromNode][ToNode] = Math.round(TravelTimes.get(link) / (timeStep * 60));
 
         }
 
@@ -72,8 +74,24 @@ public enum CarPooling2DispatcherUtils {
         return travelTimesMat;
 
     }
+    
+    public static List<Pair<Integer, Link>> getLinkofVirtualNode(VirtualNetwork<Link> virtualNetwork){
+        
+        List<Pair<Integer, Link>> linkList = new ArrayList<>();
+        
+        for(VirtualNode<Link> node: virtualNetwork.getVirtualNodes()) {
+            Optional<Link> linkAny = node.getLinks().stream().findAny();
+            Link link = linkAny.get();
+            
+            Pair<Integer, Link> pair = Pair.of(node.getIndex(), link);
+            linkList.add(node.getIndex(), pair);
+            
+        }
+        
+        return linkList;
+    }
 
-    public static double[][] getRState(double Time, int PlanningHorizon,
+    public static double[][] getRState(double Time, int PlanningHorizon, int timeStep,
             Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi,
             Map<VirtualNode<Link>, List<RoboTaxi>> RebalanceRoboTaxi, Map<VirtualNode<Link>, List<RoboTaxi>> SORoboTaxi,
             Map<VirtualNode<Link>, List<RoboTaxi>> DORoboTaxi) {
@@ -106,19 +124,19 @@ public enum CarPooling2DispatcherUtils {
                 if (RebCarsAtNode.isEmpty() == true) {
                     numberReb = 0;
                 } else {
-                    numberReb = getNumberCarsAbailableAtTime(Time, t, RebCarsAtNode);
+                    numberReb = getNumberCarsAbailableAtTime(Time, t, timeStep, RebCarsAtNode);
                 }
 
                 if (SOCarsAtNode.isEmpty() == true) {
                     numberSO = 0;
                 } else {
-                    numberSO = getNumberCarsAbailableAtTime(Time, t, SOCarsAtNode);
+                    numberSO = getNumberCarsAbailableAtTime(Time, t, timeStep, SOCarsAtNode);
                 }
 
                 if (DOCarsAtNode.isEmpty() == true) {
                     numberDO = 0;
                 } else {
-                    numberDO = getNumberCarsAbailableAtTime(Time, t, DOCarsAtNode);
+                    numberDO = getNumberCarsAbailableAtTime(Time, t, timeStep, DOCarsAtNode);
                 }
 
                 if (t == 0) {
@@ -136,7 +154,7 @@ public enum CarPooling2DispatcherUtils {
     }
 
     // TODO Get plans of double occupied cars
-    public static double[][] getXState(double Time, int PlanningHorizon,
+    public static double[][] getXState(double Time, int PlanningHorizon, int timeStep,
             Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi,
             Map<VirtualNode<Link>, List<RoboTaxi>> RebalanceRoboTaxi, Map<VirtualNode<Link>, List<RoboTaxi>> SORoboTaxi,
             Map<VirtualNode<Link>, List<RoboTaxi>> DORoboTaxi) {
@@ -169,19 +187,19 @@ public enum CarPooling2DispatcherUtils {
                 if (RebCarsAtNode.isEmpty() == true) {
                     numberReb = 0;
                 } else {
-                    numberReb = getNumberCarsAbailableAtTime(Time, t, RebCarsAtNode);
+                    numberReb = getNumberCarsAbailableAtTime(Time, t, timeStep, RebCarsAtNode);
                 }
 
                 if (SOCarsAtNode.isEmpty() == true) {
                     numberSO = 0;
                 } else {
-                    numberSO = getNumberCarsAbailableAtTime(Time, t, SOCarsAtNode);
+                    numberSO = getNumberCarsAbailableAtTime(Time, t, timeStep, SOCarsAtNode);
                 }
 
                 if (DOCarsAtNode.isEmpty() == true) {
                     numberDO = 0;
                 } else {
-                    numberDO = getNumberCarsAbailableAtTime(Time, t, DOCarsAtNode);
+                    numberDO = getNumberCarsAbailableAtTime(Time, t, timeStep, DOCarsAtNode);
                 }
 
                 if (t == 0) {
@@ -198,7 +216,7 @@ public enum CarPooling2DispatcherUtils {
 
     }
 
-    public static List<double[][]> getFlowsOut(Network network, VirtualNetwork virtualNetwork, int PlanningHorizon,
+    public static List<double[][]> getFlowsOut(Network network, VirtualNetwork<Link> virtualNetwork, int PlanningHorizon, int timeStep,
             Config config, double round_now) {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Population population = scenario.getPopulation();
@@ -218,12 +236,12 @@ public enum CarPooling2DispatcherUtils {
                         if (planElement instanceof Activity) {
                             Activity activity = (Activity) planElement;
 
-                            if (activity.getEndTime() >= (round_now + i * 5 * 60)
-                                    && activity.getEndTime() <= (round_now + (i + 1) * 5 * 60)) {
+                            if (activity.getEndTime() >= (round_now + i * timeStep * 60)
+                                    && activity.getEndTime() <= (round_now + (i + 1) * timeStep * 60)) {
                                 if (!stageActivityTypes.isStageActivity(activity.getType())) {
                                     Link link = network.getLinks().getOrDefault(activity.getLinkId(), null);
                                     if (link != null) {
-                                        VirtualNode FromVirtualNode = virtualNetwork.getVirtualNode(link);
+                                        VirtualNode<Link> FromVirtualNode = virtualNetwork.getVirtualNode(link);
                                         FromnodeIndex = FromVirtualNode.getIndex();
                                         helper = 1;
                                     }
@@ -234,7 +252,7 @@ public enum CarPooling2DispatcherUtils {
                                 if (!stageActivityTypes.isStageActivity(activity.getType())) {
                                     Link link = network.getLinks().getOrDefault(activity.getLinkId(), null);
                                     if (link != null) {
-                                        VirtualNode ToVirtualNode = virtualNetwork.getVirtualNode(link);
+                                        VirtualNode<Link> ToVirtualNode = virtualNetwork.getVirtualNode(link);
                                         TonodeIndex = ToVirtualNode.getIndex();
                                         FlowsOutMatrix[FromnodeIndex][TonodeIndex] = FlowsOutMatrix[FromnodeIndex][TonodeIndex]
                                                 + 1;
@@ -254,12 +272,12 @@ public enum CarPooling2DispatcherUtils {
 
     }
 
-    private static int getNumberCarsAbailableAtTime(double Time, int t, List<RoboTaxi> carsAtNode) {
+    private static int getNumberCarsAbailableAtTime(double Time, int t, int timeStep, List<RoboTaxi> carsAtNode) {
         int numberCars = 0;
         for (RoboTaxi car : carsAtNode) {
             Collection<RoboTaxiPlanEntry> plansCollection = car.getCurrentPlans(Time).getPlans().values();
             for (RoboTaxiPlanEntry planEntry : plansCollection) {
-                if (planEntry.endTime > Time + t * 5 * 60 && planEntry.endTime <= Time + (t + 1) * 5 * 60
+                if (planEntry.endTime > Time + t * timeStep * 60 && planEntry.endTime <= Time + (t + 1) * timeStep * 60
                         && car.getStatus() == planEntry.status) {
                     numberCars = numberCars + 1;
                 }

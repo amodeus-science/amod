@@ -3,10 +3,9 @@ package amod.demo.dispatcher;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.network.Link;
 
@@ -26,7 +25,7 @@ public class XZOSelector {
     List<Triple<RoboTaxi, AVRequest, Link>> getXZOCommands(VirtualNetwork<Link> virtualNetwork,
             Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi,
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests,
-            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests, List<Pair<Integer, Link>> listpair)
+            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests)
             throws Exception {
 
         List<Triple<RoboTaxi, AVRequest, Link>> xZOCommandsList = new ArrayList<>();
@@ -58,10 +57,13 @@ public class XZOSelector {
                         if (node < 0) {
                             return null;
                         }
-                        RoboTaxi RoboTaxi = availableCars.get(car);
+                        AVRequest avRequest = fromToRequests.get(car);
+                        RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, availableCars);
+                        availableCars.remove(closestRoboTaxi);
                         VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(RoboTaxi, fromToRequests.get(car),
-                                getLink(toNode.getIndex(), listpair));
+                        Optional<Link> linkOption = toNode.getLinks().stream().findAny();
+                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(closestRoboTaxi, avRequest,
+                                linkOption.get());
                         xZOCommandsList.add(xZOCommands);
                         car = car + 1;
                     }
@@ -77,10 +79,13 @@ public class XZOSelector {
                         if (node < 0) {
                             return null;
                         }
-                        RoboTaxi RoboTaxi = availableCars.get(icar);
+                        AVRequest avRequest = fromToRequests.get(icar);
+                        RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, availableCars);
+                        availableCars.remove(closestRoboTaxi);
                         VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(RoboTaxi, fromToRequests.get(icar),
-                                getLink(toNode.getIndex(), listpair));
+                        Optional<Link> linkOption = toNode.getLinks().stream().findAny();
+                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(closestRoboTaxi, avRequest,
+                                linkOption.get());
                         xZOCommandsList.add(xZOCommands);
                         ArrayUtils.remove(controlLawDestFrom, 0);
                     }
@@ -96,10 +101,13 @@ public class XZOSelector {
                         if (node < 0) {
                             return null;
                         }
-                        RoboTaxi RoboTaxi = availableCars.get(ireq);
+                        AVRequest avRequest = fromToRequests.get(ireq);
+                        RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, availableCars);
+                        availableCars.remove(closestRoboTaxi);
                         VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(RoboTaxi, fromToRequests.get(ireq),
-                                getLink(toNode.getIndex(), listpair));
+                        Optional<Link> linkOption = toNode.getLinks().stream().findAny();
+                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(closestRoboTaxi, avRequest,
+                                linkOption.get());
                         xZOCommandsList.add(xZOCommands);
                         ArrayUtils.remove(controlLawDestFrom, 0);
                     }
@@ -115,10 +123,13 @@ public class XZOSelector {
                         if (node < 0) {
                             return null;
                         }
-                        RoboTaxi RoboTaxi = availableCars.get(ireq);
+                        AVRequest avRequest = fromToRequests.get(ireq);
+                        RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, availableCars);
+                        availableCars.remove(closestRoboTaxi);
                         VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(RoboTaxi, fromToRequests.get(ireq),
-                                getLink(toNode.getIndex(), listpair));
+                        Optional<Link> linkOption = toNode.getLinks().stream().findAny();
+                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(closestRoboTaxi, avRequest,
+                                linkOption.get());
                         xZOCommandsList.add(xZOCommands);
                         ArrayUtils.remove(controlLawDestFrom, 0);
                     }
@@ -129,13 +140,6 @@ public class XZOSelector {
         }
 
         return xZOCommandsList;
-    }
-
-    private static Link getLink(int node, List<Pair<Integer, Link>> listpair) throws Exception {
-        for (Pair<Integer, Link> pair : listpair)
-            if (pair.getLeft() == node)
-                return pair.getRight();
-        throw new Exception("No equal node");
     }
 
 }
