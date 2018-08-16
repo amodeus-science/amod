@@ -171,7 +171,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
         }
         
         // Rebalancing
-        if(round_now % 10 == 0 && round_now >= dispatchTime && round_now < (dispatchTime+5*60) ) {
+        if(round_now % 10 == 0 && round_now >= dispatchTime && round_now < (dispatchTime+timeStep*60) ) {
             Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi = getVirtualNodeStayRoboTaxi();
             for(VirtualNode<Link> fromNode: virtualNetwork.getVirtualNodes()) {
                 try {
@@ -190,7 +190,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
         }
         
         // xZO cars
-        if(round_now % 10 == 0 && round_now >= dispatchTime && round_now < (dispatchTime+5*60) ) {
+        if(round_now % 10 == 0 && round_now >= dispatchTime && round_now < (dispatchTime+timeStep*60) ) {
             Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi = getVirtualNodeStayRoboTaxi();
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests = getVirtualNodeToAVRequest();
@@ -214,7 +214,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
         }
         
         // pZO cars
-        if(round_now % 10 == 0 && round_now >= dispatchTime && round_now < (dispatchTime+5*60) ) {
+        if(round_now % 10 == 0 && round_now >= dispatchTime && round_now < (dispatchTime+timeStep*60) ) {
             Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi = getVirtualNodeStayRoboTaxi();
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests = getVirtualNodeToAVRequest();
@@ -238,7 +238,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
         }
         
         // pSO cars
-        if(round_now % 10 == 0 && round_now >= dispatchTime && round_now < (dispatchTime+5*60) ) {
+        if(round_now % 10 == 0 && round_now >= dispatchTime && round_now < (dispatchTime+timeStep*60) ) {
             Map<VirtualNode<Link>, List<RoboTaxi>> SORoboTaxi = getVirtualNodeSORoboTaxi();
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests = getVirtualNodeToAVRequest();

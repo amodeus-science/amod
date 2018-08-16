@@ -1,12 +1,11 @@
 package amod.demo.dispatcher;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
@@ -34,6 +33,9 @@ public class PSOSelector {
             List<double[]> controlLawFirstDestination = controlLaw.get(position.getIndex());
             List<RoboTaxi> availableCars = SORoboTaxi.get(position);
 
+            List<List<AVRequest>> fromToRequestList = getFromToAVRequests(virtualNetwork, fromRequest,
+                    VirtualNodeAVToRequests);
+
             if (availableCars.isEmpty()) {
                 System.out.println("No available cars for p_oz");
                 continue;
@@ -54,62 +56,36 @@ public class PSOSelector {
 
                 double[] controlLawSecondDestination = controlLawFirstDestination.get(i);
 
-                if (availableCars.size() >= controlLawSecondDestination.length) {
-                    int car = 0;
-                    int iteration = 0;
-                    int[] removeElements = null;
-                    for (double node : controlLawSecondDestination) {
-                        node = node - 1;
-                        if (node < 0) {
-                            return null;
-                        }
-                        int indexNode = (int) node;
-                        List<AVRequest> fromToSecondRequests = (List<AVRequest>) fromRequest.stream()
-                                .filter(rt -> VirtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(indexNode))
-                                        .contains(rt));
-                        if (fromToSecondRequests.isEmpty()) {
-                            iteration = iteration + 1;
-                            continue;
-                        }
-                        RoboTaxi RoboTaxi = availableCars.get(car);
-                        Pair<RoboTaxi, AVRequest> pSOCommands = Pair.of(RoboTaxi, fromToSecondRequests.get(0));
-                        pSOCommandsList.add(pSOCommands);
-                        car = car + 1;
-                        ArrayUtils.add(removeElements, iteration);
+                int iteration = 0;
+                int[] removeElements = null;
+                for (double node : controlLawSecondDestination) {
+                    node = node - 1;
+                    int indexNode = (int) node;
 
+                    if (SOcars.isEmpty()) {
+                        break;
                     }
-                    ArrayUtils.removeAll(controlLawSecondDestination, removeElements);
 
-                    controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
-
-                } else if (availableCars.size() < controlLawSecondDestination.length) {
-                    double node;
-                    int iteration = 0;
-                    int[] removeElements = null;
-                    for (int icar = 0; icar < availableCars.size(); ++icar) {
-                        node = controlLawSecondDestination[icar] - 1;
-                        if (node < 0) {
-                            return null;
-                        }
-                        int indexNode = (int) node;
-                        List<AVRequest> fromToSecondRequests = (List<AVRequest>) fromRequest.stream()
-                                .filter(rt -> VirtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(indexNode))
-                                        .contains(rt));
-
-                        if (fromToSecondRequests.isEmpty()) {
-                            iteration = iteration + 1;
-                            continue;
-                        }
-                        RoboTaxi RoboTaxi = availableCars.get(icar);
-                        Pair<RoboTaxi, AVRequest> pSOCommands = Pair.of(RoboTaxi, fromToSecondRequests.get(0));
-                        pSOCommandsList.add(pSOCommands);
-                        ArrayUtils.add(removeElements, iteration);
+                    List<AVRequest> fromToSecondRequests = fromToRequestList.get(indexNode);
+                    if (fromToSecondRequests.isEmpty()) {
                         iteration = iteration + 1;
+                        continue;
                     }
-                    ArrayUtils.removeAll(controlLawSecondDestination, removeElements);
-                    controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
+
+                    AVRequest avRequest = fromToSecondRequests.get(0);
+                    fromToSecondRequests.remove(avRequest);
+                    fromToRequestList.set(indexNode, fromToSecondRequests);
+
+                    RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, SOcars);
+                    SOcars.remove(closestRoboTaxi);
+                    Pair<RoboTaxi, AVRequest> pSOCommands = Pair.of(closestRoboTaxi, fromToSecondRequests.get(0));
+                    pSOCommandsList.add(pSOCommands);
+                    ArrayUtils.add(removeElements, iteration);
 
                 }
+                ArrayUtils.removeAll(controlLawSecondDestination, removeElements);
+
+                controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
 
             }
         }
@@ -117,4 +93,18 @@ public class PSOSelector {
         return pSOCommandsList;
     }
 
+    private List<List<AVRequest>> getFromToAVRequests(VirtualNetwork<Link> virtualNetwork, List<AVRequest> fromRequest,
+            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests) {
+        List<List<AVRequest>> fromToAVRequests = new ArrayList<>();
+
+        for (VirtualNode<Link> node : virtualNetwork.getVirtualNodes()) {
+            @SuppressWarnings("unchecked")
+            List<AVRequest> fromToRequests = (List<AVRequest>) fromRequest.stream()
+                    .filter(rt -> VirtualNodeAVToRequests.get(node).contains(rt));
+            fromToAVRequests.add(node.getIndex(), fromToRequests);
+        }
+
+        return fromToAVRequests;
+
+    }
 }
