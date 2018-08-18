@@ -7,9 +7,9 @@ import java.util.Properties;
 
 import amod.aido.util.ContentType;
 import amod.aido.util.HttpDownloader;
-import amod.aido.util.PropertiesImport;
 import amod.aido.util.Unzip;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.tensor.io.ResourceData;
 
 /* package */ enum AidoScenarioDownload {
     ;
@@ -18,7 +18,7 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
      * @throws IOException */
     /* package */ static void download(String key) throws IOException {
 
-        Properties properties = PropertiesImport.properties("/aido/scenarios.properties");
+        Properties properties = ResourceData.properties("/aido/scenarios.properties");
         if (properties.containsKey(key)) {
             String value = properties.getProperty(key);
             System.out.println(value);
