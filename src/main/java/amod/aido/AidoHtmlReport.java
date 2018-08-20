@@ -6,8 +6,6 @@ import java.util.Map;
 
 import ch.ethz.idsc.amodeus.aido.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
-import ch.ethz.idsc.amodeus.analysis.BinnedWaitingTimesImage;
-import ch.ethz.idsc.amodeus.analysis.RequestsPerWaitingTimeImage;
 import ch.ethz.idsc.amodeus.analysis.element.DistanceElement;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlBodyElement;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlReportElement;

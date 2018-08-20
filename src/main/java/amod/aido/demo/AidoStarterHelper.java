@@ -3,7 +3,7 @@ package amod.aido.demo;
 
 import amod.aido.AidoHost;
 
-/** function starts {@link AidoHost} process and {@link AidoGuest process}
+/** function starts {@link AidoHost} process and {@link AidoGuest} process
  * in different threads for testing. */
 public enum AidoStarterHelper {
     ;
@@ -24,8 +24,8 @@ public enum AidoStarterHelper {
 
         Thread.sleep(1000);
 
-        /** {@link AidoGuest} contains the dispatching logic of the user participating
-         * in the artificial intelligence driving olympics */
+        /** {@link AidoGuest} executes the dispatching logic of the user participating
+         * in the artificial intelligence driving olympics (AIDO) */
         AidoGuest.main(args);
     }
 }

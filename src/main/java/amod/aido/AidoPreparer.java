@@ -51,10 +51,6 @@ import ch.ethz.idsc.tensor.Tensors;
         long apoSeed = 1234;
         PopulationPreparer.run(network, population, scenOpt, configMatsim, apoSeed);
 
-        // /** creating a virtual network, e.g., for dispatchers using a graph structure on the city
-        // */
-        // VirtualNetworkPreparer.run(network, population, scenarioOptions);
-
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(configMatsim, scenOpt);
 

@@ -73,10 +73,9 @@ public enum AidoHost {
             analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
 
-            // TODO adapt to new score type
-            /** send final score, currently {mean waiting time, share of empty distance, number of
-             * taxis} */
-            stringSocket.writeln(aidoHtmlReport.getFinalScore());
+            /** send final score,
+             * {total waiting time, total distance with customer, total empty distance} */
+            stringSocket.writeln(aidoScoreElement.getCurrentScore());
 
         } catch (Exception exception) {
             exception.printStackTrace();
