@@ -4,6 +4,7 @@ package amod.aido;
 import java.io.File;
 
 import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
+import ch.ethz.idsc.amodeus.aido.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
@@ -64,11 +65,17 @@ public enum AidoHost {
             /** analyze and send final score */
             Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
                     aidoServer.getOutputDirectory());
-            AidoHtmlReport aidoHtmlReport = new AidoHtmlReport();
+            AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize);
+            AidoExport aidoExport = new AidoExport(aidoScoreElement);
+            AidoHtmlReport aidoHtmlReport = new AidoHtmlReport(aidoScoreElement);
+            analysis.addAnalysisElement(aidoScoreElement);
+            analysis.addAnalysisExport(aidoExport);
             analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
 
-            /** send final score, currently {mean waiting time, share of empty distance, number of taxis} */
+            // TODO adapt to new score type
+            /** send final score, currently {mean waiting time, share of empty distance, number of
+             * taxis} */
             stringSocket.writeln(aidoHtmlReport.getFinalScore());
 
         } catch (Exception exception) {

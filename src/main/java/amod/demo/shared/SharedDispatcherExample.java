@@ -40,7 +40,6 @@ import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.router.AVRouter;
 
-// TODO class should be moved to amod
 public class SharedDispatcherExample extends SharedPartitionedDispatcher {
 
     private final int dispatchPeriod;
@@ -138,7 +137,8 @@ public class SharedDispatcherExample extends SharedPartitionedDispatcher {
                                 SharedMenu menu = taxisToPair.get(i).getMenu();
                                 @SuppressWarnings("unused")
                                 List<Integer> pickupIndeces = menu.getPickupOrDropOffCoursesIndeces(SharedMealType.PICKUP);
-                                // SharedAVCourse sharedAVCourse = new SharedAVCourse(secondRequest.getId(), SharedAVMealType.PICKUP);
+                                // SharedAVCourse sharedAVCourse = new
+                                // SharedAVCourse(secondRequest.getId(), SharedAVMealType.PICKUP);
 
                                 // .moveAVCourseToPrev(sharedAVCourse);
 
@@ -165,17 +165,20 @@ public class SharedDispatcherExample extends SharedPartitionedDispatcher {
                 // addSharedRoboTaxiPickup(sharedRoboTaxi, firstRequest);
                 //
                 // addSharedRoboTaxiPickup(sharedRoboTaxi, secondRequest);
-                // SharedAVCourse sharedAVCourse = new SharedAVCourse(secondRequest.getId(), SharedAVMealType.PICKUP);
+                // SharedAVCourse sharedAVCourse = new SharedAVCourse(secondRequest.getId(),
+                // SharedAVMealType.PICKUP);
                 //
                 // taxisToPair.get(i).getMenu().moveAVCourseToPrev(sharedAVCourse);
                 //
                 // addSharedRoboTaxiPickup(sharedRoboTaxi, thirdRequest);
-                // SharedAVCourse sharedAVCourse3 = new SharedAVCourse(thirdRequest.getId(), SharedAVMealType.PICKUP);
+                // SharedAVCourse sharedAVCourse3 = new SharedAVCourse(thirdRequest.getId(),
+                // SharedAVMealType.PICKUP);
                 // sharedRoboTaxi.getMenu().moveAVCourseToPrev(sharedAVCourse3);
                 // sharedRoboTaxi.getMenu().moveAVCourseToPrev(sharedAVCourse3);
                 //
                 // addSharedRoboTaxiPickup(sharedRoboTaxi, fourthRequest);
-                // SharedAVCourse sharedAVCourse4 = new SharedAVCourse(fourthRequest.getId(), SharedAVMealType.PICKUP);
+                // SharedAVCourse sharedAVCourse4 = new SharedAVCourse(fourthRequest.getId(),
+                // SharedAVMealType.PICKUP);
                 // sharedRoboTaxi.getMenu().moveAVCourseToPrev(sharedAVCourse4);
                 // sharedRoboTaxi.getMenu().moveAVCourseToPrev(sharedAVCourse4);
                 // sharedRoboTaxi.getMenu().moveAVCourseToPrev(sharedAVCourse4);
@@ -218,8 +221,8 @@ public class SharedDispatcherExample extends SharedPartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
             AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher = new GlobalBipartiteMatching(new EuclideanDistanceFunction());
 
-            return new SharedDispatcherExample(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork, abstractVirtualNodeDest,
-                    abstractVehicleDestMatcher, travelData);
+            return new SharedDispatcherExample(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork,
+                    abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData);
         }
     }
 

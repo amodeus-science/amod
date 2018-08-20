@@ -4,7 +4,10 @@ package amod.aido;
 import java.util.HashMap;
 import java.util.Map;
 
+import ch.ethz.idsc.amodeus.aido.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
+import ch.ethz.idsc.amodeus.analysis.BinnedWaitingTimesImage;
+import ch.ethz.idsc.amodeus.analysis.RequestsPerWaitingTimeImage;
 import ch.ethz.idsc.amodeus.analysis.element.DistanceElement;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlBodyElement;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlReportElement;
@@ -15,9 +18,15 @@ import ch.ethz.idsc.tensor.Tensors;
 
 /* package */ class AidoHtmlReport implements HtmlReportElement {
 
+    private static final String IMAGE_FOLDER = "../data"; // relative to report folder
     private Scalar totalMeanWaitingTime;
     private Scalar totalEfficiencyRatio; /* empty distance divided by total distance */
     private Scalar numberOfVehicles;
+    private final AidoScoreElement aidoScoreElement;
+
+    public AidoHtmlReport(AidoScoreElement aidoScoreElement) {
+        this.aidoScoreElement = aidoScoreElement;
+    }
 
     @Override
     public Map<String, HtmlBodyElement> process(AnalysisSummary analysisSummary) {
@@ -36,15 +45,23 @@ import ch.ethz.idsc.tensor.Tensors;
         Map<String, HtmlBodyElement> bodyElements = new HashMap<>();
         {
             HtmlBodyElement aRElement = new HtmlBodyElement();
-            aRElement.getHTMLGenerator().insertTextLeft(aRElement.getHTMLGenerator().bold("Individual Scores") + //
-                    "\n\t" + "mean waiting time:" + //
-                    "\n\t" + "empty distance / total distance:" + //
-                    "\n\t" + "number of RoboTaxis:" //
+
+            aRElement.getHTMLGenerator().insertTextLeft(aRElement.getHTMLGenerator().bold("Scores during Simulation"));
+            aRElement.getHTMLGenerator().newLine();
+            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_WAIT + ".png", 800, 600);
+            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_DIST + ".png", 800, 600);
+
+            aRElement.getHTMLGenerator()
+                    .insertTextLeft(aRElement.getHTMLGenerator().bold("Final Scores") + //
+                            "\n\t" + "total waiting time:" + //
+                            "\n\t" + "total full distance:" + //
+                            "\n\t" + "total empty distance:" //
             );
-            aRElement.getHTMLGenerator().insertTextLeft(" " + //
-                    "\n" + totalMeanWaitingTime + //
-                    "\n" + totalEfficiencyRatio + //
-                    "\n" + numberOfVehicles //
+            aRElement.getHTMLGenerator()
+                    .insertTextLeft(" " + //
+                            "\n" + aidoScoreElement.getCurrentScore().Get(0) + //
+                            "\n" + aidoScoreElement.getCurrentScore().Get(1) + //
+                            "\n" + aidoScoreElement.getCurrentScore().Get(2) //
             );
             aRElement.getHTMLGenerator().newLine();
 

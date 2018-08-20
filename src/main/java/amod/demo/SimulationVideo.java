@@ -41,8 +41,6 @@ public enum SimulationVideo {
         Static.setup();
 
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        // TODO get output folder from config.xml
-        File simOutputDir = new File(workingDirectory, "output/001");
 
         // load options
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
@@ -106,6 +104,8 @@ public enum SimulationVideo {
         amodeusComponent.zoomIn();
         amodeusComponent.moveMap(-100, -750);
 
+        String outputdirectory = config.controler().getOutputDirectory();
+        File simOutputDir = new File(workingDirectory, outputdirectory);       
         StorageUtils storageUtils = new StorageUtils(simOutputDir);
         IterationFolder iterationFolder = storageUtils.getAvailableIterations().get(0);
         StorageSupplier storageSupplier = iterationFolder.storageSupplier(); // typically has size =
