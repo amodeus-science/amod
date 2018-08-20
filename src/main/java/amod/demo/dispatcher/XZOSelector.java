@@ -37,7 +37,7 @@ public class XZOSelector {
                 double[] controlLawDestFrom = controlLawDestination.get(i);
                 List<RoboTaxi> availableCars = StayRoboTaxi.get(virtualNetwork.getVirtualNode(i));
                 if (availableCars.isEmpty()) {
-                    System.out.println("No available cars for p_oz");
+                    System.out.println("No available cars for x_zo");
                     continue;
                 }
                 
@@ -46,7 +46,7 @@ public class XZOSelector {
                         rt -> VirtualNodeAVFromRequests.get(virtualNetwork.getVirtualNode(fromNodeIndex)).contains(rt));
                 
                 if (fromToRequests.isEmpty()) {
-                    System.out.println("No available requests for p_oz");
+                    System.out.println("No available requests for x_zo");
                     continue;
                 }
                 if (availableCars.size() >= controlLawDestFrom.length
@@ -139,6 +139,10 @@ public class XZOSelector {
             }
         }
 
+        if(xZOCommandsList.isEmpty()) {
+            return null;
+        }
+        System.out.println(xZOCommandsList.get(0).getRight());
         return xZOCommandsList;
     }
 

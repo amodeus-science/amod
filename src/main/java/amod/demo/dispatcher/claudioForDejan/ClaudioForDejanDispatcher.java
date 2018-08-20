@@ -41,7 +41,6 @@ import ch.ethz.idsc.amodeus.dispatcher.util.DistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.DistanceHeuristics;
 import ch.ethz.idsc.amodeus.dispatcher.util.EuclideanDistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.HungarBiPartVehicleDestMatcher;
-import ch.ethz.idsc.amodeus.dispatcher.util.LPVehicleRebalancing;
 import ch.ethz.idsc.amodeus.dispatcher.util.RandomVirtualNodeDest;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
@@ -82,7 +81,7 @@ public class ClaudioForDejanDispatcher extends PartitionedDispatcher {
     private final int numRobotaxi;
     private int total_rebalanceCount = 0;
     private Tensor printVals = Tensors.empty();
-    private final LPVehicleRebalancing lpVehicleRebalancing;
+//    private final LPVehicleRebalancing lpVehicleRebalancing;
     private final DistanceFunction distanceFunction;
     private final DistanceHeuristics distanceHeuristics;
     private final Network network;
@@ -123,7 +122,7 @@ public class ClaudioForDejanDispatcher extends PartitionedDispatcher {
         for(Link link: network.getLinks().values()) {
             pendingLinkTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
         }       
-        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
+//        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 300);
@@ -240,148 +239,148 @@ public class ClaudioForDejanDispatcher extends PartitionedDispatcher {
 
         if (round_now % rebalancingPeriod == 0 && round_now > 100000) {
             
-            // available idle vehicles at virtual nodes
-            Map<VirtualNode<Link>,List<RoboTaxi>> idleVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis(); //TODO is this what you want Dejan?
-            
-            // custumer vehicles with destination virtual nodes
-            Map<VirtualNode<Link>,List<RoboTaxi>> customerVehicles = getVirtualNodeArrivingWithCustomerRoboTaxis();
-            
-            // rebalancing vehicles with destination virtual nodes
-            Map<VirtualNode<Link>, List<RoboTaxi>> rebalanceVehicles = getVirtualNodeRebalancingToRoboTaxis();
-            
-            // travel times
-            Map<VirtualLink<Link>, Double> travelTimes = TravelTimeCalculatorClaudioForDejan.computeTravelTimes(virtualNetwork.getVirtualLinks());
-            
-            // planning horizon for SMPC
-            int PlanningHorizon = 50;
-            
-            // Rebalancing links
-            Coord coord1 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode1);
-            Coord coord2 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode2);
-            Coord coord3 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode3);
-            Coord coord4 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode4);
-            Coord coord5 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode5);
-            Coord coord6 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode6);
-            Coord coord7 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode7);
-            Coord coord8 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode8);
-            Coord coord9 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode9);
-            Coord coord10 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode10);
-            Link link1 = pendingLinkTree.getClosest(coord1.getX(), coord1.getY());
-            Link link2 = pendingLinkTree.getClosest(coord2.getX(), coord2.getY());
-            Link link3 = pendingLinkTree.getClosest(coord3.getX(), coord3.getY());
-            Link link4 = pendingLinkTree.getClosest(coord4.getX(), coord4.getY());
-            Link link5 = pendingLinkTree.getClosest(coord5.getX(), coord5.getY());
-            Link link6 = pendingLinkTree.getClosest(coord6.getX(), coord6.getY());
-            Link link7 = pendingLinkTree.getClosest(coord7.getX(), coord7.getY());
-            Link link8 = pendingLinkTree.getClosest(coord8.getX(), coord8.getY());
-            Link link9 = pendingLinkTree.getClosest(coord9.getX(), coord9.getY());
-            Link link10 = pendingLinkTree.getClosest(coord10.getX(), coord10.getY());
-            Pair<Integer, Link> pair1 = Pair.of(0, link1);
-            Pair<Integer, Link> pair2 = Pair.of(1, link2);
-            Pair<Integer, Link> pair3 = Pair.of(2, link3);
-            Pair<Integer, Link> pair4 = Pair.of(3, link4);
-            Pair<Integer, Link> pair5 = Pair.of(4, link5);
-            Pair<Integer, Link> pair6 = Pair.of(5, link6);
-            Pair<Integer, Link> pair7 = Pair.of(6, link7);
-            Pair<Integer, Link> pair8 = Pair.of(7, link8);
-            Pair<Integer, Link> pair9 = Pair.of(8, link9);
-            Pair<Integer, Link> pair10 = Pair.of(9, link10);
-            List<Pair<Integer, Link>> listpair = new ArrayList<Pair<Integer, Link>>();
-            listpair.add(pair1);
-            listpair.add(pair2);
-            listpair.add(pair3);
-            listpair.add(pair4);
-            listpair.add(pair5);
-            listpair.add(pair6);
-            listpair.add(pair7);
-            listpair.add(pair8);
-            listpair.add(pair9);
-            listpair.add(pair10);
-            // prepare inputs for SMPC in MATLAB
-            double[][] networkSMPC = ClaudioForDejanUtils.getVirtualNetworkForMatlab(virtualNetwork);
-            double [][] travelTimesSMPC = ClaudioForDejanUtils.getTravelTimesForMatlab(virtualNetwork, travelTimes);
-            double[][] availableCarsSMP = ClaudioForDejanUtils.getTotalAvailableCarsForMatlab(round_now, PlanningHorizon, idleVehicles, rebalanceVehicles, customerVehicles);                              
-            
-            try {
-                // initialize server
-                JavaContainerSocket javaContainerSocket = new JavaContainerSocket(new Socket("localhost", MfileContainerServer.DEFAULT_PORT));
-
-                { // add inputs to server
-                Container container = ClaudioForDejanUtils.getContainerInit();
-                
-                // add network to container
-                double[] networkNode = new double[networkSMPC.length];
-                for(int index = 0; index<networkSMPC.length; ++index) {
-                    networkNode = networkSMPC[index];
-                    container.add((new DoubleArray("roadGraph" + index, new int[] { networkSMPC.length }, networkNode)));
-                }
-                
-                // add travel times to container
-                double[] travelTimeskNode = new double[travelTimesSMPC.length];
-                for(int index = 0; index<travelTimesSMPC.length; ++index) {
-                    travelTimeskNode = travelTimesSMPC[index];
-                    container.add((new DoubleArray("travelTimes" + index, new int[] { travelTimesSMPC.length }, travelTimeskNode)));
-                }
-                
-                // add available cars to container
-                double[] availableCarsNode = new double[availableCarsSMP.length];
-                int indexCar = 0;
-                for(double[] CarsAtTime: availableCarsSMP) {
-                    indexCar = indexCar + 1;
-                    availableCarsNode = CarsAtTime;
-                    container.add((new DoubleArray("availableCars" + indexCar, new int[] { availableCarsNode.length }, availableCarsNode)));
-                }
-                                
-                // add planning horizon to container
-                double[] PlanningHorizonDouble = new double[] {PlanningHorizon};
-                container.add((new DoubleArray("PlanningHorizon", new int[] { 1 }, PlanningHorizonDouble)));
-                
-             // add planning horizon to container
-                double[] currentTime = new double[] {round_now};
-                container.add((new DoubleArray("currentTime", new int[] { 1 }, currentTime)));
-                
-                System.out.println("Sending to server");
-                javaContainerSocket.writeContainer(container);
-                
-                }
-                
-                { // get outputs from server
-                System.out.println("Waiting for server");
-                Container container = javaContainerSocket.blocking_getContainer();
-                System.out.println("received: " + container);
-                
-                // get control inputs for rebalancing from container
-                List<double[]> ControlLaw = new ArrayList<>();        
-                for(int i=1; i<=container.size(); ++i) {
-                    ControlLaw.add(ClaudioForDejanUtils.getArray(container, "solution"+i));
-                }
-                
-                // apply rebalancing commands
-                CarLinkSelectorClaudioForDejan CarLinkSelect = new CarLinkSelectorClaudioForDejan(idleVehicles);
-                
-                for(int i=0; i<virtualNetwork.getVirtualNodes().size(); ++i) {
-                    VirtualNode<Link> from = virtualNetwork.getVirtualNode(i);
-                    List<Pair<RoboTaxi, Link>> controlPolicy = CarLinkSelect.getRebalanceCommands(from, ControlLaw.get(i), virtualNetwork, listpair);
-                    if(controlPolicy != null) {
-                        for(Pair<RoboTaxi, Link> pair: controlPolicy) {
-                            setRoboTaxiRebalance(pair.getLeft(), pair.getRight());
-                        }
-                        
-                    }
-                     
-                }                                              
-                
-                }
-                
-                javaContainerSocket.close();
-                
-            } catch (Exception exception) {
-                exception.printStackTrace();
-                throw new RuntimeException(); // dispatcher will not work if
-                                              // constructor has issues
-            }        
-                                 
-            System.out.println("Finished rebalancing");
+//            // available idle vehicles at virtual nodes
+//            Map<VirtualNode<Link>,List<RoboTaxi>> idleVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis(); //TODO is this what you want Dejan?
+//            
+//            // custumer vehicles with destination virtual nodes
+//            Map<VirtualNode<Link>,List<RoboTaxi>> customerVehicles = getVirtualNodeArrivingWithCustomerRoboTaxis();
+//            
+//            // rebalancing vehicles with destination virtual nodes
+//            Map<VirtualNode<Link>, List<RoboTaxi>> rebalanceVehicles = getVirtualNodeRebalancingToRoboTaxis();
+//            
+//            // travel times
+//            Map<VirtualLink<Link>, Double> travelTimes = TravelTimeCalculatorClaudioForDejan.computeTravelTimes(virtualNetwork.getVirtualLinks());
+//            
+//            // planning horizon for SMPC
+//            int PlanningHorizon = 50;
+//            
+//            // Rebalancing links
+//            Coord coord1 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode1);
+//            Coord coord2 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode2);
+//            Coord coord3 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode3);
+//            Coord coord4 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode4);
+//            Coord coord5 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode5);
+//            Coord coord6 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode6);
+//            Coord coord7 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode7);
+//            Coord coord8 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode8);
+//            Coord coord9 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode9);
+//            Coord coord10 = UserReferenceFrames.SANFRANCISCO.coords_fromWGS84().transform(coordNode10);
+//            Link link1 = pendingLinkTree.getClosest(coord1.getX(), coord1.getY());
+//            Link link2 = pendingLinkTree.getClosest(coord2.getX(), coord2.getY());
+//            Link link3 = pendingLinkTree.getClosest(coord3.getX(), coord3.getY());
+//            Link link4 = pendingLinkTree.getClosest(coord4.getX(), coord4.getY());
+//            Link link5 = pendingLinkTree.getClosest(coord5.getX(), coord5.getY());
+//            Link link6 = pendingLinkTree.getClosest(coord6.getX(), coord6.getY());
+//            Link link7 = pendingLinkTree.getClosest(coord7.getX(), coord7.getY());
+//            Link link8 = pendingLinkTree.getClosest(coord8.getX(), coord8.getY());
+//            Link link9 = pendingLinkTree.getClosest(coord9.getX(), coord9.getY());
+//            Link link10 = pendingLinkTree.getClosest(coord10.getX(), coord10.getY());
+//            Pair<Integer, Link> pair1 = Pair.of(0, link1);
+//            Pair<Integer, Link> pair2 = Pair.of(1, link2);
+//            Pair<Integer, Link> pair3 = Pair.of(2, link3);
+//            Pair<Integer, Link> pair4 = Pair.of(3, link4);
+//            Pair<Integer, Link> pair5 = Pair.of(4, link5);
+//            Pair<Integer, Link> pair6 = Pair.of(5, link6);
+//            Pair<Integer, Link> pair7 = Pair.of(6, link7);
+//            Pair<Integer, Link> pair8 = Pair.of(7, link8);
+//            Pair<Integer, Link> pair9 = Pair.of(8, link9);
+//            Pair<Integer, Link> pair10 = Pair.of(9, link10);
+//            List<Pair<Integer, Link>> listpair = new ArrayList<Pair<Integer, Link>>();
+//            listpair.add(pair1);
+//            listpair.add(pair2);
+//            listpair.add(pair3);
+//            listpair.add(pair4);
+//            listpair.add(pair5);
+//            listpair.add(pair6);
+//            listpair.add(pair7);
+//            listpair.add(pair8);
+//            listpair.add(pair9);
+//            listpair.add(pair10);
+//            // prepare inputs for SMPC in MATLAB
+//            double[][] networkSMPC = ClaudioForDejanUtils.getVirtualNetworkForMatlab(virtualNetwork);
+//            double [][] travelTimesSMPC = ClaudioForDejanUtils.getTravelTimesForMatlab(virtualNetwork, travelTimes);
+//            double[][] availableCarsSMP = ClaudioForDejanUtils.getTotalAvailableCarsForMatlab(round_now, PlanningHorizon, idleVehicles, rebalanceVehicles, customerVehicles);                              
+//            
+//            try {
+//                // initialize server
+//                JavaContainerSocket javaContainerSocket = new JavaContainerSocket(new Socket("localhost", MfileContainerServer.DEFAULT_PORT));
+//
+//                { // add inputs to server
+//                Container container = ClaudioForDejanUtils.getContainerInit();
+//                
+//                // add network to container
+//                double[] networkNode = new double[networkSMPC.length];
+//                for(int index = 0; index<networkSMPC.length; ++index) {
+//                    networkNode = networkSMPC[index];
+//                    container.add((new DoubleArray("roadGraph" + index, new int[] { networkSMPC.length }, networkNode)));
+//                }
+//                
+//                // add travel times to container
+//                double[] travelTimeskNode = new double[travelTimesSMPC.length];
+//                for(int index = 0; index<travelTimesSMPC.length; ++index) {
+//                    travelTimeskNode = travelTimesSMPC[index];
+//                    container.add((new DoubleArray("travelTimes" + index, new int[] { travelTimesSMPC.length }, travelTimeskNode)));
+//                }
+//                
+//                // add available cars to container
+//                double[] availableCarsNode = new double[availableCarsSMP.length];
+//                int indexCar = 0;
+//                for(double[] CarsAtTime: availableCarsSMP) {
+//                    indexCar = indexCar + 1;
+//                    availableCarsNode = CarsAtTime;
+//                    container.add((new DoubleArray("availableCars" + indexCar, new int[] { availableCarsNode.length }, availableCarsNode)));
+//                }
+//                                
+//                // add planning horizon to container
+//                double[] PlanningHorizonDouble = new double[] {PlanningHorizon};
+//                container.add((new DoubleArray("PlanningHorizon", new int[] { 1 }, PlanningHorizonDouble)));
+//                
+//             // add planning horizon to container
+//                double[] currentTime = new double[] {round_now};
+//                container.add((new DoubleArray("currentTime", new int[] { 1 }, currentTime)));
+//                
+//                System.out.println("Sending to server");
+//                javaContainerSocket.writeContainer(container);
+//                
+//                }
+//                
+//                { // get outputs from server
+//                System.out.println("Waiting for server");
+//                Container container = javaContainerSocket.blocking_getContainer();
+//                System.out.println("received: " + container);
+//                
+//                // get control inputs for rebalancing from container
+//                List<double[]> ControlLaw = new ArrayList<>();        
+//                for(int i=1; i<=container.size(); ++i) {
+//                    ControlLaw.add(ClaudioForDejanUtils.getArray(container, "solution"+i));
+//                }
+//                
+//                // apply rebalancing commands
+//                CarLinkSelectorClaudioForDejan CarLinkSelect = new CarLinkSelectorClaudioForDejan(idleVehicles);
+//                
+//                for(int i=0; i<virtualNetwork.getVirtualNodes().size(); ++i) {
+//                    VirtualNode<Link> from = virtualNetwork.getVirtualNode(i);
+//                    List<Pair<RoboTaxi, Link>> controlPolicy = CarLinkSelect.getRebalanceCommands(from, ControlLaw.get(i), virtualNetwork, listpair);
+//                    if(controlPolicy != null) {
+//                        for(Pair<RoboTaxi, Link> pair: controlPolicy) {
+//                            setRoboTaxiRebalance(pair.getLeft(), pair.getRight());
+//                        }
+//                        
+//                    }
+//                     
+//                }                                              
+//                
+//                }
+//                
+//                javaContainerSocket.close();
+//                
+//            } catch (Exception exception) {
+//                exception.printStackTrace();
+//                throw new RuntimeException(); // dispatcher will not work if
+//                                              // constructor has issues
+//            }        
+//                                 
+//            System.out.println("Finished rebalancing");
             
                       
         }

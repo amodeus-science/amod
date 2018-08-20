@@ -37,12 +37,12 @@ public class PSOSelector {
                     VirtualNodeAVToRequests);
 
             if (availableCars.isEmpty()) {
-                System.out.println("No available cars for p_oz");
+                System.out.println("No available cars for p_so");
                 continue;
             }
 
             if (fromRequest.isEmpty()) {
-                System.out.println("No available requests for p_oz");
+                System.out.println("No available requests for p_so");
                 continue;
             }
 
@@ -89,19 +89,29 @@ public class PSOSelector {
 
             }
         }
+        
+        if(pSOCommandsList.isEmpty()) {
+            return null;
+        }
 
         return pSOCommandsList;
     }
 
+    @SuppressWarnings("unchecked")
     private List<List<AVRequest>> getFromToAVRequests(VirtualNetwork<Link> virtualNetwork, List<AVRequest> fromRequest,
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests) {
-        List<List<AVRequest>> fromToAVRequests = new ArrayList<>();
+        List<List<AVRequest>> fromToAVRequests = new ArrayList<>(virtualNetwork.getvNodesCount());
 
         for (VirtualNode<Link> node : virtualNetwork.getVirtualNodes()) {
-            @SuppressWarnings("unchecked")
-            List<AVRequest> fromToRequests = (List<AVRequest>) fromRequest.stream()
-                    .filter(rt -> VirtualNodeAVToRequests.get(node).contains(rt));
-            fromToAVRequests.add(node.getIndex(), fromToRequests);
+            List<AVRequest> fromToRequests = new ArrayList<>();
+            if(!fromRequest.isEmpty()) {
+                fromToRequests = (List<AVRequest>) fromRequest.stream()
+                        .filter(rt -> VirtualNodeAVToRequests.get(node).contains(rt));
+            }
+            if(!fromToRequests.isEmpty()) {
+                fromToAVRequests.add(node.getIndex(), fromToRequests);
+            }
+               
         }
 
         return fromToAVRequests;

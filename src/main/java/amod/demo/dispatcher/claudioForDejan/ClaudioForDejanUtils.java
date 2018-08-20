@@ -443,75 +443,75 @@ public static List<double[]> getReducedNetworkDistance(Network network, List<Id<
 
     }
     
-    public static double[][] getTotalAvailableCarsForMatlab(double Time, int PlanningHorizon, Map<VirtualNode<Link>,List<RoboTaxi>> IdleCars,
-        Map<VirtualNode<Link>,List<RoboTaxi>> RebalanceCars, Map<VirtualNode<Link>,List<RoboTaxi>> CustomerCars){
-        
-        int NumberNodes = IdleCars.keySet().size();
-        
-        if(RebalanceCars.keySet().size() != NumberNodes || CustomerCars.keySet().size() != NumberNodes) {
-            throw new RuntimeException();
-        }
-        
-        double[][] TotalAvailableCars = new double[PlanningHorizon][NumberNodes];
-        int numberIdle;
-        int numberReb;
-        int numberCust;
-        
-        for(VirtualNode<Link> node: IdleCars.keySet()) {
-            List<RoboTaxi> IdleCarsAtNode = IdleCars.get(node);
-            List<RoboTaxi> RebCarsAtNode = RebalanceCars.get(node);
-            List<RoboTaxi> CustCarsAtNode = CustomerCars.get(node);
-            
-            if(IdleCarsAtNode.isEmpty() == true) {
-                numberIdle = 0;
-            }
-            else {
-                numberIdle = IdleCarsAtNode.size();
-            }
-            
-            for(int t=0; t<PlanningHorizon; t++) {
-                if(RebCarsAtNode.isEmpty() == true) {
-                    numberReb = 0;
-                }
-                else {
-                    numberReb = getNumberCarsAbailableAtTime(Time, t, RebCarsAtNode);
-                }
-                
-                if(CustCarsAtNode.isEmpty() == true) {
-                    numberCust = 0;
-                }
-                else {
-                    numberCust = getNumberCarsAbailableAtTime(Time, t, CustCarsAtNode); 
-                }
-                
-                if(t==0) {
-                    TotalAvailableCars[t][node.getIndex()] = numberIdle + numberReb + numberCust;
-                }
-                else {
-                    TotalAvailableCars[t][node.getIndex()] = numberReb + numberCust;
-                }
-                             
-            }
-            
-             
-        }
-        
-        return TotalAvailableCars;      
+//    public static double[][] getTotalAvailableCarsForMatlab(double Time, int PlanningHorizon, Map<VirtualNode<Link>,List<RoboTaxi>> IdleCars,
+//        Map<VirtualNode<Link>,List<RoboTaxi>> RebalanceCars, Map<VirtualNode<Link>,List<RoboTaxi>> CustomerCars){
+//        
+//        int NumberNodes = IdleCars.keySet().size();
+//        
+//        if(RebalanceCars.keySet().size() != NumberNodes || CustomerCars.keySet().size() != NumberNodes) {
+//            throw new RuntimeException();
+//        }
+//        
+//        double[][] TotalAvailableCars = new double[PlanningHorizon][NumberNodes];
+//        int numberIdle;
+//        int numberReb;
+//        int numberCust;
+//        
+//        for(VirtualNode<Link> node: IdleCars.keySet()) {
+//            List<RoboTaxi> IdleCarsAtNode = IdleCars.get(node);
+//            List<RoboTaxi> RebCarsAtNode = RebalanceCars.get(node);
+//            List<RoboTaxi> CustCarsAtNode = CustomerCars.get(node);
+//            
+//            if(IdleCarsAtNode.isEmpty() == true) {
+//                numberIdle = 0;
+//            }
+//            else {
+//                numberIdle = IdleCarsAtNode.size();
+//            }
+//            
+//            for(int t=0; t<PlanningHorizon; t++) {
+//                if(RebCarsAtNode.isEmpty() == true) {
+//                    numberReb = 0;
+//                }
+//                else {
+//                    numberReb = getNumberCarsAbailableAtTime(Time, t, RebCarsAtNode);
+//                }
+//                
+//                if(CustCarsAtNode.isEmpty() == true) {
+//                    numberCust = 0;
+//                }
+//                else {
+//                    numberCust = getNumberCarsAbailableAtTime(Time, t, CustCarsAtNode); 
+//                }
+//                
+//                if(t==0) {
+//                    TotalAvailableCars[t][node.getIndex()] = numberIdle + numberReb + numberCust;
+//                }
+//                else {
+//                    TotalAvailableCars[t][node.getIndex()] = numberReb + numberCust;
+//                }
+//                             
+//            }
+//            
+//             
+//        }
+//        
+//        return TotalAvailableCars;      
+//
+//    }
 
-    }
-
-    private static int getNumberCarsAbailableAtTime(double Time, int t, List<RoboTaxi> carsAtNode) {
-        int numberCars = 0;
-        for(RoboTaxi car: carsAtNode) {
-            Collection<RoboTaxiPlanEntry> plansCollection = car.getCurrentPlans(Time).getPlans().values();
-            for(RoboTaxiPlanEntry planEntry: plansCollection) {
-                if(planEntry.endTime > Time + t*5*60 && planEntry.endTime <= Time+(t+1)*5*60 && car.getStatus() == planEntry.status) {
-                    numberCars = numberCars + 1;
-                }
-            }
-        }
-        return numberCars;
-    }
+//    private static int getNumberCarsAbailableAtTime(double Time, int t, List<RoboTaxi> carsAtNode) {
+//        int numberCars = 0;
+//        for(RoboTaxi car: carsAtNode) {
+//            Collection<RoboTaxiPlanEntry> plansCollection = car.getCurrentPlans(Time).getPlans().values();
+//            for(RoboTaxiPlanEntry planEntry: plansCollection) {
+//                if(planEntry.endTime > Time + t*5*60 && planEntry.endTime <= Time+(t+1)*5*60 && car.getStatus() == planEntry.status) {
+//                    numberCars = numberCars + 1;
+//                }
+//            }
+//        }
+//        return numberCars;
+//    }
     
     public static void printArray(Container container, String field) {
         if (container.contains(field)) {

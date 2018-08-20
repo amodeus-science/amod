@@ -33,12 +33,12 @@ public class PZOSelector {
             List<RoboTaxi> availableCars = StayRoboTaxi.get(position);
 
             if (availableCars.isEmpty()) {
-                System.out.println("No available cars for p_oz");
+                System.out.println("No available cars for p_zo");
                 continue;
             }
 
             if (fromRequest.isEmpty()) {
-                System.out.println("No available requests for p_oz");
+                System.out.println("No available requests for p_zo");
                 continue;
             }
 
@@ -106,6 +106,10 @@ public class PZOSelector {
             }
         }
 
+        if(pZOCommandsList.isEmpty()) {
+            return null;
+        }
+        
         return pZOCommandsList;
     }
 

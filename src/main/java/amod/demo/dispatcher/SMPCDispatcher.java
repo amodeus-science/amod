@@ -47,7 +47,6 @@ import ch.ethz.idsc.amodeus.dispatcher.util.DistanceHeuristics;
 import ch.ethz.idsc.amodeus.dispatcher.util.EuclideanDistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.FeasibleRebalanceCreator;
 import ch.ethz.idsc.amodeus.dispatcher.util.HungarBiPartVehicleDestMatcher;
-import ch.ethz.idsc.amodeus.dispatcher.util.LPVehicleRebalancing;
 import ch.ethz.idsc.amodeus.dispatcher.util.RandomVirtualNodeDest;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
 import ch.ethz.idsc.amodeus.prep.NetworkCreatorUtils;
@@ -80,7 +79,7 @@ public class SMPCDispatcher extends PartitionedDispatcher {
     private final int numRobotaxi;
     private int total_rebalanceCount = 0;
     private Tensor printVals = Tensors.empty();
-    private final LPVehicleRebalancing lpVehicleRebalancing;
+//    private final LPVehicleRebalancing lpVehicleRebalancing;
     private final DistanceFunction distanceFunction;
     private final DistanceHeuristics distanceHeuristics;
     private final Network network;
@@ -101,7 +100,7 @@ public class SMPCDispatcher extends PartitionedDispatcher {
         virtualNodeDest = abstractVirtualNodeDest;
         vehicleDestMatcher = abstractVehicleDestMatcher;
         numRobotaxi = (int) generatorConfig.getNumberOfVehicles();
-        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
+//        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 300);
