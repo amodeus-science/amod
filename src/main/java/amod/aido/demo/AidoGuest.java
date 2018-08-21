@@ -44,26 +44,25 @@ public class AidoGuest {
         /** connect to AidoGuest */
         try (StringSocket stringSocket = new StringSocket(new Socket(ip, AidoHost.PORT))) {
 
-            /** send initial command {SanFrancisco, 0.4, 177} */
+            /** send initial command, e.g., {SanFrancisco, 0.4, 177} */
             Tensor config = Tensors.of( //
-                    StringScalar.of(scenario), // scenario name
-                    RealScalar.of(populationRatio), // ratio of population
-                    RealScalar.of(numberOfVehicles)); // number of vehicles
+                    StringScalar.of(scenario), /** scenario name */
+                    RealScalar.of(populationRatio), /** ratio of population */
+                    RealScalar.of(numberOfVehicles)); /** number of vehicles */
             stringSocket.writeln(config);
 
             final DispatchingLogic dispatchingLogic;
-            {
-                /** receive initial information */
-                Tensor initialInfo = Tensors.fromString(stringSocket.readLine());
 
-                /** the city grid is inside the WGS:84 coordinates bounded by the box
-                 * bottomLeft, topRight */
-                Tensor bottomLeft = initialInfo.get(0);
-                Tensor topRight = initialInfo.get(1);
+            /** receive initial information */
+            Tensor initialInfo = Tensors.fromString(stringSocket.readLine());
 
-                /** receive dispatching status and send dispatching command */
-                dispatchingLogic = new DispatchingLogic(bottomLeft, topRight);
-            }
+            /** the city grid is inside the WGS:84 coordinates bounded by the box
+             * bottomLeft, topRight */
+            Tensor bottomLeft = initialInfo.get(0);
+            Tensor topRight = initialInfo.get(1);
+
+            /** receive dispatching status and send dispatching command */
+            dispatchingLogic = new DispatchingLogic(bottomLeft, topRight);
 
             int count = 0;
             while (true) {
@@ -85,14 +84,11 @@ public class AidoGuest {
                 }
             }
 
-            {
-                /** recieve final performance score/stats */
-                Tensor finalInfo = Tensors.fromString(stringSocket.readLine());
-                // {2712.6744186046512, 0.6200892616333414, 5}
-                System.out.println("finalInfo: " + finalInfo);
-                // TODO decode numbers in finalInfo and print with interpretation
-            }
+            /** recieve final performance score/stats */
+            Tensor finalInfo = Tensors.fromString(stringSocket.readLine());
+            // TODO decode numbers in finalInfo and print with interpretation
+            System.out.println("finalInfo: " + finalInfo);
+
         } // <- closing string socket
     }
-
 }

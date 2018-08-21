@@ -26,11 +26,7 @@ import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.router.AVRouter;
 
 /** Dispatcher sends vehicles to all links in the network and lets them pickup
- * any customers which are waiting along the road.
- * 
- * @author Claudio Ruch */
-
-// TODO write interesting, funny and informative DemoDispatcher
+ * any customers which are waiting along the road. */
 public class DemoDispatcher extends RebalancingDispatcher {
     private final List<Link> links;
     private final double rebPos = 0.99;
@@ -38,13 +34,8 @@ public class DemoDispatcher extends RebalancingDispatcher {
     private final int rebalancingPeriod;
     private int total_abortTrip = 0;
 
-    private DemoDispatcher(//
-            Config config, //
-            AVDispatcherConfig avconfig, //
-            TravelTime travelTime, //
-            AVRouter router, //
-            EventsManager eventsManager, //
-            Network network) {
+    private DemoDispatcher(Config config, AVDispatcherConfig avconfig, TravelTime travelTime, //
+            AVRouter router, EventsManager eventsManager, Network network) {
         super(config, avconfig, travelTime, router, eventsManager);
         links = new ArrayList<>(network.getLinks().values());
         Collections.shuffle(links, randGen);
@@ -55,12 +46,11 @@ public class DemoDispatcher extends RebalancingDispatcher {
     @Override
     public void redispatch(double now) {
 
-        // stop all vehicles which are driving by an open request
+        /** stop all vehicles which are driving by an open request */
         total_abortTrip += DrivebyRequestStopper //
                 .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
 
-        // send vehicles to travel around the city to random links (random
-        // loitering)
+        /** send vehicles to travel around the city to random links (random loitering) */
         final long round_now = Math.round(now);
         if (round_now % rebalancingPeriod == 0 && 0 < getAVRequests().size()) {
             for (RoboTaxi roboTaxi : getDivertableRoboTaxis()) {

@@ -39,11 +39,11 @@ import ch.ethz.idsc.tensor.sca.Round;
         System.out.println("minimum longitude in network: " + lngMin);
         System.out.println("maximum longitude in network: " + lngMax);
 
-        // Example:
-        // minimum latitude in network: -33.869660953686626
-        // maximum latitude in network: -33.0303523690584
-        // minimum longitude in network: -71.38020297181387
-        // maximum longitude in network: -70.44406349551404
+        /** Example:
+         * minimum latitude in network: -33.869660953686626
+         * maximum latitude in network: -33.0303523690584
+         * minimum longitude in network: -71.38020297181387
+         * maximum longitude in network: -70.44406349551404 */
     }
 
     public Tensor of(Tensor status) {
@@ -60,7 +60,7 @@ import ch.ethz.idsc.tensor.sca.Round;
                 requests.put(request.Get(1), request);
             }
 
-            /** for each unassinged request, add a taxi in STAY mode */
+            /** for each unassigned request, add a taxi in STAY mode */
             for (Tensor request : requests.values()) {
                 if (!matchedReq.contains(request.Get(0))) {
                     while (index < status.get(1).length()) {
