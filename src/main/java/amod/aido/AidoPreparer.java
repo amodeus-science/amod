@@ -54,14 +54,14 @@ import ch.ethz.idsc.tensor.Tensors;
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(configMatsim, scenOpt);
 
-        /** send initial data (bounding box), {minX, minY, maxX, maxY} */
+        /** send initial data (bounding box), {{minX, minY}, {maxX, maxY}} */
         double[] bbox = NetworkUtils.getBoundingBox(network.getNodes().values());
 
-        Tensor initialInfo = Tensors.empty();
-        initialInfo.append(TensorCoords.toTensor(scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))));
-        initialInfo.append(TensorCoords.toTensor(scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[2], bbox[3]))));
-
-        return initialInfo;
+        return Tensors.of( //
+                TensorCoords.toTensor( //
+                        scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
+                TensorCoords.toTensor( //
+                        scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[2], bbox[3]))));
     }
 
 }

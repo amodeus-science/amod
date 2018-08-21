@@ -16,11 +16,13 @@ import ch.ethz.idsc.tensor.Tensors;
 
 /* package */ class AidoHtmlReport implements HtmlReportElement {
 
-    private static final String IMAGE_FOLDER = "../data"; // relative to report folder
+    /** relative to report folder */
+    private static final String IMAGE_FOLDER = "../data";
+    // ---
+    private final AidoScoreElement aidoScoreElement;
     private Scalar totalMeanWaitingTime;
     private Scalar totalEfficiencyRatio; /* empty distance divided by total distance */
     private Scalar numberOfVehicles;
-    private final AidoScoreElement aidoScoreElement;
 
     public AidoHtmlReport(AidoScoreElement aidoScoreElement) {
         this.aidoScoreElement = aidoScoreElement;
@@ -49,17 +51,15 @@ import ch.ethz.idsc.tensor.Tensors;
             aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_WAIT + ".png", 800, 600);
             aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_DIST + ".png", 800, 600);
 
-            aRElement.getHTMLGenerator()
-                    .insertTextLeft(aRElement.getHTMLGenerator().bold("Final Scores") + //
-                            "\n\t" + "total waiting time:" + //
-                            "\n\t" + "total full distance:" + //
-                            "\n\t" + "total empty distance:" //
+            aRElement.getHTMLGenerator().insertTextLeft(aRElement.getHTMLGenerator().bold("Final Scores") + //
+                    "\n\t" + "total waiting time:" + //
+                    "\n\t" + "total full distance:" + //
+                    "\n\t" + "total empty distance:" //
             );
-            aRElement.getHTMLGenerator()
-                    .insertTextLeft(" " + //
-                            "\n" + aidoScoreElement.getCurrentScore().Get(0) + //
-                            "\n" + aidoScoreElement.getCurrentScore().Get(1) + //
-                            "\n" + aidoScoreElement.getCurrentScore().Get(2) //
+            aRElement.getHTMLGenerator().insertTextLeft(" " + //
+                    "\n" + aidoScoreElement.getCurrentScore().Get(0) + //
+                    "\n" + aidoScoreElement.getCurrentScore().Get(1) + //
+                    "\n" + aidoScoreElement.getCurrentScore().Get(2) //
             );
             aRElement.getHTMLGenerator().newLine();
 

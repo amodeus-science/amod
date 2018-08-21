@@ -66,10 +66,12 @@ public enum AidoHost {
             Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
                     aidoServer.getOutputDirectory());
             AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize);
-            AidoExport aidoExport = new AidoExport(aidoScoreElement);
-            AidoHtmlReport aidoHtmlReport = new AidoHtmlReport(aidoScoreElement);
             analysis.addAnalysisElement(aidoScoreElement);
+
+            AidoExport aidoExport = new AidoExport(aidoScoreElement);
             analysis.addAnalysisExport(aidoExport);
+
+            AidoHtmlReport aidoHtmlReport = new AidoHtmlReport(aidoScoreElement);
             analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
 

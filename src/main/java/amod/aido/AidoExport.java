@@ -1,3 +1,4 @@
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido;
 
 import java.io.File;
@@ -21,29 +22,32 @@ import ch.ethz.idsc.tensor.alg.Transpose;
     private static final boolean FILTER_ON = true;
 
     /** aido score element */
-    private final AidoScoreElement aidoScoreElem;
+    private final AidoScoreElement aidoScoreElement;
 
-    public AidoExport(AidoScoreElement aidoScoreElem) {
-        this.aidoScoreElem = aidoScoreElem;
+    public AidoExport(AidoScoreElement aidoScoreElement) {
+        this.aidoScoreElement = aidoScoreElement;
     }
 
     @Override
     public void summaryTarget(AnalysisSummary analysisSummary, File relativeDirectory, ColorScheme colorScheme) {
 
+        Tensor scoreHistory = aidoScoreElement.getScoreHistory();
         /** produce chart that shows all 3 Aido scores during simulation */
-        Tensor time = Transpose.of(aidoScoreElem.getScoreHistory()).get(0);
+        Tensor time = scoreHistory.get(Tensor.ALL, 0);
 
-        Tensor waiting = Transpose.of(Tensors.of(Transpose.of(aidoScoreElem.getScoreHistory()).get(1)));
+        Tensor waiting = Transpose.of(Tensors.of(scoreHistory.get(Tensor.ALL, 1)));
 
-        Tensor distances = Transpose.of(Tensors.of(//
-                Transpose.of(aidoScoreElem.getScoreHistory()).get(2), //
-                Transpose.of(aidoScoreElem.getScoreHistory()).get(3)));
+        // TODO can use the following?
+        // Tensor distances = Tensor.of(scoreHistory.stream().map(row->row.extract(2, 4)));
+        Tensor distances = Transpose.of(Tensors.of( //
+                scoreHistory.get(Tensor.ALL, 2), //
+                scoreHistory.get(Tensor.ALL, 3)));
 
         /** figure for waiting times */
         try {
             TimeChart.of(relativeDirectory, FILENAME_WAIT, "Total Waiting Time", FILTER_ON, FILTERSIZE, //
                     new double[] { 1.0 }, new String[] { "total waited time [s]" }, "time of day", "waiting time", //
-                    time, waiting, aidoScoreElem.getCurrentScore().Get(0).number().doubleValue(), colorScheme);
+                    time, waiting, aidoScoreElement.getCurrentScore().Get(0).number().doubleValue(), colorScheme);
         } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
             e1.printStackTrace();
@@ -54,8 +58,10 @@ import ch.ethz.idsc.tensor.alg.Transpose;
             TimeChart.of(relativeDirectory, FILENAME_DIST, "Total Distances", FILTER_ON, FILTERSIZE, //
                     new double[] { 1.0, 1.0 }, new String[] { "total distance with customer [m]", "total empty distance [m]" }, "time of day", "distance", //
                     time, distances, //
-                    Math.max(aidoScoreElem.getCurrentScore().Get(1).number().doubleValue(), aidoScoreElem.getCurrentScore().Get(2).number().doubleValue()),
-                    colorScheme); // TODO read from data
+                    Math.max(aidoScoreElement.getCurrentScore().Get(1).number().doubleValue(), aidoScoreElement.getCurrentScore().Get(2).number().doubleValue()), colorScheme); // TODO
+                                                                                                                                                                                // read
+                                                                                                                                                                                // from
+                                                                                                                                                                                // data
         } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
             e1.printStackTrace();
@@ -63,7 +69,7 @@ import ch.ethz.idsc.tensor.alg.Transpose;
 
         /** export aggregated aido scores data */
         try {
-            UnitSaveUtils.saveFile(aidoScoreElem.getScoreHistory(), "aidoScores", relativeDirectory);
+            UnitSaveUtils.saveFile(aidoScoreElement.getScoreHistory(), "aidoScores", relativeDirectory);
         } catch (Exception e) {
             System.err.println("Saving aido score history was unsuccessful.");
             e.printStackTrace();

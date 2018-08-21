@@ -92,7 +92,6 @@ import ch.ethz.matsim.av.framework.AVUtils;
         GlobalAssert.that(Objects.nonNull(network));
         GlobalAssert.that(Objects.nonNull(population));
 
-        
         // load linkSpeedData
         File linkSpeedDataFile = new File(workingDirectory, scenarioOptions.getLinkSpeedDataName());
         System.out.println(linkSpeedDataFile.toString());
@@ -143,10 +142,4 @@ import ch.ethz.matsim.av.framework.AVUtils;
     /* package */ File getConfigFile() {
         return configFile;
     }
-
-    public static void main(String[] args) throws MalformedURLException, Exception {
-        AidoServer server = new AidoServer();
-        server.simulate(null);
-    }
-
 }
