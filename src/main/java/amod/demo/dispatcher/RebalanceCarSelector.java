@@ -21,7 +21,7 @@ public class RebalanceCarSelector {
         this.controlLaw = controlLaw;
     }
     
-    List<Pair<RoboTaxi, Link>> getRebalanceCommands(VirtualNode<Link> from, Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles, VirtualNetwork<Link> virtualNetwork) throws Exception {
+    public List<Pair<RoboTaxi, Link>> getRebalanceCommands(VirtualNode<Link> from, Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles, VirtualNetwork<Link> virtualNetwork) throws Exception {
 
         List<RoboTaxi> avTaxis = availableVehicles.get(from);
         int indexFromNode = from.getIndex();

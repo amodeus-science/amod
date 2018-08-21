@@ -29,12 +29,12 @@ import ch.ethz.idsc.amodeus.dispatcher.shared.SharedAVGeneratorConfig;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedCourse;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedDispatcherExample;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedMealType;
-import ch.ethz.idsc.amodeus.dispatcher.util.AbstractVehicleDestMatcher;
+import ch.ethz.idsc.amodeus.dispatcher.util.AbstractRoboTaxiDestMatcher;
 import ch.ethz.idsc.amodeus.dispatcher.util.AbstractVirtualNodeDest;
 import ch.ethz.idsc.amodeus.dispatcher.util.DistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.DistanceHeuristics;
 import ch.ethz.idsc.amodeus.dispatcher.util.EuclideanDistanceFunction;
-import ch.ethz.idsc.amodeus.dispatcher.util.HungarBiPartVehicleDestMatcher;
+import ch.ethz.idsc.amodeus.dispatcher.util.GlobalBipartiteMatching;
 import ch.ethz.idsc.amodeus.dispatcher.util.RandomVirtualNodeDest;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
 import ch.ethz.idsc.amodeus.traveldata.TravelData;
@@ -62,7 +62,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
     private final int dispatchPeriod;
     private final int rebalancingPeriod;
     private final AbstractVirtualNodeDest virtualNodeDest;
-    private final AbstractVehicleDestMatcher vehicleDestMatcher;
+    private final AbstractRoboTaxiDestMatcher vehicleDestMatcher;
     private final int nVNodes;
     private final int nVLinks;
     private final Network network;
@@ -88,7 +88,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
             Network network, //
             VirtualNetwork<Link> virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
-            AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
+            AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher, //
             TravelData travelData) {
         super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
         virtualNodeDest = abstractVirtualNodeDest;
@@ -464,7 +464,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
             AVGeneratorConfig generatorConfig = avconfig.getParent().getGeneratorConfig();
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
-            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(
+            AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher = new GlobalBipartiteMatching(
                     new EuclideanDistanceFunction());
 
             return new CarPooling2Dispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager,

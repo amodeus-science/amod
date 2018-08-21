@@ -12,7 +12,7 @@ public enum TravelTimeCalculatorClaudioForDejan {
     ;
     
     // TODO Dejan make this as you need it
-    /*package*/ static Map<VirtualLink<Link>,Double> computeTravelTimes(Collection<VirtualLink<Link>> vLinks){
+    /*package*/ public static Map<VirtualLink<Link>,Double> computeTravelTimes(Collection<VirtualLink<Link>> vLinks){
         
         double speed = 20; //[m/s]
         Map<VirtualLink<Link>,Double> tTimes = new HashMap<>();
