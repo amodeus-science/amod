@@ -97,6 +97,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         System.out.println(linkSpeedDataFile.toString());
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
 
+        Objects.requireNonNull(network);
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
@@ -141,5 +142,4 @@ import ch.ethz.matsim.av.framework.AVUtils;
     /* package */ File getConfigFile() {
         return configFile;
     }
-
 }

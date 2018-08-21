@@ -59,8 +59,6 @@ public enum ScenarioServer {
     public static void main(String[] args) throws MalformedURLException, Exception {
         simulate();
         // General todo's to be completed:
-        // TODO finish ride-sharing API support. (capacity >= 1)
-        // TODO enable external routing
         // TODO add time-varying dispatcher
 
     }

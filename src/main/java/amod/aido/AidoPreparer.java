@@ -35,39 +35,33 @@ import ch.ethz.idsc.tensor.Tensors;
         Static.setup();
 
         /** amodeus options */
-        ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
+        ScenarioOptions scenOpt = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** MATSim config */
-        Config configMatsim = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName());
+        Config configMatsim = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName());
         Scenario scenario = ScenarioUtils.loadScenario(configMatsim);
 
         /** adaption of MATSim network, e.g., radius cutting */
         Network network = scenario.getNetwork();
-        network = NetworkPreparer.run(network, scenarioOptions);
+        network = NetworkPreparer.run(network, scenOpt);
 
         /** adaption of MATSim population, e.g., radius cutting */
         Population population = scenario.getPopulation();
-        scenarioOptions.setMaxPopulationSize((int) (population.getPersons().size() * populRed));
+        scenOpt.setMaxPopulationSize((int) (population.getPersons().size() * populRed));
         long apoSeed = 1234;
-        PopulationPreparer.run(network, population, scenarioOptions, configMatsim, apoSeed);
-
-        // /** creating a virtual network, e.g., for dispatchers using a graph structure on the city
-        // */
-        // VirtualNetworkPreparer.run(network, population, scenarioOptions);
+        PopulationPreparer.run(network, population, scenOpt, configMatsim, apoSeed);
 
         /** create a simulation MATSim config file linking the created input data */
-        ConfigCreator.createSimulationConfigFile(configMatsim, scenarioOptions);
+        ConfigCreator.createSimulationConfigFile(configMatsim, scenOpt);
 
-        /** send initial data (bounding box) */
-        double[] bounding = NetworkUtils.getBoundingBox(network.getNodes().values()); // {minX,
-                                                                                      // minY, maxX,
-                                                                                      // maxY}
-        Tensor initialInfo = Tensors.empty();
-        initialInfo.append(TensorCoords.toTensor(scenarioOptions.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bounding[0], bounding[1]))));
+        /** send initial data (bounding box), {{minX, minY}, {maxX, maxY}} */
+        double[] bbox = NetworkUtils.getBoundingBox(network.getNodes().values());
 
-        initialInfo.append(TensorCoords.toTensor(scenarioOptions.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bounding[2], bounding[3]))));
-
-        return initialInfo;
+        return Tensors.of( //
+                TensorCoords.toTensor( //
+                        scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
+                TensorCoords.toTensor( //
+                        scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[2], bbox[3]))));
     }
 
 }
