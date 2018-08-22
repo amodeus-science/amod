@@ -28,8 +28,48 @@ public class RebalanceCarSelector {
         List<Pair<RoboTaxi, Link>> rebalanceCommandsList = new ArrayList<>();
         double[] controlInput = controlLaw.get(indexFromNode);
         
+        if(controlInput.equals(ArrayUtils.EMPTY_DOUBLE_ARRAY)) {
+            return null;
+        }
+        
         if(avTaxis.isEmpty()) {
             return null;
+        }
+        
+        
+        int iteration = 0;
+        List<Integer> removeElements = new ArrayList<Integer>();
+        for (double node : controlInput) {
+            node = node - 1;
+            int indexNode = (int) node;
+            
+            if(indexNode<1) {
+                iteration = iteration + 1;
+                continue;
+            }
+
+            if (avTaxis.isEmpty()) {
+                break;
+            }
+
+            RoboTaxi nextRoboTaxi = avTaxis.get(0);
+            avTaxis.remove(nextRoboTaxi);
+            VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
+            Optional<Link> linkOption = toNode.getLinks().stream().findAny();
+
+            Pair<RoboTaxi, Link> xZOCommands = Pair.of(nextRoboTaxi, linkOption.get());
+            rebalanceCommandsList.add(xZOCommands);
+            removeElements.add(iteration);
+            iteration = iteration + 1;
+
+        }
+        
+        if(!removeElements.isEmpty()) {
+            for(int removeArray: removeElements) {
+                controlInput[removeArray] = 0;
+            }
+
+            controlLaw.set(indexFromNode, controlInput);
         }
         
         if(avTaxis.size() >= controlInput.length) {

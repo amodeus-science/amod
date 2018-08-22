@@ -3,6 +3,7 @@ package amod.demo.dispatcher;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -22,47 +23,66 @@ public class PSOSelector {
 
     @SuppressWarnings("unchecked")
     List<Pair<RoboTaxi, AVRequest>> getPSOCommands(VirtualNetwork<Link> virtualNetwork,
-            Map<VirtualNode<Link>, List<RoboTaxi>> SORoboTaxi,
-            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests,
-            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests) throws Exception {
+            Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi,
+            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests,
+            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests) throws Exception {
 
         List<Pair<RoboTaxi, AVRequest>> pSOCommandsList = new ArrayList<>();
 
         for (VirtualNode<Link> position : virtualNetwork.getVirtualNodes()) {
-            List<AVRequest> fromRequest = VirtualNodeAVFromRequests.get(position);
-            List<double[]> controlLawFirstDestination = controlLaw.get(position.getIndex());
-            List<RoboTaxi> availableCars = SORoboTaxi.get(position);
-
-            List<List<AVRequest>> fromToRequestList = getFromToAVRequests(virtualNetwork, fromRequest,
-                    VirtualNodeAVToRequests);
-
-            if (availableCars.isEmpty()) {
-                System.out.println("No available cars for p_so");
-                continue;
-            }
-
+            List<AVRequest> fromRequest = virtualNodeAVFromRequests.get(position);
+            
             if (fromRequest.isEmpty()) {
                 System.out.println("No available requests for p_so");
                 continue;
             }
+            
+            List<double[]> controlLawFirstDestination = controlLaw.get(position.getIndex());
+            
+            if(controlLawFirstDestination.isEmpty()) {
+                continue;
+            }
+            
+            List<RoboTaxi> soTaxis = soRoboTaxi.get(position);
+            
+            if (soTaxis.isEmpty()) {
+                System.out.println("No available cars for p_so");
+                continue;
+            }
+            
+            List<List<AVRequest>> fromToRequestList = CarPooling2DispatcherUtils.getFromToAVRequests(virtualNetwork, fromRequest,
+                    virtualNodeAVToRequests);
+
 
             for (int i = 0; i < controlLawFirstDestination.size(); ++i) {
                 int ind = i;
-                List<RoboTaxi> SOcars = (List<RoboTaxi>) availableCars.stream()
-                        .filter(c -> virtualNetwork.getVirtualNode(c.getCurrentDriveDestination()).getIndex() == ind);
-                if (SOcars.isEmpty()) {
+                
+                List<RoboTaxi> availableCars = soTaxis.stream()
+                        .filter(c -> virtualNetwork.getVirtualNode(c.getCurrentDriveDestination()).getIndex() == ind && c.getMenu().getCourses().size() == 1).collect(Collectors.toList());
+               
+                if (availableCars.isEmpty()) {
                     continue;
                 }
 
                 double[] controlLawSecondDestination = controlLawFirstDestination.get(i);
+                
+                if(controlLawSecondDestination.equals(ArrayUtils.EMPTY_DOUBLE_ARRAY)) {
+                    continue;
+                }
+
 
                 int iteration = 0;
-                int[] removeElements = null;
+                List<Integer> removeElements = new ArrayList<Integer>();
                 for (double node : controlLawSecondDestination) {
                     node = node - 1;
                     int indexNode = (int) node;
+                    
+                    if(node<1) {
+                        iteration = iteration + 1;
+                        continue;
+                    }
 
-                    if (SOcars.isEmpty()) {
+                    if (availableCars.isEmpty()) {
                         break;
                     }
 
@@ -76,16 +96,23 @@ public class PSOSelector {
                     fromToSecondRequests.remove(avRequest);
                     fromToRequestList.set(indexNode, fromToSecondRequests);
 
-                    RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, SOcars);
-                    SOcars.remove(closestRoboTaxi);
-                    Pair<RoboTaxi, AVRequest> pSOCommands = Pair.of(closestRoboTaxi, fromToSecondRequests.get(0));
+                    RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, availableCars);
+                    availableCars.remove(closestRoboTaxi);
+                    Pair<RoboTaxi, AVRequest> pSOCommands = Pair.of(closestRoboTaxi, avRequest);
                     pSOCommandsList.add(pSOCommands);
-                    ArrayUtils.add(removeElements, iteration);
+                    removeElements.add(iteration);
+                    iteration = iteration + 1;
 
                 }
-                ArrayUtils.removeAll(controlLawSecondDestination, removeElements);
-
-                controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
+                
+                if(!removeElements.isEmpty()) {
+                    for(int removeArray: removeElements) {
+                        controlLawSecondDestination[removeArray] = 0;
+                    }
+                    
+                    controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
+                }
+                
 
             }
         }
@@ -97,24 +124,4 @@ public class PSOSelector {
         return pSOCommandsList;
     }
 
-    @SuppressWarnings("unchecked")
-    private List<List<AVRequest>> getFromToAVRequests(VirtualNetwork<Link> virtualNetwork, List<AVRequest> fromRequest,
-            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests) {
-        List<List<AVRequest>> fromToAVRequests = new ArrayList<>(virtualNetwork.getvNodesCount());
-
-        for (VirtualNode<Link> node : virtualNetwork.getVirtualNodes()) {
-            List<AVRequest> fromToRequests = new ArrayList<>();
-            if(!fromRequest.isEmpty()) {
-                fromToRequests = (List<AVRequest>) fromRequest.stream()
-                        .filter(rt -> VirtualNodeAVToRequests.get(node).contains(rt));
-            }
-            if(!fromToRequests.isEmpty()) {
-                fromToAVRequests.add(node.getIndex(), fromToRequests);
-            }
-               
-        }
-
-        return fromToAVRequests;
-
-    }
 }

@@ -3,6 +3,8 @@ package amod.demo.dispatcher;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -21,110 +23,78 @@ public class XDOSelector {
         this.controlLaw = controlLaw;
     }
 
-//    @SuppressWarnings("unchecked")
-//    List<Triple<RoboTaxi, AVRequest, Link>> getXZOCommands(VirtualNetwork<Link> virtualNetwork,
-//            Map<VirtualNode<Link>, List<RoboTaxi>> DORoboTaxi,
-//            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests,
-//            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests, List<Pair<Integer, Link>> listpair)
-//            throws Exception {
-//
-//        List<Triple<RoboTaxi, AVRequest, Link>> xZOCommandsList = new ArrayList<>();
-//
-//        for (VirtualNode<Link> destination : virtualNetwork.getVirtualNodes()) {
-//            List<AVRequest> requestDestination = VirtualNodeAVToRequests.get(destination);
-//            List<double[]> controlLawDestination = controlLaw.get(destination.getIndex());
-//            for (int i = 0; i < controlLawDestination.size(); ++i) {
-//                double[] controlLawDestFrom = controlLawDestination.get(i);
-//                List<RoboTaxi> availableCars = DORoboTaxi.get(virtualNetwork.getVirtualNode(i));
-//                availableCars.stream().filter(c -> c.)
-//                int fromNodeIndex = i;
-//                List<AVRequest> fromToRequests = (List<AVRequest>) requestDestination.stream().filter(
-//                        rt -> VirtualNodeAVFromRequests.get(virtualNetwork.getVirtualNode(fromNodeIndex)).contains(rt));
-//                if (availableCars.isEmpty() == false && availableCars.size() >= controlLawDestFrom.length
-//                        && availableCars.size() <= fromToRequests.size()) {
-//                    int car = 0;
-//                    for (double node : controlLawDestFrom) {
-//                        node = node - 1;
-//                        if (node < 0) {
-//                            return null;
-//                        }
-//                        RoboTaxi RoboTaxi = availableCars.get(car);
-//                        VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-//                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(RoboTaxi, fromToRequests.get(car),
-//                                getLink(toNode.getIndex(), listpair));
-//                        xZOCommandsList.add(xZOCommands);
-//                        car = car + 1;
-//                    }
-//                    controlLawDestFrom = ArrayUtils.EMPTY_DOUBLE_ARRAY;
-//
-//                    controlLaw.get(destination.getIndex()).set(i, controlLawDestFrom);
-//
-//                } else if (availableCars.isEmpty() == false && availableCars.size() < controlLawDestFrom.length
-//                        && availableCars.size() <= fromToRequests.size()) {
-//                    double node;
-//                    for (int icar = 0; icar < availableCars.size(); ++icar) {
-//                        node = controlLawDestFrom[0] - 1;
-//                        if (node < 0) {
-//                            return null;
-//                        }
-//                        RoboTaxi RoboTaxi = availableCars.get(icar);
-//                        VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-//                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(RoboTaxi, fromToRequests.get(icar),
-//                                getLink(toNode.getIndex(), listpair));
-//                        xZOCommandsList.add(xZOCommands);
-//                        ArrayUtils.remove(controlLawDestFrom, 0);
-//                    }
-//                    controlLaw.get(destination.getIndex()).set(i, controlLawDestFrom);
-//
-//                }
-//
-//                else if (availableCars.isEmpty() == false && availableCars.size() >= controlLawDestFrom.length
-//                        && availableCars.size() > fromToRequests.size()) {
-//                    double node;
-//                    for (int ireq = 0; ireq < fromToRequests.size(); ++ireq) {
-//                        node = controlLawDestFrom[0] - 1;
-//                        if (node < 0) {
-//                            return null;
-//                        }
-//                        RoboTaxi RoboTaxi = availableCars.get(ireq);
-//                        VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-//                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(RoboTaxi, fromToRequests.get(ireq),
-//                                getLink(toNode.getIndex(), listpair));
-//                        xZOCommandsList.add(xZOCommands);
-//                        ArrayUtils.remove(controlLawDestFrom, 0);
-//                    }
-//                    controlLaw.get(destination.getIndex()).set(i, controlLawDestFrom);
-//
-//                }
-//
-//                else if (availableCars.isEmpty() == false && availableCars.size() < controlLawDestFrom.length
-//                        && availableCars.size() > fromToRequests.size()) {
-//                    double node;
-//                    for (int ireq = 0; ireq < fromToRequests.size(); ++ireq) {
-//                        node = controlLawDestFrom[0] - 1;
-//                        if (node < 0) {
-//                            return null;
-//                        }
-//                        RoboTaxi RoboTaxi = availableCars.get(ireq);
-//                        VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-//                        Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(RoboTaxi, fromToRequests.get(ireq),
-//                                getLink(toNode.getIndex(), listpair));
-//                        xZOCommandsList.add(xZOCommands);
-//                        ArrayUtils.remove(controlLawDestFrom, 0);
-//                    }
-//                    controlLaw.get(destination.getIndex()).set(i, controlLawDestFrom);
-//
-//                }
-//            }
-//        }
-//
-//        return xZOCommandsList;
-//    }
-//
-//    private static Link getLink(int node, List<Pair<Integer, Link>> listpair) throws Exception {
-//        for (Pair<Integer, Link> pair : listpair)
-//            if (pair.getLeft() == node)
-//                return pair.getRight();
-//        throw new Exception("No equal node");
-//    }
+    @SuppressWarnings("unchecked")
+    List<Pair<RoboTaxi, Link>> getXDOCommands(VirtualNetwork<Link> virtualNetwork,
+            Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi,
+            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests,
+            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests) throws Exception {
+
+        List<Pair<RoboTaxi, Link>> xDOCommandsList = new ArrayList<>();
+
+        for (VirtualNode<Link> destination : virtualNetwork.getVirtualNodes()) {
+            List<double[]> controlLawDestination = controlLaw.get(destination.getIndex());
+            if(controlLawDestination.isEmpty()) {
+                continue;
+            }
+            for (int i = 0; i < controlLawDestination.size(); ++i) {
+                double[] controlLawDestFrom = controlLawDestination.get(i);
+                
+                if(controlLawDestFrom.equals(ArrayUtils.EMPTY_DOUBLE_ARRAY)) {
+                    continue;
+                }
+                
+                List<RoboTaxi> soTaxis = soRoboTaxi.get(virtualNetwork.getVirtualNode(i));
+                List<RoboTaxi> availableCars = (List<RoboTaxi>) soTaxis.stream().filter(cars -> cars.getMenu().getCourses().size() == 1
+                        && destination.getLinks().contains(cars.getCurrentDriveDestination())).collect(Collectors.toList());
+                if(availableCars.isEmpty()) {
+                    continue;
+                }
+                
+                int iteration = 0;
+                List<Integer> removeElements = new ArrayList<Integer>();
+                for (double node : controlLawDestFrom) {
+                    node = node - 1;
+                    int indexNode = (int) node;
+                    
+                    if(indexNode<1) {
+                        iteration = iteration + 1;
+                        continue;
+                    }
+
+                    if (availableCars.isEmpty()) {
+                        break;
+                    }
+
+                    RoboTaxi nextRoboTaxi = availableCars.get(0);
+                    availableCars.remove(nextRoboTaxi);
+                    VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
+                    Optional<Link> linkOption = toNode.getLinks().stream().findAny();
+
+                    Pair<RoboTaxi, Link> xZOCommands = Pair.of(nextRoboTaxi, linkOption.get());
+                    xDOCommandsList.add(xZOCommands);
+                    removeElements.add(iteration);
+                    iteration = iteration + 1;
+
+                }
+                
+                if(!removeElements.isEmpty()) {
+                    for(int removeArray: removeElements) {
+                        controlLawDestFrom[removeArray] = 0;
+                    }
+
+                    controlLaw.get(destination.getIndex()).set(i, controlLawDestFrom);
+                }
+                
+                                
+            }
+        }
+        
+        if(xDOCommandsList.isEmpty()) {
+            return null;
+        }
+
+        return xDOCommandsList;
+    }
+
+    
 }

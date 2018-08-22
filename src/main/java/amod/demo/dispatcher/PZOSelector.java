@@ -3,6 +3,7 @@ package amod.demo.dispatcher;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Triple;
@@ -21,16 +22,16 @@ public class PZOSelector {
     }
 
     List<Triple<RoboTaxi, AVRequest, AVRequest>> getPZOCommands(VirtualNetwork<Link> virtualNetwork,
-            Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi,
-            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests,
-            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests) throws Exception {
+            Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi,
+            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests,
+            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests) throws Exception {
 
         List<Triple<RoboTaxi, AVRequest, AVRequest>> pZOCommandsList = new ArrayList<>();
 
         for (VirtualNode<Link> position : virtualNetwork.getVirtualNodes()) {
 
-            List<AVRequest> fromRequest = VirtualNodeAVFromRequests.get(position);
-            List<RoboTaxi> availableCars = StayRoboTaxi.get(position);
+            List<AVRequest> fromRequest = virtualNodeAVFromRequests.get(position);
+            List<RoboTaxi> availableCars = stayRoboTaxi.get(position);
 
             if (availableCars.isEmpty()) {
                 System.out.println("No available cars for p_zo");
@@ -42,12 +43,21 @@ public class PZOSelector {
                 continue;
             }
 
-            List<List<AVRequest>> fromToRequestList = getFromToAVRequests(virtualNetwork, fromRequest,
-                    VirtualNodeAVToRequests);
+            List<List<AVRequest>> fromToRequestList = CarPooling2DispatcherUtils.getFromToAVRequests(virtualNetwork, fromRequest,
+                    virtualNodeAVToRequests);
             List<double[]> controlLawFirstDestination = controlLaw.get(position.getIndex());
+            
+            if(controlLawFirstDestination.isEmpty()) {
+                continue;
+            }
 
             for (int i = 0; i < controlLawFirstDestination.size(); ++i) {
                 double[] controlLawSecondDestination = controlLawFirstDestination.get(i);
+                
+                if(controlLawSecondDestination.equals(ArrayUtils.EMPTY_DOUBLE_ARRAY)) {
+                    continue;
+                }
+
 
                 List<AVRequest> fromToFirstRequests = fromToRequestList.get(i);
                 if (fromToFirstRequests.isEmpty()) {
@@ -55,10 +65,15 @@ public class PZOSelector {
                 }
 
                 int iteration = 0;
-                int[] removeElements = null;
+                List<Integer> removeElements = new ArrayList<Integer>();
                 for (double node : controlLawSecondDestination) {
                     node = node - 1;
                     int indexNode = (int) node;
+                    
+                    if(node<1) {
+                        iteration = iteration + 1;
+                        continue;
+                    }
 
                     if (availableCars.isEmpty()) {
                         break;
@@ -96,12 +111,18 @@ public class PZOSelector {
                             avRequestSecond);
 
                     pZOCommandsList.add(pZOCommands);
-                    ArrayUtils.add(removeElements, iteration);
+                    removeElements.add(iteration);
+                    iteration = iteration + 1;
 
                 }
-                ArrayUtils.removeAll(controlLawSecondDestination, removeElements);
+                if(!removeElements.isEmpty()) {
+                    for(int removeArray: removeElements) {
+                        controlLawSecondDestination[removeArray] = 0;
+                    }
 
-                controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
+                    controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
+                }
+                
 
             }
         }
@@ -112,19 +133,5 @@ public class PZOSelector {
         
         return pZOCommandsList;
     }
-
-    private List<List<AVRequest>> getFromToAVRequests(VirtualNetwork<Link> virtualNetwork, List<AVRequest> fromRequest,
-            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests) {
-        List<List<AVRequest>> fromToAVRequests = new ArrayList<>();
-
-        for (VirtualNode<Link> node : virtualNetwork.getVirtualNodes()) {
-            @SuppressWarnings("unchecked")
-            List<AVRequest> fromToRequests = (List<AVRequest>) fromRequest.stream()
-                    .filter(rt -> VirtualNodeAVToRequests.get(node).contains(rt));
-            fromToAVRequests.add(node.getIndex(), fromToRequests);
-        }
-
-        return fromToAVRequests;
-
-    }
+  
 }

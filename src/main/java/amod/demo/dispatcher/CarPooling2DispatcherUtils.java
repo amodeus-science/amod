@@ -6,6 +6,7 @@ import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Scenario;
@@ -28,7 +29,9 @@ import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
 import ch.ethz.idsc.jmex.Container;
 import ch.ethz.idsc.jmex.DoubleArray;
+import ch.ethz.matsim.av.framework.AVUtils;
 import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.passenger.AVRequestCreator;
 
 public enum CarPooling2DispatcherUtils {
     ;
@@ -89,82 +92,78 @@ public enum CarPooling2DispatcherUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static double[][] getRState(double Time, int PlanningHorizon, int timeStep, Collection<AVRequest> avRequests, int fixedCarCapacity,
-            Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi, List<RoboTaxi> taxiWithCustomer,
-            List<RoboTaxi> taxiRebalancing, VirtualNetwork<Link> virtualNetwork,
-            Map<VirtualLink<Link>, Double> TravelTimes) {
+    public static double[][] getRState(double time, int planningHorizon, int timeStep, Collection<AVRequest> avRequests, int fixedCarCapacity,
+            Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi, List<RoboTaxi> taxiWithCustomer,
+            Map<VirtualNode<Link>, List<RoboTaxi>> taxiRebalancing, VirtualNetwork<Link> virtualNetwork,
+            Map<VirtualLink<Link>, Double> travelTimes) {
         int NumberNodes = virtualNetwork.getvNodesCount();
 
         List<AVRequest> oneCustomer = new ArrayList<>();
         List<AVRequest> twoCustomer = new ArrayList<>();
-        List<RoboTaxi> taxiWithOneCustomer = new ArrayList<>();
-        List<RoboTaxi> taxiWithTwoCustomer = new ArrayList<>();
+        List<RoboTaxi> taxiWithOneCustomer = taxiWithCustomer.stream()
+                .filter(car -> car.getCurrentNumberOfCustomersOnBoard() == 1 && car.getMenu().getCourses().size()==1).collect(Collectors.toList());
+        List<RoboTaxi> taxiWithTwoCustomer = taxiWithCustomer.stream()
+                .filter(car -> car.getCurrentNumberOfCustomersOnBoard() == fixedCarCapacity).collect(Collectors.toList());
         
-        if(!taxiWithCustomer.isEmpty()) {
-            taxiWithOneCustomer = (List<RoboTaxi>) taxiWithCustomer.stream()
-                    .filter(car -> car.getCurrentNumberOfCustomersOnBoard() == 1);
-            taxiWithTwoCustomer = (List<RoboTaxi>) taxiWithCustomer.stream()
-                    .filter(car -> car.getCurrentNumberOfCustomersOnBoard() == fixedCarCapacity);
-        }
-        
-        if(!taxiWithOneCustomer.isEmpty()) {
-            for (RoboTaxi taxiOne : taxiWithOneCustomer) {
-                AVRequest request = (AVRequest) avRequests.stream()
-                        .filter(re -> taxiOne.getMenu().getCourses().get(0).getRequestId() == re.getId().toString());
-                oneCustomer.add(request);
-            }
-        }
-        
-       if(!taxiWithTwoCustomer.isEmpty()) {
-           for (RoboTaxi taxiTwo : taxiWithTwoCustomer) {
-               AVRequest request2 = (AVRequest) avRequests.stream()
-                       .filter(re -> taxiTwo.getMenu().getCourses().get(1).getRequestId() == re.getId().toString());
-               twoCustomer.add(request2);
-           }
-       }
+        // TODO find AVRequests
+//        if(!taxiWithOneCustomer.isEmpty()) {
+//            for (RoboTaxi taxiOne : taxiWithOneCustomer) {
+//                List<AVRequest> request = avRequests.stream()
+//                        .filter(re -> taxiOne.getMenu().getCourses().get(0).getRequestId() == re.getId().toString()).collect(Collectors.toList());
+//                if(!request.isEmpty()) {
+//                    oneCustomer.add(request.get(0));
+//                }
+//            }
+//        }
+//        
+//       if(!taxiWithTwoCustomer.isEmpty()) {
+//           for (RoboTaxi taxiTwo : taxiWithTwoCustomer) {
+//               List<AVRequest> request2 = avRequests.stream()
+//                       .filter(re -> taxiTwo.getMenu().getCourses().get(1).getRequestId() == re.getId().toString()).collect(Collectors.toList());
+//               if(!request2.isEmpty()) {
+//                   twoCustomer.add(request2.get(0));
+//               }
+//               
+//           }
+//       }
 
 
-        double[][] TotalAvailableCars = new double[PlanningHorizon][NumberNodes];
+        double[][] TotalAvailableCars = new double[planningHorizon][NumberNodes];
         int numberStay;
         int numberReb;
         int numberSO;
         int numberDO;
 
         for (VirtualNode<Link> node : virtualNetwork.getVirtualNodes()) {
-            List<RoboTaxi> StayCarsAtNode = StayRoboTaxi.get(node);
+            List<RoboTaxi> stayCarsAtNode = stayRoboTaxi.get(node);
 
-            List<RoboTaxi> rebalancingNode = new ArrayList<>();
-            
-            if(!taxiRebalancing.isEmpty()) {
-                rebalancingNode = (List<RoboTaxi>) taxiRebalancing.stream()
-                        .filter(car -> node.getLinks().contains(car.getCurrentDriveDestination()));
-            }
+            List<RoboTaxi> rebalancingToNode = taxiRebalancing.get(node);
             
 
-            if (StayCarsAtNode.isEmpty() == true) {
+            if (stayCarsAtNode.isEmpty() == true) {
                 numberStay = 0;
             } else {
-                numberStay = StayCarsAtNode.size();
+                numberStay = stayCarsAtNode.size();
             }
 
-            for (int t = 0; t < PlanningHorizon; t++) {
-                if (rebalancingNode.isEmpty() == true) {
+            for (int t = 0; t < planningHorizon; t++) {
+                if (rebalancingToNode.isEmpty() == true) {
                     numberReb = 0;
                 } else {
-                    numberReb = getNumberCarsAbailableAtTime(Time, t, timeStep, rebalancingNode, virtualNetwork,
-                            TravelTimes);
+                    numberReb = getNumberCarsAbailableAtTime(time, t, timeStep, rebalancingToNode, virtualNetwork,
+                            travelTimes);
                 }
 
                 if (oneCustomer.isEmpty() == true) {
                     numberSO = 0;
                 } else {
-                    numberSO = getNumberDropoffs(Time, t, timeStep, node, oneCustomer);
+                    numberSO = getNumberDropoffs(time, t, timeStep, node, oneCustomer);
                 }
 
                 if (twoCustomer.isEmpty() == true) {
                     numberDO = 0;
                 } else {
-                    numberDO = getNumberDropoffs(Time, t, timeStep, node, twoCustomer);
+                    numberDO = getNumberDropoffs(time, t, timeStep, node, twoCustomer);
                 }
 
                 if (t == 0) {
@@ -188,29 +187,25 @@ public enum CarPooling2DispatcherUtils {
 
         List<double[][]> xState = new ArrayList<>(NumberNodes);
 
-        List<AVRequest> firstCustomer = new ArrayList<>();
-        List<AVRequest> secondCustomer = new ArrayList<>();
         List<Pair<AVRequest, AVRequest>> customerRequests = new ArrayList<>();
-        List<RoboTaxi> taxiWithTwoCustomer = new ArrayList<>();
-
-        if(!taxiWithCustomer.isEmpty()) {
-            taxiWithTwoCustomer = (List<RoboTaxi>) taxiWithCustomer.stream()
-                    .filter(car -> car.getCurrentNumberOfCustomersOnBoard() == fixedCarCapacity);
-        }
+        List<RoboTaxi> taxiWithTwoCustomer = taxiWithCustomer.stream()
+                .filter(car -> car.getCurrentNumberOfCustomersOnBoard() == fixedCarCapacity).collect(Collectors.toList());
         
-        if(!taxiWithTwoCustomer.isEmpty()) {
-            for (RoboTaxi taxiTwo : taxiWithTwoCustomer) {
-                AVRequest request1 = (AVRequest) avRequests.stream()
-                        .filter(re -> taxiTwo.getMenu().getStarterCourse().getRequestId() == re.getId().toString());
-                AVRequest request2 = (AVRequest) avRequests.stream()
-                        .filter(re -> taxiTwo.getMenu().getCourses().get(1).getRequestId() == re.getId().toString());
-                firstCustomer.add(request1);
-                secondCustomer.add(request2);
-                Pair<AVRequest, AVRequest> requestPair = Pair.of(request1, request2);
-                customerRequests.add(requestPair);
-
-            }
-        }
+        // TODO Find AVRequests
+//        if(!taxiWithTwoCustomer.isEmpty()) {
+//            for (RoboTaxi taxiTwo : taxiWithTwoCustomer) {
+//                List<AVRequest> request1 = avRequests.stream()
+//                        .filter(re -> taxiTwo.getMenu().getStarterCourse().getRequestId() == re.getId().toString()).collect(Collectors.toList());
+//                List<AVRequest> request2 = avRequests.stream()
+//                        .filter(re -> taxiTwo.getMenu().getCourses().get(1).getRequestId() == re.getId().toString()).collect(Collectors.toList());
+//                if(!request1.isEmpty() && !request2.isEmpty()) {
+//                    Pair<AVRequest, AVRequest> requestPair = Pair.of(request1.get(0), request2.get(0));
+//                    customerRequests.add(requestPair);
+//                }
+//                
+//
+//            }
+//        }
 
         
 
@@ -309,10 +304,10 @@ public enum CarPooling2DispatcherUtils {
 
     }
 
-    private static int getNumberCarsAbailableAtTime(double Time, int t, int timeStep, List<RoboTaxi> carsAtNode,
+    private static int getNumberCarsAbailableAtTime(double Time, int t, int timeStep, List<RoboTaxi> carsToNode,
             VirtualNetwork<Link> virtualNetwork, Map<VirtualLink<Link>, Double> TravelTimes) {
         int numberCars = 0;
-        for (RoboTaxi car : carsAtNode) {
+        for (RoboTaxi car : carsToNode) {
             Link fromLink = car.getLastKnownLocation();
             Link toLink = car.getCurrentDriveDestination();
             VirtualNode<Link> fromNode = virtualNetwork.getVirtualNode(fromLink);
@@ -383,5 +378,20 @@ public enum CarPooling2DispatcherUtils {
             throw new EmptyStackException();
         }
 
+    }
+    
+    public static List<List<AVRequest>> getFromToAVRequests(VirtualNetwork<Link> virtualNetwork, List<AVRequest> fromRequest,
+            Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests) {
+        List<List<AVRequest>> fromToAVRequests = new ArrayList<>(virtualNetwork.getvNodesCount());
+
+        for (VirtualNode<Link> node : virtualNetwork.getVirtualNodes()) {
+             
+            List<AVRequest> fromToRequests = fromRequest.stream()
+                    .filter(rt -> VirtualNodeAVToRequests.get(node).contains(rt)).collect(Collectors.toList());       
+            fromToAVRequests.add(node.getIndex(), fromToRequests);            
+               
+        }
+
+        return fromToAVRequests;
     }
 }
