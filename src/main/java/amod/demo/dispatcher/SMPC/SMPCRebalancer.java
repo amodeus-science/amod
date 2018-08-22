@@ -21,7 +21,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import amod.demo.dispatcher.RebalanceCarSelector;
+import amod.demo.dispatcher.carpooling.RebalanceCarSelector;
 import amod.demo.dispatcher.claudioForDejan.ClaudioForDejanDispatcher;
 import amod.demo.dispatcher.claudioForDejan.ClaudioForDejanUtils;
 import amod.demo.dispatcher.claudioForDejan.TravelTimeCalculatorClaudioForDejan;

@@ -1,4 +1,4 @@
-package amod.demo.dispatcher;
+package amod.demo.dispatcher.carpooling;
 
 import java.net.Socket;
 import java.util.ArrayList;
