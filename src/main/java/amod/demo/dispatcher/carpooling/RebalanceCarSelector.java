@@ -72,47 +72,11 @@ public class RebalanceCarSelector {
             controlLaw.set(indexFromNode, controlInput);
         }
         
-        if(avTaxis.size() >= controlInput.length) {
-            int car = 0;
-            for(double node: controlInput) {
-                node = node - 1;
-                if(node < 0) {
-                    throw new Exception("Node ID cannot be negative");
-                }
-                RoboTaxi RoboTaxi = avTaxis.get(car);
-                VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-                Optional<Link> linkOption = toNode.getLinks().stream().findAny();
-                Pair<RoboTaxi, Link> rebalanceCommands = Pair.of(RoboTaxi, linkOption.get());
-                rebalanceCommandsList.add(rebalanceCommands);
-                car = car + 1;
-            }
-            controlInput = ArrayUtils.EMPTY_DOUBLE_ARRAY;
-            controlLaw.set(indexFromNode, controlInput);
-            return rebalanceCommandsList;
-        }
-        else if(avTaxis.size() < controlInput.length) {
-            double node;
-            for(int i=0; i<avTaxis.size(); ++i) {
-                node = controlInput[0] - 1;
-                if(node < 0) {
-                    throw new Exception("Node ID cannot be negative");
-                }
-                RoboTaxi roboTaxi = avTaxis.get(i);
-                VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-                Optional<Link> linkOption = toNode.getLinks().stream().findAny();
-                Pair<RoboTaxi, Link> rebalanceCommands = Pair.of(roboTaxi, linkOption.get());
-                rebalanceCommandsList.add(rebalanceCommands);
-                ArrayUtils.remove(controlInput, 0);
-                
-            }
-                
-            System.out.println("Not enough cars for control law");
-            controlLaw.set(indexFromNode, controlInput);
-            return rebalanceCommandsList;
-        }
-        else {
+        
+        if(rebalanceCommandsList.isEmpty()) {
             return null;
         }
+        return rebalanceCommandsList;
        
 
     }

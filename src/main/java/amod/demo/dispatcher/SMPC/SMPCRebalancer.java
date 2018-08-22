@@ -66,17 +66,6 @@ public class SMPCRebalancer extends PartitionedDispatcher {
     private final DistanceFunction distanceFunction;
     private final DistanceHeuristics distanceHeuristics;
     private final Network network;
-    private final Coord coordNode = new Coord(-122.4322514,37.78096848);
-    private final Coord coordNode1 = new Coord(-122.473764,37.778801);
-    private final Coord coordNode2 = new Coord(-122.467423,37.693303);
-    private final Coord coordNode3 = new Coord(-122.437587,37.774576);
-    private final Coord coordNode4 = new Coord(-122.422480,37.798656);
-    private final Coord coordNode5 = new Coord(-122.415639,37.758814);
-    private final Coord coordNode6 = new Coord(-122.399455,37.681558);
-    private final Coord coordNode7 = new Coord(-122.400386,37.784959);
-    private final Coord coordNode8 = new Coord(-122.406597,37.627151);
-    private final Coord coordNode9 = new Coord(-122.369284,37.824465);
-    private final Coord coordNode10 = new Coord(-122.364220,37.587794);
     private final QuadTree<Link> pendingLinkTree;
     private final double[] networkBounds;
     private final Config config;
@@ -133,7 +122,7 @@ public class SMPCRebalancer extends PartitionedDispatcher {
             // available idle vehicles at virtual nodes
             Map<VirtualNode<Link>,List<RoboTaxi>> idleVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis(); //TODO is this what you want Dejan?
             
-            List<RoboTaxi> taxiWithCustomer = getRoboTaxiSubset(RoboTaxiStatus.DRIVETOCUSTOMER);
+            List<RoboTaxi> taxiWithCustomer = getRoboTaxiSubset(RoboTaxiStatus.DRIVEWITHCUSTOMER);
             List<RoboTaxi> taxiRebalancing = getRoboTaxiSubset(RoboTaxiStatus.REBALANCEDRIVE);
             
             // travel times

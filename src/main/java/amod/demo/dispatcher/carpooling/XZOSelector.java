@@ -121,7 +121,6 @@ public class XZOSelector {
         if(xZOCommandsList.isEmpty()) {
             return null;
         }
-        System.out.println(xZOCommandsList.get(0).getRight());
         return xZOCommandsList;
     }
 
