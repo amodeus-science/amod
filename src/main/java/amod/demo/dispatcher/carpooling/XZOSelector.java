@@ -1,6 +1,7 @@
 package amod.demo.dispatcher.carpooling;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,7 +49,7 @@ public class XZOSelector {
             for (int i = 0; i < controlLawDestination.size(); ++i) {
                 double[] controlLawDestFrom = controlLawDestination.get(i);
                 
-                if(controlLawDestFrom.equals(ArrayUtils.EMPTY_DOUBLE_ARRAY)) {
+                if(Arrays.stream(controlLawDestFrom).sum()==0) {
                     continue;
                 }
                 
@@ -76,7 +77,7 @@ public class XZOSelector {
                     node = node - 1;
                     int indexNode = (int) node;
                     
-                    if(indexNode<1) {
+                    if(indexNode<0) {
                         iteration = iteration + 1;
                         continue;
                     }

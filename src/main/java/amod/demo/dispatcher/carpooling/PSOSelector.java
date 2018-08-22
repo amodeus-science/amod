@@ -1,6 +1,7 @@
 package amod.demo.dispatcher.carpooling;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,7 +67,7 @@ public class PSOSelector {
 
                 double[] controlLawSecondDestination = controlLawFirstDestination.get(i);
                 
-                if(controlLawSecondDestination.equals(ArrayUtils.EMPTY_DOUBLE_ARRAY)) {
+                if(Arrays.stream(controlLawSecondDestination).sum()==0) {
                     continue;
                 }
 
@@ -77,7 +78,7 @@ public class PSOSelector {
                     node = node - 1;
                     int indexNode = (int) node;
                     
-                    if(node<1) {
+                    if(node<0) {
                         iteration = iteration + 1;
                         continue;
                     }

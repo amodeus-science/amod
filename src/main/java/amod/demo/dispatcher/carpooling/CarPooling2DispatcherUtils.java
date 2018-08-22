@@ -259,9 +259,10 @@ public enum CarPooling2DispatcherUtils {
         int FromnodeIndex = 0;
         int TonodeIndex = 0;
         int numberVirtualNodes = virtualNetwork.getVirtualNodes().size();
-        double[][] FlowsOutMatrix = new double[numberVirtualNodes][numberVirtualNodes];
+        
 
         for (int i = 0; i < PlanningHorizon; i++) {
+            double[][] FlowsOutMatrix = new double[numberVirtualNodes][numberVirtualNodes];
             for (Person person : population.getPersons().values()) {
                 for (Plan plan : person.getPlans()) {
                     for (PlanElement planElement : plan.getPlanElements()) {

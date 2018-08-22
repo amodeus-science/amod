@@ -1,6 +1,7 @@
 package amod.demo.dispatcher.carpooling;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +29,7 @@ public class RebalanceCarSelector {
         List<Pair<RoboTaxi, Link>> rebalanceCommandsList = new ArrayList<>();
         double[] controlInput = controlLaw.get(indexFromNode);
         
-        if(controlInput.equals(ArrayUtils.EMPTY_DOUBLE_ARRAY)) {
+        if(Arrays.stream(controlInput).sum()==0) {
             return null;
         }
         
@@ -43,7 +44,7 @@ public class RebalanceCarSelector {
             node = node - 1;
             int indexNode = (int) node;
             
-            if(indexNode<1) {
+            if(indexNode<0) {
                 iteration = iteration + 1;
                 continue;
             }
