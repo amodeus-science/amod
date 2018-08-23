@@ -27,6 +27,7 @@ import ch.ethz.matsim.av.generator.AVGenerator;
  * chosen and all vehicles are placed on these random links. */
 public class DemoGenerator implements AVGenerator {
     private static final Logger LOGGER = Logger.getLogger(DemoGenerator.class);
+    // ---
     private final long numberOfVehicles;
     private final String prefix;
     private final Network network;
@@ -54,13 +55,13 @@ public class DemoGenerator implements AVGenerator {
     }
 
     /** this function is called to check if an addtional {@link RoboTaxi} can be added. */
-    @Override
+    @Override // from Iterator
     public boolean hasNext() {
         return generatedNumberOfVehicles < numberOfVehicles;
     }
 
     /** This function adds an additional {@link RoboTaxi} */
-    @Override
+    @Override // from Iterator
     public AVVehicle next() {
         ++generatedNumberOfVehicles;
 
@@ -76,7 +77,7 @@ public class DemoGenerator implements AVGenerator {
     }
 
     /** factory which is called to instatiate the DemoGenerator inside the framework */
-    static public class Factory implements AVGenerator.AVGeneratorFactory {
+    public static class Factory implements AVGenerator.AVGeneratorFactory {
         @Inject
         private Population population;
         @Inject
