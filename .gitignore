@@ -73,3 +73,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# dejan git ignore
+/simulation
+/matlab
+/virtualNetwork
