@@ -73,3 +73,8 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+matlab/
+
+simulation/
+
+virtualNetwork/
