@@ -31,8 +31,9 @@ import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -60,7 +61,6 @@ public enum ScenarioServer {
      * 
      * @throws MalformedURLException
      * @throws Exception */
-    @SuppressWarnings("unused")
     public static void simulate() throws MalformedURLException, Exception {
         Static.setup();
 
@@ -115,7 +115,7 @@ public enum ScenarioServer {
         controler.addOverridingModule(new TrafficDataModule(lsData));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
-        controler.addOverridingModule(new AmodeusGeneratorModule());
+        controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
 
         /** uncomment to include custom routers
@@ -130,8 +130,10 @@ public enum ScenarioServer {
          *           }
          *           }); */
 
-        // controler.addOverridingModule(new DefaultVirtualNetworkModule()); // Added by Lukas June 06,
-        // 2018
+        /** You need to activate this if you want to use a dispatcher that needs a virtual
+         * network! */
+        controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -156,12 +158,6 @@ public enum ScenarioServer {
                 AVUtils.registerGeneratorFactory(binder(), "DemoGenerator", DemoGenerator.Factory.class);
             }
         });
-
-        /** You need to activate this if you want to use a dispatcher that needs a virtual
-         * network! */
-        if (false) {
-            // controler.addOverridingModule(new DefaultVirtualNetworkModule());
-        }
 
         /** run simulation */
         controler.run();
