@@ -53,7 +53,8 @@ public class XZOSelector {
                     continue;
                 }
                 
-                List<RoboTaxi> availableCars = stayRoboTaxi.get(virtualNetwork.getVirtualNode(i));
+                List<RoboTaxi> availableCarsRedirect = stayRoboTaxi.get(virtualNetwork.getVirtualNode(i));
+                List<RoboTaxi> availableCars = availableCarsRedirect.stream().filter(car -> !car.getMenu().hasStarter()).collect(Collectors.toList());
                 if (availableCars.isEmpty()) {
                     System.out.println("No available cars for x_zo");
                     continue;

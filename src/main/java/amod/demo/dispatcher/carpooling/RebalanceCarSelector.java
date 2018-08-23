@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,7 +26,8 @@ public class RebalanceCarSelector {
     
     public List<Pair<RoboTaxi, Link>> getRebalanceCommands(VirtualNode<Link> from, Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles, VirtualNetwork<Link> virtualNetwork) throws Exception {
 
-        List<RoboTaxi> avTaxis = availableVehicles.get(from);
+        List<RoboTaxi> avTaxisRedirect = availableVehicles.get(from);
+        List<RoboTaxi> avTaxis = avTaxisRedirect.stream().filter(car -> !car.getMenu().hasStarter()).collect(Collectors.toList());
         int indexFromNode = from.getIndex();
         List<Pair<RoboTaxi, Link>> rebalanceCommandsList = new ArrayList<>();
         double[] controlInput = controlLaw.get(indexFromNode);

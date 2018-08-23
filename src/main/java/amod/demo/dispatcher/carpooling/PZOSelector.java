@@ -32,7 +32,8 @@ public class PZOSelector {
         for (VirtualNode<Link> position : virtualNetwork.getVirtualNodes()) {
 
             List<AVRequest> fromRequest = virtualNodeAVFromRequests.get(position);
-            List<RoboTaxi> availableCars = stayRoboTaxi.get(position);
+            List<RoboTaxi> availableCarsRedirect = stayRoboTaxi.get(position);
+            List<RoboTaxi> availableCars = availableCarsRedirect.stream().filter(car -> !car.getMenu().hasStarter()).collect(Collectors.toList());
 
             if (availableCars.isEmpty()) {
                 System.out.println("No available cars for p_zo");

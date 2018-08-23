@@ -8,11 +8,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
@@ -28,6 +31,7 @@ import ch.ethz.idsc.amodeus.dispatcher.core.SharedPartitionedDispatcher;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedAVGeneratorConfig;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedCourse;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedMealType;
+import ch.ethz.idsc.amodeus.dispatcher.shared.SharedMenu;
 import ch.ethz.idsc.amodeus.dispatcher.util.AbstractRoboTaxiDestMatcher;
 import ch.ethz.idsc.amodeus.dispatcher.util.AbstractVirtualNodeDest;
 import ch.ethz.idsc.amodeus.dispatcher.util.DistanceFunction;
@@ -53,6 +57,9 @@ import ch.ethz.matsim.av.dispatcher.AVDispatcher.AVDispatcherFactory;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.router.AVRouter;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVTask;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -115,6 +122,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
 
     @Override
     protected void redispatch(double now) {
+
         final long round_now = Math.round(now);
 
         if (round_now % dispatchPeriod == 0 && round_now>=dispatchPeriod) {
@@ -275,19 +283,39 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
                 throw new RuntimeException(); // dispatcher will not work if
                                               // constructor has issues
             }
+            
+            Collection<RoboTaxi> taxisOne = getRoboTaxisWithNumberOfCustomer(1);
+            List<RoboTaxi> taxisOneCourse = taxisOne.stream().filter(car -> car.getMenu().getCourses().size()==1 && car.getMenu().getStarterCourse().getMealType()!=SharedMealType.REDIRECT).collect(Collectors.toList());
+            List<RoboTaxi> taxistwoCourse = taxisOne.stream().filter(car -> car.getMenu().getCourses().size()==2).collect(Collectors.toList());
+            List<RoboTaxi> taxis3Course = taxisOne.stream().filter(car -> car.getMenu().getCourses().size()==3).collect(Collectors.toList());
+            List<RoboTaxi> taxis4Course = taxisOne.stream().filter(car -> car.getMenu().getCourses().size()==4).collect(Collectors.toList());
+            
+            if(!taxisOneCourse.isEmpty()) {
+                RoboTaxi taxi = taxisOneCourse.get(0);
+                SharedMenu menue = taxi.getMenu();
+                SharedCourse course = menue.getStarterCourse();
+                Schedule schedule = taxi.getSchedule();
+                AVTask avtask = (AVTask) schedule.getCurrentTask();
+                System.out.println(avtask.getAVTaskType());
+                
+                
+            }
 
         }
 
         // Rebalancing
 //        if (round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime && round_now < (dispatchTime + timeStep * 60)) {
-//            Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi = getVirtualNodeStayRoboTaxi();
+//            Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi = getVirtualNodeStayWithoutCustomerRoboTaxi();
 //            for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
 //                try {
 //                    List<Pair<RoboTaxi, Link>> controlPolicy = rebalanceSelector.getRebalanceCommands(fromNode,
 //                            stayRoboTaxi, virtualNetwork);
 //                    if (controlPolicy != null) {
 //                        for (Pair<RoboTaxi, Link> pair : controlPolicy) {
-//                            setRoboTaxiRebalance(pair.getLeft(), pair.getRight());
+////                            setRoboTaxiRebalance(pair.getLeft(), pair.getRight());
+//                            SharedCourse redirectCourse = SharedCourse.redirectCourse(pair.getRight(), //
+//                                    Double.toString(now) + pair.getLeft().getId().toString());
+//                            addSharedRoboTaxiRedirect(pair.getLeft(), redirectCourse);
 //                        }
 //
 //                    }
@@ -300,7 +328,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
 
         // xZO cars
         if (round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchPeriod && round_now < (dispatchTime + timeStep * 60)) {
-            Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi = getVirtualNodeStayRoboTaxi();
+            Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi = getVirtualNodeStayWithoutCustomerRoboTaxi();
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests = getVirtualNodeToAVRequest();
             try {
@@ -316,7 +344,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
                                 Double.toString(now) + roboTaxi.getId().toString());
                         addSharedRoboTaxiRedirect(roboTaxi, redirectCourse);
                         roboTaxi.getMenu().moveAVCourseToPrev(redirectCourse);
-
+                        
                     }
 
                 }
@@ -331,7 +359,6 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
             Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi = getVirtualNodeSORoboTaxi();
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests = getVirtualNodeToAVRequest();
-
             try {
                 List<Pair<RoboTaxi, Link>> xDOControlPolicy = xDOSelector.getXDOCommands(virtualNetwork, soRoboTaxi, virtualNodeAVFromRequests, virtualNodeAVToRequests);
                 if (xDOControlPolicy != null) {
@@ -354,7 +381,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
         
         // pZO cars
         if (round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime && round_now < (dispatchTime + timeStep * 60)) {
-            Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi = getVirtualNodeStayRoboTaxi();
+            Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi = getVirtualNodeStayWithoutCustomerRoboTaxi();
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests = getVirtualNodeToAVRequest();
             try {
@@ -369,6 +396,10 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
                         addSharedRoboTaxiPickup(roboTaxi, avRequest2);
                         SharedCourse sharedAVCourse2 = SharedCourse.pickupCourse(avRequest2);
                         roboTaxi.getMenu().moveAVCourseToPrev(sharedAVCourse2);
+                        Schedule sce = roboTaxi.getSchedule();
+                        List<? extends Task> ta = sce.getTasks();
+                        double ti = ta.get(0).getEndTime();
+                        System.out.println(ti);
 
                     }
 
@@ -384,7 +415,6 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
             Map<VirtualNode<Link>, List<RoboTaxi>> SORoboTaxi = getVirtualNodeSORoboTaxi();
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
             Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests = getVirtualNodeToAVRequest();
-
             try {
                 List<Pair<RoboTaxi, AVRequest>> pSOControlPolicy = pSOSelector.getPSOCommands(virtualNetwork,
                         SORoboTaxi, VirtualNodeAVFromRequests, VirtualNodeAVToRequests);
@@ -427,6 +457,11 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
 
     private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayRoboTaxi() {
         return virtualNetwork.binToVirtualNode(getRoboTaxiSubset(RoboTaxiStatus.STAY), RoboTaxi::getDivertableLocation);
+    }
+    
+    private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayWithoutCustomerRoboTaxi() {
+        List<RoboTaxi> taxiList = getDivertableUnassignedRoboTaxis().stream().filter(car -> car.isInStayTask() && car.getCurrentNumberOfCustomersOnBoard()==0).collect(Collectors.toList());
+        return virtualNetwork.binToVirtualNode(taxiList, RoboTaxi::getDivertableLocation);
     }
 
     private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeSORoboTaxi() {
