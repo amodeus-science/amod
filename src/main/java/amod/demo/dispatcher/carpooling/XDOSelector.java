@@ -5,11 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
@@ -24,7 +21,6 @@ public class XDOSelector {
         this.controlLaw = controlLaw;
     }
 
-    @SuppressWarnings("unchecked")
     List<Pair<RoboTaxi, Link>> getXDOCommands(VirtualNetwork<Link> virtualNetwork,
             Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi,
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests,
@@ -34,30 +30,29 @@ public class XDOSelector {
 
         for (VirtualNode<Link> destination : virtualNetwork.getVirtualNodes()) {
             List<double[]> controlLawDestination = controlLaw.get(destination.getIndex());
-            if(controlLawDestination.isEmpty()) {
+            if (controlLawDestination.isEmpty()) {
                 continue;
             }
             for (int i = 0; i < controlLawDestination.size(); ++i) {
                 double[] controlLawDestFrom = controlLawDestination.get(i);
-                
-                if(Arrays.stream(controlLawDestFrom).sum()==0) {
+
+                if (Arrays.stream(controlLawDestFrom).sum() == 0) {
                     continue;
                 }
+
+                List<RoboTaxi> availableCars = soRoboTaxi.get(virtualNetwork.getVirtualNode(i));
                 
-                List<RoboTaxi> soTaxis = soRoboTaxi.get(virtualNetwork.getVirtualNode(i));
-                List<RoboTaxi> availableCars = (List<RoboTaxi>) soTaxis.stream().filter(cars -> cars.getMenu().getCourses().size() == 1
-                        && destination.getLinks().contains(cars.getCurrentDriveDestination())).collect(Collectors.toList());
-                if(availableCars.isEmpty()) {
+                if (availableCars.isEmpty()) {
                     continue;
                 }
-                
+
                 int iteration = 0;
                 List<Integer> removeElements = new ArrayList<Integer>();
                 for (double node : controlLawDestFrom) {
                     node = node - 1;
                     int indexNode = (int) node;
-                    
-                    if(indexNode<0) {
+
+                    if (indexNode < 0) {
                         iteration = iteration + 1;
                         continue;
                     }
@@ -68,6 +63,7 @@ public class XDOSelector {
 
                     RoboTaxi nextRoboTaxi = availableCars.get(0);
                     availableCars.remove(nextRoboTaxi);
+                    soRoboTaxi.get(virtualNetwork.getVirtualNode(i)).remove(nextRoboTaxi);
                     VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
                     Optional<Link> linkOption = toNode.getLinks().stream().findAny();
 
@@ -77,25 +73,23 @@ public class XDOSelector {
                     iteration = iteration + 1;
 
                 }
-                
-                if(!removeElements.isEmpty()) {
-                    for(int removeArray: removeElements) {
+
+                if (!removeElements.isEmpty()) {
+                    for (int removeArray : removeElements) {
                         controlLawDestFrom[removeArray] = 0;
                     }
 
                     controlLaw.get(destination.getIndex()).set(i, controlLawDestFrom);
                 }
-                
-                                
+
             }
         }
-        
-        if(xDOCommandsList.isEmpty()) {
+
+        if (xDOCommandsList.isEmpty()) {
             return null;
         }
 
         return xDOCommandsList;
     }
 
-    
 }

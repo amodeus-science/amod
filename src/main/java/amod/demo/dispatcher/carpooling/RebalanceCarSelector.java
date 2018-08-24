@@ -5,10 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
 
@@ -26,8 +23,7 @@ public class RebalanceCarSelector {
     
     public List<Pair<RoboTaxi, Link>> getRebalanceCommands(VirtualNode<Link> from, Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles, VirtualNetwork<Link> virtualNetwork) throws Exception {
 
-        List<RoboTaxi> avTaxisRedirect = availableVehicles.get(from);
-        List<RoboTaxi> avTaxis = avTaxisRedirect.stream().filter(car -> !car.getMenu().hasStarter()).collect(Collectors.toList());
+        List<RoboTaxi> avTaxis = availableVehicles.get(from);
         int indexFromNode = from.getIndex();
         List<Pair<RoboTaxi, Link>> rebalanceCommandsList = new ArrayList<>();
         double[] controlInput = controlLaw.get(indexFromNode);
@@ -58,6 +54,8 @@ public class RebalanceCarSelector {
 
             RoboTaxi nextRoboTaxi = avTaxis.get(0);
             avTaxis.remove(nextRoboTaxi);
+            availableVehicles.get(from).remove(nextRoboTaxi);
+            
             VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
             Optional<Link> linkOption = toNode.getLinks().stream().findAny();
 

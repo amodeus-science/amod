@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.network.Link;
 
@@ -32,34 +30,30 @@ public class PZOSelector {
         for (VirtualNode<Link> position : virtualNetwork.getVirtualNodes()) {
 
             List<AVRequest> fromRequest = virtualNodeAVFromRequests.get(position);
-            List<RoboTaxi> availableCarsRedirect = stayRoboTaxi.get(position);
-            List<RoboTaxi> availableCars = availableCarsRedirect.stream().filter(car -> !car.getMenu().hasStarter()).collect(Collectors.toList());
+            List<RoboTaxi> availableCars = stayRoboTaxi.get(position);
 
             if (availableCars.isEmpty()) {
-                System.out.println("No available cars for p_zo");
                 continue;
             }
 
             if (fromRequest.isEmpty()) {
-                System.out.println("No available requests for p_zo");
                 continue;
             }
 
-            List<List<AVRequest>> fromToRequestList = CarPooling2DispatcherUtils.getFromToAVRequests(virtualNetwork, fromRequest,
-                    virtualNodeAVToRequests);
+            List<List<AVRequest>> fromToRequestList = CarPooling2DispatcherUtils.getFromToAVRequests(virtualNetwork,
+                    fromRequest, virtualNodeAVToRequests);
             List<double[]> controlLawFirstDestination = controlLaw.get(position.getIndex());
-            
-            if(controlLawFirstDestination.isEmpty()) {
+
+            if (controlLawFirstDestination.isEmpty()) {
                 continue;
             }
 
             for (int i = 0; i < controlLawFirstDestination.size(); ++i) {
                 double[] controlLawSecondDestination = controlLawFirstDestination.get(i);
-                
-                if(Arrays.stream(controlLawSecondDestination).sum()==0) {
+
+                if (Arrays.stream(controlLawSecondDestination).sum() == 0) {
                     continue;
                 }
-
 
                 List<AVRequest> fromToFirstRequests = fromToRequestList.get(i);
                 if (fromToFirstRequests.isEmpty()) {
@@ -71,8 +65,8 @@ public class PZOSelector {
                 for (double node : controlLawSecondDestination) {
                     node = node - 1;
                     int indexNode = (int) node;
-                    
-                    if(node<0) {
+
+                    if (node < 0) {
                         iteration = iteration + 1;
                         continue;
                     }
@@ -84,13 +78,13 @@ public class PZOSelector {
                     if (fromToFirstRequests.isEmpty()) {
                         break;
                     }
-                    
-                    if(i==indexNode && fromToRequestList.get(indexNode).size() < 2) {
+
+                    if (i == indexNode && fromToRequestList.get(indexNode).size() < 2) {
                         iteration = iteration + 1;
                         continue;
                     }
-                    
-                    if(i!=indexNode && fromToRequestList.get(indexNode).isEmpty()) {
+
+                    if (i != indexNode && fromToRequestList.get(indexNode).isEmpty()) {
                         iteration = iteration + 1;
                         continue;
                     }
@@ -98,16 +92,19 @@ public class PZOSelector {
                     AVRequest avRequestFirst = fromToFirstRequests.get(0);
                     fromToFirstRequests.remove(avRequestFirst);
                     fromToRequestList.set(i, fromToFirstRequests);
+                    virtualNodeAVFromRequests.get(position).remove(avRequestFirst);
 
                     RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequestFirst,
                             availableCars);
                     availableCars.remove(closestRoboTaxi);
+                    stayRoboTaxi.get(position).remove(closestRoboTaxi);
 
                     List<AVRequest> fromToSecondRequests = fromToRequestList.get(indexNode);
 
                     AVRequest avRequestSecond = fromToSecondRequests.get(0);
                     fromToSecondRequests.remove(avRequestSecond);
                     fromToRequestList.set(indexNode, fromToSecondRequests);
+                    virtualNodeAVFromRequests.get(position).remove(avRequestSecond);
 
                     Triple<RoboTaxi, AVRequest, AVRequest> pZOCommands = Triple.of(closestRoboTaxi, avRequestFirst,
                             avRequestSecond);
@@ -117,23 +114,22 @@ public class PZOSelector {
                     iteration = iteration + 1;
 
                 }
-                if(!removeElements.isEmpty()) {
-                    for(int removeArray: removeElements) {
+                if (!removeElements.isEmpty()) {
+                    for (int removeArray : removeElements) {
                         controlLawSecondDestination[removeArray] = 0;
                     }
 
                     controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
                 }
-                
 
             }
         }
 
-        if(pZOCommandsList.isEmpty()) {
+        if (pZOCommandsList.isEmpty()) {
             return null;
         }
-        
+
         return pZOCommandsList;
     }
-  
+
 }

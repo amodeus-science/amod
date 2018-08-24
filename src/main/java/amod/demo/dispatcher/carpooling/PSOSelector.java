@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
 
@@ -22,7 +21,6 @@ public class PSOSelector {
         this.controlLaw = controlLaw;
     }
 
-    @SuppressWarnings("unchecked")
     List<Pair<RoboTaxi, AVRequest>> getPSOCommands(VirtualNetwork<Link> virtualNetwork,
             Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi,
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests,
@@ -32,53 +30,51 @@ public class PSOSelector {
 
         for (VirtualNode<Link> position : virtualNetwork.getVirtualNodes()) {
             List<AVRequest> fromRequest = virtualNodeAVFromRequests.get(position);
-            
+
             if (fromRequest.isEmpty()) {
-                System.out.println("No available requests for p_so");
                 continue;
             }
-            
+
             List<double[]> controlLawFirstDestination = controlLaw.get(position.getIndex());
-            
-            if(controlLawFirstDestination.isEmpty()) {
+
+            if (controlLawFirstDestination.isEmpty()) {
                 continue;
             }
-            
+
             List<RoboTaxi> soTaxis = soRoboTaxi.get(position);
             
             if (soTaxis.isEmpty()) {
-                System.out.println("No available cars for p_so");
                 continue;
             }
-            
-            List<List<AVRequest>> fromToRequestList = CarPooling2DispatcherUtils.getFromToAVRequests(virtualNetwork, fromRequest,
-                    virtualNodeAVToRequests);
 
+            List<List<AVRequest>> fromToRequestList = CarPooling2DispatcherUtils.getFromToAVRequests(virtualNetwork,
+                    fromRequest, virtualNodeAVToRequests);
 
             for (int i = 0; i < controlLawFirstDestination.size(); ++i) {
                 int ind = i;
-                
+
                 List<RoboTaxi> availableCars = soTaxis.stream()
-                        .filter(c -> virtualNetwork.getVirtualNode(c.getCurrentDriveDestination()).getIndex() == ind && c.getMenu().getCourses().size() == 1).collect(Collectors.toList());
-               
+                        .filter(c -> virtualNetwork.getVirtualNode(c.getCurrentDriveDestination()).getIndex() == ind
+                                && c.getMenu().getCourses().size() == 1)
+                        .collect(Collectors.toList());
+
                 if (availableCars.isEmpty()) {
                     continue;
                 }
 
                 double[] controlLawSecondDestination = controlLawFirstDestination.get(i);
-                
-                if(Arrays.stream(controlLawSecondDestination).sum()==0) {
+
+                if (Arrays.stream(controlLawSecondDestination).sum() == 0) {
                     continue;
                 }
-
 
                 int iteration = 0;
                 List<Integer> removeElements = new ArrayList<Integer>();
                 for (double node : controlLawSecondDestination) {
                     node = node - 1;
                     int indexNode = (int) node;
-                    
-                    if(node<0) {
+
+                    if (node < 0) {
                         iteration = iteration + 1;
                         continue;
                     }
@@ -96,29 +92,31 @@ public class PSOSelector {
                     AVRequest avRequest = fromToSecondRequests.get(0);
                     fromToSecondRequests.remove(avRequest);
                     fromToRequestList.set(indexNode, fromToSecondRequests);
+                    virtualNodeAVFromRequests.get(position).remove(avRequest);
 
                     RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, availableCars);
                     availableCars.remove(closestRoboTaxi);
+                    soRoboTaxi.get(position).remove(closestRoboTaxi);
+                    
                     Pair<RoboTaxi, AVRequest> pSOCommands = Pair.of(closestRoboTaxi, avRequest);
                     pSOCommandsList.add(pSOCommands);
                     removeElements.add(iteration);
                     iteration = iteration + 1;
 
                 }
-                
-                if(!removeElements.isEmpty()) {
-                    for(int removeArray: removeElements) {
+
+                if (!removeElements.isEmpty()) {
+                    for (int removeArray : removeElements) {
                         controlLawSecondDestination[removeArray] = 0;
                     }
-                    
+
                     controlLaw.get(position.getIndex()).set(i, controlLawSecondDestination);
                 }
-                
 
             }
         }
-        
-        if(pSOCommandsList.isEmpty()) {
+
+        if (pSOCommandsList.isEmpty()) {
             return null;
         }
 

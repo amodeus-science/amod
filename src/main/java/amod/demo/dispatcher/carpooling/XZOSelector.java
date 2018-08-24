@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.network.Link;
 
@@ -19,12 +17,13 @@ import ch.ethz.matsim.av.passenger.AVRequest;
 
 public class XZOSelector {
     private List<List<double[]>> controlLaw;
+    private List<RoboTaxi> availableCars;
+    private List<AVRequest> fromToRequests;
 
     public XZOSelector(List<List<double[]>> controlLaw) {
         this.controlLaw = controlLaw;
     }
 
-    @SuppressWarnings("unchecked")
     List<Triple<RoboTaxi, AVRequest, Link>> getXZOCommands(VirtualNetwork<Link> virtualNetwork,
             Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi,
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests,
@@ -53,21 +52,18 @@ public class XZOSelector {
                     continue;
                 }
                 
-                List<RoboTaxi> availableCarsRedirect = stayRoboTaxi.get(virtualNetwork.getVirtualNode(i));
-                List<RoboTaxi> availableCars = availableCarsRedirect.stream().filter(car -> !car.getMenu().hasStarter()).collect(Collectors.toList());
+                availableCars = stayRoboTaxi.get(virtualNetwork.getVirtualNode(i));
                 if (availableCars.isEmpty()) {
-                    System.out.println("No available cars for x_zo");
                     continue;
                 }
                 
                 int fromNodeIndex = i;
                 
-                List<AVRequest> fromToRequests = requestDestination.stream().filter(
+                fromToRequests = requestDestination.stream().filter(
                         rt -> virtualNodeAVFromRequests.get(virtualNetwork.getVirtualNode(fromNodeIndex)).contains(rt)).collect(Collectors.toList());
                      
                 
                 if (fromToRequests.isEmpty()) {
-                    System.out.println("No available requests for x_zo");
                     continue;
                 }
                 
@@ -94,10 +90,13 @@ public class XZOSelector {
 
                     AVRequest avRequest = fromToRequests.get(0);
                     fromToRequests.remove(avRequest);
+                    virtualNodeAVToRequests.get(destination).remove(avRequest);
 
                     RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest,
                             availableCars);
                     availableCars.remove(closestRoboTaxi);
+                    stayRoboTaxi.get(virtualNetwork.getVirtualNode(i)).remove(closestRoboTaxi);
+                    
                     VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
                     Optional<Link> linkOption = toNode.getLinks().stream().findAny();
 
@@ -123,6 +122,8 @@ public class XZOSelector {
         if(xZOCommandsList.isEmpty()) {
             return null;
         }
+        
+        
         return xZOCommandsList;
     }
 
