@@ -35,7 +35,8 @@ public class AidoStarterHelperTest extends TestCase {
         // Previously:
         // if i put 2 instead of 1 -> doesn't finish but exception in traffic link data
         // ... cannot run more than 1 scenario at runtime
-        // TODO right now SanFrancisco has to run last -> don't shuffle
+        // TODO Jan right now SanFrancisco has to run last -> don't shuffle
+        // TODO Jan include Berlin
         // Collections.shuffle(list);
         list = list.stream().limit(3).collect(Collectors.toList());
         for (int index : list)
