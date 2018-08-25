@@ -37,7 +37,7 @@ import ch.ethz.idsc.tensor.alg.Transpose;
 
         Tensor waiting = Transpose.of(Tensors.of(scoreHistory.get(Tensor.ALL, 1)));
 
-        // TODO can use the following?
+        // TODO Jan can use the following?
         // Tensor distances = Tensor.of(scoreHistory.stream().map(row->row.extract(2, 4)));
         Tensor distances = Transpose.of(Tensors.of( //
                 scoreHistory.get(Tensor.ALL, 2), //
@@ -58,10 +58,9 @@ import ch.ethz.idsc.tensor.alg.Transpose;
             TimeChart.of(relativeDirectory, FILENAME_DIST, "Total Distances", FILTER_ON, FILTERSIZE, //
                     new double[] { 1.0, 1.0 }, new String[] { "total distance with customer [m]", "total empty distance [m]" }, "time of day", "distance", //
                     time, distances, //
-                    Math.max(aidoScoreElement.getCurrentScore().Get(1).number().doubleValue(), aidoScoreElement.getCurrentScore().Get(2).number().doubleValue()), colorScheme); // TODO
-                                                                                                                                                                                // read
-                                                                                                                                                                                // from
-                                                                                                                                                                                // data
+                    Math.max(aidoScoreElement.getCurrentScore().Get(1).number().doubleValue(), //
+                            aidoScoreElement.getCurrentScore().Get(2).number().doubleValue()),
+                    colorScheme);
         } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
             e1.printStackTrace();
