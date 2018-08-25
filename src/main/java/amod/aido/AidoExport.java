@@ -36,12 +36,7 @@ import ch.ethz.idsc.tensor.alg.Transpose;
         Tensor time = scoreHistory.get(Tensor.ALL, 0);
 
         Tensor waiting = Transpose.of(Tensors.of(scoreHistory.get(Tensor.ALL, 1)));
-
-        // TODO Jan can use the following?
-        // Tensor distances = Tensor.of(scoreHistory.stream().map(row->row.extract(2, 4)));
-        Tensor distances = Transpose.of(Tensors.of( //
-                scoreHistory.get(Tensor.ALL, 2), //
-                scoreHistory.get(Tensor.ALL, 3)));
+        Tensor distances = Tensor.of(scoreHistory.stream().map(row -> row.extract(2, 4)));
 
         /** figure for waiting times */
         try {
