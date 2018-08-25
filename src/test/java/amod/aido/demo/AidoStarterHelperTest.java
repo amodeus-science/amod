@@ -31,14 +31,13 @@ public class AidoStarterHelperTest extends TestCase {
 
     public void testSanFrancisco() throws UnknownHostException, IOException, Exception {
 
-        List<Integer> list = IntStream.range(0, 3).boxed().collect(Collectors.toList());
+        List<Integer> list = IntStream.range(0, 4).boxed().collect(Collectors.toList());
         // Previously:
         // if i put 2 instead of 1 -> doesn't finish but exception in traffic link data
         // ... cannot run more than 1 scenario at runtime
         // TODO Jan right now SanFrancisco has to run last -> don't shuffle
-        // TODO Jan include Berlin
         // Collections.shuffle(list);
-        list = list.stream().limit(3).collect(Collectors.toList());
+        list = list.stream().limit(4).collect(Collectors.toList());
         for (int index : list)
             switch (index) {
             case 0:
@@ -48,6 +47,9 @@ public class AidoStarterHelperTest extends TestCase {
                 guest().run("Santiago", 0.001, 10);
                 break;
             case 2:
+                guest().run("Berlin", 0.002, 10);
+                break;
+            case 3:
                 guest().run("SanFrancisco", 0.01, 5);
                 break;
             default:
