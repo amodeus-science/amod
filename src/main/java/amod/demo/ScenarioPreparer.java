@@ -56,7 +56,7 @@ public enum ScenarioPreparer {
         PopulationPreparer.run(network, population, scenarioOptions, config, apoSeed);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
-        new VirtualNetworkPreparer(scenarioOptions).create(network, population);
+        VirtualNetworkPreparer.INSTANCE.create(network, population, scenarioOptions);
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(config, scenarioOptions);
