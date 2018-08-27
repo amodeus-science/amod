@@ -86,7 +86,7 @@ public class AidoGuest {
 
             /** recieve final performance score/stats */
             Tensor finalInfo = Tensors.fromString(stringSocket.readLine());
-            // TODO decode numbers in finalInfo and print with interpretation
+            // TODO Claudio decode numbers in finalInfo and print with interpretation
             System.out.println("finalInfo: " + finalInfo);
 
         } // <- closing string socket

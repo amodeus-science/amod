@@ -21,9 +21,7 @@ import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of
- * network, population, creation of virtualNetwork and travelData objects.
- * 
- * @author clruch */
+ * network, population, creation of virtualNetwork and travelData objects. */
 public enum ScenarioPreparer {
     ;
 
@@ -58,7 +56,7 @@ public enum ScenarioPreparer {
         PopulationPreparer.run(network, population, scenarioOptions, config, apoSeed);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
-        VirtualNetworkPreparer.run(network, population, scenarioOptions);
+        VirtualNetworkPreparer.INSTANCE.create(network, population, scenarioOptions);
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(config, scenarioOptions);

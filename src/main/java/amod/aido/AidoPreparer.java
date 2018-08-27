@@ -20,6 +20,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.amodeus.prep.PopulationPreparer;
+import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
@@ -50,6 +51,9 @@ import ch.ethz.idsc.tensor.Tensors;
         scenOpt.setMaxPopulationSize((int) (population.getPersons().size() * populRed));
         long apoSeed = 1234;
         PopulationPreparer.run(network, population, scenOpt, configMatsim, apoSeed);
+
+        /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
+        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt);
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(configMatsim, scenOpt);

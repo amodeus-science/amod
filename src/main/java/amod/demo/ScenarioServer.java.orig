@@ -1,5 +1,5 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.aido;
+package amod.demo;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -20,8 +20,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
+import amod.demo.analysis.CustomAnalysis;
+import amod.demo.dispatcher.DemoDispatcher;
+import amod.demo.dispatcher.SMPCDispatcher;
+import amod.demo.dispatcher.SMPC.SMPCRebalancer;
+import amod.demo.dispatcher.carpooling.CarPooling2Dispatcher;
+import amod.demo.dispatcher.claudioForDejan.ClaudioForDejanDispatcher;
 import amod.demo.ext.Static;
-import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
+import amod.demo.generator.DemoGenerator;
+import amod.demo.router.IAMoDRouter;
+import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
@@ -29,8 +37,13 @@ import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
+<<<<<<< HEAD
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
+//import ch.ethz.idsc.amodeus.matsim.mod.DefaultVirtualNetworkModule;
+=======
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
+>>>>>>> master
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -38,26 +51,30 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.framework.AVUtils;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
-/* package */ class AidoServer {
+public enum ScenarioServer {
+    ;
 
-    private File configFile;
-    private File outputDirectory;
+    public static void main(String[] args) throws MalformedURLException, Exception {
+        simulate();
+        // General todo's to be completed:
+        // TODO add time-varying dispatcher
+
+    }
 
     /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml
      * 
      * @throws MalformedURLException
      * @throws Exception */
-
-    public void simulate(StringSocket stringSocket) throws MalformedURLException, Exception {
-
+    public static void simulate() throws MalformedURLException, Exception {
         Static.setup();
+
+        Static.checkGLPKLib();
 
         /** working directory and options */
         File workingDirectory = MultiFileTools.getWorkingDirectory();
@@ -67,7 +84,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
          * instance viewer client, for fals the ScenarioServer starts the simulation
          * immediately */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
-        configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
+        File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
         /** geographic information */
         LocationSpec locationSpec = scenarioOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
@@ -86,6 +103,9 @@ import ch.ethz.matsim.av.framework.AVUtils;
             activityParams.setTypicalDuration(3600.0); // TODO fix this to meaningful values
         }
 
+        /** output directory for saving results */
+        String outputdirectory = config.controler().getOutputDirectory();
+
         /** load MATSim scenario for simulation */
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
@@ -98,7 +118,6 @@ import ch.ethz.matsim.av.framework.AVUtils;
         System.out.println(linkSpeedDataFile.toString());
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
 
-        Objects.requireNonNull(network);
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
@@ -107,9 +126,29 @@ import ch.ethz.matsim.av.framework.AVUtils;
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
-        controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
-        controler.addOverridingModule(new AidoModule(stringSocket));
+
+        /** uncomment to include custom routers
+         * controler.addOverridingModule(new AbstractModule() {
+         * 
+         * @Override
+         *           public void install() {
+         *           bind(CustomRouter.Factory.class);
+         *           AVUtils.bindRouterFactory(binder(),
+         *           CustomRouter.class.getSimpleName()).to(CustomRouter.Factory.class);
+         * 
+         *           }
+         *           }); */
+
+<<<<<<< HEAD
+//         controler.addOverridingModule(new DefaultVirtualNetworkModule()); // Added by Lukas June 06,
+        // 2018
+=======
+        /** You need to activate this if you want to use a dispatcher that needs a virtual
+         * network! */
+        controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+
+>>>>>>> master
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -118,30 +157,83 @@ import ch.ethz.matsim.av.framework.AVUtils;
         });
         controler.addOverridingModule(new AmodeusModule());
 
+        /** here an additional user-defined dispatcher is added, functionality in class
+         * DemoDispatcher */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "AidoDispatcherHost", AidoDispatcherHost.Factory.class);
+                AVUtils.registerDispatcherFactory(binder(), "SMPCDispatcher", SMPCDispatcher.Factory.class);
+            }
+        });
+        
+        /** here an additional user-defined dispatcher is added, functionality in class
+         * DemoDispatcher */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerDispatcherFactory(binder(), "ClaudioForDejanDispatcher", ClaudioForDejanDispatcher.Factory.class);                
+            }
+        });
+        
+        /** here an additional user-defined dispatcher is added, functionality in class
+         * DemoDispatcher */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerDispatcherFactory(binder(), "SMPCRebalancer", SMPCRebalancer.Factory.class);                
+            }
+        });
+        
+        /** here an additional user-defined dispatcher is added, functionality in class
+         * DemoDispatcher */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerDispatcherFactory(binder(), "CarPooling2Dispatcher", CarPooling2Dispatcher.Factory.class);                
+            }
+        });
+        
+        /** here an additional user-defined initial placement logic called generator is added,
+         * functionality in class DemoGenerator */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerGeneratorFactory(binder(), "DemoGenerator", DemoGenerator.Factory.class);
             }
         });
 
+<<<<<<< HEAD
+        /** You need to activate this if you want to use a dispatcher that needs a virtual
+         * network! */
+        if (true) {
+            controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+        }
+        
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(IAMoDRouter.Factory.class);
+                AVUtils.bindRouterFactory(binder(), IAMoDRouter.class.getSimpleName()).to(IAMoDRouter.Factory.class);
+            }
+         });
+
+=======
+>>>>>>> master
         /** run simulation */
         controler.run();
 
         /** close port for visualizaiton */
         SimulationServer.INSTANCE.stopAccepting();
 
-        /** perform analysis of simulation */
-        /** output directory for saving results */
-        outputDirectory = new File(config.controler().getOutputDirectory());
+        /** perform analysis of simulation, a demo of how to add custom
+         * analysis methods is provided in the package amod.demo.analysis */
+        Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory));
+        CustomAnalysis.addTo(analysis);
+        analysis.run();
 
     }
 
-    /* package */ File getOutputDirectory() {
-        return outputDirectory;
-    }
-
-    /* package */ File getConfigFile() {
-        return configFile;
+    public static void clearMemory() {
+        // TODO clear memory for the sequential server such that RAM is not limiting
     }
 }
