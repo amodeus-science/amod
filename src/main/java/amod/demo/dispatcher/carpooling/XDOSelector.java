@@ -5,11 +5,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
+import ch.ethz.idsc.amodeus.dispatcher.shared.SharedMealType;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
 import ch.ethz.matsim.av.passenger.AVRequest;
@@ -40,7 +44,9 @@ public class XDOSelector {
                     continue;
                 }
 
-                List<RoboTaxi> availableCars = soRoboTaxi.get(virtualNetwork.getVirtualNode(i));
+                List<RoboTaxi> availableCarsRedirect = soRoboTaxi.get(virtualNetwork.getVirtualNode(i));
+
+                List<RoboTaxi> availableCars = availableCarsRedirect.stream().filter(cars -> cars.getMenu().getCourses().size()==1 && cars.getMenu().getCourses().get(0).getMealType()==SharedMealType.DROPOFF).collect(Collectors.toList());                
                 
                 if (availableCars.isEmpty()) {
                     continue;
@@ -65,9 +71,12 @@ public class XDOSelector {
                     availableCars.remove(nextRoboTaxi);
                     soRoboTaxi.get(virtualNetwork.getVirtualNode(i)).remove(nextRoboTaxi);
                     VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-                    Optional<Link> linkOption = toNode.getLinks().stream().findAny();
+                    Set<Link> linkSet = toNode.getLinks();
+                    List<Link> linkList = new ArrayList<Link>(linkSet);
+                    List<Link> linkListFiltered = linkList.stream().filter(link -> link!=null).collect(Collectors.toList());
+                    Link redirectLink = linkListFiltered.get(new Random().nextInt(linkListFiltered.size()-1));
 
-                    Pair<RoboTaxi, Link> xZOCommands = Pair.of(nextRoboTaxi, linkOption.get());
+                    Pair<RoboTaxi, Link> xZOCommands = Pair.of(nextRoboTaxi, redirectLink);
                     xDOCommandsList.add(xZOCommands);
                     removeElements.add(iteration);
                     iteration = iteration + 1;

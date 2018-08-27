@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
@@ -17,6 +18,8 @@ import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
 import ch.ethz.idsc.jmex.Container;
 import ch.ethz.idsc.jmex.DoubleArray;
 import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.schedule.AVTask;
+import ch.ethz.matsim.av.schedule.AVTask.AVTaskType;
 
 public enum SMPCutils {
     ;
@@ -76,62 +79,40 @@ public enum SMPCutils {
         return linkList;
     }
 
-    public static double[][] getAvailableCars(double Time, int PlanningHorizon, int timeStep,
-            Collection<AVRequest> avRequests, Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi,
-            List<RoboTaxi> taxiWithCustomer, List<RoboTaxi> taxiRebalancing, VirtualNetwork<Link> virtualNetwork,
-            Map<VirtualLink<Link>, Double> TravelTimes) {
+    public static double[][] getAvailableCars(double time, int planningHorizon, int timeStep,
+            Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi, Map<VirtualNode<Link>, List<RoboTaxi>> rebalanceRoboTaxi,
+            Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi, VirtualNetwork<Link> virtualNetwork, Map<VirtualLink<Link>, Double> travelTimes) {
         int NumberNodes = virtualNetwork.getvNodesCount();
 
-        List<AVRequest> oneCustomer = new ArrayList<>();
-        List<RoboTaxi> taxiWithOneCustomer = new ArrayList<>();
-
-        if (!taxiWithCustomer.isEmpty()) {
-            taxiWithOneCustomer = (List<RoboTaxi>) taxiWithCustomer.stream()
-                    .filter(car -> car.getCurrentNumberOfCustomersOnBoard() == 1);
-
-        }
-
-        if (!taxiWithOneCustomer.isEmpty()) {
-            for (RoboTaxi taxiOne : taxiWithOneCustomer) {
-                AVRequest request = (AVRequest) avRequests.stream()
-                        .filter(re -> taxiOne.getMenu().getCourses().get(0).getRequestId() == re.getId().toString());
-                oneCustomer.add(request);
-            }
-        }
-
-        double[][] TotalAvailableCars = new double[PlanningHorizon][NumberNodes];
+        double[][] TotalAvailableCars = new double[planningHorizon][NumberNodes];
         int numberStay;
         int numberReb;
         int numberSO;
 
         for (VirtualNode<Link> node : virtualNetwork.getVirtualNodes()) {
-            List<RoboTaxi> StayCarsAtNode = StayRoboTaxi.get(node);
+            List<RoboTaxi> StayCarsAtNode = stayRoboTaxi.get(node);
 
-            List<RoboTaxi> rebalancingNode = new ArrayList<>();
+            List<RoboTaxi> rebalanceCarsAtNode = rebalanceRoboTaxi.get(node);
+            List<RoboTaxi> soCarsAtNode = soRoboTaxi.get(node);
 
-            if (!taxiRebalancing.isEmpty()) {
-                rebalancingNode = (List<RoboTaxi>) taxiRebalancing.stream()
-                        .filter(car -> node.getLinks().contains(car.getCurrentDriveDestination()));
-            }
-
+            
             if (StayCarsAtNode.isEmpty() == true) {
                 numberStay = 0;
             } else {
                 numberStay = StayCarsAtNode.size();
             }
 
-            for (int t = 0; t < PlanningHorizon; t++) {
-                if (rebalancingNode.isEmpty() == true) {
+            for (int t = 0; t < planningHorizon; t++) {
+                if (rebalanceCarsAtNode.isEmpty() == true) {
                     numberReb = 0;
                 } else {
-                    numberReb = getNumberCarsAbailableAtTime(Time, t, timeStep, rebalancingNode, virtualNetwork,
-                            TravelTimes);
+                    numberReb = getFinishingTaskAtTimeCars(time, t, timeStep, rebalanceCarsAtNode);
                 }
 
-                if (oneCustomer.isEmpty() == true) {
+                if (soCarsAtNode.isEmpty() == true) {
                     numberSO = 0;
                 } else {
-                    numberSO = getNumberDropoffs(Time, t, timeStep, node, oneCustomer);
+                    numberSO = getFinishingTaskAtTimeCars(time, t, timeStep, soCarsAtNode);
                 }
 
                 if (t == 0) {
@@ -148,25 +129,18 @@ public enum SMPCutils {
 
     }
 
-    private static int getNumberCarsAbailableAtTime(double Time, int t, int timeStep, List<RoboTaxi> carsAtNode,
-            VirtualNetwork<Link> virtualNetwork, Map<VirtualLink<Link>, Double> TravelTimes) {
+private static int getFinishingTaskAtTimeCars(double Time, int t, int timeStep, List<RoboTaxi> roboTaxiList) {
+        
         int numberCars = 0;
-        for (RoboTaxi car : carsAtNode) {
-            Link fromLink = car.getLastKnownLocation();
-            Link toLink = car.getCurrentDriveDestination();
-            VirtualNode<Link> fromNode = virtualNetwork.getVirtualNode(fromLink);
-            VirtualNode<Link> toNode = virtualNetwork.getVirtualNode(toLink);
-            for (VirtualLink<Link> link : virtualNetwork.getVirtualLinks()) {
-                if (link.getFrom() == fromNode && link.getTo() == toNode) {
-                    Double travelTime = TravelTimes.get(link);
-                    if (travelTime + Time > Time + t * timeStep * 60
-                            && travelTime + Time <= Time + (t + 1) * timeStep * 60) {
-                        numberCars = numberCars + 1;
-                    }
-                    break;
-                }
+        for (RoboTaxi roboTaxi : roboTaxiList) {
+            Schedule scheduleRoboTaxi = roboTaxi.getSchedule();
+            AVTask avtask = (AVTask) scheduleRoboTaxi.getCurrentTask();
+            if (avtask.getEndTime() > Time + t * timeStep * 60
+                    && avtask.getEndTime() <= Time + (t + 1) * timeStep * 60 && avtask.getAVTaskType() == AVTaskType.DRIVE) {
+                numberCars = numberCars + 1;
             }
         }
+
         return numberCars;
     }
 

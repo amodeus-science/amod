@@ -84,3 +84,12 @@ matlab/SMPC
 # output data too big
 output/
 virtualNetwork/
+matlab/jmex/solution.mat
+matlab/jmex/InputOutputInfeasible.mat
+matlab/jmex/InputOutputforMatt.mat
+matlab/jmex/clone3.log
+matlab/jmex/clone2.log
+matlab/jmex/clone1.log
+matlab/jmex/clone0.log
+matlab/jmex/InputInfeasible001.mat
+matlab/jmex/InputInfeasible.mat

@@ -65,6 +65,9 @@ public enum CarPooling2DispatcherUtils {
             int FromNode = link.getFrom().getIndex();
             int ToNode = link.getTo().getIndex();
             travelTimesMat[FromNode][ToNode] = Math.round(TravelTimes.get(link) / (timeStep * 60));
+            if(travelTimesMat[FromNode][ToNode] == 0) {
+                travelTimesMat[FromNode][ToNode] = 1;
+            }
 
         }
 
@@ -162,7 +165,8 @@ public enum CarPooling2DispatcherUtils {
             int numberDO;
 
             for (VirtualNode<Link> destNodeFirst : virtualNetwork.getVirtualNodes()) {
-                List<RoboTaxi> soCarsAtNode = soRoboTaxi.get(destNodeFirst);
+                List<RoboTaxi> soCarsAtNodeNonfiltered = soRoboTaxi.get(destNodeFirst);
+                List<RoboTaxi> soCarsAtNode = soCarsAtNodeNonfiltered.stream().filter(cars -> destNodeSecond.getLinks().contains(cars.getCurrentDriveDestination())).collect(Collectors.toList());
                 List<RoboTaxi> doCarsAtNode = doRoboTaxi.get(destNodeFirst);
                 List<RoboTaxi> doFiltered = doCarsAtNode.stream().filter(car -> destNodeSecond.getLinks().contains(car.getMenu().getCourses().get(1).getLink())).collect(Collectors.toList());
 

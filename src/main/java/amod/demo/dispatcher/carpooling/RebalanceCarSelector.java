@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
@@ -57,9 +59,12 @@ public class RebalanceCarSelector {
             availableVehicles.get(from).remove(nextRoboTaxi);
             
             VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-            Optional<Link> linkOption = toNode.getLinks().stream().findAny();
+            Set<Link> linkSet = toNode.getLinks();
+            List<Link> linkList = new ArrayList<Link>(linkSet);
+            List<Link> linkListFiltered = linkList.stream().filter(link -> link!=null).collect(Collectors.toList());
+            Link rebalanceLink = linkListFiltered.get(new Random().nextInt(linkListFiltered.size()-1));
 
-            Pair<RoboTaxi, Link> xZOCommands = Pair.of(nextRoboTaxi, linkOption.get());
+            Pair<RoboTaxi, Link> xZOCommands = Pair.of(nextRoboTaxi, rebalanceLink);
             rebalanceCommandsList.add(xZOCommands);
             removeElements.add(iteration);
             iteration = iteration + 1;

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Triple;
@@ -98,10 +99,13 @@ public class XZOSelector {
                     stayRoboTaxi.get(virtualNetwork.getVirtualNode(i)).remove(closestRoboTaxi);
                     
                     VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-                    Optional<Link> linkOption = toNode.getLinks().stream().findAny();
+                    Set<Link> linkSet = toNode.getLinks();
+                    List<Link> linkList = new ArrayList<Link>(linkSet);
+                    List<Link> linkListFiltered = linkList.stream().filter(link -> link!=null).collect(Collectors.toList());
+                    Link redirectLink = linkListFiltered.get(new Random().nextInt(linkListFiltered.size()-1));
 
                     Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(closestRoboTaxi, avRequest,
-                            linkOption.get());
+                            redirectLink);
                     xZOCommandsList.add(xZOCommands);
                     removeElements.add(iteration);
                     iteration = iteration + 1;

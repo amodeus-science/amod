@@ -129,14 +129,19 @@ public class SMPCRebalancer extends PartitionedDispatcher {
             Map<VirtualLink<Link>, Double> travelTimes = TravelTimeCalculatorClaudioForDejan.computeTravelTimes(virtualNetwork.getVirtualLinks());
             
             // planning horizon for SMPC
-            int PlanningHorizon = 50;
+            int planningHorizon = 50;
             
-            Collection<AVRequest> avRequests = getAVRequests();
             
             // prepare inputs for SMPC in MATLAB
             double[][] networkSMPC = SMPCutils.getVirtualNetworkForMatlab(virtualNetwork);
             double [][] travelTimesSMPC = SMPCutils.getTravelTimesVirtualNetworkForMatlab(virtualNetwork, timeStep, travelTimes);
-            double[][] availableCarsSMP = SMPCutils.getAvailableCars(round_now, PlanningHorizon, timeStep, avRequests, idleVehicles, taxiWithCustomer, taxiRebalancing, virtualNetwork, travelTimes);                              
+            
+            Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi = getVirtualNodeStayRoboTaxi();
+            Map<VirtualNode<Link>, List<RoboTaxi>> rebalancingTaxi = getVirtualNodeDestinationRebalancingRoboTaxi();
+            Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi = getVirtualNodeDestinationWithCustomerRoboTaxi();
+            
+            double[][] availableCarsSMP = SMPCutils.getAvailableCars(round_now, planningHorizon, timeStep, stayRoboTaxi, rebalancingTaxi, soRoboTaxi, virtualNetwork,
+                    travelTimes);                              
             
             try {
                 // initialize server
@@ -169,7 +174,7 @@ public class SMPCRebalancer extends PartitionedDispatcher {
                 }
                                 
                 // add planning horizon to container
-                double[] PlanningHorizonDouble = new double[] {PlanningHorizon};
+                double[] PlanningHorizonDouble = new double[] {planningHorizon};
                 container.add((new DoubleArray("PlanningHorizon", new int[] { 1 }, PlanningHorizonDouble)));
                 
              // add planning horizon to container
@@ -233,11 +238,25 @@ public class SMPCRebalancer extends PartitionedDispatcher {
         
 
         if (round_now % dispatchPeriod == 0) {
-            printVals = bipartiteMatchingEngine.executePickup(this, getDivertableNotRebalancingRoboTaxis(), //
+            printVals = bipartiteMatchingEngine.executePickup(this, getDivertableUnassignedRoboTaxis(), //
                     getAVRequests(), distanceFunction, network, false);
         }
     }
 
+    private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayRoboTaxi() {
+        return virtualNetwork.binToVirtualNode(getRoboTaxiSubset(RoboTaxiStatus.STAY), RoboTaxi::getDivertableLocation);
+    }
+    
+    private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeDestinationRebalancingRoboTaxi() {
+        return virtualNetwork.binToVirtualNode(getRoboTaxiSubset(RoboTaxiStatus.REBALANCEDRIVE),
+                RoboTaxi::getCurrentDriveDestination);
+    }
+    
+    private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeDestinationWithCustomerRoboTaxi() {
+        return virtualNetwork.binToVirtualNode(getRoboTaxiSubset(RoboTaxiStatus.DRIVEWITHCUSTOMER),
+                RoboTaxi::getCurrentDriveDestination);
+    }
+    
     @Override
     protected String getInfoLine() {
         return String.format("%s RV=%s H=%s", //

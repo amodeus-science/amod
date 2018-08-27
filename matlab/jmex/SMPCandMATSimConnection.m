@@ -54,7 +54,7 @@ RoadNetwork.Starters = Starters;
 
 Passengers.FlowsOut = predictDemandK(currentTime, 0, 0, 0);
 
-Flags.milpflag = 0;
+Flags.milpflag = 1;
 
 RebWeight = 5.0;
 
