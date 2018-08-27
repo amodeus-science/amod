@@ -15,6 +15,7 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.gfx.AmodeusComponent;
 import ch.ethz.idsc.amodeus.gfx.ClockLayer;
 import ch.ethz.idsc.amodeus.gfx.HudLayer;
+import ch.ethz.idsc.amodeus.gfx.LinkLayer;
 import ch.ethz.idsc.amodeus.gfx.LoadLayer;
 import ch.ethz.idsc.amodeus.gfx.RequestsLayer;
 import ch.ethz.idsc.amodeus.gfx.RoboTaxiStatusColors;
@@ -42,7 +43,7 @@ import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
 /** demo shows how to compile the simulation output to a video animation
  * 
  * run ScenarioServer first to generate the simulation objects */
-public enum SimulationVideo {
+public enum SimulationVideoDark {
     ;
     public static void main(String[] args) throws Exception {
         Static.setup();
@@ -72,26 +73,28 @@ public enum SimulationVideo {
 
         amodeusComponent.setTileSource(GrayMapnikTileSource.INSTANCE);
 
-        amodeusComponent.mapGrayCover = 255;
-        amodeusComponent.mapAlphaCover = 128;
+        amodeusComponent.mapGrayCover = 0;
+        amodeusComponent.mapAlphaCover = 192;
         amodeusComponent.addLayer(new TilesLayer());
 
         VehiclesLayer vehiclesLayer = new VehiclesLayer();
         vehiclesLayer.showLocation = true;
+        // vehiclesLayer.
         vehiclesLayer.statusColors = RoboTaxiStatusColors.Standard;
         amodeusComponent.addLayer(vehiclesLayer);
 
         RequestsLayer requestsLayer = new RequestsLayer();
         requestsLayer.drawNumber = false;
-        requestsLayer.requestHeatMap.setShow(false);
-        requestsLayer.requestHeatMap.setColorSchemes(ColorSchemes.Jet);
+        requestsLayer.requestHeatMap.setShow(true);
+        requestsLayer.requestHeatMap.setColorSchemes(ColorSchemes.Pbj);
         requestsLayer.requestDestMap.setShow(true);
-        requestsLayer.requestDestMap.setColorSchemes(ColorSchemes.Sunset);
+        requestsLayer.requestDestMap.setColorSchemes(ColorSchemes.Classic);
+
         amodeusComponent.addLayer(requestsLayer);
 
-        // LinkLayer linkLayer = new LinkLayer();
-        // linkLayer.linkLimit = 16384;
-        // amodeusComponent.addLayer(linkLayer);
+        LinkLayer linkLayer = new LinkLayer();
+        linkLayer.linkLimit = 1;
+        amodeusComponent.addLayer(linkLayer);
 
         LoadLayer loadLayer = new LoadLayer();
         loadLayer.drawLoad = true;
@@ -113,16 +116,16 @@ public enum SimulationVideo {
         System.out.println("has vn: " + (virtualNetwork != null));
         amodeusComponent.virtualNetworkLayer.setVirtualNetwork(virtualNetwork);
         amodeusComponent.virtualNetworkLayer.drawVNodes = true;
-        amodeusComponent.virtualNetworkLayer.virtualNodeShader = VirtualNodeShader.MaxRequestWaiting;
+        amodeusComponent.virtualNetworkLayer.virtualNodeShader = VirtualNodeShader.RequestCount;
         amodeusComponent.virtualNetworkLayer.colorSchemes = ColorSchemes.Parula;
 
         Dimension resolution = SimulationObjectsVideo.RESOLUTION_FullHD;
         amodeusComponent.setSize(resolution);
         AmodeusComponentUtil.adjustMapZoom(amodeusComponent, network, scenarioOptions);
         amodeusComponent.zoomIn();
+        amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();
-        // amodeusComponent.zoomIn();
-        // amodeusComponent.moveMap(-100, -750);
+        amodeusComponent.moveMap(-200, 200);
 
         StorageUtils storageUtils = new StorageUtils(outputSubDirectory);
         IterationFolder iterationFolder = storageUtils.getAvailableIterations().get(0);
@@ -132,20 +135,19 @@ public enum SimulationVideo {
         int count = 0;
         int base = 1;
         try (SimulationObjectsVideo simulationObjectsVideo = //
-                new SimulationObjectsVideo("20180825_berlin_10k.mp4", resolution, 25, amodeusComponent)) {
+                new SimulationObjectsVideo("recording.mp4", resolution, 15, amodeusComponent)) {
 
             simulationObjectsVideo.millis = 20000;
 
             int intervalEstimate = storageSupplier.getIntervalEstimate(); // 10
             int hrs = 60 * 60 / intervalEstimate;
-            final int start = 5 * hrs;
-            final int end = Math.min((int) (24.0 * hrs), storageSupplier.size());
-            for (int index = start; index < end; index += 1) {
+            final int end = Math.min((int) (9.2 * hrs), storageSupplier.size());
+            for (int index = 6 * hrs; index < end; index += 1) {
                 SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
                 simulationObjectsVideo.append(simulationObject);
 
                 if (++count >= base) {
-                    System.out.println("render simObj " + count + "/" + (end - start));
+                    System.out.println("render simObj " + count);
                     base *= 2;
                 }
             }

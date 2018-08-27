@@ -53,7 +53,7 @@ import ch.ethz.idsc.tensor.Tensors;
         PopulationPreparer.run(network, population, scenOpt, configMatsim, apoSeed);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
-        new VirtualNetworkPreparer(scenOpt).create(network, population);
+        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt);
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(configMatsim, scenOpt);
