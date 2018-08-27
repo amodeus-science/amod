@@ -103,7 +103,11 @@ f = zeros(statesize,1);
 for t=1:T
     for i=1:N
         for j=1:N
-            f(r_flow(i,j,t)) = RebWeight*TravelTimes(i,j);
+            if (i == j) % to ensure that idle cars will stay instead of move (in case some travel times between different stations is 1)
+                f(r_flow(i,j,t)) = 0.1*RebWeight*TravelTimes(i,j);
+            else
+                f(r_flow(i,j,t)) = RebWeight*TravelTimes(i,j);
+            end
             % f(find_wait(i,j,t)) = WaitTimeCost*t;
             f(find_drop(i,j,t)) = SourceRelaxCost;
             for s = 1:N
