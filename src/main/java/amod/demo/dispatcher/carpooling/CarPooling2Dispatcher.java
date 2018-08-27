@@ -87,6 +87,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
     private final int timeStep;
     private final int planningHorizon;
     private final int fixedCarCapacity;
+    private final AVRouter router;
 
     protected CarPooling2Dispatcher(Config config, //
             AVDispatcherConfig avconfig, //
@@ -119,6 +120,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
         dispatchPeriod = timeStep * 60;
         this.planningHorizon = 8;
         this.fixedCarCapacity = 2;
+        this.router = router;
 
     }
 
@@ -158,16 +160,17 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
             Map<VirtualNode<Link>, List<RoboTaxi>> rebalancingTaxi = getDestinationVirtualNodeRedirectOnlyRoboTaxi();
             Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi = getDestinationVirtualNodeSORoboTaxiOnlyDropoff();
             Map<VirtualNode<Link>, List<RoboTaxi>> doRoboTaxi = getDestinationVirtualNodeDORoboTaxiOnlyDropoff();
+            Collection<RoboTaxi> oneCustomerRoboTaxi = getRoboTaxisWithNumberOfCustomer(1);
             Collection<RoboTaxi> twoCustomerRoboTaxi = getRoboTaxisWithNumberOfCustomer(fixedCarCapacity);
-
+            
             double[][] rState = CarPooling2DispatcherUtils.getRState(round_now, planningHorizon, timeStep,
-                    fixedCarCapacity, stayRoboTaxi, rebalancingTaxi, soRoboTaxi, twoCustomerRoboTaxi, virtualNetwork,
-                    travelTimes);
+                    fixedCarCapacity, stayRoboTaxi, rebalancingTaxi, oneCustomerRoboTaxi, twoCustomerRoboTaxi, virtualNetwork,
+                    travelTimes, router);
 
             Map<VirtualNode<Link>, List<RoboTaxi>> soFromNode = getVirtualNodeSORoboTaxi();
 
             List<double[][]> xState = CarPooling2DispatcherUtils.getXState(round_now, planningHorizon, timeStep,
-                    fixedCarCapacity, soFromNode, doRoboTaxi, virtualNetwork);
+                    fixedCarCapacity, soFromNode, doRoboTaxi, virtualNetwork, router);
 
             try {
                 // initialize server

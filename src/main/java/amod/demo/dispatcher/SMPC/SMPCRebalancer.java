@@ -62,7 +62,7 @@ public class SMPCRebalancer extends PartitionedDispatcher {
     private final int numRobotaxi;
     private int total_rebalanceCount = 0;
     private Tensor printVals = Tensors.empty();
-//    private final LPVehicleRebalancing lpVehicleRebalancing;
+    // private final LPVehicleRebalancing lpVehicleRebalancing;
     private final DistanceFunction distanceFunction;
     private final DistanceHeuristics distanceHeuristics;
     private final Network network;
@@ -73,8 +73,9 @@ public class SMPCRebalancer extends PartitionedDispatcher {
     private RebalanceCarSelector rebalanceSelector;
     private double dispatchTime;
     private final BipartiteMatchingUtils bipartiteMatchingEngine;
-    
-//    final JavaContainerSocket javaContainerSocket;
+    private final ParallelLeastCostPathCalculator router;
+
+    // final JavaContainerSocket javaContainerSocket;
 
     public SMPCRebalancer( //
             Config config, AVDispatcherConfig avconfig, //
@@ -92,10 +93,10 @@ public class SMPCRebalancer extends PartitionedDispatcher {
         numRobotaxi = (int) generatorConfig.getNumberOfVehicles();
         networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         pendingLinkTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
-        for(Link link: network.getLinks().values()) {
+        for (Link link : network.getLinks().values()) {
             pendingLinkTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
-        }       
-//        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
+        }
+        // lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 300);
@@ -107,6 +108,7 @@ public class SMPCRebalancer extends PartitionedDispatcher {
         this.config = config;
         this.timeStep = 5;
         this.bipartiteMatchingEngine = new BipartiteMatchingUtils(network);
+        this.router = router;
 
     }
 
@@ -115,109 +117,113 @@ public class SMPCRebalancer extends PartitionedDispatcher {
 
         // PART I: rebalance all vehicles periodically
         final long round_now = Math.round(now);
-        
 
-        if (round_now % rebalancingPeriod == 0 && round_now>=rebalancingPeriod) {
-            
+        if (round_now % rebalancingPeriod == 0 && round_now >= rebalancingPeriod) {
+
             // available idle vehicles at virtual nodes
-            Map<VirtualNode<Link>,List<RoboTaxi>> idleVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis(); //TODO is this what you want Dejan?
-            
+            Map<VirtualNode<Link>, List<RoboTaxi>> idleVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis(); 
+                                                                                                                     
             List<RoboTaxi> taxiWithCustomer = getRoboTaxiSubset(RoboTaxiStatus.DRIVEWITHCUSTOMER);
             List<RoboTaxi> taxiRebalancing = getRoboTaxiSubset(RoboTaxiStatus.REBALANCEDRIVE);
-            
+
             // travel times
-            Map<VirtualLink<Link>, Double> travelTimes = TravelTimeCalculatorClaudioForDejan.computeTravelTimes(virtualNetwork.getVirtualLinks());
-            
+            Map<VirtualLink<Link>, Double> travelTimes = TravelTimeCalculatorClaudioForDejan
+                    .computeTravelTimes(virtualNetwork.getVirtualLinks());
+
             // planning horizon for SMPC
             int planningHorizon = 50;
-            
-            
+
             // prepare inputs for SMPC in MATLAB
             double[][] networkSMPC = SMPCutils.getVirtualNetworkForMatlab(virtualNetwork);
-            double [][] travelTimesSMPC = SMPCutils.getTravelTimesVirtualNetworkForMatlab(virtualNetwork, timeStep, travelTimes);
-            
+            double[][] travelTimesSMPC = SMPCutils.getTravelTimesVirtualNetworkForMatlab(virtualNetwork, timeStep,
+                    travelTimes);
+
             Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi = getVirtualNodeStayRoboTaxi();
             Map<VirtualNode<Link>, List<RoboTaxi>> rebalancingTaxi = getVirtualNodeDestinationRebalancingRoboTaxi();
             Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi = getVirtualNodeDestinationWithCustomerRoboTaxi();
-            
-            double[][] availableCarsSMP = SMPCutils.getAvailableCars(round_now, planningHorizon, timeStep, stayRoboTaxi, rebalancingTaxi, soRoboTaxi, virtualNetwork,
-                    travelTimes);                              
-            
+
+            double[][] availableCarsSMP = SMPCutils.getAvailableCars(round_now, planningHorizon, timeStep, stayRoboTaxi,
+                    rebalancingTaxi, soRoboTaxi, virtualNetwork, router);
+
             try {
                 // initialize server
-                JavaContainerSocket javaContainerSocket = new JavaContainerSocket(new Socket("localhost", MfileContainerServer.DEFAULT_PORT));
+                JavaContainerSocket javaContainerSocket = new JavaContainerSocket(
+                        new Socket("localhost", MfileContainerServer.DEFAULT_PORT));
 
                 { // add inputs to server
-                Container container = SMPCutils.getContainerInit();
-                
-                // add network to container
-                double[] networkNode = new double[networkSMPC.length];
-                for(int index = 0; index<networkSMPC.length; ++index) {
-                    networkNode = networkSMPC[index];
-                    container.add((new DoubleArray("roadGraph" + index, new int[] { networkSMPC.length }, networkNode)));
+                    Container container = SMPCutils.getContainerInit();
+
+                    // add network to container
+                    double[] networkNode = new double[networkSMPC.length];
+                    for (int index = 0; index < networkSMPC.length; ++index) {
+                        networkNode = networkSMPC[index];
+                        container.add(
+                                (new DoubleArray("roadGraph" + index, new int[] { networkSMPC.length }, networkNode)));
+                    }
+
+                    // add travel times to container
+                    double[] travelTimeskNode = new double[travelTimesSMPC.length];
+                    for (int index = 0; index < travelTimesSMPC.length; ++index) {
+                        travelTimeskNode = travelTimesSMPC[index];
+                        container.add((new DoubleArray("travelTimes" + index, new int[] { travelTimesSMPC.length },
+                                travelTimeskNode)));
+                    }
+
+                    // add available cars to container
+                    double[] availableCarsNode = new double[availableCarsSMP.length];
+                    int indexCar = 0;
+                    for (double[] CarsAtTime : availableCarsSMP) {
+                        indexCar = indexCar + 1;
+                        availableCarsNode = CarsAtTime;
+                        container.add((new DoubleArray("availableCars" + indexCar,
+                                new int[] { availableCarsNode.length }, availableCarsNode)));
+                    }
+
+                    // add planning horizon to container
+                    double[] PlanningHorizonDouble = new double[] { planningHorizon };
+                    container.add((new DoubleArray("PlanningHorizon", new int[] { 1 }, PlanningHorizonDouble)));
+
+                    // add planning horizon to container
+                    double[] currentTime = new double[] { round_now };
+                    container.add((new DoubleArray("currentTime", new int[] { 1 }, currentTime)));
+
+                    System.out.println("Sending to server");
+                    javaContainerSocket.writeContainer(container);
+
                 }
-                
-                // add travel times to container
-                double[] travelTimeskNode = new double[travelTimesSMPC.length];
-                for(int index = 0; index<travelTimesSMPC.length; ++index) {
-                    travelTimeskNode = travelTimesSMPC[index];
-                    container.add((new DoubleArray("travelTimes" + index, new int[] { travelTimesSMPC.length }, travelTimeskNode)));
-                }
-                
-                // add available cars to container
-                double[] availableCarsNode = new double[availableCarsSMP.length];
-                int indexCar = 0;
-                for(double[] CarsAtTime: availableCarsSMP) {
-                    indexCar = indexCar + 1;
-                    availableCarsNode = CarsAtTime;
-                    container.add((new DoubleArray("availableCars" + indexCar, new int[] { availableCarsNode.length }, availableCarsNode)));
-                }
-                                
-                // add planning horizon to container
-                double[] PlanningHorizonDouble = new double[] {planningHorizon};
-                container.add((new DoubleArray("PlanningHorizon", new int[] { 1 }, PlanningHorizonDouble)));
-                
-             // add planning horizon to container
-                double[] currentTime = new double[] {round_now};
-                container.add((new DoubleArray("currentTime", new int[] { 1 }, currentTime)));
-                
-                System.out.println("Sending to server");
-                javaContainerSocket.writeContainer(container);
-                
-                }
-                
+
                 { // get outputs from server
-                System.out.println("Waiting for server");
-                Container container = javaContainerSocket.blocking_getContainer();
-                System.out.println("received: " + container);
-                
-                // get control inputs for rebalancing from container
-                List<double[]> ControlLaw = new ArrayList<>();        
-                for(int i=1; i<=container.size(); ++i) {
-                    ControlLaw.add(SMPCutils.getArray(container, "solution"+i));
+                    System.out.println("Waiting for server");
+                    Container container = javaContainerSocket.blocking_getContainer();
+                    System.out.println("received: " + container);
+
+                    // get control inputs for rebalancing from container
+                    List<double[]> ControlLaw = new ArrayList<>();
+                    for (int i = 1; i <= container.size(); ++i) {
+                        ControlLaw.add(SMPCutils.getArray(container, "solution" + i));
+                    }
+
+                    // apply rebalancing commands
+                    rebalanceSelector = new RebalanceCarSelector(ControlLaw);
+
+                    dispatchTime = round_now;
                 }
-                
-                // apply rebalancing commands
-                rebalanceSelector = new RebalanceCarSelector(ControlLaw);
-                
-                dispatchTime = round_now;
-                }
-                
+
                 javaContainerSocket.close();
-                
+
             } catch (Exception exception) {
                 exception.printStackTrace();
                 throw new RuntimeException(); // dispatcher will not work if
                                               // constructor has issues
-            }        
-                                 
+            }
+
             System.out.println("Finished rebalancing");
-            
-                      
+
         }
 
-     // Rebalancing
-        if (round_now % 10 == 0 && round_now > rebalancingPeriod && round_now >= dispatchTime && round_now < (dispatchTime + timeStep * 60)) {
+        // Rebalancing
+        if (round_now % 10 == 0 && round_now > rebalancingPeriod && round_now >= dispatchTime
+                && round_now < (dispatchTime + timeStep * 60)) {
             Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi = getVirtualNodeDivertableNotRebalancingRoboTaxis();
             for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
                 try {
@@ -235,7 +241,6 @@ public class SMPCRebalancer extends PartitionedDispatcher {
                 }
             }
         }
-        
 
         if (round_now % dispatchPeriod == 0) {
             printVals = bipartiteMatchingEngine.executePickup(this, getDivertableUnassignedRoboTaxis(), //
@@ -246,17 +251,17 @@ public class SMPCRebalancer extends PartitionedDispatcher {
     private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayRoboTaxi() {
         return virtualNetwork.binToVirtualNode(getRoboTaxiSubset(RoboTaxiStatus.STAY), RoboTaxi::getDivertableLocation);
     }
-    
+
     private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeDestinationRebalancingRoboTaxi() {
         return virtualNetwork.binToVirtualNode(getRoboTaxiSubset(RoboTaxiStatus.REBALANCEDRIVE),
                 RoboTaxi::getCurrentDriveDestination);
     }
-    
+
     private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeDestinationWithCustomerRoboTaxi() {
         return virtualNetwork.binToVirtualNode(getRoboTaxiSubset(RoboTaxiStatus.DRIVEWITHCUSTOMER),
                 RoboTaxi::getCurrentDriveDestination);
     }
-    
+
     @Override
     protected String getInfoLine() {
         return String.format("%s RV=%s H=%s", //
@@ -289,11 +294,11 @@ public class SMPCRebalancer extends PartitionedDispatcher {
             AVGeneratorConfig generatorConfig = avconfig.getParent().getGeneratorConfig();
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
-            AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher = new GlobalBipartiteMatching(new EuclideanDistanceFunction());
+            AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher = new GlobalBipartiteMatching(
+                    new EuclideanDistanceFunction());
 
-            return new SMPCRebalancer(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork, abstractVirtualNodeDest,
-                    abstractVehicleDestMatcher);
+            return new SMPCRebalancer(config, avconfig, generatorConfig, travelTime, router, eventsManager, network,
+                    virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher);
         }
     }
 }
-

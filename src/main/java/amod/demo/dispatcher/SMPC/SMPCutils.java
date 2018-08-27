@@ -1,25 +1,27 @@
 package amod.demo.dispatcher.SMPC;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
+import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
 import ch.ethz.idsc.jmex.Container;
 import ch.ethz.idsc.jmex.DoubleArray;
-import ch.ethz.matsim.av.passenger.AVRequest;
-import ch.ethz.matsim.av.schedule.AVTask;
-import ch.ethz.matsim.av.schedule.AVTask.AVTaskType;
+import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.qty.Quantity;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
+import ch.ethz.matsim.av.router.AVRouter;
 
 public enum SMPCutils {
     ;
@@ -81,7 +83,7 @@ public enum SMPCutils {
 
     public static double[][] getAvailableCars(double time, int planningHorizon, int timeStep,
             Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi, Map<VirtualNode<Link>, List<RoboTaxi>> rebalanceRoboTaxi,
-            Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi, VirtualNetwork<Link> virtualNetwork, Map<VirtualLink<Link>, Double> travelTimes) {
+            Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi, VirtualNetwork<Link> virtualNetwork, ParallelLeastCostPathCalculator router) {
         int NumberNodes = virtualNetwork.getvNodesCount();
 
         double[][] TotalAvailableCars = new double[planningHorizon][NumberNodes];
@@ -106,13 +108,13 @@ public enum SMPCutils {
                 if (rebalanceCarsAtNode.isEmpty() == true) {
                     numberReb = 0;
                 } else {
-                    numberReb = getFinishingTaskAtTimeCars(time, t, timeStep, rebalanceCarsAtNode);
+                    numberReb = getNumberOfArrivingCars(time, t, timeStep, rebalanceCarsAtNode, router);
                 }
 
                 if (soCarsAtNode.isEmpty() == true) {
                     numberSO = 0;
                 } else {
-                    numberSO = getFinishingTaskAtTimeCars(time, t, timeStep, soCarsAtNode);
+                    numberSO = getNumberOfArrivingCars(time, t, timeStep, soCarsAtNode, router);
                 }
 
                 if (t == 0) {
@@ -129,14 +131,16 @@ public enum SMPCutils {
 
     }
 
-private static int getFinishingTaskAtTimeCars(double Time, int t, int timeStep, List<RoboTaxi> roboTaxiList) {
+private static int getNumberOfArrivingCars(double now, int t, int timeStep, List<RoboTaxi> roboTaxiList, ParallelLeastCostPathCalculator router) {
         
         int numberCars = 0;
         for (RoboTaxi roboTaxi : roboTaxiList) {
-            Schedule scheduleRoboTaxi = roboTaxi.getSchedule();
-            AVTask avtask = (AVTask) scheduleRoboTaxi.getCurrentTask();
-            if (avtask.getEndTime() > Time + t * timeStep * 60
-                    && avtask.getEndTime() <= Time + (t + 1) * timeStep * 60 && avtask.getAVTaskType() == AVTaskType.DRIVE) {
+            Link toLink = roboTaxi.getCurrentDriveDestination();
+            Link fromLink = roboTaxi.getLastKnownLocation();
+            Scalar time = Quantity.of(now, SI.SECOND);
+            Scalar arrivingTime = timeFromTo(fromLink, toLink, time, roboTaxi, router);
+            if (arrivingTime.number().doubleValue() > now + t * timeStep * 60
+                    && arrivingTime.number().doubleValue() <= now + (t + 1) * timeStep * 60) {
                 numberCars = numberCars + 1;
             }
         }
@@ -144,20 +148,21 @@ private static int getFinishingTaskAtTimeCars(double Time, int t, int timeStep, 
         return numberCars;
     }
 
-    private static int getNumberDropoffs(double Time, int t, int timeStep, VirtualNode<Link> node,
-            List<AVRequest> requestList) {
-        int numberDropoffs = 0;
-
-        for (AVRequest request : requestList) {
-            if (request.getSubmissionTime() > Time + t * timeStep * 60
-                    && request.getSubmissionTime() <= Time + (t + 1) * timeStep * 60
-                    && node.getLinks().contains(request.getToLink())) {
-                numberDropoffs = numberDropoffs + 1;
-            }
-        }
-
-        return numberDropoffs;
+/** @return time in seconds needed for {@link RoboTaxi} @param roboTaxi to travel from {@link Link}
+ * @param from to the {@link Link} @param to starting at {@link Scalar} @param now and using
+ *            the {@link AVRouter} @param router
+ * @return null if path calculation unsuccessful */
+private static Scalar timeFromTo(Link from, Link to, Scalar now, RoboTaxi roboTaxi, ParallelLeastCostPathCalculator router) {
+    Future<Path> path = router.calcLeastCostPath(from.getFromNode(), to.getToNode(), now.number().doubleValue(), //
+            null, null);
+    Double travelTime = null;
+    try {
+        travelTime = path.get().travelTime;
+    } catch (Exception e) {
+        System.err.println("Calculation of expected arrival failed.");
     }
+    return Quantity.of(travelTime, SI.SECOND);
+}
 
     public static Container getContainerInit() {
 
