@@ -22,8 +22,8 @@ import ch.ethz.idsc.tensor.sca.Round;
 
     private final Set<Scalar> matchedReq = new HashSet<>();
     private final Set<Scalar> matchedTax = new HashSet<>();
-    private final Distribution dist_lat;
     private final Distribution dist_lng;
+    private final Distribution dist_lat;
 
     /** @param bottomLeft {lngMin, latMin}
      * @param topRight {lngMax, latMax} */
@@ -39,13 +39,13 @@ import ch.ethz.idsc.tensor.sca.Round;
         System.out.println("maximum latitude  in network: " + latMax);
 
         /** Example:
-         * minimum latitude in network: -33.869660953686626
-         * maximum latitude in network: -33.0303523690584
          * minimum longitude in network: -71.38020297181387
-         * maximum longitude in network: -70.44406349551404 */
+         * maximum longitude in network: -70.44406349551404
+         * minimum latitude in network: -33.869660953686626
+         * maximum latitude in network: -33.0303523690584 */
 
-        dist_lat = UniformDistribution.of(latMin, latMax);
         dist_lng = UniformDistribution.of(lngMin, lngMax);
+        dist_lat = UniformDistribution.of(latMin, latMax);
     }
 
     public Tensor of(Tensor status) {
@@ -97,8 +97,9 @@ import ch.ethz.idsc.tensor.sca.Round;
     }
 
     private Tensor getRandomRebalanceLocation() {
-        /** ATTENTION: AMoDeus internally uses the convention (longitude, latitude) for a WGS:84
-         * pair, not (latitude, longitude) as in some other cases. */
+        /** ATTENTION: AMoDeus internally uses the convention
+         * (longitude, latitude) for a WGS:84 pair,
+         * not the other way around as in some other cases. */
         return Tensors.of( //
                 RandomVariate.of(dist_lng), //
                 RandomVariate.of(dist_lat));
