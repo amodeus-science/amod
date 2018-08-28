@@ -84,19 +84,53 @@ The `submission time` is a numeric value less than `simulation time`.
 
 #### REWARDS
 
-The variable `REWARDS` is a list that contains the gains accumulated in different categories since the previous simulation step. The sum of all rewards equal the final score.
+The variable `REWARDS` is a list that contains the gains accumulated in different categories since the previous simulation step.
 
-	TODO
+	{service reward, efficiency reward, THIRD_REWARD}
+
+The value of `THIRD_REWARD` is initially `0` but switches to `-Infinity` if the maximum wait-time among the unserviced requests exceeds 10 minutes.
+
+The final score vector is the (undiscounted) sum of all reward vectors.
 
 ### Client -> Server
 
 The client has to instruct the simulation server on how to divert the vehicles.
+Each vehicle can either be sent on a pickup drive to fetch a waiting customer, or a rebalancing drive.
+The message is a list of the form:
+
+	{PICKUPS, REBALANCING}
+
+The variable `PICKUPS` is a list of the form
+
+	{PICKUP_PAIR[1], ..., PICKUP_PAIR[p]}
+
+The variable `PICKUP_PAIR` is a list with two entries that associates a divertable vehicle with an open request. The list is of the form
+
+	{vehicle index, request index}
+
+The variable `REBALANCING` is a list of the form
+
+	{REBALANCE[1], ..., REBALANCE[r]}
+
+The variable `REBALANCE` is of the form
+
+	{vehicle index, {longitude destination, latitude destination}}
+
+Important:
+Each vehicle index may only appear in either the pickup or rebalancing instructions. Additionally, within the list, each vehicle index may only appear once. Each request index may only appear once in the list of pickup instructions. However, in the next time step, another vehicle may be assigned to the same request. In that case, the former vehicle will stop driving.
+
+Examples:
+* The client may choose to send `{{}, {}}` which corresponds to an empty list of pickup instructions, and an empty list of rebalancing instructions.
+* The client is not required to use rebalancing instructions. A message of the form `{PICKUPS, {}}` is valid.
+* The client may choose to only send rebalancing instructions. In that case, the message is the form `{{}, REBALANCING}` is valid.
+
 
 ## Evaluation
 
 ### Server -> Client
 
-The server sends with
+The server sends the (undiscounted) sum of all reward vectors. In the last component, a reward of `-n` incurs, which represents the cost for the number of vehicles used.
 
-    {1,2,3}
+    {service score, efficiency score, THIRD_SCORE}
 
+In particular, the `THIRD_SCORE` takes the value `-n` or `-Infinity`.

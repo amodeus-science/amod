@@ -2,7 +2,6 @@
 package amod.aido.demo;
 
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -12,38 +11,41 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.pdf.Distribution;
+import ch.ethz.idsc.tensor.pdf.RandomVariate;
+import ch.ethz.idsc.tensor.pdf.UniformDistribution;
 import ch.ethz.idsc.tensor.sca.Round;
 
 /** dispatching logic in the AidoGuest demo to compute dispatching instructions
  * that are forwarded to the AidoHost */
 /* package */ class DispatchingLogic {
 
-    private final Random random = new Random(1234);
     private final Set<Scalar> matchedReq = new HashSet<>();
     private final Set<Scalar> matchedTax = new HashSet<>();
-    private final Scalar latMin;
-    private final Scalar latMax;
-    private final Scalar lngMin;
-    private final Scalar lngMax;
+    private final Distribution dist_lat;
+    private final Distribution dist_lng;
 
     /** @param bottomLeft {lngMin, latMin}
      * @param topRight {lngMax, latMax} */
     public DispatchingLogic(Tensor bottomLeft, Tensor topRight) {
-        this.latMin = bottomLeft.Get(1);
-        this.latMax = topRight.Get(1);
-        this.lngMin = bottomLeft.Get(0);
-        this.lngMax = topRight.Get(0);
+        Scalar lngMin = bottomLeft.Get(0);
+        Scalar lngMax = topRight.Get(0);
+        Scalar latMin = bottomLeft.Get(1);
+        Scalar latMax = topRight.Get(1);
 
-        System.out.println("minimum latitude  in network: " + latMin);
-        System.out.println("maximum latitude  in network: " + latMax);
         System.out.println("minimum longitude in network: " + lngMin);
         System.out.println("maximum longitude in network: " + lngMax);
+        System.out.println("minimum latitude  in network: " + latMin);
+        System.out.println("maximum latitude  in network: " + latMax);
 
         /** Example:
          * minimum latitude in network: -33.869660953686626
          * maximum latitude in network: -33.0303523690584
          * minimum longitude in network: -71.38020297181387
          * maximum longitude in network: -70.44406349551404 */
+
+        dist_lat = UniformDistribution.of(latMin, latMax);
+        dist_lng = UniformDistribution.of(lngMin, lngMax);
     }
 
     public Tensor of(Tensor status) {
@@ -95,14 +97,10 @@ import ch.ethz.idsc.tensor.sca.Round;
     }
 
     private Tensor getRandomRebalanceLocation() {
-        double latRand = latMin.number().doubleValue() + //
-                random.nextDouble() * ((latMax.subtract(latMin)).number().doubleValue());
-
-        double lngRand = lngMin.number().doubleValue() + //
-                random.nextDouble() * ((lngMax.subtract(lngMin)).number().doubleValue());
-
-        /** ATTENTION: AMoDeus internally uses the convention (longitude, latutide) for a WGS:84
+        /** ATTENTION: AMoDeus internally uses the convention (longitude, latitude) for a WGS:84
          * pair, not (latitude, longitude) as in some other cases. */
-        return Tensors.vector(lngRand, latRand);
+        return Tensors.of( //
+                RandomVariate.of(dist_lng), //
+                RandomVariate.of(dist_lat));
     }
 }
