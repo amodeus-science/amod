@@ -13,7 +13,7 @@ public enum TravelTimeCalculatorForVirtualNetwork {
     
 static Map<VirtualLink<Link>,Double> computeTravelTimes(Collection<VirtualLink<Link>> vLinks){
         
-        double speed = 12; //[m/s]
+        double speed = 10; //[m/s]
         Map<VirtualLink<Link>,Double> tTimes = new HashMap<>();
         
         for(VirtualLink<Link> vLink : vLinks){

@@ -295,7 +295,7 @@ public class SMPCRebalancer extends PartitionedDispatcher {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
             AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher = new GlobalBipartiteMatching(
-                    new EuclideanDistanceFunction());
+                    EuclideanDistanceFunction.INSTANCE);
 
             return new SMPCRebalancer(config, avconfig, generatorConfig, travelTime, router, eventsManager, network,
                     virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher);

@@ -74,12 +74,29 @@ Flags.ignorerealpax = 1 - use_outpax;
 
 RebWeight = 5.0;
 
-% save('Input.mat','RoadNetwork','RebWeight','Passengers','Flags');
+% global int;
+% if(isempty(int))
+%    int = 0; 
+% end
+% 
+% save(sprintf('Input%d',int),'RoadNetwork','RebWeight','Passengers','Flags');
+% int = int +1;
+
+save('Input','RoadNetwork','RebWeight','Passengers','Flags');
 
 % Optimization!!!!!!!
 [rebalanceQueue, output] = amod_p_mpc_v6(RoadNetwork, RebWeight, Passengers, Flags);
 
-%save('solution.mat','rebalanceQueue');
+% global out;
+% if(isempty(out))
+%    out = 0; 
+% end
+% 
+% save(sprintf('Output%d',out),'rebalanceQueue','output');
+% 
+% out = out + 1;
+
+save('Output','rebalanceQueue','output');
 
 % if(sum(FlowsOut(1,:,1)>0))
 %     save('InputOutputforMatt.mat','RoadNetwork','RebWeight','Passengers','Flags','rebalanceQueue','output');
