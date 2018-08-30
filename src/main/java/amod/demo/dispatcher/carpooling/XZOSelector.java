@@ -46,7 +46,7 @@ public class XZOSelector {
                 continue;
             }
             
-            for (int i = 0; i < controlLawDestination.size(); ++i) {
+            for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
                 double[] controlLawDestFrom = controlLawDestination.get(i);
                 
                 if(Arrays.stream(controlLawDestFrom).sum()==0) {

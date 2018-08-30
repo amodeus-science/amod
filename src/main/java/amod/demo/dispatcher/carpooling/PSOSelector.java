@@ -42,7 +42,7 @@ public class PSOSelector {
             }
 
             List<RoboTaxi> soTaxis = soRoboTaxi.get(position);
-            
+
             if (soTaxis.isEmpty()) {
                 continue;
             }
@@ -50,12 +50,14 @@ public class PSOSelector {
             List<List<AVRequest>> fromToRequestList = CarPooling2DispatcherUtils.getFromToAVRequests(virtualNetwork,
                     fromRequest, virtualNodeAVToRequests);
 
-            for (int i = 0; i < controlLawFirstDestination.size(); ++i) {
+            for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
                 int ind = i;
 
                 List<RoboTaxi> availableCars = soTaxis.stream()
-                        .filter(c -> virtualNetwork.getVirtualNode(c.getCurrentDriveDestination()).getIndex() == ind
+                        .filter(c -> (virtualNetwork.getVirtualNode(c.getCurrentDriveDestination()).getIndex() == ind
                                 && c.getMenu().getCourses().size() == 1)
+                                || (c.getMenu().getCourses().size() == 2 && virtualNetwork
+                                        .getVirtualNode(c.getMenu().getCourses().get(1).getLink()).getIndex() == ind))
                         .collect(Collectors.toList());
 
                 if (availableCars.isEmpty()) {
@@ -97,7 +99,7 @@ public class PSOSelector {
                     RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, availableCars);
                     availableCars.remove(closestRoboTaxi);
                     soRoboTaxi.get(position).remove(closestRoboTaxi);
-                    
+
                     Pair<RoboTaxi, AVRequest> pSOCommands = Pair.of(closestRoboTaxi, avRequest);
                     pSOCommandsList.add(pSOCommands);
                     removeElements.add(iteration);

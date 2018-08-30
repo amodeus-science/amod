@@ -37,16 +37,15 @@ public class XDOSelector {
             if (controlLawDestination.isEmpty()) {
                 continue;
             }
-            for (int i = 0; i < controlLawDestination.size(); ++i) {
+            for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
                 double[] controlLawDestFrom = controlLawDestination.get(i);
 
                 if (Arrays.stream(controlLawDestFrom).sum() == 0) {
                     continue;
                 }
 
-                List<RoboTaxi> availableCarsRedirect = soRoboTaxi.get(virtualNetwork.getVirtualNode(i));
+                List<RoboTaxi> availableCars = soRoboTaxi.get(virtualNetwork.getVirtualNode(i));
 
-                List<RoboTaxi> availableCars = availableCarsRedirect.stream().filter(cars -> cars.getMenu().getCourses().size()==1 && cars.getMenu().getCourses().get(0).getMealType()==SharedMealType.DROPOFF).collect(Collectors.toList());                
                 
                 if (availableCars.isEmpty()) {
                     continue;
@@ -73,8 +72,9 @@ public class XDOSelector {
                     VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
                     Set<Link> linkSet = toNode.getLinks();
                     List<Link> linkList = new ArrayList<Link>(linkSet);
-                    List<Link> linkListFiltered = linkList.stream().filter(link -> link!=null).collect(Collectors.toList());
-                    Link redirectLink = linkListFiltered.get(new Random().nextInt(linkListFiltered.size()-1));
+                    List<Link> linkListFiltered = linkList.stream().filter(link -> link != null)
+                            .collect(Collectors.toList());
+                    Link redirectLink = linkListFiltered.get(new Random().nextInt(linkListFiltered.size() - 1));
 
                     Pair<RoboTaxi, Link> xZOCommands = Pair.of(nextRoboTaxi, redirectLink);
                     xDOCommandsList.add(xZOCommands);

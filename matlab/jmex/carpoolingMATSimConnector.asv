@@ -74,36 +74,36 @@ Flags.ignorerealpax = 1 - use_outpax;
 
 RebWeight = 5.0;
 
-% flagTest = 0;
-% global deki1;
-% 
-% if(isempty(deki1))
-%     deki1 = 0;
-% end
-% 
-% cont = zeros(1,2);
-% contsec = zeros(1,2);
-% if(sum(sum(FlowsOut(:,:,1)))~=0 && deki1==0)
-%     [row,column] = find(FlowsOut(:,:,1));
-%     for(i=1:1:length(row))
-%         if(row(i) ~= column(i))
-%             cont = [column(i),row(i)];
-%             break
-%         end
-%             
-%     end
-%     
-%     for(i=1:1:length(row))
-%         if(row(i) ~= cont(2) && column(i)~=cont(1))
-%             contsec(1) = column(i);
-%             contsec(2) = row(i);
-%             break
-%         end
-%             
-%     end
-%     flagTest = 1;
-%     deki1 = 1;
-% end
+flagTest = 0;
+global deki1;
+
+if(isempty(deki1))
+    deki1 = 0;
+end
+
+cont = zeros(1,2);
+contsec = zeros(1,2);
+if(sum(sum(FlowsOut(:,:,1)))~=0 && deki1==0)
+    [row,column] = find(FlowsOut(:,:,1));
+    for(i=1:1:length(row))
+        if(row(i) ~= column(i))
+            cont = [column(i),row(i)];
+            break
+        end
+            
+    end
+    
+    for(i=1:1:length(row))
+        if(row(i) ~= cont(2) && column(i)~=cont(1))
+            contsec(1) = column(i);
+            contsec(2) = row(i);
+            break
+        end
+            
+    end
+    flagTest = 1;
+    deki1 = 1;
+end
 
 % global int;
 % if(isempty(int))
@@ -113,10 +113,10 @@ RebWeight = 5.0;
 % save(sprintf('Input%d',int),'RoadNetwork','RebWeight','Passengers','Flags');
 % int = int +1;
 
-save('Input','RoadNetwork','RebWeight','Passengers','Flags');
+% save('Input','RoadNetwork','RebWeight','Passengers','Flags');
 
 % Optimization!!!!!!!
-[rebalanceQueue, output] = amod_p_mpc_v8(RoadNetwork, RebWeight, Passengers, Flags);
+% [rebalanceQueue, output] = amod_p_mpc_v8(RoadNetwork, RebWeight, Passengers, Flags);
 
 % global out;
 % if(isempty(out))
@@ -127,40 +127,42 @@ save('Input','RoadNetwork','RebWeight','Passengers','Flags');
 % 
 % out = out + 1;
 
-save('Output','rebalanceQueue','output');
+% save('Output','rebalanceQueue','output');
 
-r = rebalanceQueue.r;
-x_zo = rebalanceQueue.x_zo;
-x_so = rebalanceQueue.x_so;
-p_zo = rebalanceQueue.p_zo;
-p_so = rebalanceQueue.p_so;
+% r = rebalanceQueue.r;
+% x_zo = rebalanceQueue.x_zo;
+% x_so = rebalanceQueue.x_so;
+% p_zo = rebalanceQueue.p_zo;
+% p_so = rebalanceQueue.p_so;
 
-% r = cell(numberNodes,1);
-% x_zo = cell(numberNodes,numberNodes);
-% x_so = cell(numberNodes,numberNodes);
-% p_zo = cell(numberNodes,numberNodes);
-% p_so = cell(numberNodes,numberNodes);
+r = cell(numberNodes,1);
+x_zo = cell(numberNodes,numberNodes);
+x_so = cell(numberNodes,numberNodes);
+p_zo = cell(numberNodes,numberNodes);
+p_so = cell(numberNodes,numberNodes);
 
-% if(flagTest == 1)
-%     x_zo{cont(1),cont(2)} = [0, 0, 0, contsec(2)];
-%     
-% end
-% 
-% global state;
-% global dest1;
-% global dest2;
-% 
-% if(contsec(2)~=0 && cont(1)~=0 && contsec(1)~=0)
-%     state = contsec(2);
-%     dest1 = cont(1);
-%     dest2 = contsec(1);
-% end
-% 
-% if(~isempty(state))
-%     if(state ~= 0 && dest1 ~= 0 && dest2~=0)
-%      x_so{2,3} = [0, 0, 0, 7];
-%     end
-% end
+if(flagTest == 1)
+    x_zo{cont(1),cont(2)} = [0, 0, 0, contsec(2)];
+    
+end
+
+global state;
+global dest1;
+global dest2;
+
+if(contsec(2)~=0 && cont(1)~=0 && contsec(1)~=0)
+    state = contsec(2);
+    dest1 = cont(1);
+    dest2 = contsec(1);
+end
+
+if(~isempty(state))
+    if(state ~= 0 && dest1 ~= 0 && dest2~=0)
+     x_so{state,state} = [0, 0, 0, dest2];
+    end
+end
+
+
 
 for i = 1:1:numberNodes
     if(isempty(r{i}) == true)

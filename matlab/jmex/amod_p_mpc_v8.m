@@ -1,4 +1,4 @@
-function [rebalanceQueue, output] = amod_p_mpc_v6(RoadNetwork, RebWeight, Passengers, Flags)
+function [rebalanceQueue, output] = amod_p_mpc_v8(RoadNetwork, RebWeight, Passengers, Flags)
 %{
 README:
     INPUTS:
@@ -81,16 +81,16 @@ find_served = @(i,j,t) (2*N+2)*N*N*T + (t-1)*N*N + (i-1)*N + j;
 
 % book-keeping for x
 x_zo_flow = @(s,i,j,t) (2*N+3)*N*N*T + (s-1)*N*N*T + (t-1)*N*N + (i-1)*N + j;
-x_do_flow = @(s,i,j,t) (3*N+3)*N*N*T + (s-1)*N*N*T + (t-1)*N*N + (i-1)*N + j;
+x_so_flow = @(s,i,j,t) (3*N+3)*N*N*T + (s-1)*N*N*T + (t-1)*N*N + (i-1)*N + j;
 
 % book-keeping for p
 p_zo_flow = @(i,j,k,t) (4*N+3)*N*N*T + (t-1)*N*N*N + (i-1)*N*N + (j-1)*N + k;
 p_so_flow = @(i,j,k,t) (5*N+3)*N*N*T + (t-1)*N*N*N + (i-1)*N*N + (j-1)*N + k;
-p_do_flow = @(i,j,k,t) (6*N+3)*N*N*T + (t-1)*N*N*N + (i-1)*N*N + (j-1)*N + k;
+%p_do_flow = @(i,j,k,t) (6*N+3)*N*N*T + (t-1)*N*N*N + (i-1)*N*N + (j-1)*N + k;
 
 % state size determined here
 
-statesize = (7*N + 3)*N*N*T;
+statesize = (6*N + 3)*N*N*T;
 
 if (dialogflag == 1)
     tic % measure time for preprocessing and building the problem 
@@ -103,7 +103,7 @@ f = zeros(statesize,1);
 for t=1:T
     for i=1:N
         for j=1:N
-            if (i == j) % to ensure that idle cars will stay instead of move (in case some travel times between different stations is 1)
+            if (i == j)
                 f(r_flow(i,j,t)) = 0.1*RebWeight*TravelTimes(i,j);
             else
                 f(r_flow(i,j,t)) = RebWeight*TravelTimes(i,j);
@@ -113,16 +113,8 @@ for t=1:T
             for s = 1:N
                 % only pay for the first leg of the trip because the flow
                 % type will change when the car drops off first cust. 
-                f(p_flow(i,j,s,t)) = CustomerTransitCost*TravelTimes(i,j);
-                if (i ~=j)
-                    f(x_flow(s,i,j,t)) = CustomerTransitCost*TravelTimes(i,j);
-                else
-                    f(x_flow(s,i,j,t)) = 0.9*CustomerTransitCost*TravelTimes(i,j); % make it easier to stay than to move.
-                    % This way, if the travel time is longer than the
-                    % planning horizon, then the car will not move,
-                    % allowing us to detect when the travel time is longer
-                    % than the planning horizon. 
-                end
+                f(p_flow(i,j,s,t)) = CustomerTransitCost*TravelTimes(i,j); 
+                f(x_flow(s,i,j,t)) = CustomerTransitCost*TravelTimes(i,j); 
             end
         end
     end
@@ -133,8 +125,8 @@ if (dialogflag == 1)
 end
 %% build equality constraints
 
-num_eq_constr =  N*T                + N*(N-1)*T         + N*(N-1)*T         + N*N*T             + N*N*N*T   + N*N*N*T   + N*N*T; % 
-num_eq_entries = N*T*(4*N + 2*N^2)  + N*(N-1)*T*(2*N)   + N*(N-1)*T*(3*N)   + N*N*T*(1 + 3*N)   + N*N*N*T*3 + N*N*N*T*4 + (N*N*T+ ceil(N*N*T*(T+1)*0.5));% 
+num_eq_constr =  N*(N-1)*T         + N*N*T             + N*N*N*T   + N*N*N*T   + N*N*T; % 
+num_eq_entries = N*(N-1)*T*(4*N)   + N*N*T*(2 + 2*N)   + N*N*N*T*3 + N*N*N*T*3 + (N*N*T+ ceil(N*N*T*(T+1)*0.5));% 
 
 num_eq_constr = num_eq_constr + N*T;
 num_eq_entries = num_eq_entries + N*T*(N + 2*N*N);
@@ -143,42 +135,6 @@ Aeqsparse = zeros(num_eq_entries, 3);
 Beq = zeros(num_eq_constr,1);
 Aeqrow = 0;
 Aeqentry = 0;
-
-% conservation of vehicles 
-for t=1:T
-    for i=1:N
-        % all cars coming into intersection i.         
-        Aeqrow = Aeqrow + 1;
-        for j=1:N
-            if (t > TravelTimes(j,i))
-                Aeqentry = Aeqentry + 1;
-                Aeqsparse(Aeqentry,:) = [Aeqrow, r_flow(j,i,t-TravelTimes(j,i)), -1];
-                for k=1:N
-                    Aeqentry = Aeqentry + 1;    
-                    Aeqsparse(Aeqentry,:) = [Aeqrow, x_flow(k,j,i,t-TravelTimes(j,i)), -1];
-                    Aeqentry = Aeqentry + 1;
-                    Aeqsparse(Aeqentry,:) = [Aeqrow, p_flow(j,i,k,t-TravelTimes(j,i)), -1];
-                end
-            end
-        end
-        % cars leaving the intersection
-        for j=1:N
-            Aeqentry = Aeqentry + 1;
-            Aeqsparse(Aeqentry,:) = [Aeqrow, r_flow(i,j,t), 1];
-            for k=1:N
-                Aeqentry = Aeqentry + 1;
-                Aeqsparse(Aeqentry,:) = [Aeqrow, x_flow(k,i,j,t), 1];
-                Aeqentry = Aeqentry + 1;
-                Aeqsparse(Aeqentry,:) = [Aeqrow, p_flow(i,j,k,t), 1];                
-            end
-        end
-        outflow = Starters.r_state(i,t);
-        for s=1:N
-            outflow = outflow + Starters.x_state(s,i,t);
-        end
-        Beq(Aeqrow) = outflow;
-    end
-end
 
 for t=1:T
     for i=1:N
@@ -205,7 +161,7 @@ for t=1:T
         Beq(Aeqrow) = Starters.r_state(i,t); % specify the influx of vehicles. t=1 is the initial condition.
     end
 end
-disp('Checkpoint 1')
+
 % single occupancy outflow equation
 for t=1:T
     for i=1:N
@@ -216,16 +172,20 @@ for t=1:T
                     if (t > TravelTimes(j,i))
                         Aeqentry = Aeqentry + 1;
                         Aeqsparse(Aeqentry,:) = [Aeqrow, x_flow(s,j,i,t-TravelTimes(j,i)), -1]; % count all single occupancy vehicles going to s passing through here. 
+                        Aeqentry = Aeqentry + 1;
+                        Aeqsparse(Aeqentry,:) = [Aeqrow, p_flow(j,i,s,t-TravelTimes(j,i)), -1]; % count double occupancy cars that will drop off a customer to be single occ.
                     end
+                    Aeqentry = Aeqentry + 1;
+                    Aeqsparse(Aeqentry,:) = [Aeqrow, x_so_flow(i,s,j,t), 1]; % cars leaving without picking up a customer.
                     Aeqentry = Aeqentry + 1;
                     Aeqsparse(Aeqentry,:) = [Aeqrow, p_so_flow(i,s,j,t), 1]; % how many of these cars will pick up another customer.                    
                 end
-                % Beq(Aeqrow) = Starters.x_state(s,i,t); % influx of cars. t=1 is the initial condition.  
-                Beq(Aeqrow) = 0; % updated in version 4.
+                Beq(Aeqrow) = Starters.x_state(s,i,t); % influx of cars. t=1 is the initial condition.  
             end
         end
     end
 end
+%{
 disp('Checkpoint 2')
 % double occupancy outflow equation
 for t=1:T
@@ -239,7 +199,7 @@ for t=1:T
                         Aeqsparse(Aeqentry,:) = [Aeqrow, p_flow(j,i,k,t - TravelTimes(j,i)), -1]; % count all double occupancy cars coming into node i.
                     end
                     Aeqentry = Aeqentry + 1;
-                    Aeqsparse(Aeqentry,:) = [Aeqrow, x_do_flow(k,i,j,t), 1]; % car will drop off a customer and move on.
+                    Aeqsparse(Aeqentry,:) = [Aeqrow, x_so_flow(k,i,j,t), 1]; % car will drop off a customer and move on.
                     Aeqentry = Aeqentry + 1;
                     Aeqsparse(Aeqentry,:) = [Aeqrow, p_do_flow(i,k,j,t), 1]; % car will drop off a customer and pick up one more.
                 end
@@ -250,7 +210,7 @@ for t=1:T
         end
     end
 end
-disp('Checkpoint 3')
+%}
 % dropped customer equation
 for t=1:T
     for i=1:N
@@ -267,20 +227,16 @@ for t=1:T
                 Aeqsparse(Aeqentry,:) = [Aeqrow, x_zo_flow(j,i,u,t), 1]; % cars carrying one customer, of the 1st kind. 
                 Aeqentry = Aeqentry + 1;
                 Aeqsparse(Aeqentry,:) = [Aeqrow, p_so_flow(i,u,j,t), 1]; % customers picked up in pairs.
-                Aeqentry = Aeqentry + 1;
-                Aeqsparse(Aeqentry,:) = [Aeqrow, p_do_flow(i,u,j,t), 1]; % customers picked up in pairs.
             end
         end
     end
 end
-disp('Checkpoint 4')
 
 % clear everything... this should make things work.
 Aeqsparse_part1 = Aeqsparse(1:Aeqentry,:);
 Aeqsparse = zeros(num_eq_entries, 3);
 Aeqentry = 0;
 
-disp('Checkpoint 5')
 % single occupancy components
 for t=1:T
     for i=1:N
@@ -292,12 +248,11 @@ for t=1:T
                 Aeqentry = Aeqentry + 1;
                 Aeqsparse(Aeqentry,:) = [Aeqrow, x_zo_flow(s,i,j,t), -1]; % total outbound singly occupied vehicles, 1st kind.
                 Aeqentry = Aeqentry + 1;
-                Aeqsparse(Aeqentry,:) = [Aeqrow, x_do_flow(s,i,j,t), -1]; % total outbound singly occupied vehicles, 2nd kind.
+                Aeqsparse(Aeqentry,:) = [Aeqrow, x_so_flow(s,i,j,t), -1]; % total outbound singly occupied vehicles, 2nd kind.
             end
         end
     end
 end
-disp('Checkpoint 6')
 
 % double occupancy components
 for t=1:T
@@ -311,8 +266,6 @@ for t=1:T
                 Aeqsparse(Aeqentry,:) = [Aeqrow, p_zo_flow(i,j,k,t), -1]; % first kind
                 Aeqentry = Aeqentry + 1;
                 Aeqsparse(Aeqentry,:) = [Aeqrow, p_so_flow(i,j,k,t), -1]; % second kind
-                Aeqentry = Aeqentry + 1;
-                Aeqsparse(Aeqentry,:) = [Aeqrow, p_do_flow(i,j,k,t), -1]; % third kind
             end
         end
     end
@@ -335,7 +288,6 @@ for t=1:T
     end
 end
 
-disp('done!')
 
 if (dialogflag == 1)
     fprintf('Equality constraints specified. %d constraints, %d expected. \n', Aeqrow, num_eq_constr)
@@ -365,9 +317,18 @@ end
 lb=zeros(statesize,1); %everything is non-negative
 ub=Inf*ones(statesize,1); %no constraints
 
-%%%%% Prune Inefficient trip types %%%%
-% If (distance(i,j) + distance(j,k))/distance(i,k) is too large, set max
-% capacity of that flow to zero. 
+for i=1:N
+    for j=1:N
+        for k=1:N
+            if (i==j)
+                for t=1:T
+                    ub(p_so_flow(i,j,k,t)) = 0;
+                    ub(x_so_flow(j,i,k,t)) = 0;
+                end
+            end
+        end
+    end
+end
 
 prune_counter = 0;
 for i=1:N
@@ -390,6 +351,7 @@ if (dialogflag == 1)
     effective_statesize = statesize - prune_counter;
     fprintf('Pruned %d flows. Effective state size is %d. \n', prune_counter, effective_statesize)
 end
+
 
 
 %% Setting variable types
@@ -464,33 +426,49 @@ disp('Exporting control action...')
 r = cell(N,1);
 for i=1:N
     for j=1:N
-        for k=1:round(cplex_out(r_flow(i,j,1)))
-            r{i} = [r{i} j];
+        if (i ~= j)
+            for k=1:round(cplex_out(r_flow(i,j,1)))
+                r{i} = [r{i} j];
+            end
         end
     end
 end
 rebalanceQueue.r = r;
 
 x_zo = cell(N,N); % format: first index is final destination, second index is current position. 
-x_do = cell(N,N);
+x_so = cell(N,N);
 for i=1:N
     for j=1:N
         for s=1:N
-            for k=1:round(cplex_out(x_zo_flow(s,i,j,1)))
-                x_zo{s,i} = [x_zo{s,i} j];
+            if (i ~= j) % controller asks the car to move to a different station
+                for k=1:round(cplex_out(x_zo_flow(s,i,j,1)))
+                    x_zo{s,i} = [x_zo{s,i} j];
+                end
+                for k=1:round(cplex_out(x_so_flow(s,i,j,1)))
+                    x_so{s,i} = [x_so{s,i} j];
+                end
+            else
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                 % if car does not move, override the command and send the car to the customer's destination.
+                 % this is because cars that cannot reach their
+                 % destinations within the time horizon will give up and do
+                 % nothing. We do not want to allow that to happen.
+                for k=1:round(cplex_out(x_zo_flow(s,i,j,1)))
+                    x_zo{s,i} = [x_zo{s,i} s];
+                end
+                for k=1:round(cplex_out(x_so_flow(s,i,j,1)))
+                    x_so{s,i} = [x_so{s,i} s];
+                end
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             end
-            for k=1:round(cplex_out(x_do_flow(s,i,j,1)))
-                x_do{s,i} = [x_do{s,i} j];
-            end        
         end
     end
 end
 rebalanceQueue.x_zo = x_zo;
-rebalanceQueue.x_do = x_do;
+rebalanceQueue.x_so = x_so;
 
 p_zo = cell(N,N); % format: first index is current location, second index is first destination. 
 p_so = cell(N,N);
-%p_do = cell(N,N);
 
 for i=1:N
     for j=1:N
@@ -500,15 +478,17 @@ for i=1:N
             end
             for kk=1:round(cplex_out(p_so_flow(i,j,k,1)))
                 p_so{i,j} = [p_so{i,j} k];
-            end
-            for kk=1:round(cplex_out(p_do_flow(i,j,k,1)))
-                % p_do{i,j} = [p_do{i,j} k];
-                p_so{i,j} = [p_so{i,j} k];
-            end        
+            end     
         end
     end
 end
 rebalanceQueue.p_zo = p_zo;
 rebalanceQueue.p_so = p_so;
-%rebalanceQueue.p_do = p_do;
 
+output.r_flow = r_flow;
+output.x_flow = x_flow;
+output.x_zo_flow = x_zo_flow;
+output.x_so_flow = x_so_flow;
+output.p_flow = p_flow;
+output.p_zo_flow = p_zo_flow;
+output.p_so_flow = p_so_flow;

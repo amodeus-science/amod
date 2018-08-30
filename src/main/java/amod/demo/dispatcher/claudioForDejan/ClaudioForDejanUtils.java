@@ -1,5 +1,9 @@
 package amod.demo.dispatcher.claudioForDejan;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EmptyStackException;
@@ -37,6 +41,33 @@ import ch.ethz.idsc.jmex.DoubleArray;
 
 public enum ClaudioForDejanUtils {
 ;
+    
+//    for (VirtualNode<Link> virtNode : virtualNetwork.getVirtualNodes()) {
+//        try {
+//            File file = new File("Station" + virtNode.getIndex() + ".csv");
+//            FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
+//            BufferedWriter br = new BufferedWriter(fileWriter);
+//            for (Link link : virtNode.getLinks()) {
+//                Coord coordNode = link.getCoord();
+//                Coord coordNodeWGS84 = UserReferenceFrames.SANFRANCISCO.coords_toWGS84().transform(coordNode);
+//                double[] location = new double[2];
+//                location[0] = coordNodeWGS84.getY();
+//                location[1] = coordNodeWGS84.getX();
+//
+//                // Create a CSV file of the two lists
+//                
+//                br.write(String.valueOf(location[0]) + "," + String.valueOf(location[1]));
+//                br.newLine();
+//                
+//
+//            }
+//            br.close();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
     
     public static Container getContainerInit(){
         

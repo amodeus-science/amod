@@ -112,14 +112,13 @@ public enum CarPooling2DispatcherUtils {
             List<RoboTaxi> stayCarsAtNode = stayRoboTaxi.get(node);
             List<RoboTaxi> rebalanceCarsAtNode = rebalanceRoboTaxi.get(node);
             List<RoboTaxi> soCarsAtNode = soRoboTaxi.stream()
-                    .filter(car -> (car.getMenu().getCourses().size() == 2
-                            && car.getMenu().getStarterCourse().getMealType() == SharedMealType.REDIRECT
-                            && node.getLinks().contains(car.getMenu().getCourses().get(1).getLink()))
-                            || (car.getMenu().getCourses().size() == 1 && node.getLinks().contains(car.getMenu().getCourses().get(0).getLink())))
+                    .filter(car -> car.getMenu().getCourses().size() == 1
+                            && node.getLinks().contains(car.getMenu().getCourses().get(0).getLink()))
                     .collect(Collectors.toList());
 
             List<RoboTaxi> doFiltered = doRoboTaxi.stream()
                     .filter(car -> car.getMenu().getCourses().size() == 2
+                            && node.getLinks().contains(car.getMenu().getCourses().get(0).getLink())
                             && node.getLinks().contains(car.getMenu().getCourses().get(1).getLink()))
                     .collect(Collectors.toList());
 
@@ -169,28 +168,30 @@ public enum CarPooling2DispatcherUtils {
 
         List<double[][]> xState = new ArrayList<>(NumberNodes);
 
-        for (VirtualNode<Link> destNodeSecond : virtualNetwork.getVirtualNodes()) {
+        for (VirtualNode<Link> destination : virtualNetwork.getVirtualNodes()) {
             double[][] TotalAvailableCars = new double[planningHorizon][NumberNodes];
             int numberSO;
             int numberDO;
 
-            for (VirtualNode<Link> destNodeFirst : virtualNetwork.getVirtualNodes()) {
-                List<RoboTaxi> soCarsAtNodeNonfiltered = soRoboTaxi.get(destNodeFirst);
+            for (VirtualNode<Link> position : virtualNetwork.getVirtualNodes()) {
+                List<RoboTaxi> soCarsAtNodeNonfiltered = soRoboTaxi.get(position);
                 List<RoboTaxi> soCarsAtNode = soCarsAtNodeNonfiltered.stream()
-                        .filter(cars -> destNodeSecond.getLinks().contains(cars.getCurrentDriveDestination()))
+                        .filter(cars -> destination.getLinks().contains(cars.getMenu().getCourses().get(1).getLink()))
                         .collect(Collectors.toList());
-                List<RoboTaxi> doCarsAtNode = doRoboTaxi.get(destNodeFirst);
+                List<RoboTaxi> doCarsAtNode = doRoboTaxi.get(position);
                 List<RoboTaxi> doFiltered = doCarsAtNode.stream()
-                        .filter(car -> destNodeSecond.getLinks().contains(car.getMenu().getCourses().get(1).getLink()))
+                        .filter(car -> destination.getLinks().contains(car.getMenu().getCourses().get(1).getLink())
+                                && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) != virtualNetwork
+                                        .getVirtualNode(car.getMenu().getCourses().get(1).getLink()))
                         .collect(Collectors.toList());
-
-                if (soCarsAtNode.isEmpty() == true) {
-                    numberSO = 0;
-                } else {
-                    numberSO = soCarsAtNode.size();
-                }
 
                 for (int t = 0; t < planningHorizon; t++) {
+
+                    if (soCarsAtNode.isEmpty() == true) {
+                        numberSO = 0;
+                    } else {
+                        numberSO = getNumberOfArrivingCars(time, t, timeStep, soCarsAtNode, router);
+                    }
 
                     if (doFiltered.isEmpty() == true) {
                         numberDO = 0;
@@ -198,16 +199,12 @@ public enum CarPooling2DispatcherUtils {
                         numberDO = getNumberOfArrivingCarsXstate(time, t, timeStep, doFiltered, router);
                     }
 
-                    if (t == 0) {
-                        TotalAvailableCars[t][destNodeFirst.getIndex()] = numberSO + numberDO;
-                    } else {
-                        TotalAvailableCars[t][destNodeFirst.getIndex()] = numberDO;
-                    }
+                    TotalAvailableCars[t][position.getIndex()] = numberSO + numberDO;
 
                 }
 
             }
-            xState.add(destNodeSecond.getIndex(), TotalAvailableCars);
+            xState.add(destination.getIndex(), TotalAvailableCars);
         }
 
         return xState;
@@ -270,7 +267,6 @@ public enum CarPooling2DispatcherUtils {
 
     }
 
-
     private static int getNumberOfArrivingCars(double Time, int t, int timeStep, List<RoboTaxi> roboTaxiList,
             AVRouter router) {
 
@@ -286,12 +282,12 @@ public enum CarPooling2DispatcherUtils {
 
                 if (roboTaxi.getCurrentNumberOfCustomersOnBoard() == 1) {
                     Scalar arrivalTimeSO;
-                    if(roboTaxi.getMenu().getCourses().size()>1) {
-                        arrivalTimeSO = arrivals.get(roboTaxi.getMenu().getCourses().get(1).getRequestId());
+                    if (roboTaxi.getMenu().getCourses().size() > 1) {
+                        arrivalTimeSO = arrivals.get(roboTaxi.getMenu().getCourses().get(0).getRequestId());
                     } else {
                         arrivalTimeSO = arrivals.get(roboTaxi.getMenu().getStarterCourse().getRequestId());
                     }
-                    
+
                     if (arrivalTimeSO.number().doubleValue() > Time + t * timeStep * 60
                             && arrivalTimeSO.number().doubleValue() <= Time + (t + 1) * timeStep * 60) {
                         numberCars = numberCars + 1;
@@ -311,7 +307,7 @@ public enum CarPooling2DispatcherUtils {
 
         return numberCars;
     }
-    
+
     private static int getNumberOfArrivingCarsXstate(double Time, int t, int timeStep, List<RoboTaxi> roboTaxiList,
             AVRouter router) {
 
