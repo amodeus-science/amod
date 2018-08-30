@@ -44,7 +44,15 @@ public enum AidoHost {
             String scenarioTag = config.Get(0).toString();
 
             /** download the chosen scenario */
-            AidoScenarioDownload.download(scenarioTag);
+            try {
+                AidoScenarioDownload.download(scenarioTag);
+            } catch (Exception exception) {
+                /** send empty tensor "{}" to stop */
+                stringSocket.writeln(Tensors.empty());
+                /** send fictitious costs */
+                stringSocket.writeln("{-Infinity, -Infinity, -Infinity}");
+                throw exception;
+            }
 
             /** setup environment variables */
             StaticHelper.setup();

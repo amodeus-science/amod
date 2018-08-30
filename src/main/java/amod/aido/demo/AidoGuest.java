@@ -54,7 +54,8 @@ public class AidoGuest {
 
             /** receive information on chosen scenario, i.e., bouding box and number of
              * requests, the city grid is inside the WGS:84 coordinates bounded by the
-             * box bottomLeft, topRight */
+             * box bottomLeft, topRight,
+             * {{longitude min, latitude min}, {longitude max, latitude max}} */
             Tensor scenarioInfo = Tensors.fromString(stringSocket.readLine());
             Scalar numReq = (Scalar) scenarioInfo.get(0);
             Tensor bbox = scenarioInfo.get(1);
