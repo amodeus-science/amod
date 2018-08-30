@@ -11,7 +11,7 @@ public class AidoGuestTest extends TestCase {
     public void testSimple() {
         Tensor config = Tensors.of( //
                 StringScalar.of(AidoGuest.SCENARIO), // scenario name
-                RealScalar.of(AidoGuest.POPULATION_RATIO), // ratio of population
+                RealScalar.of(AidoGuest.REQUEST_NUMBER_DESIRED), // ratio of population
                 RealScalar.of(AidoGuest.NUMBER_OF_VEHICLES)); // number of vehicles
         assertEquals(config.toString().indexOf('\"'), -1);
     }

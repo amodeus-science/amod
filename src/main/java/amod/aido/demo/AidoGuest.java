@@ -7,8 +7,11 @@ import java.net.UnknownHostException;
 import java.util.Objects;
 
 import amod.aido.AidoHost;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.io.StringScalar;
@@ -20,16 +23,16 @@ import ch.ethz.idsc.tensor.io.StringScalar;
 public class AidoGuest {
 
     /** default values for demo */
-    static final String SCENARIO = "Santiago";
-    static final double POPULATION_RATIO = 0.4;
-    static final int NUMBER_OF_VEHICLES = 177;
+    static final String SCENARIO = "SanFrancisco.20080518";
+    static final int REQUEST_NUMBER_DESIRED = 500;
+    static final int NUMBER_OF_VEHICLES = 20;
     private static final int PRINT_SCORE_PERIOD = 200;
 
     /** @param args 1 entry which is IP address
      * @throws Exception */
     public static void main(String[] args) throws Exception {
         AidoGuest aidoGuest = new AidoGuest(args.length == 0 ? "localhost" : args[0]);
-        aidoGuest.run(SCENARIO, POPULATION_RATIO, NUMBER_OF_VEHICLES);
+        aidoGuest.run(SCENARIO, REQUEST_NUMBER_DESIRED, NUMBER_OF_VEHICLES);
     }
 
     // ---
@@ -40,26 +43,37 @@ public class AidoGuest {
         this.ip = ip;
     }
 
-    public void run(String scenario, double populationRatio, int numberOfVehicles) throws UnknownHostException, IOException, Exception {
+    public void run(String scenario, int requestsDesired, int numberOfVehicles) throws UnknownHostException, IOException, Exception {
         /** connect to AidoGuest */
         try (StringSocket stringSocket = new StringSocket(new Socket(ip, AidoHost.PORT))) {
 
-            /** send initial command, e.g., {SanFrancisco, 0.4, 177} */
-            Tensor config = Tensors.of( //
-                    StringScalar.of(scenario), /** scenario name */
-                    RealScalar.of(populationRatio), /** ratio of population */
-                    RealScalar.of(numberOfVehicles)); /** number of vehicles */
+            /** send initial command, e.g., {SanFrancisco} */
+            /** , 0.4, 177} */
+            Tensor config = Tensors.of(StringScalar.of(scenario)); /** scenario name */
             stringSocket.writeln(config);
 
+            /** receive information on chosen scenario, i.e., bouding box and number of
+             * requests, the city grid is inside the WGS:84 coordinates bounded by the
+             * box bottomLeft, topRight */
+            Tensor scenarioInfo = Tensors.fromString(stringSocket.readLine());
+            Scalar numReq = (Scalar) scenarioInfo.get(0);
+            Tensor bbox = scenarioInfo.get(1);
+            Tensor bottomLeft = bbox.get(0);
+            Tensor topRight = bbox.get(1);
+            Scalar nominalFleetSize = (Scalar) scenarioInfo.get(2);
+
+            /** chose number of Requests and fleet size */
+            Scalar numReqDes = RealScalar.of(requestsDesired);
+            GlobalAssert.that(Scalars.lessEquals(numReqDes, numReq));
+            Scalar numRoboTaxi = RealScalar.of(numberOfVehicles);
+
+            System.out.println("Nominal fleet size: " + nominalFleetSize);
+            System.out.println("Chosen fleet size:  " + numRoboTaxi);
+
+            Tensor configSize = Tensors.of(numReqDes, numRoboTaxi);
+            stringSocket.writeln(configSize);
+
             final DispatchingLogic dispatchingLogic;
-
-            /** receive initial information */
-            Tensor initialInfo = Tensors.fromString(stringSocket.readLine());
-
-            /** the city grid is inside the WGS:84 coordinates bounded by the box
-             * bottomLeft, topRight */
-            Tensor bottomLeft = initialInfo.get(0);
-            Tensor topRight = initialInfo.get(1);
 
             /** receive dispatching status and send dispatching command */
             dispatchingLogic = new DispatchingLogic(bottomLeft, topRight);
@@ -85,9 +99,10 @@ public class AidoGuest {
             }
 
             /** recieve final performance score/stats */
-            Tensor finalInfo = Tensors.fromString(stringSocket.readLine());
-            // TODO Claudio decode numbers in finalInfo and print with interpretation
-            System.out.println("finalInfo: " + finalInfo);
+            Tensor finalScores = Tensors.fromString(stringSocket.readLine());
+            System.out.println("final service quality score:  " + finalScores.Get(1));
+            System.out.println("final efficiency score:       " + finalScores.Get(2));
+            System.out.println("final fleet size score:       " + finalScores.Get(3));
 
         } // <- closing string socket
     }

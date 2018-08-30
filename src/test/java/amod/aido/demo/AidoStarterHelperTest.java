@@ -41,16 +41,16 @@ public class AidoStarterHelperTest extends TestCase {
         for (int index : list)
             switch (index) {
             case 0:
-                guest().run("TelAviv", 0.001, 6);
+                guest().run("TelAviv", 5000, 6);
                 break;
             case 1:
-                guest().run("Santiago", 0.001, 10);
+                guest().run("Santiago", 5000, 10);
                 break;
             case 2:
-                guest().run("Berlin", 0.002, 10);
+                guest().run("Berlin", 5000, 10);
                 break;
             case 3:
-                guest().run("SanFrancisco", 0.01, 5);
+                guest().run("SanFrancisco", 5000, 5);
                 break;
             default:
                 throw new RuntimeException("out of range");
