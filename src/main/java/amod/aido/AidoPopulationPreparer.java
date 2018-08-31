@@ -28,8 +28,7 @@ public enum AidoPopulationPreparer {
         populationCutter.cut(population, network, config);
 
         /** apocalypse reduces the number of requests */
-        TheRequestApocalypse.reducesThe(population).toNoMoreThan(RationalScalar.of(numReqDes,1), seed);
-        System.out.println("Population after decimation:" + population.getPersons().values().size());
+        TheRequestApocalypse.reducesThe(population).toNoMoreThan(RationalScalar.of(numReqDes, 1), seed);
         GlobalAssert.that(0 < population.getPersons().size());
         GlobalAssert.that(LegCount.of(population, "av").number().intValue() == numReqDes);
 
