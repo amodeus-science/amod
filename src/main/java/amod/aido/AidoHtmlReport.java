@@ -54,17 +54,15 @@ import ch.ethz.idsc.tensor.red.Total;
             aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE_INTG + ".png", 800, 600);
             aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE3_INTG + ".png", 800, 600);
 
-            aRElement.getHTMLGenerator()
-                    .insertTextLeft(aRElement.getHTMLGenerator().bold("Final Scores") + //
-                            "\n\t" + "final service quality score:" + //
-                            "\n\t" + "final efficiency score:" + //
-                            "\n\t" + "final fleet size score:" //
+            aRElement.getHTMLGenerator().insertTextLeft(aRElement.getHTMLGenerator().bold("Final Scores") + //
+                    "\n\t" + "final service quality score:" + //
+                    "\n\t" + "final efficiency score:" + //
+                    "\n\t" + "final fleet size score:" //
             );
-            aRElement.getHTMLGenerator()
-                    .insertTextLeft(" " + //
-                            "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(1)) + //
-                            "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(2)) + //
-                            "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(3)) //
+            aRElement.getHTMLGenerator().insertTextLeft(" " + //
+                    "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(1)) + //
+                    "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(2)) + //
+                    "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(3)) //
             );
             aRElement.getHTMLGenerator().newLine();
 

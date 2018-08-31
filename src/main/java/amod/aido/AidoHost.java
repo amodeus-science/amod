@@ -5,7 +5,6 @@ import java.io.File;
 import java.util.Properties;
 
 import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
-import ch.ethz.idsc.amodeus.aido.AidoScenarioDownload;
 import ch.ethz.idsc.amodeus.aido.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
@@ -46,7 +45,7 @@ public enum AidoHost {
 
             /** download the chosen scenario */
             try {
-                AidoScenarioDownload.download(scenarioTag);
+                AidoScenarioDownload2.download(scenarioTag);
             } catch (Exception exception) {
                 /** send empty tensor "{}" to stop */
                 stringSocket.writeln(Tensors.empty());
