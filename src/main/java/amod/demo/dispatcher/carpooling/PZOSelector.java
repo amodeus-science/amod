@@ -131,5 +131,9 @@ public class PZOSelector {
 
         return pZOCommandsList;
     }
+    
+    List<List<double[]>> getControlLawPZO(){
+        return controlLaw;   
+    }
 
 }

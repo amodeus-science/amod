@@ -130,5 +130,9 @@ public class XZOSelector {
         
         return xZOCommandsList;
     }
+    
+    List<List<double[]>> getControlLawXZO(){
+        return controlLaw;   
+    }
 
 }

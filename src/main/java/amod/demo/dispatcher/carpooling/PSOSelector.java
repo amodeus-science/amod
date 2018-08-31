@@ -124,5 +124,9 @@ public class PSOSelector {
 
         return pSOCommandsList;
     }
+    
+    List<List<double[]>> getControlLawPSO(){
+        return controlLaw;   
+    }
 
 }
