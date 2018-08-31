@@ -64,6 +64,6 @@ public class AidoStarterHelperTest extends TestCase {
         /** virtual network folder */
         FileDelete.of(new File("virtualNetwork"), 1, 4);
         /** output folder */
-        FileDelete.of(new File("output"), 5, 10999);
+        FileDelete.of(new File("output"), 5, 25000);
     }
 }
