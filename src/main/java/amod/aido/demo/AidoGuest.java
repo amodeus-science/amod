@@ -51,21 +51,20 @@ public class AidoGuest {
                     RealScalar.of(numberOfVehicles)); /** number of vehicles */
             stringSocket.writeln(config);
 
-            final DispatchingLogic dispatchingLogic;
-
-            /** receive initial information */
+            /** receive initial information about the coordinate system
+             * {{longitude min, latitude min}, {longitude max, latitude max}} */
             Tensor initialInfo = Tensors.fromString(stringSocket.readLine());
 
             /** the city grid is inside the WGS:84 coordinates bounded by the box
              * bottomLeft, topRight */
-            Tensor bottomLeft = initialInfo.get(0);
-            Tensor topRight = initialInfo.get(1);
+            Tensor bottomLeft = initialInfo.get(0); // e.g. {-71.38020297181387, -33.869660953686626}
+            Tensor topRight = initialInfo.get(1); // e.g. {-70.44406349551404, -33.0303523690584}
 
-            /** receive dispatching status and send dispatching command */
-            dispatchingLogic = new DispatchingLogic(bottomLeft, topRight);
+            DispatchingLogic dispatchingLogic = new DispatchingLogic(bottomLeft, topRight);
 
             int count = 0;
             while (true) {
+                /** receive dispatching status */
                 String string = stringSocket.readLine();
                 if (Objects.nonNull(string)) { // when the server closed prematurely
                     Tensor status = Tensors.fromString(string);
@@ -76,6 +75,7 @@ public class AidoGuest {
                     if (++count % PRINT_SCORE_PERIOD == 0)
                         System.out.println("score = " + score + " at " + status.Get(0));
 
+                    /** send dispatching command */
                     Tensor command = dispatchingLogic.of(status);
                     stringSocket.writeln(command);
                 } else {

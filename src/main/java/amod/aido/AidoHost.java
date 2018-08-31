@@ -38,7 +38,15 @@ public enum AidoHost {
             int fleetSize = config.Get(2).number().intValue();
 
             /** download the chosen scenario */
-            AidoScenarioDownload.download(scenarioTag);
+            try {
+                AidoScenarioDownload.download(scenarioTag);
+            } catch (Exception exception) {
+                /** send empty tensor "{}" to stop */
+                stringSocket.writeln(Tensors.empty());
+                /** send fictitious costs */
+                stringSocket.writeln("{-Infinity, -Infinity, -Infinity}");
+                throw exception;
+            }
 
             /** setup environment variables */
             StaticHelper.setup();
