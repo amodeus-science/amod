@@ -5,13 +5,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-import amod.aido.util.ContentType;
-import amod.aido.util.HttpDownloader;
-import amod.aido.util.Unzip;
+import ch.ethz.idsc.amodeus.aido.util.ContentType;
+import ch.ethz.idsc.amodeus.aido.util.HttpDownloader;
+import ch.ethz.idsc.amodeus.aido.util.Unzip;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.tensor.io.ResourceData;
 
-/* package */ enum AidoScenarioDownload {
+public enum AidoScenarioDownload2 {
     ;
 
     /** @param key for instance "SanFrancisco"
