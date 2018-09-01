@@ -101,7 +101,7 @@ public class PZOSelector {
 
                     List<AVRequest> fromToSecondRequests = fromToRequestList.get(indexNode);
 
-                    AVRequest avRequestSecond = fromToSecondRequests.get(0);
+                    AVRequest avRequestSecond = StaticHelperCarPooling.findClostestRequestfromRequest(avRequestFirst, fromToSecondRequests);
                     fromToSecondRequests.remove(avRequestSecond);
                     fromToRequestList.set(indexNode, fromToSecondRequests);
                     virtualNodeAVFromRequests.get(position).remove(avRequestSecond);

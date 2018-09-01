@@ -548,7 +548,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
 			}
 
 		}
-
+		
 	}
 
 	private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayRoboTaxi() {
