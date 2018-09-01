@@ -278,27 +278,27 @@ public enum CarPooling2DispatcherUtils {
                         && arrivalTimeReb.number().doubleValue() <= Time + (t + 1) * timeStep * 60) {
                     numberCars = numberCars + 1;
                 }
-
-                if (roboTaxi.getCurrentNumberOfCustomersOnBoard() == 1) {
-                    Scalar arrivalTimeSO;
-                    if (roboTaxi.getMenu().getCourses().size() > 1) {
-                        arrivalTimeSO = arrivals.get(roboTaxi.getMenu().getCourses().get(0).getRequestId());
-                    } else {
-                        arrivalTimeSO = arrivals.get(roboTaxi.getMenu().getStarterCourse().getRequestId());
-                    }
-
-                    if (arrivalTimeSO.number().doubleValue() > Time + t * timeStep * 60
-                            && arrivalTimeSO.number().doubleValue() <= Time + (t + 1) * timeStep * 60) {
-                        numberCars = numberCars + 1;
-                    }
+            }
+            
+            if (roboTaxi.getCurrentNumberOfCustomersOnBoard() == 1) {
+                Scalar arrivalTimeSO;
+                if (roboTaxi.getMenu().getCourses().size() > 1) {
+                    arrivalTimeSO = arrivals.get(roboTaxi.getMenu().getCourses().get(0).getRequestId());
+                } else {
+                    arrivalTimeSO = arrivals.get(roboTaxi.getMenu().getStarterCourse().getRequestId());
                 }
 
-                if (roboTaxi.getCurrentNumberOfCustomersOnBoard() == 2) {
-                    Scalar arrivalTimeDO = arrivals.get(roboTaxi.getMenu().getCourses().get(1).getRequestId());
-                    if (arrivalTimeDO.number().doubleValue() > Time + t * timeStep * 60
-                            && arrivalTimeDO.number().doubleValue() <= Time + (t + 1) * timeStep * 60) {
-                        numberCars = numberCars + 1;
-                    }
+                if (arrivalTimeSO.number().doubleValue() > Time + t * timeStep * 60
+                        && arrivalTimeSO.number().doubleValue() <= Time + (t + 1) * timeStep * 60) {
+                    numberCars = numberCars + 1;
+                }
+            }
+
+            if (roboTaxi.getCurrentNumberOfCustomersOnBoard() == 2) {
+                Scalar arrivalTimeDO = arrivals.get(roboTaxi.getMenu().getCourses().get(1).getRequestId());
+                if (arrivalTimeDO.number().doubleValue() > Time + t * timeStep * 60
+                        && arrivalTimeDO.number().doubleValue() <= Time + (t + 1) * timeStep * 60) {
+                    numberCars = numberCars + 1;
                 }
             }
 
