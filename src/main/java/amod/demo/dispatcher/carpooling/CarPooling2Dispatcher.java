@@ -491,54 +491,54 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
         }
 
         // Assign unassigned requests
-        if (round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
-                && round_now < (dispatchTime + timeStep * 60)) {
-            for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
-                for (VirtualNode<Link> toNode : virtualNetwork.getVirtualNodes()) {
-                    List<List<double[]>> controlLawXZO = xZOSelector.getControlLawXZO();
-                    List<List<double[]>> controlLawPZO = pZOSelector.getControlLawPZO();
-                    List<List<double[]>> controlLawPSO = pSOSelector.getControlLawPSO();
-                    double[] xZOqueueFromTo = controlLawXZO.get(toNode.getIndex()).get(fromNode.getIndex());
-                    double[] pZOqueueFromTo = controlLawPZO.get(fromNode.getIndex()).get(toNode.getIndex());
-                    List<double[]> pSOqueueFrom = controlLawPSO.get(fromNode.getIndex());
-                    @SuppressWarnings("static-access")
-                    List<double[]> presence = pSOqueueFrom.stream()
-                            .filter(q -> Arrays.stream(q).findAny().of((toNode.getIndex() + 1)).isPresent() == true)
-                            .collect(Collectors.toList());
-
-                    if (Arrays.stream(xZOqueueFromTo).sum() == 0 && Arrays.stream(pZOqueueFromTo).sum() == 0
-                            && presence.isEmpty()) {
-                        Map<VirtualNode<Link>, List<RoboTaxi>> freeCarsMap = getVirtualNodeStayWithoutCustomerOrRebalanceRoboTaxi();
-                        List<RoboTaxi> freeCarsAt = freeCarsMap.get(fromNode);
-                        List<AVRequest> fromRequests = getVirtualNodeFromAVRequest().get(fromNode);
-                        List<AVRequest> toRequests = getVirtualNodeToAVRequest().get(toNode);
-                        List<AVRequest> fromToRequests = fromRequests.stream().filter(req -> toRequests.contains(req))
-                                .collect(Collectors.toList());
-                        if (!freeCarsAt.isEmpty() && !fromToRequests.isEmpty()) {
-                            for (AVRequest avRequest : fromToRequests) {
-                                RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest,
-                                        freeCarsAt);
-                                if (!closestRoboTaxi.getMenu().getCourses().isEmpty()
-                                        && closestRoboTaxi.getMenu().getCourses().size() == 1
-                                        && closestRoboTaxi.getMenu().getCourses().get(0)
-                                                .getMealType() == SharedMealType.REDIRECT) {
-                                    closestRoboTaxi.getMenu().clearWholeMenu();
-                                }
-                                addSharedRoboTaxiPickup(closestRoboTaxi, avRequest);
-                                freeCarsAt.remove(closestRoboTaxi);
-                                freeCarsMap.get(fromNode).remove(closestRoboTaxi);
-                                if(freeCarsAt.isEmpty()) {
-                                    break;
-                                }
-                            }
-
-                        }
-                    }
-
-                }
-            }
-
-        }
+//        if (round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
+//                && round_now < (dispatchTime + timeStep * 60)) {
+//            for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
+//                for (VirtualNode<Link> toNode : virtualNetwork.getVirtualNodes()) {
+//                    List<List<double[]>> controlLawXZO = xZOSelector.getControlLawXZO();
+//                    List<List<double[]>> controlLawPZO = pZOSelector.getControlLawPZO();
+//                    List<List<double[]>> controlLawPSO = pSOSelector.getControlLawPSO();
+//                    double[] xZOqueueFromTo = controlLawXZO.get(toNode.getIndex()).get(fromNode.getIndex());
+//                    double[] pZOqueueFromTo = controlLawPZO.get(fromNode.getIndex()).get(toNode.getIndex());
+//                    List<double[]> pSOqueueFrom = controlLawPSO.get(fromNode.getIndex());
+//                    @SuppressWarnings("static-access")
+//                    List<double[]> presence = pSOqueueFrom.stream()
+//                            .filter(q -> Arrays.stream(q).findAny().of((toNode.getIndex() + 1)).isPresent() == true)
+//                            .collect(Collectors.toList());
+//
+//                    if (Arrays.stream(xZOqueueFromTo).sum() == 0 && Arrays.stream(pZOqueueFromTo).sum() == 0
+//                            && presence.isEmpty()) {
+//                        Map<VirtualNode<Link>, List<RoboTaxi>> freeCarsMap = getVirtualNodeStayWithoutCustomerOrRebalanceRoboTaxi();
+//                        List<RoboTaxi> freeCarsAt = freeCarsMap.get(fromNode);
+//                        List<AVRequest> fromRequests = getVirtualNodeFromAVRequest().get(fromNode);
+//                        List<AVRequest> toRequests = getVirtualNodeToAVRequest().get(toNode);
+//                        List<AVRequest> fromToRequests = fromRequests.stream().filter(req -> toRequests.contains(req))
+//                                .collect(Collectors.toList());
+//                        if (!freeCarsAt.isEmpty() && !fromToRequests.isEmpty()) {
+//                            for (AVRequest avRequest : fromToRequests) {
+//                                RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest,
+//                                        freeCarsAt);
+//                                if (!closestRoboTaxi.getMenu().getCourses().isEmpty()
+//                                        && closestRoboTaxi.getMenu().getCourses().size() == 1
+//                                        && closestRoboTaxi.getMenu().getCourses().get(0)
+//                                                .getMealType() == SharedMealType.REDIRECT) {
+//                                    closestRoboTaxi.getMenu().clearWholeMenu();
+//                                }
+//                                addSharedRoboTaxiPickup(closestRoboTaxi, avRequest);
+//                                freeCarsAt.remove(closestRoboTaxi);
+//                                freeCarsMap.get(fromNode).remove(closestRoboTaxi);
+//                                if(freeCarsAt.isEmpty()) {
+//                                    break;
+//                                }
+//                            }
+//
+//                        }
+//                    }
+//
+//                }
+//            }
+//
+//        }
 
     }
 
