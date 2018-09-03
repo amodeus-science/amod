@@ -1,6 +1,8 @@
 # AIDO client protocol
 
-This file outlines the communication protocol for the Artificial Intelligence Driving Olympics (=AIDO) fleet level competition, for assistance please contact [mailto] (clruch@idsc.mavt.ethz.ch)
+This file outlines the communication protocol for the Artificial Intelligence Driving Olympics (=AIDO) autonomous mobility-on-demand competition, for assistance please contact [mailto] (clruch@idsc.mavt.ethz.ch)
+
+Documentation on the AIDO mobility-on-demand competition can be found [here](https://www.duckietown.org/research/ai-driving-olympics/ai-do-rules), [here](http://docs.duckietown.org/AIDO/out/amod.html) and [here](http://docs.duckietown.org/AIDO/out/performance.html).
 
 The communication is text based.
 
@@ -22,25 +24,20 @@ The server requires information about which scenario to run. The range of option
 
     {SanFrancisco.20080518}
 
-The line encodes the name of the scenario `SanFrancisco.20080518`.
+The line encodes the name of the scenario `SanFrancisco.20080518`, valid scenarios names include also `TelAviv`, `Santiago`, `Berlin`.
 
-Valid scenarios names include also, `TelAviv`, `Santiago`, `Berlin`.
-
-
-, the population size ratio `0.4`, and the number of vehicles `180`.
-The size ratio should be between `0` and `1`.
-The value `1` corresponds to the full scenario.
 
 ### Server -> Client
 
-The server replies with the bounding box of the scenario coordinates.
-The city grid is inside the WGS:84 coordinates bounded by the box
+The server replies with the total number of requests in the scenario, bounding box of the scenario coordinates and the nominal fleet size.
 
-    {{-71.38020297181387, -33.869660953686626}, {-70.44406349551404, -33.0303523690584}}
+    {190788,{{-71.38020297181387, -33.869660953686626}, {-70.44406349551404, -33.0303523690584}},700}
 
 The interpretation is
 
-    {{longitude min, latitude min}, {longitude max, latitude max}}
+    {number of requests,{{longitude min, latitude min}, {longitude max, latitude max}}, nominal fleet size}
+
+The coordinates of the bouding box are denoted in the WGS:84 coordinate system.
 
 ## Main loop
 
