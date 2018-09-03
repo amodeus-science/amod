@@ -37,6 +37,19 @@ The interpretation is
 
 The coordinates of the bouding box are denoted in the WGS:84 coordinate system.
 
+### Client -> Server
+
+The client then responds by chosing the desired number of requests and the desired fleet size, for instance
+
+    {10000,277}
+
+
+The interpretation is
+
+    {desired number of requests, desired fleet size}
+
+The desired number of requests must be a positive integer. If it is larger than the total requests in the chosen scenario, the total requests in the chosen scenario are used in the simulation. The desired fleet size can be any positive integer.
+
 ## Main loop
 
 ### Server -> Client
@@ -87,7 +100,7 @@ The `submission time` is a numeric value less than `simulation time`.
 
 The variable `REWARDS` is a list that contains the gains accumulated in different categories since the previous simulation step.
 
-	{service reward, efficiency reward, THIRD_REWARD}
+	{service reward, efficiency reward, fleet size reward}
 
 The value of `THIRD_REWARD` is initially `0` but switches to `-Infinity` if the maximum wait-time among the unserviced requests exceeds 10 minutes.
 
@@ -132,6 +145,6 @@ Examples:
 
 The server sends the (undiscounted) sum of all reward vectors. In the last component, a reward of `-n` incurs, which represents the cost for the number of vehicles used.
 
-    {service score, efficiency score, THIRD_SCORE}
+    {service score, efficiency score, fleet size score}
 
-In particular, the `THIRD_SCORE` takes the value `-n` or `-Infinity`.
+In particular, the `fleet size score` takes the value `-n` or `-Infinity`. More information the rewards can be found [here](http://docs.duckietown.org/AIDO/out/performance.html).
