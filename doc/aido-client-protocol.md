@@ -18,14 +18,16 @@ The server listens for incoming `TCP/IP` connections at port `9382`.
 
 ### Client -> Server
 
-The server requires information about which scenario to run.
-The client sends the first line for instance as
+The server requires information about which scenario to run. The range of options is visible in [this file](https://github.com/idsc-frazzoli/amodeus/blob/master/src/main/resources/aido/scenarios.properties). The client sends the first line for instance as
 
-    {SanFrancisco, 0.4, 180}
+    {SanFrancisco.20080518}
 
-The line encodes the name of the scenario `SanFrancisco`, the population size ratio `0.4`, and the number of vehicles `180`.
+The line encodes the name of the scenario `SanFrancisco.20080518`.
 
-Valid scenarios names include `SanFrancisco`, `TelAviv`, `Santiago`, `Berlin`.
+Valid scenarios names include also, `TelAviv`, `Santiago`, `Berlin`.
+
+
+, the population size ratio `0.4`, and the number of vehicles `180`.
 The size ratio should be between `0` and `1`.
 The value `1` corresponds to the full scenario.
 
