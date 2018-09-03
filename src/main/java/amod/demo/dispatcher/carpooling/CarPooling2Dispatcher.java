@@ -109,7 +109,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
 		// dispatchPeriod = safeConfig.getInteger("dispatchPeriod", timeStep *
 		// 60);
 		dispatchPeriod = timeStep * 60;
-		this.planningHorizon = 20;
+		this.planningHorizon = 8;
 		this.fixedCarCapacity = 2;
 		this.router = router;
 
@@ -550,7 +550,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
 			}
 
 		}
-		
+
 	}
 
 	private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayRoboTaxi() {
@@ -577,13 +577,16 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
 	}
 
 	private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayOrSingleOrRebalanceRoboTaxi() {
-		List<RoboTaxi> taxiList = getRoboTaxis().stream().filter(car -> (car.isInStayTask()
-				&& car.getCurrentNumberOfCustomersOnBoard() == 0 && car.getMenu().getCourses().isEmpty())
-				|| (car.getMenu().getCourses().size() == 1
-						&& car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
-						&& virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
-								.getVirtualNode(car.getDivertableLocation())
-						|| car.getCurrentNumberOfCustomersOnBoard() == 1 && car.getMenu().getCourses().size() == 2
+		List<RoboTaxi> taxiList = getRoboTaxis().stream()
+				.filter(car -> (car.isInStayTask() && car.getCurrentNumberOfCustomersOnBoard() == 0
+						&& car.getMenu().getCourses().isEmpty())
+						|| (car.getMenu().getCourses().size() == 1
+								&& car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
+								&& virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
+										.getVirtualNode(car.getDivertableLocation()))
+						|| (car.getMenu().getCourses().size() == 1
+								&& car.getMenu().getStarterCourse().getMealType() == SharedMealType.DROPOFF)
+						|| (car.getMenu().getCourses().size() == 2
 								&& car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
 								&& virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
 										.getVirtualNode(car.getDivertableLocation())))
