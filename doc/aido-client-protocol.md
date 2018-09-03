@@ -1,8 +1,6 @@
 # AIDO client protocol
 
-This file outlines the communication protocol for the Artificial Intelligence Driving Olympics (=AIDO) autonomous mobility-on-demand competition, for assistance please contact [mailto] (clruch@idsc.mavt.ethz.ch)
-
-Documentation on the AIDO mobility-on-demand competition can be found [here](https://www.duckietown.org/research/ai-driving-olympics/ai-do-rules), [here](http://docs.duckietown.org/AIDO/out/amod.html) and [here](http://docs.duckietown.org/AIDO/out/performance.html).
+This file outlines the communication protocol for the Artificial Intelligence Driving Olympics (=AIDO) autonomous mobility-on-demand competition, for assistance please contact [mailto] (clruch@idsc.mavt.ethz.ch) . Documentation on the AIDO mobility-on-demand competition can be found [here](https://www.duckietown.org/research/ai-driving-olympics/ai-do-rules), [here](http://docs.duckietown.org/AIDO/out/amod.html) and [here](http://docs.duckietown.org/AIDO/out/performance.html).
 
 The communication is text based.
 
