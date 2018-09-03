@@ -4,7 +4,7 @@ The communication is text based.
 
 Each message is a string that terminates with a line break `\n`. Apart from the last character, the string does **not** contain another line break.
 
-*Remark:* The notation adheres to the *Mathematica* standard for nested lists.
+*Remark:* The notation adheres to the *Mathematica* standard for nested lists. [see here](https://reference.wolfram.com/language/tutorial/NestedLists.html)
 
 ## Port of server
 
