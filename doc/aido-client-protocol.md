@@ -8,7 +8,7 @@ Each message is a string that terminates with a line break `\n`. Apart from the 
 
 *Remark:* The notation adheres to the *Mathematica* standard for nested lists, [see here](https://reference.wolfram.com/language/tutorial/NestedLists.html).
 
-The communication takes place between the main processes in [AidoHost](https://github.com/idsc-frazzoli/amod/blob/master/src/main/java/amod/aido/AidoHost.java) and [AidoGuest](https://github.com/idsc-frazzoli/amod/blob/master/src/main/java/amod/aido/demo/AidoGuest.java). AidoHost contains the simulation environment, while a modified version of AidoGuest can be used by the participant of AIDO to place their own fleet operational policy. AidoHost is implemented as a server and AidoGuest as a client.
+The communication takes place between the main processes in [AidoHost](https://github.com/idsc-frazzoli/amod/blob/master/src/main/java/amod/aido/AidoHost.java) and [AidoGuest](https://github.com/idsc-frazzoli/amod/blob/master/src/main/java/amod/aido/demo/AidoGuest.java). AidoHost contains the simulation environment, while a modified version of AidoGuest can be used by the participant of AIDO to place their own fleet operational policy. **AidoHost** is implemented as a **Server** and **AidoGuest** as a **Client**.
 
 ## Port of server
 
