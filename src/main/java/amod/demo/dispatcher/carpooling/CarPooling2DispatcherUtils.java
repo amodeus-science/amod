@@ -281,7 +281,7 @@ public enum CarPooling2DispatcherUtils {
             }
             
             if (roboTaxi.getCurrentNumberOfCustomersOnBoard() == 1) {
-                Scalar arrivalTimeSO;
+                Scalar arrivalTimeSO = null;
                 if (roboTaxi.getMenu().getCourses().size() > 1) {
                     arrivalTimeSO = arrivals.get(roboTaxi.getMenu().getCourses().get(0).getRequestId());
                 } else {
