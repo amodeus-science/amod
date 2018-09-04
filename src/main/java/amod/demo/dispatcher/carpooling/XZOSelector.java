@@ -135,4 +135,8 @@ public class XZOSelector {
         return controlLaw;   
     }
 
+    void removeXZOCommand(VirtualNode<Link> fromNode, VirtualNode<Link> toNode, int redirectNode){
+        controlLaw.get(toNode.getIndex()).get(fromNode.getIndex())[redirectNode] = 0;
+    }
+    
 }
