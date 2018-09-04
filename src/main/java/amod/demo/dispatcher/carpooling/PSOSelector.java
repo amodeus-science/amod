@@ -128,5 +128,9 @@ public class PSOSelector {
     List<List<double[]>> getControlLawPSO(){
         return controlLaw;   
     }
+    
+    void removePSOCommand(VirtualNode<Link> fromNode, int toNodeFist, int toNodeSecond){
+        controlLaw.get(fromNode.getIndex()).get(toNodeFist)[toNodeSecond] = 0;
+    }
 
 }

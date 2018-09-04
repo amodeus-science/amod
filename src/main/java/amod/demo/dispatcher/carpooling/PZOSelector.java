@@ -135,5 +135,9 @@ public class PZOSelector {
     List<List<double[]>> getControlLawPZO(){
         return controlLaw;   
     }
+    
+    void removePZOCommand(VirtualNode<Link> fromNode, VirtualNode<Link> toNode, int toNodeSecond) {
+        controlLaw.get(fromNode.getIndex()).get(toNode.getIndex())[toNodeSecond] = 0;
+    }
 
 }
