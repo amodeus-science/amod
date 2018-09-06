@@ -37,7 +37,7 @@ for i = 1:1:numberNodes
     travelTimes(i,:) = inputCarpooling.(InputNames{i+numberNodes})';
 end
 
-Delta_Threshold = 5000;
+Delta_Threshold = 0;
 
 RoadNetwork.RoadGraph = RoadGraph;
 RoadNetwork.TravelTimes = travelTimes;
@@ -74,6 +74,7 @@ Flags.ignorerealpax = 1 - use_outpax;
 
 RebWeight = 5.0;
 
+% TESTING
 % flagTest = 0;
 % global deki1;
 % 
@@ -104,28 +105,25 @@ RebWeight = 5.0;
 %     flagTest = 1;
 %     deki1 = 1;
 % end
-
-% global int;
-% if(isempty(int))
-%    int = 0; 
+% r = cell(numberNodes,1);
+% x_zo = cell(numberNodes,numberNodes);
+% x_so = cell(numberNodes,numberNodes);
+% p_zo = cell(numberNodes,numberNodes);
+% p_so = cell(numberNodes,numberNodes);
+% 
+% if(flagTest == 1)
+%     x_zo{cont(1),cont(2)} = [0, 0, 0, contsec(2)];
+%     
 % end
 % 
-% save(sprintf('Input%d',int),'RoadNetwork','RebWeight','Passengers','Flags');
-% int = int +1;
+% 
+% p_so{3,2} = [0, 0, 0, 14];
+
 
 save('Input','RoadNetwork','RebWeight','Passengers','Flags');
 
 % Optimization!!!!!!!
-[rebalanceQueue, output] = amod_p_mpc_v9(RoadNetwork, RebWeight, Passengers, Flags);
-
-% global out;
-% if(isempty(out))
-%    out = 0; 
-% end
-% 
-% save(sprintf('Output%d',out),'rebalanceQueue','output');
-% 
-% out = out + 1;
+[rebalanceQueue, output] = amod_p_mpc_v8(RoadNetwork, RebWeight, Passengers, Flags);
 
 save('Output','rebalanceQueue','output');
 
@@ -134,33 +132,6 @@ x_zo = rebalanceQueue.x_zo;
 x_so = rebalanceQueue.x_so;
 p_zo = rebalanceQueue.p_zo;
 p_so = rebalanceQueue.p_so;
-
-% r = cell(numberNodes,1);
-% x_zo = cell(numberNodes,numberNodes);
-% x_so = cell(numberNodes,numberNodes);
-% p_zo = cell(numberNodes,numberNodes);
-% p_so = cell(numberNodes,numberNodes);
-
-% if(flagTest == 1)
-%     x_zo{cont(1),cont(2)} = [0, 0, 0, contsec(2)];
-%     
-% end
-% 
-% global state;
-% global dest1;
-% global dest2;
-% 
-% if(contsec(2)~=0 && cont(1)~=0 && contsec(1)~=0)
-%     state = contsec(2);
-%     dest1 = cont(1);
-%     dest2 = contsec(1);
-% end
-% 
-% if(~isempty(state))
-%     if(state ~= 0 && dest1 ~= 0 && dest2~=0)
-%      x_so{2,3} = [0, 0, 0, 7];
-%     end
-% end
 
 for i = 1:1:numberNodes
     if(isempty(r{i}) == true)

@@ -1,4 +1,4 @@
-function [rebalanceQueue, output] = amod_p_mpc_v8(RoadNetwork, RebWeight, Passengers, Flags)
+function [rebalanceQueue, output] = amod_p_mpc_v10(RoadNetwork, RebWeight, Passengers, Flags)
 %{
 README:
     INPUTS:
@@ -104,7 +104,7 @@ for t=1:T
     for i=1:N
         for j=1:N
             if (i == j)
-                f(r_flow(i,j,t)) = 0.7*RebWeight*TravelTimes(i,j);
+                f(r_flow(i,j,t)) = 0.1*RebWeight*TravelTimes(i,j);
             else
                 f(r_flow(i,j,t)) = RebWeight*TravelTimes(i,j);
             end
@@ -125,11 +125,12 @@ if (dialogflag == 1)
 end
 %% build equality constraints
 
-num_eq_constr =  N*(N-1)*T         + N*N*T             + N*N*N*T   + N*N*N*T   + N*N*T; % 
-num_eq_entries = N*(N-1)*T*(4*N)   + N*N*T*(2 + 2*N)   + N*N*N*T*3 + N*N*N*T*3 + (N*N*T+ ceil(N*N*T*(T+1)*0.5));% 
+                 %zo outflow         so outflow         delayed customer              so component    do component  delay cost
+num_eq_constr =  N*T                + N*(N-1)*T         + N*N*T                     + N*N*N*T       + N*N*N*T       + N*N*T; % 
+num_eq_entries = N*T*(4*N + 2*N*N)  + N*(N-1)*T*(4*N)   + N*N*T*(2 + 2*N + 2*(N-1)) + N*N*N*T*3     + N*N*N*T*3     + (N*N*T+ ceil(N*N*T*(T+1)*0.5));% 
 
-num_eq_constr = num_eq_constr + N*T;
-num_eq_entries = num_eq_entries + N*T*(N + 2*N*N);
+%num_eq_constr = num_eq_constr + N*T;
+%num_eq_entries = num_eq_entries + N*T*(N + 2*N*N);
 
 Aeqsparse = zeros(num_eq_entries, 3);
 Beq = zeros(num_eq_constr,1);
@@ -176,7 +177,7 @@ for t=1:T
                         Aeqsparse(Aeqentry,:) = [Aeqrow, p_flow(j,i,s,t-TravelTimes(j,i)), -1]; % count double occupancy cars that will drop off a customer to be single occ.
                     end
                     Aeqentry = Aeqentry + 1;
-                    Aeqsparse(Aeqentry,:) = [Aeqrow, x_so_flow(i,s,j,t), 1]; % cars leaving without picking up a customer.
+                    Aeqsparse(Aeqentry,:) = [Aeqrow, x_so_flow(s,i,j,t), 1]; % cars leaving without picking up a customer.
                     Aeqentry = Aeqentry + 1;
                     Aeqsparse(Aeqentry,:) = [Aeqrow, p_so_flow(i,s,j,t), 1]; % how many of these cars will pick up another customer.                    
                 end
@@ -227,6 +228,12 @@ for t=1:T
                 Aeqsparse(Aeqentry,:) = [Aeqrow, x_zo_flow(j,i,u,t), 1]; % cars carrying one customer, of the 1st kind. 
                 Aeqentry = Aeqentry + 1;
                 Aeqsparse(Aeqentry,:) = [Aeqrow, p_so_flow(i,u,j,t), 1]; % customers picked up in pairs.
+                if (u ~= j)
+                    Aeqentry = Aeqentry + 1;
+                    Aeqsparse(Aeqentry,:) = [Aeqrow, p_zo_flow(i,u,j,t), 1]; % customers picked up in pairs, but only the second customer is i->j. The first is something else.
+                    Aeqentry = Aeqentry + 1;
+                    Aeqsparse(Aeqentry,:) = [Aeqrow, p_zo_flow(i,j,u,t), 1]; % customers picked up in pairs, but only the first customer is i->j. The second is something else.
+                end
             end
         end
     end
@@ -317,6 +324,21 @@ end
 lb=zeros(statesize,1); %everything is non-negative
 ub=Inf*ones(statesize,1); %no constraints
 
+% uncomment to disable double occupancy. 
+%{
+for i=1:N
+    for j=1:N
+        for k=1:N
+            for t=1:T
+                ub(p_flow(i,j,k,t)) = 0;
+                ub(p_zo_flow(i,j,k,t)) = 0;
+                ub(p_so_flow(i,j,k,t)) = 0;
+            end
+        end
+    end
+end
+%}
+
 for i=1:N
     for j=1:N
         for k=1:N
@@ -361,7 +383,21 @@ if (dialogflag == 1)
 end    
 ConstrType=char(zeros(1,statesize));
 if (milpflag == 1)
-    ConstrType(1:end)='I';
+    % only demand that the first timestep is integer.
+    ConstrType(1:end)='C';
+    for i=1:N
+        for j=1:N
+            ConstrType(r_flow(i,j,1)) = 'I';
+            for k=1:N
+                ConstrType(x_flow(k,i,j,1)) = 'I';
+                ConstrType(x_zo_flow(k,i,j,1)) = 'I';
+                ConstrType(x_so_flow(k,i,j,1)) = 'I';
+                ConstrType(p_flow(i,j,k,1)) = 'I';
+                ConstrType(p_zo_flow(i,j,k,1)) = 'I';
+                ConstrType(p_so_flow(i,j,k,1)) = 'I';
+            end
+        end
+    end                
 else
     ConstrType(1:end)='C';
 end
@@ -427,7 +463,7 @@ r = cell(N,1);
 for i=1:N
     for j=1:N
         if (i ~= j)
-            for k=1:round(cplex_out(r_flow(i,j,1)))
+            for k=1:floor(cplex_out(r_flow(i,j,1)))
                 r{i} = [r{i} j];
             end
         end
@@ -441,10 +477,10 @@ for i=1:N
     for j=1:N
         for s=1:N
             if (i ~= j) % controller asks the car to move to a different station
-                for k=1:round(cplex_out(x_zo_flow(s,i,j,1)))
+                for k=1:floor(cplex_out(x_zo_flow(s,i,j,1)))
                     x_zo{s,i} = [x_zo{s,i} j];
                 end
-                for k=1:round(cplex_out(x_so_flow(s,i,j,1)))
+                for k=1:floor(cplex_out(x_so_flow(s,i,j,1)))
                     x_so{s,i} = [x_so{s,i} j];
                 end
             else
@@ -453,10 +489,10 @@ for i=1:N
                  % this is because cars that cannot reach their
                  % destinations within the time horizon will give up and do
                  % nothing. We do not want to allow that to happen.
-                for k=1:round(cplex_out(x_zo_flow(s,i,j,1)))
+                for k=1:floor(cplex_out(x_zo_flow(s,i,j,1)))
                     x_zo{s,i} = [x_zo{s,i} s];
                 end
-                for k=1:round(cplex_out(x_so_flow(s,i,j,1)))
+                for k=1:floor(cplex_out(x_so_flow(s,i,j,1)))
                     x_so{s,i} = [x_so{s,i} s];
                 end
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -473,10 +509,10 @@ p_so = cell(N,N);
 for i=1:N
     for j=1:N
         for k=1:N
-            for kk=1:round(cplex_out(p_zo_flow(i,j,k,1)))
+            for kk=1:floor(cplex_out(p_zo_flow(i,j,k,1)))
                 p_zo{i,j} = [p_zo{i,j} k];
             end
-            for kk=1:round(cplex_out(p_so_flow(i,j,k,1)))
+            for kk=1:floor(cplex_out(p_so_flow(i,j,k,1)))
                 p_so{i,j} = [p_so{i,j} k];
             end     
         end
@@ -492,3 +528,38 @@ output.x_so_flow = x_so_flow;
 output.p_flow = p_flow;
 output.p_zo_flow = p_zo_flow;
 output.p_so_flow = p_so_flow;
+
+% check the number of people who will be delivered
+delivered = 0;
+en_route = 0;
+for i=1:N
+    for j=1:N
+        for t=1:T
+            if (t + TravelTimes(j,i) <= T)
+                delivered = delivered + cplex_out(x_flow(i,j,i,t));
+            else
+                en_route = en_route + cplex_out(x_flow(i,j,i,t));
+            end
+            if (t + TravelTimes(i,j) <= T)
+                for k=1:N
+                    if (k==j)
+                        delivered = delivered + 2*cplex_out(p_flow(i,j,k,t));
+                    else
+                        delivered = delivered + cplex_out(p_flow(i,j,k,t));
+                    end
+                end
+            else
+                for k=1:N
+                    if (k==j)
+                        en_route = en_route + 2*cplex_out(p_flow(i,j,k,t));
+                    else
+                        en_route = en_route + cplex_out(p_flow(i,j,k,t));
+                    end
+                end                
+            end
+        end
+    end
+end
+
+fprintf('%d customers delivered. \n', delivered)
+fprintf('%d customers en route. \n', en_route)

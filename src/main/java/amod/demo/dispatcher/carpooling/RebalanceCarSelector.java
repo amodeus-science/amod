@@ -87,5 +87,9 @@ public class RebalanceCarSelector {
        
 
     }
+    
+    List<double[]> getControlLawRebalance(){
+        return controlLaw;   
+    }
 
 }
