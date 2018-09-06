@@ -102,7 +102,7 @@ public class PZOControl {
                         removePZOCommand(fromNode, toNodeFirst, ipzo);
 
                     }
-                    if (!toRequestFirst.isEmpty() && toRequestSecond.isEmpty()) {
+                    else if (!toRequestFirst.isEmpty() && toRequestSecond.isEmpty()) {
                         AVRequest avRequestFirst = toRequestFirst.get(0);
                         toRequestFirst.remove(avRequestFirst);
                         virtualNodeAVFromRequests.get(fromNode).remove(avRequestFirst);
@@ -138,7 +138,7 @@ public class PZOControl {
                         removePZOCommand(fromNode, toNodeFirst, ipzo);
 
                     }
-                    if (toRequestFirst.isEmpty() && !toRequestSecond.isEmpty()) {
+                    else if (toRequestFirst.isEmpty() && !toRequestSecond.isEmpty()) {
                         AVRequest avRequestFirst = null;
 
                         AVRequest avRequestSecond = toRequestSecond.get(0);
@@ -176,7 +176,7 @@ public class PZOControl {
 
                         removePZOCommand(fromNode, toNodeFirst, ipzo);
                     }
-                    if (!toRequestFirst.isEmpty() && !toRequestSecond.isEmpty()
+                    else if (!toRequestFirst.isEmpty() && !toRequestSecond.isEmpty()
                             && toNodeSecondIndex == toNodeFirst.getIndex()) {
 
                         if (toRequestFirst.size() == 1) {
@@ -209,37 +209,37 @@ public class PZOControl {
 
                             removePZOCommand(fromNode, toNodeFirst, ipzo);
                         }
+                        else {
+                            AVRequest avRequestFirst = toRequestFirst.get(0);
+                            toRequestFirst.remove(avRequestFirst);
+                            virtualNodeAVFromRequests.get(fromNode).remove(avRequestFirst);
+                            virtualNodeAVToRequests.get(toNodeFirst).remove(avRequestFirst);
 
-                        AVRequest avRequestFirst = toRequestFirst.get(0);
-                        toRequestFirst.remove(avRequestFirst);
-                        virtualNodeAVFromRequests.get(fromNode).remove(avRequestFirst);
-                        virtualNodeAVToRequests.get(toNodeFirst).remove(avRequestFirst);
+                            RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequestFirst,
+                                    availableCars);
+                            availableCars.remove(closestRoboTaxi);
+                            stayRoboTaxi.get(fromNode).remove(closestRoboTaxi);
 
-                        RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequestFirst,
-                                availableCars);
-                        availableCars.remove(closestRoboTaxi);
-                        stayRoboTaxi.get(fromNode).remove(closestRoboTaxi);
+                            AVRequest avRequestSecond = StaticHelperCarPooling
+                                    .findClostestRequestfromRequest(avRequestFirst, toRequestSecond);
+                            toRequestSecond.remove(avRequestSecond);
+                            toRequestSecondUnfilterd.remove(avRequestSecond);
+                            virtualNodeAVFromRequests.get(fromNode).remove(avRequestSecond);
+                            virtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(toNodeSecondIndex))
+                                    .remove(avRequestSecond);
 
-                        AVRequest avRequestSecond = StaticHelperCarPooling
-                                .findClostestRequestfromRequest(avRequestFirst, toRequestSecond);
-                        toRequestSecond.remove(avRequestSecond);
-                        toRequestSecondUnfilterd.remove(avRequestSecond);
-                        virtualNodeAVFromRequests.get(fromNode).remove(avRequestSecond);
-                        virtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(toNodeSecondIndex))
-                                .remove(avRequestSecond);
+                            Pair<AVRequest, AVRequest> pairRequests = Pair.of(avRequestFirst, avRequestSecond);
+                            Pair<Link, VirtualNode<Link>> pairWait = Pair.of(null, null);
 
-                        Pair<AVRequest, AVRequest> pairRequests = Pair.of(avRequestFirst, avRequestSecond);
-                        Pair<Link, VirtualNode<Link>> pairWait = Pair.of(null, null);
+                            Triple<RoboTaxi, Pair<AVRequest, AVRequest>, Pair<Link, VirtualNode<Link>>> pZOCommands = Triple
+                                    .of(closestRoboTaxi, pairRequests, pairWait);
 
-                        Triple<RoboTaxi, Pair<AVRequest, AVRequest>, Pair<Link, VirtualNode<Link>>> pZOCommands = Triple
-                                .of(closestRoboTaxi, pairRequests, pairWait);
+                            pZOCommandsList.add(pZOCommands);
 
-                        pZOCommandsList.add(pZOCommands);
-
-                        removePZOCommand(fromNode, toNodeFirst, ipzo);
-
+                            removePZOCommand(fromNode, toNodeFirst, ipzo);
+                        }
+                        
                     }
-                    System.out.println("finished");
 
                 }
             }
