@@ -214,6 +214,8 @@ public class PZOControl {
                             toRequestFirst.remove(avRequestFirst);
                             virtualNodeAVFromRequests.get(fromNode).remove(avRequestFirst);
                             virtualNodeAVToRequests.get(toNodeFirst).remove(avRequestFirst);
+                            toRequestSecond.remove(avRequestFirst);
+                            toRequestSecondUnfilterd.remove(avRequestFirst);
 
                             RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequestFirst,
                                     availableCars);
@@ -227,6 +229,7 @@ public class PZOControl {
                             virtualNodeAVFromRequests.get(fromNode).remove(avRequestSecond);
                             virtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(toNodeSecondIndex))
                                     .remove(avRequestSecond);
+                            toRequestFirst.remove(avRequestSecond);
 
                             Pair<AVRequest, AVRequest> pairRequests = Pair.of(avRequestFirst, avRequestSecond);
                             Pair<Link, VirtualNode<Link>> pairWait = Pair.of(null, null);

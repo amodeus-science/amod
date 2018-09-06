@@ -17,134 +17,136 @@ import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
 import ch.ethz.matsim.av.passenger.AVRequest;
 
 public class PSOControl {
-    private List<List<double[]>> controlLaw;
-    private HashMap<VirtualNode<Link>, List<Link>> linkMap;
+	private List<List<double[]>> controlLaw;
+	private HashMap<VirtualNode<Link>, List<Link>> linkMap;
 
-    public PSOControl(List<List<double[]>> controlLaw, HashMap<VirtualNode<Link>, List<Link>> linkMap) {
-        this.controlLaw = controlLaw;
-        this.linkMap = linkMap;
-    }
+	public PSOControl(List<List<double[]>> controlLaw, HashMap<VirtualNode<Link>, List<Link>> linkMap) {
+		this.controlLaw = controlLaw;
+		this.linkMap = linkMap;
+	}
 
-    List<Triple<RoboTaxi, AVRequest, Pair<Link, VirtualNode<Link>>>> getPSOCommands(VirtualNetwork<Link> virtualNetwork,
-            Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi,
-            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests,
-            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests) throws Exception {
+	List<Triple<RoboTaxi, AVRequest, Pair<Link, VirtualNode<Link>>>> getPSOCommands(VirtualNetwork<Link> virtualNetwork,
+			Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi,
+			Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests,
+			Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests) throws Exception {
 
-        List<Triple<RoboTaxi, AVRequest, Pair<Link, VirtualNode<Link>>>> pSOCommandsList = new ArrayList<>();
+		List<Triple<RoboTaxi, AVRequest, Pair<Link, VirtualNode<Link>>>> pSOCommandsList = new ArrayList<>();
 
-        for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
-            List<RoboTaxi> availableCarsFrom = soRoboTaxi.get(fromNode);
-            if (availableCarsFrom.isEmpty()) {
-                continue;
-            }
-            List<AVRequest> fromRequests = virtualNodeAVFromRequests.get(fromNode);
+		for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
+			List<RoboTaxi> availableCarsFrom = soRoboTaxi.get(fromNode);
+			if (availableCarsFrom.isEmpty()) {
+				continue;
+			}
+			List<AVRequest> fromRequests = virtualNodeAVFromRequests.get(fromNode);
 
-            for (VirtualNode<Link> toNodeFirst : virtualNetwork.getVirtualNodes()) {
+			for (VirtualNode<Link> toNodeFirst : virtualNetwork.getVirtualNodes()) {
 
-                List<RoboTaxi> availableCars = availableCarsFrom.stream()
-                        .filter(car -> (car.getMenu().getCourses().size() == 1
-                                && toNodeFirst.getLinks().contains(car.getMenu().getStarterCourse().getLink()))
-                                || (car.getMenu().getCourses().size() == 2 && toNodeFirst.getLinks()
-                                        .contains(car.getMenu().getCourses().get(1).getLink())))
-                        .collect(Collectors.toList());
-                
-                if(availableCars.isEmpty()) {
-                    continue;
-                }
+				List<RoboTaxi> availableCars = availableCarsFrom.stream()
+						.filter(car -> (car.getMenu().getCourses().size() == 1
+								&& toNodeFirst.getLinks().contains(car.getMenu().getStarterCourse().getLink()))
+								|| (car.getMenu().getCourses().size() == 2 && toNodeFirst.getLinks()
+										.contains(car.getMenu().getCourses().get(1).getLink())))
+						.collect(Collectors.toList());
 
-                double[] controlPso = controlLaw.get(fromNode.getIndex()).get(toNodeFirst.getIndex());
+				if (availableCars.isEmpty()) {
+					continue;
+				}
 
-                if (Arrays.stream(controlPso).sum() == 0) {
-                    continue;
-                }
+				double[] controlPso = controlLaw.get(fromNode.getIndex()).get(toNodeFirst.getIndex());
 
-                for (int ipso = 0; ipso < controlPso.length; ipso++) {
-                    int toNodeSecondIndex = (int) controlPso[ipso] - 1;
-                    if (toNodeSecondIndex < 0) {
-                        continue;
-                    }
-                    
-                    if(availableCars.isEmpty()) {
-                        break;
-                    }
+				if (Arrays.stream(controlPso).sum() == 0) {
+					continue;
+				}
 
-                    List<AVRequest> toRequestSecondUnfilterd = virtualNodeAVToRequests
-                            .get(virtualNetwork.getVirtualNode(toNodeSecondIndex));
-                    List<AVRequest> toRequestSecond = fromRequests.stream()
-                            .filter(req -> toRequestSecondUnfilterd.contains(req)).collect(Collectors.toList());
-                    if (!toRequestSecond.isEmpty()) {
-                        AVRequest avRequestSecond = toRequestSecond.get(0);
-                        toRequestSecond.remove(avRequestSecond);
-                        toRequestSecondUnfilterd.remove(avRequestSecond);
-                        virtualNodeAVFromRequests.get(fromNode).remove(avRequestSecond);
-                        virtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(toNodeSecondIndex))
-                                .remove(avRequestSecond);
+				for (int ipso = 0; ipso < controlPso.length; ipso++) {
+					int toNodeSecondIndex = (int) controlPso[ipso] - 1;
+					if (toNodeSecondIndex < 0) {
+						continue;
+					}
 
-                        RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequestSecond,
-                                availableCars);
-                        availableCars.remove(closestRoboTaxi);
-                        availableCarsFrom.remove(closestRoboTaxi);
-                        soRoboTaxi.get(fromNode).remove(closestRoboTaxi);
+					if (availableCars.isEmpty()) {
+						break;
+					}
 
-                        Triple<RoboTaxi, AVRequest, Pair<Link, VirtualNode<Link>>> pSOCommands = Triple
-                                .of(closestRoboTaxi, avRequestSecond, null);
+					List<AVRequest> toRequestSecondUnfilterd = virtualNodeAVToRequests
+							.get(virtualNetwork.getVirtualNode(toNodeSecondIndex));
+					List<AVRequest> toRequestSecond = fromRequests.stream()
+							.filter(req -> toRequestSecondUnfilterd.contains(req)).collect(Collectors.toList());
+					if (!toRequestSecond.isEmpty()) {
+						AVRequest avRequestSecond = toRequestSecond.get(0);
+						toRequestSecond.remove(avRequestSecond);
+						toRequestSecondUnfilterd.remove(avRequestSecond);
+						virtualNodeAVFromRequests.get(fromNode).remove(avRequestSecond);
+						virtualNodeAVToRequests.get(virtualNetwork.getVirtualNode(toNodeSecondIndex))
+								.remove(avRequestSecond);
 
-                        pSOCommandsList.add(pSOCommands);
+						RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequestSecond,
+								availableCars);
+						availableCars.remove(closestRoboTaxi);
+						availableCarsFrom.remove(closestRoboTaxi);
+						soRoboTaxi.get(fromNode).remove(closestRoboTaxi);
 
-                        removePSOCommand(fromNode, toNodeFirst, ipso);
-                    }
+						Triple<RoboTaxi, AVRequest, Pair<Link, VirtualNode<Link>>> pSOCommands = Triple
+								.of(closestRoboTaxi, avRequestSecond, null);
 
-                    if (toRequestSecond.isEmpty()) {
-                        AVRequest avRequestSecond = null;
+						pSOCommandsList.add(pSOCommands);
 
-                        List<Link> linkSet = linkMap.get(virtualNetwork.getVirtualNode(toNodeSecondIndex));
-                        List<Link> fromNodeLinkList = linkSet.stream()
-                                .filter(link -> fromNode.getLinks().contains(link)).collect(Collectors.toList());
-                        
-                        Link waitingLink = null;
-                        RoboTaxi closestRoboTaxi = null;
-                        if(!fromNodeLinkList.isEmpty()) {
-                            waitingLink = fromNodeLinkList.get(0);
-                            linkMap.get(virtualNetwork.getVirtualNode(toNodeSecondIndex)).remove(waitingLink);
-                            closestRoboTaxi = StaticHelperCarPooling.findClostestVehicleToLink(waitingLink,
-                                    availableCars);
-                        } else {
-                            closestRoboTaxi = availableCars.get(0);
-                            waitingLink = closestRoboTaxi.getDivertableLocation();
-                        }
+						removePSOCommand(fromNode, toNodeFirst, ipso);
+					} else if (toRequestSecond.isEmpty()) {
+						AVRequest avRequestSecond = null;
 
-                        availableCars.remove(closestRoboTaxi);
-                        availableCarsFrom.remove(closestRoboTaxi);
-                        soRoboTaxi.get(fromNode).remove(closestRoboTaxi);
+						List<Link> linkSet = linkMap.get(virtualNetwork.getVirtualNode(toNodeSecondIndex));
+						List<Link> fromNodeLinkList = linkSet.stream()
+								.filter(link -> fromNode.getLinks().contains(link)).collect(Collectors.toList());
 
-                        Pair<Link, VirtualNode<Link>> pairWait = Pair.of(waitingLink,
-                                virtualNetwork.getVirtualNode(toNodeSecondIndex));
+						Link waitingLink = null;
+						RoboTaxi closestRoboTaxi = null;
+						if (!fromNodeLinkList.isEmpty()) {
+							waitingLink = fromNodeLinkList.get(0);
+							linkMap.get(virtualNetwork.getVirtualNode(toNodeSecondIndex)).remove(waitingLink);
+							closestRoboTaxi = StaticHelperCarPooling.findClostestVehicleToLink(waitingLink,
+									availableCars);
+						} else {
+							closestRoboTaxi = availableCars.get(0);
+							waitingLink = closestRoboTaxi.getDivertableLocation();
+						}
 
-                        Triple<RoboTaxi, AVRequest, Pair<Link, VirtualNode<Link>>> pSOCommands = Triple
-                                .of(closestRoboTaxi, avRequestSecond, pairWait);
+						if (closestRoboTaxi == null) {
+							System.out.println("NULL");
+						}
 
-                        pSOCommandsList.add(pSOCommands);
+						availableCars.remove(closestRoboTaxi);
+						availableCarsFrom.remove(closestRoboTaxi);
+						soRoboTaxi.get(fromNode).remove(closestRoboTaxi);
 
-                        removePSOCommand(fromNode, toNodeFirst, ipso);
+						Pair<Link, VirtualNode<Link>> pairWait = Pair.of(waitingLink,
+								virtualNetwork.getVirtualNode(toNodeSecondIndex));
 
-                    }
-                }
-            }
-        }
+						Triple<RoboTaxi, AVRequest, Pair<Link, VirtualNode<Link>>> pSOCommands = Triple
+								.of(closestRoboTaxi, avRequestSecond, pairWait);
 
-        return pSOCommandsList;
-    }
+						pSOCommandsList.add(pSOCommands);
 
-    List<List<double[]>> getControlLawPSO() {
-        return controlLaw;
-    }
+						removePSOCommand(fromNode, toNodeFirst, ipso);
 
-    HashMap<VirtualNode<Link>, List<Link>> getLinkMapPSO() {
-        return linkMap;
-    }
+					}
+				}
+			}
+		}
 
-    void removePSOCommand(VirtualNode<Link> fromNode, VirtualNode<Link> toNode, int toNodeSecond) {
-        controlLaw.get(fromNode.getIndex()).get(toNode.getIndex())[toNodeSecond] = 0;
-    }
+		return pSOCommandsList;
+	}
+
+	List<List<double[]>> getControlLawPSO() {
+		return controlLaw;
+	}
+
+	HashMap<VirtualNode<Link>, List<Link>> getLinkMapPSO() {
+		return linkMap;
+	}
+
+	void removePSOCommand(VirtualNode<Link> fromNode, VirtualNode<Link> toNode, int toNodeSecond) {
+		controlLaw.get(fromNode.getIndex()).get(toNode.getIndex())[toNodeSecond] = 0;
+	}
 
 }
