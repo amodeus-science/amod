@@ -331,7 +331,6 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
                             addSharedRoboTaxiPickup(roboTaxi, avRequest2);
                             SharedCourse sharedAVCourse2 = SharedCourse.pickupCourse(avRequest2);
                             roboTaxi.getMenu().moveAVCourseToPrev(sharedAVCourse2);
-                            GlobalAssert.that(roboTaxi.getMenu().getCourses().size() == 4);
                             GlobalAssert.that(roboTaxi.checkMenuConsistency());
                         } else if (avRequest1 != null && avRequest2 == null) {
                             addSharedRoboTaxiPickup(roboTaxi, avRequest1);
