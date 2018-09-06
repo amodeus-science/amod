@@ -104,7 +104,7 @@ for t=1:T
     for i=1:N
         for j=1:N
             if (i == j)
-                f(r_flow(i,j,t)) = 0.7*RebWeight*TravelTimes(i,j);
+                f(r_flow(i,j,t)) = 0.1*RebWeight*TravelTimes(i,j);
             else
                 f(r_flow(i,j,t)) = RebWeight*TravelTimes(i,j);
             end
