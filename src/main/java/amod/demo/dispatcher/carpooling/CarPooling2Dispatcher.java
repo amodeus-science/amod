@@ -512,7 +512,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
 
                     if (Arrays.stream(xZOqueueFromTo).sum() == 0 && Arrays.stream(pZOqueueFromTo).sum() == 0
                             && presence.isEmpty()) {
-                        Map<VirtualNode<Link>, List<RoboTaxi>> freeCarsMap = getVirtualNodeStayOrSingleOrRebalanceRoboTaxi();
+                        Map<VirtualNode<Link>, List<RoboTaxi>> freeCarsMap = getVirtualNodeStayWithoutCustomerOrRebalanceRoboTaxi();
                         List<RoboTaxi> freeCarsAt = freeCarsMap.get(fromNode);
                         List<AVRequest> fromRequests = getVirtualNodeFromAVRequest().get(fromNode);
                         List<AVRequest> toRequests = getVirtualNodeToAVRequest().get(toNode);

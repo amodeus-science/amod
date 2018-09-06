@@ -37,7 +37,7 @@ for i = 1:1:numberNodes
     travelTimes(i,:) = inputCarpooling.(InputNames{i+numberNodes})';
 end
 
-Delta_Threshold = 5000;
+Delta_Threshold = 0;
 
 RoadNetwork.RoadGraph = RoadGraph;
 RoadNetwork.TravelTimes = travelTimes;
@@ -116,7 +116,7 @@ RebWeight = 5.0;
 save('Input','RoadNetwork','RebWeight','Passengers','Flags');
 
 % Optimization!!!!!!!
-[rebalanceQueue, output] = amod_p_mpc_v9(RoadNetwork, RebWeight, Passengers, Flags);
+[rebalanceQueue, output] = amod_p_mpc_v8(RoadNetwork, RebWeight, Passengers, Flags);
 
 % global out;
 % if(isempty(out))
