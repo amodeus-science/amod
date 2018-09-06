@@ -57,6 +57,20 @@ enum StaticHelperCarPooling {
         return closestRoboTaxi;
     }
     
+    static RoboTaxi findClostestVehicleToLink(Link link, Collection<RoboTaxi> roboTaxis) {
+        GlobalAssert.that(roboTaxis != null);
+        RoboTaxi closestRoboTaxi = null;
+        double min = Double.POSITIVE_INFINITY;
+        for (RoboTaxi roboTaxi : roboTaxis) {
+            double newDistance = NetworkUtils.getEuclideanDistance(link.getCoord(), roboTaxi.getDivertableLocation().getCoord());
+            if (closestRoboTaxi == null || newDistance < min) {
+                min = newDistance;
+                closestRoboTaxi = roboTaxi;
+            }
+        }
+        return closestRoboTaxi;
+    }
+    
     static AVRequest findClostestRequestfromVehcile(RoboTaxi roboTaxi, Collection<AVRequest> avRequest) {
         GlobalAssert.that(avRequest != null);
         AVRequest closestAVRequest = null;
@@ -83,6 +97,22 @@ enum StaticHelperCarPooling {
             }
         }
         return closestAVRequest;
+    }
+    
+    static Link findClostestWaitLink(AVRequest avRequest, Collection<Link> linkList) {
+        GlobalAssert.that(linkList != null);
+        Link closestLink = null;
+        double min = Double.POSITIVE_INFINITY;
+        for (Link link : linkList) {
+            double newDistance = NetworkUtils.getEuclideanDistance( //
+                    avRequest.getFromLink().getCoord(), //
+                    link.getCoord());
+            if (closestLink == null || newDistance < min) {
+                min = newDistance;
+                closestLink = link;
+            }
+        }
+        return closestLink;
     }
 
     static Map<Link, Set<AVRequest>> getFromLinkMap(Collection<AVRequest> avRequests) {

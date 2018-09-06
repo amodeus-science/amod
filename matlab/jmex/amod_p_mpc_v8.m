@@ -177,7 +177,7 @@ for t=1:T
                         Aeqsparse(Aeqentry,:) = [Aeqrow, p_flow(j,i,s,t-TravelTimes(j,i)), -1]; % count double occupancy cars that will drop off a customer to be single occ.
                     end
                     Aeqentry = Aeqentry + 1;
-                    Aeqsparse(Aeqentry,:) = [Aeqrow, x_so_flow(i,s,j,t), 1]; % cars leaving without picking up a customer.
+                    Aeqsparse(Aeqentry,:) = [Aeqrow, x_so_flow(s,i,j,t), 1]; % cars leaving without picking up a customer.
                     Aeqentry = Aeqentry + 1;
                     Aeqsparse(Aeqentry,:) = [Aeqrow, p_so_flow(i,s,j,t), 1]; % how many of these cars will pick up another customer.                    
                 end
@@ -323,6 +323,21 @@ end
 
 lb=zeros(statesize,1); %everything is non-negative
 ub=Inf*ones(statesize,1); %no constraints
+
+% uncomment to disable double occupancy. 
+%{
+for i=1:N
+    for j=1:N
+        for k=1:N
+            for t=1:T
+                ub(p_flow(i,j,k,t)) = 0;
+                ub(p_zo_flow(i,j,k,t)) = 0;
+                ub(p_so_flow(i,j,k,t)) = 0;
+            end
+        end
+    end
+end
+%}
 
 for i=1:N
     for j=1:N

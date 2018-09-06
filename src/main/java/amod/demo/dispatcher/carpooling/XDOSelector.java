@@ -98,5 +98,9 @@ public class XDOSelector {
 
         return xDOCommandsList;
     }
+    
+    List<List<double[]>> getControlLawXDO(){
+        return controlLaw;   
+    }
 
 }
