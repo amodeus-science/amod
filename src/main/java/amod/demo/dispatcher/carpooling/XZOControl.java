@@ -104,7 +104,7 @@ public class XZOControl {
         return xZOCommandsList;
     }
 
-    List<List<double[]>> getControlLawPSO() {
+    List<List<double[]>> getControlLawXZO() {
         return controlLaw;
     }
 

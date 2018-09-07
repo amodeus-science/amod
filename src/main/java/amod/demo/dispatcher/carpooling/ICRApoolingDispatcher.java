@@ -2,14 +2,17 @@ package amod.demo.dispatcher.carpooling;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.DoublePredicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -77,6 +80,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 	private final int fixedCarCapacity;
 	private final AVRouter router;
 	private LinkWait linkWait;
+	static private final Logger logger = Logger.getLogger(ICRApoolingDispatcher.class);
 
 	protected ICRApoolingDispatcher(Config config, //
 			AVDispatcherConfig avconfig, //
@@ -304,8 +308,9 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		}
 
 		// pZO cars
-		if (round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
-				&& round_now < (dispatchTime + timeStep * 60)) {
+		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
+				&& round_now < (dispatchTime + timeStep * 60))
+				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
 			Map<VirtualNode<Link>, List<RoboTaxi>> StayRoboTaxi = getVirtualNodeStayWithoutCustomerOrRebalanceRoboTaxi();
 			Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
 			Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests = getVirtualNodeToAVRequest();
@@ -363,8 +368,9 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		}
 
 		// waiting cars
-		if (round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
-				&& round_now < (dispatchTime + timeStep * 60)) {
+		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
+				&& round_now < (dispatchTime + timeStep * 60))
+				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
 			Map<VirtualNode<Link>, List<RoboTaxi>> waitingToboTaxi = getVirtualNodeWaitingRoboTaxi();
 			Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
 			Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests = getVirtualNodeToAVRequest();
@@ -416,8 +422,9 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		}
 
 		// pSO cars
-		if (round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
-				&& round_now < (dispatchTime + timeStep * 60)) {
+		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
+				&& round_now < (dispatchTime + timeStep * 60))
+				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
 			Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi = getVirtualNodeSORoboTaxi();
 			Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
 			Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests = getVirtualNodeToAVRequest();
@@ -460,8 +467,9 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		}
 
 		// xZO cars
-		if (round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchPeriod
-				&& round_now < (dispatchTime + timeStep * 60)) {
+		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
+				&& round_now < (dispatchTime + timeStep * 60))
+				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
 			Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi = getVirtualNodeStayWithoutCustomerOrRebalanceRoboTaxi();
 			Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
 			Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests = getVirtualNodeToAVRequest();
@@ -507,8 +515,9 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		}
 
 		// xSO cars
-		if (round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
-				&& round_now < (dispatchTime + timeStep * 60)) {
+		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
+				&& round_now < (dispatchTime + timeStep * 60))
+				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
 			Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi = getVirtualNodeSORoboTaxi();
 			try {
 				List<Pair<RoboTaxi, Link>> xDOControlPolicy = xSOControl.getXSOCommands(virtualNetwork, soRoboTaxi);
@@ -549,8 +558,9 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		}
 
 		// Rebalancing
-		if (round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
-				&& round_now < (dispatchTime + timeStep * 60)) {
+		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
+				&& round_now < (dispatchTime + timeStep * 60))
+				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
 			Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi = getVirtualNodeStayWithoutCustomerRoboTaxi();
 			for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
 				try {
@@ -583,6 +593,252 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 				}
 			}
 		}
+
+		// Assign unassigned requests
+		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
+				&& round_now < (dispatchTime + timeStep * 60))
+				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
+			for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
+				for (VirtualNode<Link> toNode : virtualNetwork.getVirtualNodes()) {
+					List<List<double[]>> controlLawXZO = xZOControl.getControlLawXZO();
+					List<List<double[]>> controlLawPZO = pZOControl.getControlLawPZO();
+					List<List<double[]>> controlLawPSO = pSOControl.getControlLawPSO();
+					double[] xZOqueueFromTo = controlLawXZO.get(toNode.getIndex()).get(fromNode.getIndex());
+					double[] pZOqueueFromTo = controlLawPZO.get(fromNode.getIndex()).get(toNode.getIndex());
+					List<double[]> pSOqueueFrom = controlLawPSO.get(fromNode.getIndex());
+					DoublePredicate predicate = d -> d == (toNode.getIndex() + 1);
+					List<double[]> presence = pSOqueueFrom.stream()
+							.filter(q -> Arrays.stream(q).anyMatch(predicate) == true).collect(Collectors.toList());
+
+					if (Arrays.stream(xZOqueueFromTo).sum() == 0 && Arrays.stream(pZOqueueFromTo).sum() == 0
+							&& presence.isEmpty()) {
+						List<AVRequest> fromRequests = getVirtualNodeFromAVRequest().get(fromNode);
+						List<AVRequest> toRequests = getVirtualNodeToAVRequest().get(toNode);
+						List<AVRequest> fromToRequests = fromRequests.stream().filter(req -> toRequests.contains(req))
+								.collect(Collectors.toList());
+						if (!fromToRequests.isEmpty()) {
+							for (AVRequest avRequest : fromToRequests) {
+								Collection<RoboTaxi> availableCars = getRoboTaxisAvailable(avRequest);
+								if (availableCars.isEmpty()) {
+									continue;
+								}
+								RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest,
+										availableCars);
+								if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu()
+										.getCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
+									closestRoboTaxi.getMenu().removeAVCourse(0);
+									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+								}
+
+								if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu()
+										.getCourses().get(0).getMealType() == SharedMealType.WAITFORCUSTOMER) {
+									closestRoboTaxi.getMenu().removeAVCourse(0);
+									GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 1);
+									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+								}
+
+								if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu()
+										.getCourses().get(0).getMealType() == SharedMealType.DROPOFF) {
+									addSharedRoboTaxiPickup(closestRoboTaxi, avRequest);
+									SharedCourse sharedAVCourse = SharedCourse.pickupCourse(avRequest);
+									closestRoboTaxi.getMenu().moveAVCourseToPrev(sharedAVCourse);
+									GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 3);
+									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+								} else {
+									addSharedRoboTaxiPickup(closestRoboTaxi, avRequest);
+									GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 2);
+									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+								}
+							}
+
+						}
+					}
+
+				}
+			}
+
+		}
+		
+		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
+				&& round_now < (dispatchTime + timeStep * 60))
+				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
+			
+			Collection<RoboTaxi> doRoboTaxis = getRoboTaxisWithNumberOfCustomer(2);
+			Collection<RoboTaxi> soRoboTaxis = getRoboTaxisWithNumberOfCustomer(1);
+			Collection<RoboTaxi> emptyRoboTaxis = getRoboTaxisWithNumberOfCustomer(0);
+			System.out.println("Number of DO Cars: " + doRoboTaxis.size());
+			System.out.println("Number of SO Cars: " + soRoboTaxis.size());
+			System.out.println("Number of empty Cars: " + emptyRoboTaxis.size());
+		}
+
+		// check if control inputs used
+		if (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60)) {
+			List<List<double[]>> controlLawXZO = xZOControl.getControlLawXZO();
+			List<List<double[]>> controlLawXDO = xSOControl.getControlLawXSO();
+			List<List<double[]>> controlLawPZO = pZOControl.getControlLawPZO();
+			List<List<double[]>> controlLawPSO = pSOControl.getControlLawPSO();
+			List<double[]> controlLawRebalance = rebalanceSelector.getControlLawRebalance();
+			double numberRebalance = 0;
+			double numberXzo = 0;
+			double numberXdo = 0;
+			double numberPzo = 0;
+			double numberPso = 0;
+			for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
+				double[] rebalancequeue = controlLawRebalance.get(fromNode.getIndex());
+				numberRebalance = numberRebalance + Arrays.stream(rebalancequeue).sum();
+				for (VirtualNode<Link> toNode : virtualNetwork.getVirtualNodes()) {
+					double[] xzoQueue = controlLawXZO.get(toNode.getIndex()).get(fromNode.getIndex());
+					double[] xdoQueue = controlLawXDO.get(toNode.getIndex()).get(fromNode.getIndex());
+					double[] pzoQueue = controlLawPZO.get(fromNode.getIndex()).get(toNode.getIndex());
+					double[] psoQueue = controlLawPSO.get(fromNode.getIndex()).get(toNode.getIndex());
+					numberXzo = numberXzo + Arrays.stream(xzoQueue).sum();
+
+					if (Arrays.stream(xzoQueue).sum() != 0) {
+						List<AVRequest> fromRequests = getVirtualNodeFromAVRequest().get(fromNode);
+						List<AVRequest> toRequests = getVirtualNodeToAVRequest().get(toNode);
+						List<RoboTaxi> freecar = getVirtualNodeStayWithoutCustomerOrRebalanceRoboTaxi().get(fromNode);
+						List<AVRequest> fromToRequest = fromRequests.stream().filter(req -> toRequests.contains(req))
+								.collect(Collectors.toList());
+						GlobalAssert.that(freecar.isEmpty() || fromToRequest.isEmpty());
+					}
+
+					numberXdo = numberXdo + Arrays.stream(xdoQueue).sum();
+
+					if (Arrays.stream(xdoQueue).sum() != 0) {
+						List<RoboTaxi> freecar = getVirtualNodeSORoboTaxi().get(fromNode).stream()
+								.filter(car -> (car.getMenu().getStarterCourse().getMealType() == SharedMealType.DROPOFF
+										&& toNode.getLinks().contains(car.getCurrentDriveDestination())
+										|| (car.getMenu().getStarterCourse().getMealType() == SharedMealType.REDIRECT
+												&& toNode.getLinks()
+														.contains(car.getMenu().getCourses().get(1).getLink()))))
+								.collect(Collectors.toList());
+						GlobalAssert.that(freecar.isEmpty());
+					}
+
+					numberPzo = numberPzo + Arrays.stream(pzoQueue).sum();
+
+					if (Arrays.stream(pzoQueue).sum() != 0) {
+						List<AVRequest> fromRequests = getVirtualNodeFromAVRequest().get(fromNode);
+						List<AVRequest> toRequests = getVirtualNodeToAVRequest().get(toNode);
+						List<AVRequest> fromToRequest = fromRequests.stream().filter(req -> toRequests.contains(req))
+								.collect(Collectors.toList());
+						List<RoboTaxi> freecar = getVirtualNodeStayWithoutCustomerOrRebalanceRoboTaxi().get(fromNode);
+						GlobalAssert.that(freecar.isEmpty() || fromToRequest.isEmpty());
+						for (int i = 0; i < pzoQueue.length; i++) {
+							int index = (int) pzoQueue[i] - 1;
+							if (index < 0) {
+								continue;
+							}
+							List<AVRequest> fromToRequest2 = fromRequests
+									.stream().filter(req -> getVirtualNodeToAVRequest()
+											.get(virtualNetwork.getVirtualNode(index)).contains(req))
+									.collect(Collectors.toList());
+							GlobalAssert.that(freecar.isEmpty() || fromToRequest2.isEmpty());
+							GlobalAssert.that(freecar.isEmpty() || fromToRequest.isEmpty() || fromToRequest2.isEmpty());
+						}
+					}
+					numberPso = numberPso + Arrays.stream(psoQueue).sum();
+
+					if (Arrays.stream(psoQueue).sum() != 0) {
+						List<AVRequest> fromRequests = getVirtualNodeFromAVRequest().get(fromNode);
+						List<RoboTaxi> freecar = getVirtualNodeSORoboTaxi().get(fromNode).stream()
+								.filter(car -> (car.getMenu().getStarterCourse().getMealType() == SharedMealType.DROPOFF
+										&& toNode.getLinks().contains(car.getCurrentDriveDestination())
+										|| (car.getMenu().getStarterCourse().getMealType() == SharedMealType.REDIRECT
+												&& toNode.getLinks()
+														.contains(car.getMenu().getCourses().get(1).getLink()))))
+								.collect(Collectors.toList());
+						for (int i = 0; i < psoQueue.length; i++) {
+							int index = (int) psoQueue[i] - 1;
+							if (index < 0) {
+								continue;
+							}
+							List<AVRequest> fromToRequest2 = fromRequests
+									.stream().filter(req -> getVirtualNodeToAVRequest()
+											.get(virtualNetwork.getVirtualNode(index)).contains(req))
+									.collect(Collectors.toList());
+							GlobalAssert.that(freecar.isEmpty() || fromToRequest2.isEmpty());
+						}
+						GlobalAssert.that(freecar.isEmpty() || fromRequests.isEmpty());
+					}
+				}
+			}
+
+			if (numberRebalance == 0) {
+				System.out.println("all rebalance commands used");
+			} else {
+				logger.warn("NOT ALL rebalance commands used");
+			}
+
+			if (numberXzo == 0) {
+				System.out.println("all XZO commands used");
+			} else {
+				logger.warn("NOT ALL XZO commands used");
+			}
+
+			if (numberXdo == 0) {
+				System.out.println("all XSO commands used");
+			} else {
+				logger.warn("NOT ALL XSO commands used");
+			}
+
+			if (numberPzo == 0) {
+				System.out.println("all PZO commands used");
+			} else {
+				logger.warn("NOT ALL PZO commands used");
+			}
+
+			if (numberPso == 0) {
+				System.out.println("all PSO commands used");
+			} else {
+				logger.warn("NOT ALL PSO commands used");
+			}
+
+			List<AVRequest> unassignedRequests = getUnassignedAVRequests();
+			if (!unassignedRequests.isEmpty()) {
+				logger.warn("Open Requests");
+			}
+		}
+
+		// Assign last unassigned requests
+//		if (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60)
+//				&& !getUnassignedAVRequests().isEmpty()) {
+//			for (AVRequest avRequest : getUnassignedAVRequests()) {
+//				Collection<RoboTaxi> availableCars = getRoboTaxisAvailable(avRequest);
+//				if (availableCars.isEmpty()) {
+//					continue;
+//				}
+//				RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, availableCars);
+//				if (!closestRoboTaxi.getMenu().getCourses().isEmpty()
+//						&& closestRoboTaxi.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
+//					closestRoboTaxi.getMenu().removeAVCourse(0);
+//					GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+//				}
+//
+//				if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu().getCourses().get(0)
+//						.getMealType() == SharedMealType.WAITFORCUSTOMER) {
+//					closestRoboTaxi.getMenu().removeAVCourse(0);
+//					GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 1);
+//					GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+//				}
+//
+//				if (!closestRoboTaxi.getMenu().getCourses().isEmpty()
+//						&& closestRoboTaxi.getMenu().getCourses().get(0).getMealType() == SharedMealType.DROPOFF) {
+//					addSharedRoboTaxiPickup(closestRoboTaxi, avRequest);
+//					SharedCourse sharedAVCourse = SharedCourse.pickupCourse(avRequest);
+//					closestRoboTaxi.getMenu().moveAVCourseToPrev(sharedAVCourse);
+//					GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 3);
+//					GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+//				} else {
+//					addSharedRoboTaxiPickup(closestRoboTaxi, avRequest);
+//					GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 2);
+//					GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+//				}
+//			}
+//			if (!getUnassignedAVRequests().isEmpty()) {
+//				logger.warn("Open Requests");
+//			}
+//		}
 
 	}
 
@@ -667,21 +923,28 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 				.collect(Collectors.toList());
 	}
 
-	protected final Collection<RoboTaxi> getRoboTaxisAvailable() {
-		return getRoboTaxis().stream() //
+	protected final Collection<RoboTaxi> getRoboTaxisAvailable(AVRequest avRequest) {
+		VirtualNode<Link> toVirtualNode = virtualNetwork.getVirtualNode(avRequest.getToLink());
+		List<RoboTaxi> availableCars = getRoboTaxis().stream() //
 				.filter(car -> (car.isInStayTask() && car.getCurrentNumberOfCustomersOnBoard() == 0
 						&& car.getMenu().getCourses().isEmpty())
 						|| (car.getMenu().getCourses().size() == 1
 								&& car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
 								&& virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
 										.getVirtualNode(car.getDivertableLocation()))
+						|| (!car.getMenu().getCourses().isEmpty() && car.getMenu().getStarterCourse().getMealType() == SharedMealType.WAITFORCUSTOMER
+								&& car.getMenu().getStarterCourse().getRequestId().toString().split("-")[0]
+										.equals(toVirtualNode.getId()))
 						|| (car.getMenu().getCourses().size() == 1
-								&& car.getMenu().getStarterCourse().getMealType() == SharedMealType.DROPOFF)
+								&& car.getMenu().getStarterCourse().getMealType() == SharedMealType.DROPOFF
+								&& toVirtualNode.getLinks().contains(car.getCurrentDriveDestination()))
 						|| (car.getMenu().getCourses().size() == 2
 								&& car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
 								&& virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
-										.getVirtualNode(car.getDivertableLocation()))) //
+										.getVirtualNode(car.getDivertableLocation())
+								&& toVirtualNode.getLinks().contains(car.getMenu().getCourses().get(1).getLink()))) //
 				.collect(Collectors.toList());
+		return availableCars;
 	}
 
 	public static class Factory implements AVDispatcherFactory {
