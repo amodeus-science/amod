@@ -45,7 +45,7 @@ public enum AidoHost {
 
             /** download the chosen scenario */
             try {
-                AidoScenarioDownload2.download(scenarioTag);
+                ScenarioResourceData.extract(scenarioTag);
             } catch (Exception exception) {
                 /** send empty tensor "{}" to stop */
                 stringSocket.writeln(Tensors.empty());
