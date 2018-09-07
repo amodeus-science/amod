@@ -45,12 +45,12 @@ public enum AidoHost {
 
             /** download the chosen scenario */
             try {
-                ScenarioResourceData.extract(scenarioTag);
+                AidoScenarioResource.extract(scenarioTag);
             } catch (Exception exception) {
                 /** send empty tensor "{}" to stop */
                 stringSocket.writeln(Tensors.empty());
                 /** send fictitious costs */
-                stringSocket.writeln("{-Infinity, -Infinity, -Infinity}");
+                stringSocket.writeln(StaticHelper.FAILURE_SCORE);
                 throw exception;
             }
 
