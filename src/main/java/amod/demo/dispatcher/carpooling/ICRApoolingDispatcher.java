@@ -111,7 +111,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		// dispatchPeriod = safeConfig.getInteger("dispatchPeriod", timeStep *
 		// 60);
 		dispatchPeriod = timeStep * 60;
-		this.planningHorizon = 8;
+		this.planningHorizon = 10;
 		this.fixedCarCapacity = 2;
 		this.router = router;
 

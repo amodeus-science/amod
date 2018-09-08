@@ -131,8 +131,8 @@ public class SMPCRebalancer extends PartitionedDispatcher {
 			Map<VirtualLink<Link>, Double> travelTimes = TravelTimeCalculatorClaudioForDejan
 					.computeTravelTimes(virtualNetwork.getVirtualLinks());
 
-			// planning horizon for SMPC
-			int planningHorizon = 25;
+            // planning horizon for SMPC
+            int planningHorizon = 25;
 
 			// prepare inputs for SMPC in MATLAB
 			double[][] networkSMPC = SMPCutils.getVirtualNetworkForMatlab(virtualNetwork);
