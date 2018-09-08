@@ -138,9 +138,10 @@ private static int getNumberOfArrivingCars(double now, int t, int timeStep, List
             Link toLink = roboTaxi.getCurrentDriveDestination();
             Link fromLink = roboTaxi.getLastKnownLocation();
             Scalar time = Quantity.of(now, SI.SECOND);
-            Scalar arrivingTime = timeFromTo(fromLink, toLink, time, roboTaxi, router);
-            if (arrivingTime.number().doubleValue() > now + t * timeStep * 60
-                    && arrivingTime.number().doubleValue() <= now + (t + 1) * timeStep * 60) {
+            Scalar travelTime = timeFromTo(fromLink, toLink, time, roboTaxi, router);
+            double arrivingTime = travelTime.number().doubleValue() + now;
+            if (arrivingTime > now + t * timeStep * 60
+                    && arrivingTime <= now + (t + 1) * timeStep * 60) {
                 numberCars = numberCars + 1;
             }
         }

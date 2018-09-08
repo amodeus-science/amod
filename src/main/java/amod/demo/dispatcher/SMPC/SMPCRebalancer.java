@@ -131,7 +131,7 @@ public class SMPCRebalancer extends PartitionedDispatcher {
                     .computeTravelTimes(virtualNetwork.getVirtualLinks());
 
             // planning horizon for SMPC
-            int planningHorizon = 50;
+            int planningHorizon = 25;
 
             // prepare inputs for SMPC in MATLAB
             double[][] networkSMPC = SMPCutils.getVirtualNetworkForMatlab(virtualNetwork);

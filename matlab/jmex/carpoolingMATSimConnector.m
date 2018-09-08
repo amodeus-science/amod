@@ -123,7 +123,7 @@ RebWeight = 5.0;
 save('Input','RoadNetwork','RebWeight','Passengers','Flags');
 
 % Optimization!!!!!!!
-[rebalanceQueue, output] = amod_p_mpc_v8(RoadNetwork, RebWeight, Passengers, Flags);
+[rebalanceQueue, output] = amod_p_mpc_v10(RoadNetwork, RebWeight, Passengers, Flags);
 
 save('Output','rebalanceQueue','output');
 
