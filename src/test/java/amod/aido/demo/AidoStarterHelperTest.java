@@ -1,6 +1,7 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido.demo;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import amod.aido.AidoHost;
+import ch.ethz.idsc.amodeus.aido.CleanAidoScenarios;
+import ch.ethz.idsc.amodeus.util.io.FileDelete;
 import junit.framework.TestCase;
 
 public class AidoStarterHelperTest extends TestCase {
@@ -41,21 +44,26 @@ public class AidoStarterHelperTest extends TestCase {
         for (int index : list)
             switch (index) {
             case 0:
-                guest().run("TelAviv", 0.001, 6);
+                guest().run("TelAviv", 5000, 6);
                 break;
             case 1:
-                guest().run("Santiago", 0.001, 10);
+                guest().run("Santiago", 5000, 10);
                 break;
             case 2:
-                guest().run("Berlin", 0.002, 10);
+                guest().run("Berlin", 5000, 10);
                 break;
             case 3:
-                guest().run("SanFrancisco", 0.01, 5);
+                guest().run("SanFrancisco", 5000, 5);
                 break;
             default:
                 throw new RuntimeException("out of range");
             }
 
+        /** files */
+        CleanAidoScenarios.now();
+        /** virtual network folder */
+        FileDelete.of(new File("virtualNetwork"), 1, 4);
+        /** output folder */
+        FileDelete.of(new File("output"), 5, 25000);
     }
-
 }

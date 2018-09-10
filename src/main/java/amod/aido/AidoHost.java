@@ -2,16 +2,24 @@
 package amod.aido;
 
 import java.io.File;
+import java.util.Properties;
 
 import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
+import ch.ethz.idsc.amodeus.aido.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
+import ch.ethz.idsc.amodeus.prep.LegCount;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.io.ResourceData;
+import ch.ethz.idsc.tensor.red.Total;
+import ch.ethz.idsc.tensor.sca.Round;
 
 /** host that runs in container.
  * a client can connect to a running host via TCP/IP
@@ -21,6 +29,7 @@ import ch.ethz.idsc.tensor.Tensors;
 public enum AidoHost {
     ;
     public static final int PORT = 9382;
+    private static final Properties scoreparam = ResourceData.properties("/aido/scoreparam.properties");
 
     public static void main(String[] args) throws Exception {
         /** open String server and wait for initial command */
@@ -32,14 +41,11 @@ public enum AidoHost {
             Tensor config = Tensors.fromString(readLine);
             System.out.println("AidoHost config: " + config);
             Thread.sleep(1000);
-
             String scenarioTag = config.Get(0).toString();
-            double populRed = config.Get(1).number().doubleValue();
-            int fleetSize = config.Get(2).number().intValue();
 
             /** download the chosen scenario */
             try {
-                AidoScenarioDownload.download(scenarioTag);
+                AidoScenarioDownload2.download(scenarioTag);
             } catch (Exception exception) {
                 /** send empty tensor "{}" to stop */
                 stringSocket.writeln(Tensors.empty());
@@ -55,16 +61,32 @@ public enum AidoHost {
             File workingDirectory = MultiFileTools.getWorkingDirectory();
             System.out.println("Using scenario directory: " + workingDirectory);
 
-            Tensor initialInfo = AidoPreparer.run(workingDirectory, populRed);
+            /** run first part of preparer */
+            AidoPreparer preparer = new AidoPreparer(workingDirectory);
 
-            /** send initial data (bounding box) */
+            /** get number of requests in population */
+            Scalar numReq = LegCount.of(preparer.getPopulation(), "av");
+            Scalar nominalFleetSize = //
+                    Round.of(numReq.multiply(RealScalar.of(Double.parseDouble(scoreparam.getProperty("gamma")))));
+            Tensor initialInfo = Tensors.of(numReq, preparer.getBoundingBox(), nominalFleetSize);
+
+            /** send initial data: {numberRequests,boundingBox} */
             stringSocket.writeln(initialInfo);
+
+            /** get additional information */
+            String readLine2 = stringSocket.readLine();
+            Tensor config2 = Tensors.fromString(readLine2);
+            int numReqDes = config2.Get(0).number().intValue();
+            int fleetSize = config2.Get(1).number().intValue();
+
+            /** run second part of preparer */
+            preparer.run2(numReqDes);
 
             /** run with AIDO dispatcher */
             XmlDispatcherChanger.of(workingDirectory, AidoDispatcherHost.class.getSimpleName());
             XmlNumberOfVehiclesChanger.of(workingDirectory, fleetSize);
             AidoServer aidoServer = new AidoServer();
-            aidoServer.simulate(stringSocket);
+            aidoServer.simulate(stringSocket, numReqDes);
 
             /** send empty tensor "{}" to stop */
             stringSocket.writeln(Tensors.empty());
@@ -72,12 +94,19 @@ public enum AidoHost {
             /** analyze and send final score */
             Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
                     aidoServer.getOutputDirectory());
-            AidoHtmlReport aidoHtmlReport = new AidoHtmlReport();
+            AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize);
+            analysis.addAnalysisElement(aidoScoreElement);
+
+            AidoExport aidoExport = new AidoExport(aidoScoreElement);
+            analysis.addAnalysisExport(aidoExport);
+
+            AidoHtmlReport aidoHtmlReport = new AidoHtmlReport(aidoScoreElement);
             analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
 
-            /** send final score, currently {mean waiting time, share of empty distance, number of taxis} */
-            stringSocket.writeln(aidoHtmlReport.getFinalScore());
+            /** send final score,
+             * {total waiting time, total distance with customer, total empty distance} */
+            stringSocket.writeln(Total.of(aidoScoreElement.getScoreDiffHistory()));
 
         } catch (Exception exception) {
             exception.printStackTrace();
