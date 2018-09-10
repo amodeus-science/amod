@@ -94,7 +94,7 @@ public enum AidoHost {
             /** analyze and send final score */
             Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
                     aidoServer.getOutputDirectory());
-            AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize, numReqDes);
+            AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize);
             analysis.addAnalysisElement(aidoScoreElement);
 
             AidoExport aidoExport = new AidoExport(aidoScoreElement);
