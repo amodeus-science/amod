@@ -55,7 +55,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
      * @throws MalformedURLException
      * @throws Exception */
 
-    public void simulate(StringSocket stringSocket) throws MalformedURLException, Exception {
+    public void simulate(StringSocket stringSocket, int numReqTot) throws MalformedURLException, Exception {
 
         Static.setup();
 
@@ -109,7 +109,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
         controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
-        controler.addOverridingModule(new AidoModule(stringSocket));
+        controler.addOverridingModule(new AidoModule(stringSocket, numReqTot));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

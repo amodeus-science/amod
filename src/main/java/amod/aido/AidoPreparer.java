@@ -19,53 +19,63 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
-import ch.ethz.idsc.amodeus.prep.PopulationPreparer;
 import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-/* package */ enum AidoPreparer {
-    ;
+/* package */ class AidoPreparer {
+
+    private final Population population;
+    private final ScenarioOptions scenOpt;
+    private final Config configMatsim;
+    private final Network network;
 
     /** loads scenario preparer in the {@link File} workingDirectory
      * 
      * @param workingDirectory
      * @throws MalformedURLException
      * @throws Exception */
-    public static Tensor run(File workingDirectory, double populRed) throws MalformedURLException, Exception {
+    public AidoPreparer(File workingDirectory) throws MalformedURLException, Exception {
         Static.setup();
 
         /** amodeus options */
-        ScenarioOptions scenOpt = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
+        scenOpt = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** MATSim config */
-        Config configMatsim = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName());
+        configMatsim = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName());
         Scenario scenario = ScenarioUtils.loadScenario(configMatsim);
 
         /** adaption of MATSim network, e.g., radius cutting */
         Network network = scenario.getNetwork();
-        network = NetworkPreparer.run(network, scenOpt);
+        this.network = NetworkPreparer.run(network, scenOpt);
 
         /** adaption of MATSim population, e.g., radius cutting */
-        Population population = scenario.getPopulation();
-        scenOpt.setMaxPopulationSize((int) (population.getPersons().size() * populRed));
+        population = scenario.getPopulation();
+    }
+
+    public void run2(int numReqDes) throws MalformedURLException, Exception {
         long apoSeed = 1234;
-        PopulationPreparer.run(network, population, scenOpt, configMatsim, apoSeed);
+        AidoPopulationPreparer.run(network, population, scenOpt, configMatsim, apoSeed, numReqDes);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
         VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt);
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(configMatsim, scenOpt);
+    }
 
+    public Tensor getBoundingBox() {
         /** send initial data (bounding box), {{minX, minY}, {maxX, maxY}} */
         double[] bbox = NetworkUtils.getBoundingBox(network.getNodes().values());
 
-        return Tensors.of( //
-                TensorCoords.toTensor( //
-                        scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
+        return Tensors.of(TensorCoords.toTensor( //
+                scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
                 TensorCoords.toTensor( //
                         scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[2], bbox[3]))));
+    }
+
+    public Population getPopulation() {
+        return population;
     }
 
 }

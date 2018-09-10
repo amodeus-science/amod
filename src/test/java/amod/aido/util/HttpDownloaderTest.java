@@ -4,6 +4,8 @@ package amod.aido.util;
 import java.io.File;
 import java.io.IOException;
 
+import ch.ethz.idsc.amodeus.aido.util.ContentType;
+import ch.ethz.idsc.amodeus.aido.util.HttpDownloader;
 import ch.ethz.idsc.amodeus.util.math.UserHome;
 import junit.framework.TestCase;
 

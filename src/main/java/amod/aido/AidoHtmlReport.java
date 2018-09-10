@@ -13,6 +13,8 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Transpose;
+import ch.ethz.idsc.tensor.red.Total;
 
 /* package */ class AidoHtmlReport implements HtmlReportElement {
 
@@ -48,18 +50,19 @@ import ch.ethz.idsc.tensor.Tensors;
 
             aRElement.getHTMLGenerator().insertTextLeft(aRElement.getHTMLGenerator().bold("Scores during Simulation"));
             aRElement.getHTMLGenerator().newLine();
-            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_WAIT + ".png", 800, 600);
-            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_DIST + ".png", 800, 600);
+            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE_INCR + ".png", 800, 600);
+            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE_INTG + ".png", 800, 600);
+            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE3_INTG + ".png", 800, 600);
 
             aRElement.getHTMLGenerator().insertTextLeft(aRElement.getHTMLGenerator().bold("Final Scores") + //
-                    "\n\t" + "total waiting time:" + //
-                    "\n\t" + "total full distance:" + //
-                    "\n\t" + "total empty distance:" //
+                    "\n\t" + "final service quality score:" + //
+                    "\n\t" + "final efficiency score:" + //
+                    "\n\t" + "final fleet size score:" //
             );
             aRElement.getHTMLGenerator().insertTextLeft(" " + //
-                    "\n" + aidoScoreElement.getCurrentScore().Get(0) + //
-                    "\n" + aidoScoreElement.getCurrentScore().Get(1) + //
-                    "\n" + aidoScoreElement.getCurrentScore().Get(2) //
+                    "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(1)) + //
+                    "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(2)) + //
+                    "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(3)) //
             );
             aRElement.getHTMLGenerator().newLine();
 

@@ -13,9 +13,11 @@ import ch.ethz.idsc.amodeus.util.net.StringSocket;
 
 public class AidoModule extends AbstractModule {
     private final StringSocket stringSocket;
+    private final int numReqTot;
 
-    public AidoModule(StringSocket stringSocket) {
+    public AidoModule(StringSocket stringSocket, int numReqTot) {
         this.stringSocket = Objects.requireNonNull(stringSocket);
+        this.numReqTot = numReqTot;
     }
 
     @Override
@@ -27,5 +29,11 @@ public class AidoModule extends AbstractModule {
     @Singleton
     public StringSocket provideStringSocket(Network network) {
         return stringSocket;
+    }
+
+    @Provides
+    @Singleton
+    public int provideNumReqTot() {
+        return numReqTot;
     }
 }

@@ -1,10 +1,14 @@
 # AIDO client protocol
 
+This file outlines the communication protocol for the Artificial Intelligence Driving Olympics (=AIDO) autonomous mobility-on-demand competition, for assistance please contact [mailto] (clruch@idsc.mavt.ethz.ch) . Documentation on the AIDO mobility-on-demand competition can be found [here](https://www.duckietown.org/research/ai-driving-olympics/ai-do-rules), [here](http://docs.duckietown.org/AIDO/out/amod.html) and [here](http://docs.duckietown.org/AIDO/out/performance.html).
+
 The communication is text based.
 
 Each message is a string that terminates with a line break `\n`. Apart from the last character, the string does **not** contain another line break.
 
-*Remark:* The notation adheres to the *Mathematica* standard for nested lists.
+*Remark:* The notation adheres to the *Mathematica* standard for nested lists, [see here](https://reference.wolfram.com/language/tutorial/NestedLists.html).
+
+The communication takes place between the main processes in [AidoHost](https://github.com/idsc-frazzoli/amod/blob/master/src/main/java/amod/aido/AidoHost.java) and [AidoGuest](https://github.com/idsc-frazzoli/amod/blob/master/src/main/java/amod/aido/demo/AidoGuest.java). AidoHost contains the simulation environment, while a modified version of AidoGuest can be used by the participant of AIDO to place their own fleet operational policy. **AidoHost** is implemented as a **Server** and **AidoGuest** as a **Client**.
 
 ## Port of server
 
@@ -14,27 +18,37 @@ The server listens for incoming `TCP/IP` connections at port `9382`.
 
 ### Client -> Server
 
-The server requires information about which scenario to run.
-The client sends the first line for instance as
+The server requires information about which scenario to run. The range of options is visible in [this file](https://github.com/idsc-frazzoli/amodeus/blob/master/src/main/resources/aido/scenarios.properties). The client sends the first line for instance as
 
-    {SanFrancisco, 0.4, 180}
+    {SanFrancisco.20080518}
 
-The line encodes the name of the scenario `SanFrancisco`, the population size ratio `0.4`, and the number of vehicles `180`.
+The line encodes the name of the scenario `SanFrancisco.20080518`, valid scenarios names include also `TelAviv`, `Santiago`, `Berlin`.
 
-Valid scenarios names include `SanFrancisco`, `TelAviv`, `Santiago`, `Berlin`.
-The size ratio should be between `0` and `1`.
-The value `1` corresponds to the full scenario.
 
 ### Server -> Client
 
-The server replies with the bounding box of the scenario coordinates.
-The city grid is inside the WGS:84 coordinates bounded by the box
+The server replies with the total number of requests in the scenario, bounding box of the scenario coordinates and the nominal fleet size.
 
-    {{-71.38020297181387, -33.869660953686626}, {-70.44406349551404, -33.0303523690584}}
+    {190788,{{-71.38020297181387, -33.869660953686626}, {-70.44406349551404, -33.0303523690584}},700}
 
 The interpretation is
 
-    {{longitude min, latitude min}, {longitude max, latitude max}}
+    {number of requests,{{longitude min, latitude min}, {longitude max, latitude max}}, nominal fleet size}
+
+The coordinates of the bouding box are denoted in the WGS:84 coordinate system.
+
+### Client -> Server
+
+The client then responds by chosing the desired number of requests and the desired fleet size, for instance
+
+    {10000,277}
+
+
+The interpretation is
+
+    {desired number of requests, desired fleet size}
+
+The desired number of requests must be a positive integer. If it is larger than the total requests in the chosen scenario, the total requests in the chosen scenario are used in the simulation. The desired fleet size can be any positive integer.
 
 ## Main loop
 
@@ -86,7 +100,7 @@ The `submission time` is a numeric value less than `simulation time`.
 
 The variable `REWARDS` is a list that contains the gains accumulated in different categories since the previous simulation step.
 
-	{service reward, efficiency reward, THIRD_REWARD}
+	{service reward, efficiency reward, fleet size reward}
 
 The value of `THIRD_REWARD` is initially `0` but switches to `-Infinity` if the maximum wait-time among the unserviced requests exceeds 10 minutes.
 
@@ -131,6 +145,6 @@ Examples:
 
 The server sends the (undiscounted) sum of all reward vectors. In the last component, a reward of `-n` incurs, which represents the cost for the number of vehicles used.
 
-    {service score, efficiency score, THIRD_SCORE}
+    {service score, efficiency score, fleet size score}
 
-In particular, the `THIRD_SCORE` takes the value `-n` or `-Infinity`.
+In particular, the `fleet size score` takes the value `-n` or `-Infinity`. More information the rewards can be found [here](http://docs.duckietown.org/AIDO/out/performance.html).
