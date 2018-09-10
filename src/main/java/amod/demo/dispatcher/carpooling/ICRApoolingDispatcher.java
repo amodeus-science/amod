@@ -107,11 +107,11 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		System.out.println("Using DistanceHeuristics: " + distanceHeuristics.name());
 		this.distanceFunction = distanceHeuristics.getDistanceFunction(network);
 		this.config = config;
-		this.timeStep = 10;
+		this.timeStep = 15;
 		// dispatchPeriod = safeConfig.getInteger("dispatchPeriod", timeStep *
 		// 60);
 		dispatchPeriod = timeStep * 60;
-		this.planningHorizon = 30;
+		this.planningHorizon = 10;
 		this.fixedCarCapacity = 2;
 		this.router = router;
 
@@ -658,7 +658,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 //			}
 //
 //		}
-		
+//		
 		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
 				&& round_now < (dispatchTime + timeStep * 60))
 				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
