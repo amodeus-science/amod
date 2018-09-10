@@ -107,11 +107,11 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		System.out.println("Using DistanceHeuristics: " + distanceHeuristics.name());
 		this.distanceFunction = distanceHeuristics.getDistanceFunction(network);
 		this.config = config;
-		this.timeStep = 25;
+		this.timeStep = 10;
 		// dispatchPeriod = safeConfig.getInteger("dispatchPeriod", timeStep *
 		// 60);
 		dispatchPeriod = timeStep * 60;
-		this.planningHorizon = 10;
+		this.planningHorizon = 30;
 		this.fixedCarCapacity = 2;
 		this.router = router;
 
@@ -595,69 +595,69 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		}
 
 		// Assign unassigned requests
-		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
-				&& round_now < (dispatchTime + timeStep * 60))
-				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
-			for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
-				for (VirtualNode<Link> toNode : virtualNetwork.getVirtualNodes()) {
-					List<List<double[]>> controlLawXZO = xZOControl.getControlLawXZO();
-					List<List<double[]>> controlLawPZO = pZOControl.getControlLawPZO();
-					List<List<double[]>> controlLawPSO = pSOControl.getControlLawPSO();
-					double[] xZOqueueFromTo = controlLawXZO.get(toNode.getIndex()).get(fromNode.getIndex());
-					double[] pZOqueueFromTo = controlLawPZO.get(fromNode.getIndex()).get(toNode.getIndex());
-					List<double[]> pSOqueueFrom = controlLawPSO.get(fromNode.getIndex());
-					DoublePredicate predicate = d -> d == (toNode.getIndex() + 1);
-					List<double[]> presence = pSOqueueFrom.stream()
-							.filter(q -> Arrays.stream(q).anyMatch(predicate) == true).collect(Collectors.toList());
-
-					if (Arrays.stream(xZOqueueFromTo).sum() == 0 && Arrays.stream(pZOqueueFromTo).sum() == 0
-							&& presence.isEmpty()) {
-						List<AVRequest> fromRequests = getVirtualNodeFromAVRequest().get(fromNode);
-						List<AVRequest> toRequests = getVirtualNodeToAVRequest().get(toNode);
-						List<AVRequest> fromToRequests = fromRequests.stream().filter(req -> toRequests.contains(req))
-								.collect(Collectors.toList());
-						if (!fromToRequests.isEmpty()) {
-							for (AVRequest avRequest : fromToRequests) {
-								Collection<RoboTaxi> availableCars = getRoboTaxisAvailable(avRequest);
-								if (availableCars.isEmpty()) {
-									continue;
-								}
-								RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest,
-										availableCars);
-								if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu()
-										.getCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
-									closestRoboTaxi.getMenu().removeAVCourse(0);
-									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
-								}
-
-								if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu()
-										.getCourses().get(0).getMealType() == SharedMealType.WAITFORCUSTOMER) {
-									closestRoboTaxi.getMenu().removeAVCourse(0);
-									GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 1);
-									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
-								}
-
-								if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu()
-										.getCourses().get(0).getMealType() == SharedMealType.DROPOFF) {
-									addSharedRoboTaxiPickup(closestRoboTaxi, avRequest);
-									SharedCourse sharedAVCourse = SharedCourse.pickupCourse(avRequest);
-									closestRoboTaxi.getMenu().moveAVCourseToPrev(sharedAVCourse);
-									GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 3);
-									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
-								} else {
-									addSharedRoboTaxiPickup(closestRoboTaxi, avRequest);
-									GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 2);
-									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
-								}
-							}
-
-						}
-					}
-
-				}
-			}
-
-		}
+//		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
+//				&& round_now < (dispatchTime + timeStep * 60))
+//				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
+//			for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
+//				for (VirtualNode<Link> toNode : virtualNetwork.getVirtualNodes()) {
+//					List<List<double[]>> controlLawXZO = xZOControl.getControlLawXZO();
+//					List<List<double[]>> controlLawPZO = pZOControl.getControlLawPZO();
+//					List<List<double[]>> controlLawPSO = pSOControl.getControlLawPSO();
+//					double[] xZOqueueFromTo = controlLawXZO.get(toNode.getIndex()).get(fromNode.getIndex());
+//					double[] pZOqueueFromTo = controlLawPZO.get(fromNode.getIndex()).get(toNode.getIndex());
+//					List<double[]> pSOqueueFrom = controlLawPSO.get(fromNode.getIndex());
+//					DoublePredicate predicate = d -> d == (toNode.getIndex() + 1);
+//					List<double[]> presence = pSOqueueFrom.stream()
+//							.filter(q -> Arrays.stream(q).anyMatch(predicate) == true).collect(Collectors.toList());
+//
+//					if (Arrays.stream(xZOqueueFromTo).sum() == 0 && Arrays.stream(pZOqueueFromTo).sum() == 0
+//							&& presence.isEmpty()) {
+//						List<AVRequest> fromRequests = getVirtualNodeFromAVRequest().get(fromNode);
+//						List<AVRequest> toRequests = getVirtualNodeToAVRequest().get(toNode);
+//						List<AVRequest> fromToRequests = fromRequests.stream().filter(req -> toRequests.contains(req))
+//								.collect(Collectors.toList());
+//						if (!fromToRequests.isEmpty()) {
+//							for (AVRequest avRequest : fromToRequests) {
+//								Collection<RoboTaxi> availableCars = getRoboTaxisAvailable(avRequest);
+//								if (availableCars.isEmpty()) {
+//									continue;
+//								}
+//								RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest,
+//										availableCars);
+//								if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu()
+//										.getCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
+//									closestRoboTaxi.getMenu().removeAVCourse(0);
+//									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+//								}
+//
+//								if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu()
+//										.getCourses().get(0).getMealType() == SharedMealType.WAITFORCUSTOMER) {
+//									closestRoboTaxi.getMenu().removeAVCourse(0);
+//									GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 1);
+//									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+//								}
+//
+//								if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu()
+//										.getCourses().get(0).getMealType() == SharedMealType.DROPOFF) {
+//									addSharedRoboTaxiPickup(closestRoboTaxi, avRequest);
+//									SharedCourse sharedAVCourse = SharedCourse.pickupCourse(avRequest);
+//									closestRoboTaxi.getMenu().moveAVCourseToPrev(sharedAVCourse);
+//									GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 3);
+//									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+//								} else {
+//									addSharedRoboTaxiPickup(closestRoboTaxi, avRequest);
+//									GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 2);
+//									GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+//								}
+//							}
+//
+//						}
+//					}
+//
+//				}
+//			}
+//
+//		}
 		
 		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
 				&& round_now < (dispatchTime + timeStep * 60))
@@ -797,6 +797,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 			List<AVRequest> unassignedRequests = getUnassignedAVRequests();
 			if (!unassignedRequests.isEmpty()) {
 				logger.warn("Open Requests");
+				System.out.println("Number of open requests: " + unassignedRequests.size());
 			}
 		}
 

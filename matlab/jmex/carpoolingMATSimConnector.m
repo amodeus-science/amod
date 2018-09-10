@@ -74,6 +74,8 @@ Flags.ignorerealpax = 1 - use_outpax;
 
 RebWeight = 5.0;
 
+ReactiveFlag = 0;
+
 % TESTING
 % flagTest = 0;
 % global deki1;
@@ -118,6 +120,12 @@ RebWeight = 5.0;
 % 
 % 
 % p_so{3,2} = [0, 0, 0, 14];
+
+if ReactiveFlag == 1
+    for t = 2:1:T
+        Passengers.FlowsOut(:,:,t) = Passengers.FlowsOut(:,:,t) * 0;
+    end
+end
 
 
 save('Input','RoadNetwork','RebWeight','Passengers','Flags');
