@@ -26,6 +26,7 @@ import amod.demo.dispatcher.SMPCDispatcher;
 import amod.demo.dispatcher.WaitNorthPoleSharedDispatcher;
 import amod.demo.dispatcher.SMPC.SMPCRebalancer;
 import amod.demo.dispatcher.carpooling.CarPooling2Dispatcher;
+import amod.demo.dispatcher.carpooling.FlowsOut;
 import amod.demo.dispatcher.carpooling.ICRApoolingDispatcher;
 import amod.demo.dispatcher.claudioForDejan.ClaudioForDejanDispatcher;
 import amod.demo.ext.Static;
@@ -200,6 +201,15 @@ public enum ScenarioServer {
             @Override
             public void install() {
                 AVUtils.registerDispatcherFactory(binder(), "ICRApoolingDispatcher", ICRApoolingDispatcher.Factory.class);                
+            }
+        });
+        
+        /** here an additional user-defined dispatcher is added, functionality in class
+         * DemoDispatcher */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerDispatcherFactory(binder(), "FlowsOut", FlowsOut.Factory.class);                
             }
         });
         

@@ -1,4 +1,4 @@
-function carpoolingMATSimConnector(server)
+function stochasticCarpoolingMATSimConnector(server)
 % routine is terminated anytime by pressing Ctrl+C
 
 while 1
@@ -13,11 +13,14 @@ while 1
 container = socket.pollContainer();
 [inputCarpooling] = jmexStruct(container);
 
+reactiveFlag = 1;
+
 % get number of nodes
 numberNodes = length(inputCarpooling.roadGraph0);
 
 % get planning horizon
 T = inputCarpooling.PlanningHorizon;
+currentTime = inputCarpooling.currentTime;
 RoadNetwork.T = T;
 fprintf('Planning horizon: %d \n', T);
 
@@ -26,7 +29,7 @@ RoadGraph = cell(1,numberNodes);
 travelTimes = zeros(numberNodes,numberNodes);
 rState = zeros(T,numberNodes);
 xState = zeros(numberNodes, numberNodes, T);
-FlowsOut = zeros(numberNodes, numberNodes, T);
+unassignedRequests = zeros(numberNodes, numberNodes);
 
 % get struct elements names
 InputNames = fieldnames(inputCarpooling);
@@ -60,11 +63,20 @@ Starters.x_state = xState;
 
 RoadNetwork.Starters = Starters;
 
-for t = 1:1:T
-    for i = 1:1:numberNodes
-        FlowsOut(i,:,t) = inputCarpooling.(InputNames{i + 2*numberNodes + T*numberNodes + T + (t-1)*numberNodes})';
+for i = 1:1:numberNodes
+    unassignedRequests(i,:) = inputCarpooling.(InputNames{i + 2*numberNodes + T*numberNodes + T})';
+end
+
+FlowsOut = predictPassengers(currentTime);
+
+if(reactiveFlag == 1)
+    for t=2:1:T
+        FlowsOut(:,:,t) = FlowsOut(:,:,t)*0;
     end
 end
+
+
+FlowsOut(:,:,1) = FlowsOut(:,:,1) + unassignedRequests;
 
 Passengers.FlowsOut = FlowsOut;
 
@@ -74,52 +86,6 @@ Flags.ignorerealpax = 1 - use_outpax;
 Flags.pooling_flag = 1;
 
 RebWeight = 5.0;
-
-% TESTING
-% flagTest = 0;
-% global deki1;
-% 
-% if(isempty(deki1))
-%     deki1 = 0;
-% end
-% 
-% cont = zeros(1,2);
-% contsec = zeros(1,2);
-% if(sum(sum(FlowsOut(:,:,1)))~=0 && deki1==0)
-%     [row,column] = find(FlowsOut(:,:,1));
-%     for(i=1:1:length(row))
-%         if(row(i) ~= column(i))
-%             cont = [column(i),row(i)];
-%             break
-%         end
-%             
-%     end
-%     
-%     for(i=1:1:length(row))
-%         if(row(i) ~= cont(2) && column(i)~=cont(1))
-%             contsec(1) = column(i);
-%             contsec(2) = row(i);
-%             break
-%         end
-%             
-%     end
-%     flagTest = 1;
-%     deki1 = 1;
-% end
-% r = cell(numberNodes,1);
-% x_zo = cell(numberNodes,numberNodes);
-% x_so = cell(numberNodes,numberNodes);
-% p_zo = cell(numberNodes,numberNodes);
-% p_so = cell(numberNodes,numberNodes);
-% 
-% if(flagTest == 1)
-%     x_zo{cont(1),cont(2)} = [0, 0, 0, contsec(2)];
-%     
-% end
-% 
-% 
-% p_so{3,2} = [0, 0, 0, 14];
-
 
 save('Input','RoadNetwork','RebWeight','Passengers','Flags');
 
@@ -159,8 +125,6 @@ for i = 1:1:numberNodes
     end
     
 end
-
-% save('InputOutput.mat','RoadNetwork','RebWeight','Passengers','Flags','rebalanceQueue','output');
 
 % write reply to client socket
 sol = ch.ethz.idsc.jmex.Container('solution');

@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
 import ch.ethz.matsim.av.passenger.AVRequest;
@@ -124,7 +125,9 @@ public class PZOControl {
                             linkMap.get(virtualNetwork.getVirtualNode(toNodeSecondIndex)).remove(waitingLink);
                         } else {
                             waitingLink = avRequestFirst.getFromLink();
-                        }
+                        }                                               
+                        
+                        GlobalAssert.that(waitingLink != null);
                         
                         Pair<Link, VirtualNode<Link>> pairWait = Pair.of(waitingLink,
                                 virtualNetwork.getVirtualNode(toNodeSecondIndex));
@@ -165,6 +168,9 @@ public class PZOControl {
                         } else {
                             waitingLink = avRequestSecond.getFromLink();
                         }
+                                                
+                        
+                        GlobalAssert.that(waitingLink != null);
 
                         Pair<Link, VirtualNode<Link>> pairWait = Pair.of(waitingLink, toNodeFirst);
 
@@ -192,12 +198,19 @@ public class PZOControl {
 
                             List<Link> linkSet = linkMap.get(virtualNetwork.getVirtualNode(toNodeSecondIndex));
                             List<Link> fromNodeLinkList = linkSet.stream()
-                                    .filter(link -> fromNode.getLinks().contains(link)).collect(Collectors.toList());
+                                    .filter(link -> fromNode.getLinks().contains(link)).collect(Collectors.toList());           
 
-                            Link waitingLink = StaticHelperCarPooling.findClostestWaitLink(avRequestFirst,
-                                    fromNodeLinkList);
-                            linkMap.get(virtualNetwork.getVirtualNode(toNodeSecondIndex)).remove(waitingLink);
-
+                            Link waitingLink = null;
+                            if(!fromNodeLinkList.isEmpty()) {
+                                waitingLink = StaticHelperCarPooling.findClostestWaitLink(avRequestFirst,
+                                        fromNodeLinkList);
+                                linkMap.get(virtualNetwork.getVirtualNode(toNodeSecondIndex)).remove(waitingLink);
+                            } else {
+                                waitingLink = avRequestFirst.getFromLink();
+                            }
+                            
+                            GlobalAssert.that(waitingLink != null);
+                            
                             Pair<Link, VirtualNode<Link>> pairWait = Pair.of(waitingLink,
                                     virtualNetwork.getVirtualNode(toNodeSecondIndex));
 
