@@ -33,7 +33,9 @@ import ch.ethz.idsc.tensor.red.Total;
     @Override
     public Map<String, HtmlBodyElement> process(AnalysisSummary analysisSummary) {
 
-        this.totalMeanWaitingTime = analysisSummary.getWaitingTimes().totalWaitTimeMean;
+        this.totalMeanWaitingTime = analysisSummary.getTravelTimeAnalysis().getWaitAggrgte().Get(1);
+                
+
 
         {
             DistanceElement distanceElement = analysisSummary.getDistanceElement();
