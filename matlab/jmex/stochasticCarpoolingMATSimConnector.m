@@ -13,7 +13,7 @@ while 1
 container = socket.pollContainer();
 [inputCarpooling] = jmexStruct(container);
 
-reactiveFlag = 1;
+reactiveFlag = 0;
 
 % get number of nodes
 numberNodes = length(inputCarpooling.roadGraph0);
@@ -77,7 +77,6 @@ end
 
 
 FlowsOut(:,:,1) = FlowsOut(:,:,1) + unassignedRequests;
-
 Passengers.FlowsOut = FlowsOut;
 
 use_outpax = 1;
