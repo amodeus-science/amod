@@ -34,8 +34,6 @@ import ch.ethz.idsc.tensor.red.Total;
     public Map<String, HtmlBodyElement> process(AnalysisSummary analysisSummary) {
 
         this.totalMeanWaitingTime = analysisSummary.getTravelTimeAnalysis().getWaitAggrgte().Get(1);
-                
-
 
         {
             DistanceElement distanceElement = analysisSummary.getDistanceElement();
