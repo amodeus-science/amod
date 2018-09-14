@@ -2,10 +2,10 @@
 package amod.aido;
 
 import java.io.File;
-import java.util.Properties;
 
 import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
 import ch.ethz.idsc.amodeus.aido.AidoScoreElement;
+import ch.ethz.idsc.amodeus.aido.ScoreParameters;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
@@ -13,11 +13,9 @@ import ch.ethz.idsc.amodeus.prep.LegCount;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
-import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.io.ResourceData;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
 
@@ -29,7 +27,6 @@ import ch.ethz.idsc.tensor.sca.Round;
 public enum AidoHost {
     ;
     public static final int PORT = 9382;
-    private static final Properties scoreparam = ResourceData.properties("/aido/scoreparam.properties");
 
     public static void main(String[] args) throws Exception {
         /** open String server and wait for initial command */
@@ -66,8 +63,8 @@ public enum AidoHost {
 
             /** get number of requests in population */
             Scalar numReq = LegCount.of(preparer.getPopulation(), "av");
-            Scalar nominalFleetSize = //
-                    Round.of(numReq.multiply(RealScalar.of(Double.parseDouble(scoreparam.getProperty("gamma")))));
+
+            Scalar nominalFleetSize = Round.of(numReq.multiply(ScoreParameters.GLOBAL.gamma));
             Tensor initialInfo = Tensors.of(numReq, preparer.getBoundingBox(), nominalFleetSize);
 
             /** send initial data: {numberRequests,boundingBox} */
