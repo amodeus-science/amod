@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.ethz.idsc</groupId>
 	<artifactId>amod</artifactId>
-	<version>1.4.0</version>
+	<version>1.4.2</version>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -15,12 +15,12 @@
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>amodeus</artifactId>
-			<version>1.4.0</version>
+			<version>1.4.2</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>tensor</artifactId>
-			<version>0.5.8</version>
+			<version>0.5.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
