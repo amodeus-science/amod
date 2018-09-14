@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 
 public class AidoPropertiesTest extends TestCase {
     public void testScoreParam() {
-        Properties properties = ResourceData.properties("/aido/scoreparam.properties");
+        Properties properties = ResourceData.properties("/aido/ScoreParameters.properties");
         assertNotNull(properties);
     }
 
