@@ -4,6 +4,7 @@ package amod.aido.demo;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -35,25 +36,20 @@ public class AidoStarterHelperTest extends TestCase {
     public void testSanFrancisco() throws UnknownHostException, IOException, Exception {
 
         List<Integer> list = IntStream.range(0, 4).boxed().collect(Collectors.toList());
-        // Previously:
-        // if i put 2 instead of 1 -> doesn't finish but exception in traffic link data
-        // ... cannot run more than 1 scenario at runtime
-        // TODO Jan right now SanFrancisco has to run last -> don't shuffle
-        // Collections.shuffle(list);
-        list = list.stream().limit(4).collect(Collectors.toList());
+        Collections.shuffle(list);
         for (int index : list)
             switch (index) {
             case 0:
-                guest().run("TelAviv", 5000, 6);
+                guest().run("TelAviv", 1000, 6);
                 break;
             case 1:
-                guest().run("Santiago", 5000, 10);
+                guest().run("Santiago", 1000, 10);
                 break;
             case 2:
-                guest().run("Berlin", 5000, 10);
+                guest().run("Berlin", 1000, 10);
                 break;
             case 3:
-                guest().run("SanFrancisco", 5000, 5);
+                guest().run(AidoGuest.SCENARIO, 1000, 5);
                 break;
             default:
                 throw new RuntimeException("out of range");
