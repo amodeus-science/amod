@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -19,6 +20,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -357,4 +359,92 @@ public enum ICRApoolingDispatcherUtils {
 
         return fromToAVRequests;
     }
+    
+    public static List<Link>  getLinkforStation(Network network, Config config, VirtualNetwork<Link> virtualNetwork) {
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        Population population = scenario.getPopulation();
+        StageActivityTypes stageActivityTypes = new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
+        
+        HashMap<VirtualNode<Link>, List<Coord>> coordMap = new HashMap<VirtualNode<Link>, List<Coord>>();
+        for(VirtualNode<Link> vNod: virtualNetwork.getVirtualNodes()) {
+            List<Coord> linkList = new ArrayList<>();
+            coordMap.put(vNod, linkList);
+        }
+        int helper = 0;
+
+        Link fromLink = null;
+        Coord fromCoord = null;
+
+            for (Person person : population.getPersons().values()) {
+                for (Plan plan : person.getPlans()) {
+                    for (PlanElement planElement : plan.getPlanElements()) {
+                        if (planElement instanceof Activity) {
+                            Activity activity = (Activity) planElement;
+
+                            if (activity.getEndTime() != Double.NEGATIVE_INFINITY) {
+                                if (!stageActivityTypes.isStageActivity(activity.getType())) {
+                                    fromLink = network.getLinks().getOrDefault(activity.getLinkId(), null);                                    
+                                    if (fromLink != null) {
+                                        fromCoord = fromLink.getCoord();
+                                        helper = 1;
+                                    }
+                                }
+                            }
+
+                            if (activity.getStartTime() != Double.NEGATIVE_INFINITY && helper == 1) {
+                                if (!stageActivityTypes.isStageActivity(activity.getType())) {
+                                    Link link = network.getLinks().getOrDefault(activity.getLinkId(), null);
+                                    if (link != null) {
+                                        coordMap.get(virtualNetwork.getVirtualNode(fromLink)).add(fromCoord);
+                                        helper = 0;
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+            }
+            
+            List<Link> linkList = new ArrayList<Link>(virtualNetwork.getvNodesCount());
+            
+            for(int i=0; i<virtualNetwork.getvNodesCount(); i++) {
+                linkList.add(i, null);
+            }
+            
+            
+            for(int index=0; index<virtualNetwork.getvNodesCount(); index++) {
+                Link destination = null;
+                VirtualNode<Link> virtnode = virtualNetwork.getVirtualNode(index);
+                List<Coord> coordinates = coordMap.get(virtnode);
+                
+                double xsum = 0;
+                double ysum = 0;
+                
+                if(coordinates.size() == 0) {
+                    destination = virtualNetwork.getVirtualNode(index).getLinks().iterator().next();
+                } else {
+                    for(int i=0; i<coordinates.size(); i++) {
+                        xsum = coordinates.get(i).getX() + xsum;
+                        ysum = coordinates.get(i).getY() + ysum;
+                    }
+                    
+                    double xCoord = xsum/coordinates.size();
+                    double yCoord = ysum/coordinates.size();
+                    
+                    Coord coord = new Coord(xCoord, yCoord);
+                    
+                    destination = NetworkUtils.getNearestLink(network, coord);
+                }
+                linkList.set(index, destination);
+                
+            }
+                
+            return linkList;
+
+
+    }
+    
+    
 }

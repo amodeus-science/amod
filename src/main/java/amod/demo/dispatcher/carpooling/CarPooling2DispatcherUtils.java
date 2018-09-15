@@ -3,12 +3,14 @@ package amod.demo.dispatcher.carpooling;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EmptyStackException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -18,6 +20,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -279,7 +282,7 @@ public enum CarPooling2DispatcherUtils {
                     numberCars = numberCars + 1;
                 }
             }
-            
+
             if (roboTaxi.getCurrentNumberOfCustomersOnBoard() == 1) {
                 Scalar arrivalTimeSO = null;
                 if (roboTaxi.getMenu().getCourses().size() > 1) {
@@ -359,5 +362,82 @@ public enum CarPooling2DispatcherUtils {
         }
 
         return fromToAVRequests;
+    }
+
+    public static List<List<Coord>> getDemand(Network network, int timeStep, Config config, VirtualNetwork<Link> virtualNetwork) {
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        Population population = scenario.getPopulation();
+        StageActivityTypes stageActivityTypes = new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
+        List<List<Coord>> coordList = new ArrayList<List<Coord>>(virtualNetwork.getVirtualNodes().size());
+        List<Coord> coorListIni = new ArrayList<Coord>();
+        for(int i=0;i<virtualNetwork.getvNodesCount();i++) {
+            coordList.add(i,coorListIni);
+        }
+
+        int helper = 0;
+
+        Link fromLink = null;
+        Coord fromCoord = null;
+        VirtualNode<Link> station = null;
+
+            for (Person person : population.getPersons().values()) {
+                for (Plan plan : person.getPlans()) {
+                    for (PlanElement planElement : plan.getPlanElements()) {
+                        if (planElement instanceof Activity) {
+                            Activity activity = (Activity) planElement;
+
+                            if (activity.getEndTime() != Double.NEGATIVE_INFINITY) {
+                                if (!stageActivityTypes.isStageActivity(activity.getType())) {
+                                    fromLink = network.getLinks().getOrDefault(activity.getLinkId(), null);                                    
+                                    if (fromLink != null) {
+                                        station = virtualNetwork.getVirtualNode(fromLink);
+                                        fromCoord = fromLink.getCoord();
+                                        helper = 1;
+                                    }
+                                }
+                            }
+
+                            if (activity.getStartTime() != Double.NEGATIVE_INFINITY && helper == 1) {
+                                if (!stageActivityTypes.isStageActivity(activity.getType())) {
+                                    Link link = network.getLinks().getOrDefault(activity.getLinkId(), null);
+                                    if (link != null) {
+                                        coordList.get(station.getIndex()).add(fromCoord);
+                                        helper = 0;
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+            }
+
+        return coordList;
+
+    }
+    
+    public static Link getLinkforStation(Network network, List<List<Coord>> coordList, VirtualNode<Link> vNode) {
+        
+        Link destination = null;
+        
+        List<Coord> coordinates = coordList.get(vNode.getIndex());
+        double xsum = 0;
+        double ysum = 0;
+        
+        for(int i=0; i<coordinates.size(); i++) {
+            xsum = coordinates.get(i).getX() + xsum;
+            ysum = coordinates.get(i).getY() + ysum;
+        }
+        
+        double xCoord = xsum/coordinates.size();
+        double yCoord = ysum/coordinates.size();
+        
+        Coord coord = new Coord(xCoord, yCoord);
+        
+        destination = NetworkUtils.getNearestLink(network, coord);
+               
+        return destination;
+        
     }
 }

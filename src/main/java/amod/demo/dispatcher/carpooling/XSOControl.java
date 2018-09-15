@@ -26,7 +26,7 @@ public class XSOControl {
 	}
 
 	List<Pair<RoboTaxi, Link>> getXSOCommands(VirtualNetwork<Link> virtualNetwork,
-			Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi) throws Exception {
+			Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi, List<Link> linkList) throws Exception {
 
 		List<Pair<RoboTaxi, Link>> xSOCommandsList = new ArrayList<>();
 
@@ -66,11 +66,7 @@ public class XSOControl {
 					availableCars.remove(nextRoboTaxi);
 					soRoboTaxi.get(fromNode).remove(nextRoboTaxi);
 					VirtualNode<Link> toVirtualNodeRedirect = virtualNetwork.getVirtualNode(toNodeRedirect);
-					Set<Link> linkSet = toVirtualNodeRedirect.getLinks();
-					List<Link> linkList = new ArrayList<Link>(linkSet);
-					List<Link> linkListFiltered = linkList.stream().filter(link -> link != null)
-							.collect(Collectors.toList());
-					Link redirectLink = linkListFiltered.get(new Random().nextInt(linkListFiltered.size() - 1));
+					Link redirectLink = linkList.get(toVirtualNodeRedirect.getIndex());
 
 					Pair<RoboTaxi, Link> xSOCommands = Pair.of(nextRoboTaxi, redirectLink);
 					xSOCommandsList.add(xSOCommands);

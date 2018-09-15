@@ -23,7 +23,7 @@ public class RebalanceCarSelector {
         this.controlLaw = controlLaw;
     }
     
-    public List<Pair<RoboTaxi, Link>> getRebalanceCommands(VirtualNode<Link> from, Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles, VirtualNetwork<Link> virtualNetwork) throws Exception {
+    public List<Pair<RoboTaxi, Link>> getRebalanceCommands(VirtualNode<Link> from, Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles, VirtualNetwork<Link> virtualNetwork, List<Link> linkList) throws Exception {
 
         List<RoboTaxi> avTaxis = availableVehicles.get(from);
         int indexFromNode = from.getIndex();
@@ -59,10 +59,7 @@ public class RebalanceCarSelector {
             availableVehicles.get(from).remove(nextRoboTaxi);
             
             VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
-            Set<Link> linkSet = toNode.getLinks();
-            List<Link> linkList = new ArrayList<Link>(linkSet);
-            List<Link> linkListFiltered = linkList.stream().filter(link -> link!=null).collect(Collectors.toList());
-            Link rebalanceLink = linkListFiltered.get(new Random().nextInt(linkListFiltered.size()-1));
+            Link rebalanceLink = linkList.get(toNode.getIndex());
 
             Pair<RoboTaxi, Link> xZOCommands = Pair.of(nextRoboTaxi, rebalanceLink);
             rebalanceCommandsList.add(xZOCommands);

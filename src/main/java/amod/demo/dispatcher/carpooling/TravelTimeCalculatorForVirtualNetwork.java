@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -25,7 +26,7 @@ import ch.ethz.matsim.av.router.AVRouter;
 public enum TravelTimeCalculatorForVirtualNetwork {
     ;
     
-static Map<VirtualLink<Link>,Double> computeTravelTimes(Collection<VirtualLink<Link>> vLinks, Scalar now, AVRouter router){
+static Map<VirtualLink<Link>,Double> computeTravelTimes(Collection<VirtualLink<Link>> vLinks, Scalar now, AVRouter router, List<Link> linkList){
         
         Map<VirtualLink<Link>,Double> tTimes = new HashMap<>();
         
@@ -33,15 +34,9 @@ static Map<VirtualLink<Link>,Double> computeTravelTimes(Collection<VirtualLink<L
             VirtualNode<Link> fromNode = vLink.getFrom();
             VirtualNode<Link> toNode = vLink.getTo();
             
-            Set<Link> linkSetFrom = fromNode.getLinks();
-            List<Link> linkListFrom = new ArrayList<Link>(linkSetFrom);
-            List<Link> linkListFilteredFrom = linkListFrom.stream().filter(link -> link!=null).collect(Collectors.toList());
-            Link linkFrom = linkListFilteredFrom.get(new Random().nextInt(linkListFilteredFrom.size()-1));
-            
-            Set<Link> linkSetTo = toNode.getLinks();
-            List<Link> linkListTo = new ArrayList<Link>(linkSetTo);
-            List<Link> linkListFilteredTo = linkListTo.stream().filter(link -> link!=null).collect(Collectors.toList());
-            Link linkTo = linkListFilteredTo.get(new Random().nextInt(linkListFilteredTo.size()-1));
+            Link linkFrom = linkList.get(fromNode.getIndex());
+                       
+            Link linkTo = linkList.get(toNode.getIndex());
             
             Scalar travelTime = timeFromTo(linkFrom, linkTo, now, router);
             

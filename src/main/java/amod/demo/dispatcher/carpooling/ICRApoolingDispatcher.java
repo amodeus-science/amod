@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -83,6 +84,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 	private final boolean predictedDemand;
 	private final boolean allowAssistance;
 	private final boolean poolingFlag;
+	private List<Link> linkList;
 	static private final Logger logger = Logger.getLogger(ICRApoolingDispatcher.class);
 
 	protected ICRApoolingDispatcher(Config config, //
@@ -120,6 +122,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		this.predictedDemand = true;
 		this.allowAssistance = true;
 		this.poolingFlag = true;
+		this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);
 
 	}
 
@@ -132,7 +135,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 
 			// travel times
 			Map<VirtualLink<Link>, Double> travelTimes = TravelTimeCalculatorForVirtualNetwork
-					.computeTravelTimes(virtualNetwork.getVirtualLinks(), Quantity.of(now, SI.SECOND), router);
+					.computeTravelTimes(virtualNetwork.getVirtualLinks(), Quantity.of(now, SI.SECOND), router, linkList);
 
 			double[][] StationsRoadGraph = CarPooling2DispatcherUtils.getVirtualNetworkForMatlab(virtualNetwork);
 			double[][] TravelTimesStations = CarPooling2DispatcherUtils
@@ -500,7 +503,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 			Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests = getVirtualNodeToAVRequest();
 			try {
 				List<Triple<RoboTaxi, AVRequest, Link>> xZOControlPolicy = xZOControl.getXZOCommands(virtualNetwork,
-						stayRoboTaxi, virtualNodeAVFromRequests, virtualNodeAVToRequests);
+						stayRoboTaxi, virtualNodeAVFromRequests, virtualNodeAVToRequests, linkList);
 				if (xZOControlPolicy != null) {
 					for (Triple<RoboTaxi, AVRequest, Link> triple : xZOControlPolicy) {
 						RoboTaxi roboTaxi = triple.getLeft();
@@ -545,7 +548,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
 			Map<VirtualNode<Link>, List<RoboTaxi>> soRoboTaxi = getVirtualNodeSORoboTaxi();
 			try {
-				List<Pair<RoboTaxi, Link>> xDOControlPolicy = xSOControl.getXSOCommands(virtualNetwork, soRoboTaxi);
+				List<Pair<RoboTaxi, Link>> xDOControlPolicy = xSOControl.getXSOCommands(virtualNetwork, soRoboTaxi, linkList);
 				if (xDOControlPolicy != null) {
 					for (Pair<RoboTaxi, Link> pair : xDOControlPolicy) {
 						RoboTaxi roboTaxi = pair.getLeft();
@@ -590,7 +593,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 			for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
 				try {
 					List<Pair<RoboTaxi, Link>> controlPolicy = rebalanceSelector.getRebalanceCommands(fromNode,
-							stayRoboTaxi, virtualNetwork);
+							stayRoboTaxi, virtualNetwork, linkList);
 					if (controlPolicy != null) {
 						for (Pair<RoboTaxi, Link> pair : controlPolicy) {
 							RoboTaxi roboTaxi = pair.getLeft();

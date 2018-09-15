@@ -22,6 +22,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import amod.demo.dispatcher.carpooling.ICRApoolingDispatcherUtils;
 import amod.demo.dispatcher.carpooling.RebalanceCarSelector;
 import amod.demo.dispatcher.claudioForDejan.ClaudioForDejanDispatcher;
 import amod.demo.dispatcher.claudioForDejan.ClaudioForDejanUtils;
@@ -75,6 +76,7 @@ public class SMPCRebalancer extends PartitionedDispatcher {
 	private double dispatchTime;
 	private final BipartiteMatchingUtils bipartiteMatchingEngine;
 	private final AVRouter router;
+	private List<Link> linkList;
 
 	// final JavaContainerSocket javaContainerSocket;
 
@@ -110,6 +112,7 @@ public class SMPCRebalancer extends PartitionedDispatcher {
 		this.timeStep = 5;
 		this.bipartiteMatchingEngine = new BipartiteMatchingUtils(network);
 		this.router = router;
+		this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);
 
 	}
 
@@ -229,7 +232,7 @@ public class SMPCRebalancer extends PartitionedDispatcher {
 			for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
 				try {
 					List<Pair<RoboTaxi, Link>> controlPolicy = rebalanceSelector.getRebalanceCommands(fromNode,
-							StayRoboTaxi, virtualNetwork);
+							StayRoboTaxi, virtualNetwork, linkList);
 					if (controlPolicy != null) {
 						for (Pair<RoboTaxi, Link> pair : controlPolicy) {
 							setRoboTaxiRebalance(pair.getLeft(), pair.getRight());

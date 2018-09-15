@@ -26,7 +26,7 @@ public class XZOControl {
     List<Triple<RoboTaxi, AVRequest, Link>> getXZOCommands(VirtualNetwork<Link> virtualNetwork,
             Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi,
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests,
-            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests) throws Exception {
+            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests, List<Link> linkList) throws Exception {
 
         List<Triple<RoboTaxi, AVRequest, Link>> xZOCommandsList = new ArrayList<>();
 
@@ -86,11 +86,7 @@ public class XZOControl {
                     stayRoboTaxi.get(fromNode).remove(closestRoboTaxi);
 
                     VirtualNode<Link> toVirtualNodeRedirect = virtualNetwork.getVirtualNode(toNodeRedirect);
-                    Set<Link> linkSet = toVirtualNodeRedirect.getLinks();
-                    List<Link> linkList = new ArrayList<Link>(linkSet);
-                    List<Link> linkListFiltered = linkList.stream().filter(link -> link != null)
-                            .collect(Collectors.toList());
-                    Link redirectLink = linkListFiltered.get(new Random().nextInt(linkListFiltered.size() - 1));
+                    Link redirectLink = linkList.get(toVirtualNodeRedirect.getIndex());
 
                     Triple<RoboTaxi, AVRequest, Link> xZOCommands = Triple.of(closestRoboTaxi, avRequest, redirectLink);
                     xZOCommandsList.add(xZOCommands);
