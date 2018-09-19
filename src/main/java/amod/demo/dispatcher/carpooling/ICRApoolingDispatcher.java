@@ -607,6 +607,12 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 								GlobalAssert.that(roboTaxi.checkMenuConsistency());
 								continue;
 							}
+							
+							if (!roboTaxi.getMenu().getCourses().isEmpty() && roboTaxi.getMenu().getCourses().size() == 1
+	                                && roboTaxi.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
+	                            roboTaxi.getMenu().clearWholeMenu();
+	                        }
+							
 							SharedCourse redirectCourse = SharedCourse.redirectCourse(redirectLink, //
 									Double.toString(now) + roboTaxi.getId().toString());
 							addSharedRoboTaxiRedirect(roboTaxi, redirectCourse);
@@ -831,6 +837,8 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 			}
 
 			List<AVRequest> unassignedRequests = getUnassignedAVRequests();
+			Collection<AVRequest> totRequest = getAVRequests();
+			System.out.println("Number of open total requests: " + totRequest.size());
 			if (!unassignedRequests.isEmpty()) {
 				logger.warn("Open Requests");
 				System.out.println("Number of open requests: " + unassignedRequests.size());
@@ -884,8 +892,11 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 	}
 
 	private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayWithoutCustomerRoboTaxi() {
-		List<RoboTaxi> taxiList = getDivertableUnassignedRoboTaxis().stream().filter(car -> car.isInStayTask()
-				&& car.getCurrentNumberOfCustomersOnBoard() == 0 && car.getMenu().getCourses().isEmpty())
+		List<RoboTaxi> taxiList = getDivertableUnassignedRoboTaxis().stream().filter(car -> (car.isInStayTask()
+				&& car.getCurrentNumberOfCustomersOnBoard() == 0 && car.getMenu().getCourses().isEmpty())|| (car.getMenu().getCourses().size() == 1
+                && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
+                && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
+                        .getVirtualNode(car.getDivertableLocation())))
 				.collect(Collectors.toList());
 		return virtualNetwork.binToVirtualNode(taxiList, RoboTaxi::getDivertableLocation);
 	}
