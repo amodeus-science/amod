@@ -69,24 +69,24 @@ public enum SimulationVideoDark {
 
         // load viewer
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(MatsimStaticDatabase.INSTANCE);
+        AmodeusComponent amodeusComponent = new AmodeusComponent(MatsimStaticDatabase.INSTANCE);
 
         amodeusComponent.setTileSource(GrayMapnikTileSource.INSTANCE);
 
         amodeusComponent.mapGrayCover = 0;
-        amodeusComponent.mapAlphaCover = 0;
+        amodeusComponent.mapAlphaCover = 180;
         amodeusComponent.addLayer(new TilesLayer());
 
         VehiclesLayer vehiclesLayer = new VehiclesLayer();
         vehiclesLayer.showLocation = true;
         // vehiclesLayer.
-        vehiclesLayer.statusColors = RoboTaxiStatusColors.Pop;
+        vehiclesLayer.statusColors = RoboTaxiStatusColors.ICRA;
         amodeusComponent.addLayer(vehiclesLayer);
 
         RequestsLayer requestsLayer = new RequestsLayer();
         requestsLayer.drawNumber = false;
-        requestsLayer.requestHeatMap.setShow(false);
-        requestsLayer.requestHeatMap.setColorSchemes(ColorSchemes.Pbj);
+        requestsLayer.requestHeatMap.setShow(true);
+        requestsLayer.requestHeatMap.setColorSchemes(ColorSchemes.OrangeContour);
         requestsLayer.requestDestMap.setShow(false);
         requestsLayer.requestDestMap.setColorSchemes(ColorSchemes.Classic);
 
@@ -103,7 +103,7 @@ public enum SimulationVideoDark {
         amodeusComponent.addLayer(loadLayer);
 
         amodeusComponent.addLayer(new HudLayer());
-        amodeusComponent.setFontSize(0);
+        amodeusComponent.setFontSize(20);
         ClockLayer clockLayer = new ClockLayer();
         clockLayer.alpha = 128;
         amodeusComponent.addLayer(clockLayer);
@@ -116,8 +116,8 @@ public enum SimulationVideoDark {
         System.out.println("has vn: " + (virtualNetwork != null));
         amodeusComponent.virtualNetworkLayer.setVirtualNetwork(virtualNetwork);
         amodeusComponent.virtualNetworkLayer.drawVNodes = true;
-        amodeusComponent.virtualNetworkLayer.virtualNodeShader = VirtualNodeShader.RequestCount;
-        amodeusComponent.virtualNetworkLayer.colorSchemes = ColorSchemes.Parula;
+//        amodeusComponent.virtualNetworkLayer.virtualNodeShader = VirtualNodeShader.RequestCount;
+//        amodeusComponent.virtualNetworkLayer.colorSchemes = ColorSchemes.Parula;
 
         Dimension resolution = SimulationObjectsVideo.RESOLUTION_FullHD;
         amodeusComponent.setSize(resolution);
@@ -125,7 +125,7 @@ public enum SimulationVideoDark {
         amodeusComponent.zoomIn();
 //        amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();
-        amodeusComponent.moveMap(0, 100);
+        amodeusComponent.moveMap(-50, 100);
 
         StorageUtils storageUtils = new StorageUtils(outputSubDirectory);
         IterationFolder iterationFolder = storageUtils.getAvailableIterations().get(0);
@@ -135,14 +135,14 @@ public enum SimulationVideoDark {
         int count = 0;
         int base = 1;
         try (SimulationObjectsVideo simulationObjectsVideo = //
-                new SimulationObjectsVideo("recording006.mp4", resolution, 15, amodeusComponent)) {
+                new SimulationObjectsVideo("recording007.mp4", resolution, 15, amodeusComponent)) {
 
             simulationObjectsVideo.millis = 20000;
 
             int intervalEstimate = storageSupplier.getIntervalEstimate(); // 10
             int hrs = 60 * 60 / intervalEstimate;
             final int end = Math.min((int) (9.2 * hrs), storageSupplier.size());
-            for (int index = 5 * hrs; index < 11 * hrs; index += 1) {
+            for (int index = 5 * hrs; index < 12 * hrs; index += 1) {
                 SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
                 simulationObjectsVideo.append(simulationObject);
 
