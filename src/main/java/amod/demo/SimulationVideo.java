@@ -100,7 +100,7 @@ public enum SimulationVideo {
         amodeusComponent.addLayer(loadLayer);
 
         amodeusComponent.addLayer(new HudLayer());
-        amodeusComponent.setFontSize(0);
+//        amodeusComponent.setFontSize(0);
         ClockLayer clockLayer = new ClockLayer();
         clockLayer.alpha = 128;
         amodeusComponent.addLayer(clockLayer);
@@ -119,7 +119,7 @@ public enum SimulationVideo {
         Dimension resolution = SimulationObjectsVideo.RESOLUTION_FullHD;
         amodeusComponent.setSize(resolution);
         AmodeusComponentUtil.adjustMapZoom(amodeusComponent, network, scenarioOptions);
-//        amodeusComponent.zoomIn();
+        amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();
         // amodeusComponent.moveMap(-100, -750);
@@ -132,7 +132,7 @@ public enum SimulationVideo {
         int count = 0;
         int base = 1;
         try (SimulationObjectsVideo simulationObjectsVideo = //
-                new SimulationObjectsVideo("SanFrancisco.mp4", resolution, 25, amodeusComponent)) {
+                new SimulationObjectsVideo("20180825_berlin_10k.mp4", resolution, 25, amodeusComponent)) {
 
             simulationObjectsVideo.millis = 20000;
 
@@ -140,7 +140,7 @@ public enum SimulationVideo {
             int hrs = 60 * 60 / intervalEstimate;
             final int start = 5 * hrs;
             final int end = Math.min((int) (24.0 * hrs), storageSupplier.size());
-            for (int index = start; index < end; index += 1) {
+            for (int index = start; index < 6 * hrs; index += 1) {
                 SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
                 simulationObjectsVideo.append(simulationObject);
 

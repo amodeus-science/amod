@@ -47,12 +47,11 @@ public class AidoGuest {
         /** connect to AidoGuest */
         try (StringSocket stringSocket = new StringSocket(new Socket(ip, AidoHost.PORT))) {
 
-            /** send initial command, e.g., {SanFrancisco} */
-            /** , 0.4, 177} */
+            /** send initial command, e.g., {SanFrancisco.20080518} */
             Tensor config = Tensors.of(StringScalar.of(scenario)); /** scenario name */
             stringSocket.writeln(config);
 
-            /** receive information on chosen scenario, i.e., bouding box and number of
+            /** receive information on chosen scenario, i.e., bounding box and number of
              * requests, the city grid is inside the WGS:84 coordinates bounded by the
              * box bottomLeft, topRight,
              * {{longitude min, latitude min}, {longitude max, latitude max}} */
