@@ -38,7 +38,7 @@ The code format of the `amod` repository is specified in the `amodeus` profile t
 ## Installation guidelines for amod repository
 
 1. Clone amod
-2. Import to eclipse as existing maven project using the pom.xml in the top folder.
+2. Import to eclipse as existing maven project (Package Explorer->Import) using the pom.xml in the top folder of this repository.
 3. Set up Run Configurations for: (ScenarioPreparer; ScenarioServer; ScenarioViewer), chose the Working Directory to be the top Simulation Folder directory. You can get a sample simulation scenario at http://www.idsc.ethz.ch/research-frazzoli/amodeus.html
 4. Adjust the simulation settings in the 3 config files: av.xml for av fleet values (e.g. number vehicles), AmodeusOptions.properties for AMoDeus settings (e.g. max number of people) and config.xml for Matsim settings (e.g. output directory). 
 5. Add JAVA VM arguments if necessary, e.g., `-Xmx10000m` to run with 10 GB of RAM and `-Dmatsim.preferLocalDtds=true` to prefer the local Dtds. 

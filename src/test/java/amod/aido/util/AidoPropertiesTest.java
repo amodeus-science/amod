@@ -1,14 +1,15 @@
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido.util;
 
 import java.util.Properties;
 
+import ch.ethz.idsc.amodeus.aido.ScoreParameters;
 import ch.ethz.idsc.tensor.io.ResourceData;
 import junit.framework.TestCase;
 
 public class AidoPropertiesTest extends TestCase {
     public void testScoreParam() {
-        Properties properties = ResourceData.properties("/aido/scoreparam.properties");
-        assertNotNull(properties);
+        assertNotNull(ScoreParameters.GLOBAL);
     }
 
     public void testScenarios() {
