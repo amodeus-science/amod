@@ -69,35 +69,35 @@ public enum SimulationVideoDark {
 
         // load viewer
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-        AmodeusComponent amodeusComponent = new AmodeusComponent(MatsimStaticDatabase.INSTANCE);
+        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(MatsimStaticDatabase.INSTANCE);
 
         amodeusComponent.setTileSource(GrayMapnikTileSource.INSTANCE);
 
         amodeusComponent.mapGrayCover = 0;
-        amodeusComponent.mapAlphaCover = 192;
+        amodeusComponent.mapAlphaCover = 0;
         amodeusComponent.addLayer(new TilesLayer());
 
         VehiclesLayer vehiclesLayer = new VehiclesLayer();
         vehiclesLayer.showLocation = true;
         // vehiclesLayer.
-        vehiclesLayer.statusColors = RoboTaxiStatusColors.Standard;
+        vehiclesLayer.statusColors = RoboTaxiStatusColors.Pop;
         amodeusComponent.addLayer(vehiclesLayer);
 
         RequestsLayer requestsLayer = new RequestsLayer();
         requestsLayer.drawNumber = false;
-        requestsLayer.requestHeatMap.setShow(true);
+        requestsLayer.requestHeatMap.setShow(false);
         requestsLayer.requestHeatMap.setColorSchemes(ColorSchemes.Pbj);
-        requestsLayer.requestDestMap.setShow(true);
+        requestsLayer.requestDestMap.setShow(false);
         requestsLayer.requestDestMap.setColorSchemes(ColorSchemes.Classic);
 
         amodeusComponent.addLayer(requestsLayer);
 
         LinkLayer linkLayer = new LinkLayer();
-        linkLayer.linkLimit = 1;
+        linkLayer.linkLimit = 10;
         amodeusComponent.addLayer(linkLayer);
 
         LoadLayer loadLayer = new LoadLayer();
-        loadLayer.drawLoad = true;
+        loadLayer.drawLoad = false;
         loadLayer.historyLength = 5;
         loadLayer.loadScale = 15;
         amodeusComponent.addLayer(loadLayer);
@@ -123,9 +123,9 @@ public enum SimulationVideoDark {
         amodeusComponent.setSize(resolution);
         AmodeusComponentUtil.adjustMapZoom(amodeusComponent, network, scenarioOptions);
         amodeusComponent.zoomIn();
-        amodeusComponent.zoomIn();
+//        amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();
-        amodeusComponent.moveMap(-200, 200);
+        amodeusComponent.moveMap(0, 100);
 
         StorageUtils storageUtils = new StorageUtils(outputSubDirectory);
         IterationFolder iterationFolder = storageUtils.getAvailableIterations().get(0);
@@ -135,14 +135,14 @@ public enum SimulationVideoDark {
         int count = 0;
         int base = 1;
         try (SimulationObjectsVideo simulationObjectsVideo = //
-                new SimulationObjectsVideo("recording.mp4", resolution, 15, amodeusComponent)) {
+                new SimulationObjectsVideo("recording006.mp4", resolution, 15, amodeusComponent)) {
 
             simulationObjectsVideo.millis = 20000;
 
             int intervalEstimate = storageSupplier.getIntervalEstimate(); // 10
             int hrs = 60 * 60 / intervalEstimate;
             final int end = Math.min((int) (9.2 * hrs), storageSupplier.size());
-            for (int index = 6 * hrs; index < end; index += 1) {
+            for (int index = 5 * hrs; index < 11 * hrs; index += 1) {
                 SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
                 simulationObjectsVideo.append(simulationObject);
 
