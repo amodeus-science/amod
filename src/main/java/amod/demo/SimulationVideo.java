@@ -132,7 +132,7 @@ public enum SimulationVideo {
         int count = 0;
         int base = 1;
         try (SimulationObjectsVideo simulationObjectsVideo = //
-                new SimulationObjectsVideo("20180825_berlin_10k.mp4", resolution, 25, amodeusComponent)) {
+                new SimulationObjectsVideo("SanFrancisco.mp4", resolution, 25, amodeusComponent)) {
 
             simulationObjectsVideo.millis = 20000;
 
