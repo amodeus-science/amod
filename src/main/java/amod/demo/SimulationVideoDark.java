@@ -116,8 +116,8 @@ public enum SimulationVideoDark {
         System.out.println("has vn: " + (virtualNetwork != null));
         amodeusComponent.virtualNetworkLayer.setVirtualNetwork(virtualNetwork);
         amodeusComponent.virtualNetworkLayer.drawVNodes = true;
-//        amodeusComponent.virtualNetworkLayer.virtualNodeShader = VirtualNodeShader.RequestCount;
-//        amodeusComponent.virtualNetworkLayer.colorSchemes = ColorSchemes.Parula;
+        amodeusComponent.virtualNetworkLayer.virtualNodeShader = VirtualNodeShader.RequestCount;
+        amodeusComponent.virtualNetworkLayer.colorSchemes = ColorSchemes.Parula;
 
         Dimension resolution = SimulationObjectsVideo.RESOLUTION_FullHD;
         amodeusComponent.setSize(resolution);
@@ -135,14 +135,14 @@ public enum SimulationVideoDark {
         int count = 0;
         int base = 1;
         try (SimulationObjectsVideo simulationObjectsVideo = //
-                new SimulationObjectsVideo("recording007.mp4", resolution, 15, amodeusComponent)) {
+                new SimulationObjectsVideo("recording008.mp4", resolution, 25, amodeusComponent)) {
 
             simulationObjectsVideo.millis = 20000;
 
             int intervalEstimate = storageSupplier.getIntervalEstimate(); // 10
             int hrs = 60 * 60 / intervalEstimate;
             final int end = Math.min((int) (9.2 * hrs), storageSupplier.size());
-            for (int index = 5 * hrs; index < 12 * hrs; index += 1) {
+            for (int index = 5 * hrs; index < 17*hrs; index += 1) {
                 SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
                 simulationObjectsVideo.append(simulationObject);
 
