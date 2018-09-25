@@ -20,8 +20,12 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
+import ch.ethz.idsc.amodeus.util.io.ProvideAVConfig;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.matsim.av.config.AVConfig;
+import ch.ethz.matsim.av.config.AVGeneratorConfig;
+import ch.ethz.matsim.av.framework.AVConfigGroup;
 
 /* package */ class AidoPreparer {
 
@@ -42,7 +46,9 @@ import ch.ethz.idsc.tensor.Tensors;
         scenOpt = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** MATSim config */
-        configMatsim = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName());
+        AVConfigGroup avCg = new AVConfigGroup();
+        configMatsim = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName(), avCg);
+
         Scenario scenario = ScenarioUtils.loadScenario(configMatsim);
 
         /** adaption of MATSim network, e.g., radius cutting */
@@ -53,12 +59,12 @@ import ch.ethz.idsc.tensor.Tensors;
         population = scenario.getPopulation();
     }
 
-    public void run2(int numReqDes) throws MalformedURLException, Exception {
+    public void run2(int numReqDes, int fleetSize) throws MalformedURLException, Exception {
         long apoSeed = 1234;
         AidoPopulationPreparer.run(network, population, scenOpt, configMatsim, apoSeed, numReqDes);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
-        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt);
+        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt, fleetSize);
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(configMatsim, scenOpt);
@@ -68,8 +74,9 @@ import ch.ethz.idsc.tensor.Tensors;
         /** send initial data (bounding box), {{minX, minY}, {maxX, maxY}} */
         double[] bbox = NetworkUtils.getBoundingBox(network.getNodes().values());
 
-        return Tensors.of(TensorCoords.toTensor( //
-                scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
+        return Tensors.of(
+                TensorCoords.toTensor( //
+                        scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
                 TensorCoords.toTensor( //
                         scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[2], bbox[3]))));
     }
