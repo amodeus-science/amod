@@ -109,14 +109,14 @@ NIn = ones(1,n)*A;
 N     = NIn*ones(n,1);
 fprintf('Links %d \n',N);
 %%
-% iMatrix = A;
-% iMatrix(1,:) = cumsum(A(1,:)).*A(1,:);
-% for i = 2:n
-%     iMatrix(i,:) = (max(iMatrix(i-1,:))+cumsum(A(i,:))).*A(i,:);
-% end
+iMatrix = A;
+iMatrix(1,:) = cumsum(A(1,:)).*A(1,:);
+for i = 2:n
+    iMatrix(i,:) = (max(iMatrix(i-1,:))+cumsum(A(i,:))).*A(i,:);
+end
 
 % save('iMatrix','iMatrix');
-load('iMatrix');
+% load('iMatrix');
 disp('iMatrix loaded');
 %%
 AT = A';
@@ -215,7 +215,7 @@ for i=1:numberStations
    LocationStations(i,:) = Location(Stations(i)+1,:);
 end
 
-[idx,Centroids] = kmeans(LocationStations,10);
+[idx,Centroids] = kmeans(LocationStations,100);
 
 numberClusters = length(Centroids);
 
