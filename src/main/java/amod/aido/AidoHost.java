@@ -77,7 +77,7 @@ public enum AidoHost {
             int fleetSize = config2.Get(1).number().intValue();
 
             /** run second part of preparer */
-            preparer.run2(numReqDes);
+            preparer.run2(numReqDes,fleetSize);
 
             /** run with AIDO dispatcher */
             XmlDispatcherChanger.of(workingDirectory, AidoDispatcherHost.class.getSimpleName());
