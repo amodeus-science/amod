@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>amodeus</artifactId>
-			<version>1.4.5</version>
+			<version>1.4.4</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
