@@ -19,6 +19,10 @@ import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.amodeus.prep.PopulationPreparer;
 import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.amodeus.util.io.ProvideAVConfig;
+import ch.ethz.matsim.av.config.AVConfig;
+import ch.ethz.matsim.av.config.AVGeneratorConfig;
+import ch.ethz.matsim.av.framework.AVConfigGroup;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of
  * network, population, creation of virtualNetwork and travelData objects. */
@@ -43,13 +47,14 @@ public enum ScenarioPreparer {
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** MATSim config */
-        Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName());
-        // AVConfigGroup avCg = new AVConfigGroup();
-        // Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName(),avCg);
+        // Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName());
+        AVConfigGroup avConfigGroup = new AVConfigGroup();
+        Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName(), avConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        // AVConfig avC = ProvideAVConfig.with(config, avCg);
-        // AVGeneratorConfig genConfig = avC.getOperatorConfigs().iterator().next().getGeneratorConfig();
-        // int numRt = (int) genConfig.getNumberOfVehicles();
+        AVConfig avConfig = ProvideAVConfig.with(config, avConfigGroup);
+        AVGeneratorConfig genConfig = avConfig.getOperatorConfigs().iterator().next().getGeneratorConfig();
+        int numRt = (int) genConfig.getNumberOfVehicles();
+        System.out.println("NumberOfVehicles=" + numRt);
 
         /** adaption of MATSim network, e.g., radius cutting */
         Network network = scenario.getNetwork();
@@ -61,7 +66,7 @@ public enum ScenarioPreparer {
         PopulationPreparer.run(network, population, scenarioOptions, config, apoSeed);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
-        VirtualNetworkPreparer.INSTANCE.create(network, population, scenarioOptions); // , numRt
+        VirtualNetworkPreparer.INSTANCE.create(network, population, scenarioOptions, numRt); //
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(config, scenarioOptions);
