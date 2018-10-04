@@ -118,7 +118,7 @@ public enum SimulationVideo {
 
         Dimension resolution = SimulationObjectsVideo.RESOLUTION_FullHD;
         amodeusComponent.setSize(resolution);
-        AmodeusComponentUtil.adjustMapZoom(amodeusComponent, network, scenarioOptions,db);
+        AmodeusComponentUtil.adjustMapZoom(amodeusComponent, network, scenarioOptions, db);
         amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();

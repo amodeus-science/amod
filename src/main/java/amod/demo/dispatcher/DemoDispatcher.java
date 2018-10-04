@@ -95,13 +95,13 @@ public class DemoDispatcher extends RebalancingDispatcher {
 
         @Inject
         private Config config;
-        
+
         @Inject
         private MatsimAmodeusDatabase db;
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
-            return new DemoDispatcher(config, avconfig, travelTime, router, eventsManager, network,db);
+            return new DemoDispatcher(config, avconfig, travelTime, router, eventsManager, network, db);
         }
     }
 

@@ -226,8 +226,8 @@ public class SharedDispatcherExample extends SharedPartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
             AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher = new GlobalBipartiteMatching(EuclideanDistanceFunction.INSTANCE);
 
-            return new SharedDispatcherExample(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork,
-                    abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData, db);
+            return new SharedDispatcherExample(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork, abstractVirtualNodeDest,
+                    abstractVehicleDestMatcher, travelData, db);
         }
     }
 

@@ -97,8 +97,8 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
     public Population getPopulation() {
         return population;
     }
-    
-    public MatsimAmodeusDatabase getDatabase(){
+
+    public MatsimAmodeusDatabase getDatabase() {
         return this.db;
     }
 

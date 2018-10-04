@@ -169,7 +169,7 @@ public enum ScenarioServer {
 
         /** perform analysis of simulation, a demo of how to add custom
          * analysis methods is provided in the package amod.demo.analysis */
-        Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory),db);
+        Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory), db);
         CustomAnalysis.addTo(analysis);
         analysis.run();
 
