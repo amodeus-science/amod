@@ -4,6 +4,7 @@ package amod.demo.dispatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.network.Link;
@@ -24,6 +25,7 @@ import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.matsim.av.config.AVDispatcherConfig;
 import ch.ethz.matsim.av.dispatcher.AVDispatcher;
 import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.router.AVRouter;
 
 /** Dispatcher sends vehicles to all links in the network and lets them pickup
@@ -49,8 +51,10 @@ public class DemoDispatcher extends RebalancingDispatcher {
     public void redispatch(double now) {
 
         /** stop all vehicles which are driving by an open request */
-        total_abortTrip += DrivebyRequestStopper //
-                .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), getDivertableRoboTaxis(), this::setRoboTaxiPickup).size();
+        // TODO CR check again
+        Map<RoboTaxi, AVRequest> stopDrivingBy = DrivebyRequestStopper //
+                .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
+        total_abortTrip += stopDrivingBy.size();
 
         /** send vehicles to travel around the city to random links (random loitering) */
         final long round_now = Math.round(now);

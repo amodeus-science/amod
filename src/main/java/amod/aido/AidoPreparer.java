@@ -34,9 +34,10 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
 
     private final Population population;
     private final ScenarioOptions scenOpt;
-    private final Config configMatsim;
+    private final Config config;
     private final Network network;
     private final MatsimStaticDatabase db;
+    private final int numRt;
 
     /** loads scenario preparer in the {@link File} workingDirectory
      * 
@@ -50,10 +51,15 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
         scenOpt = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** MATSim config */
-        AVConfigGroup avCg = new AVConfigGroup();
-        configMatsim = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName(), avCg);
+        // configMatsim = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName());
+        AVConfigGroup avConfigGroup = new AVConfigGroup();
+        config = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName(), avConfigGroup);
 
-        Scenario scenario = ScenarioUtils.loadScenario(configMatsim);
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        AVConfig avConfig = ProvideAVConfig.with(config, avConfigGroup);
+        AVGeneratorConfig genConfig = avConfig.getOperatorConfigs().iterator().next().getGeneratorConfig();
+        numRt = (int) genConfig.getNumberOfVehicles();
+        System.out.println("aidoprep NumberOfVehicles=" + numRt);
 
         /** adaption of MATSim network, e.g., radius cutting */
         Network network = scenario.getNetwork();
@@ -67,24 +73,23 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
         this.db = MatsimStaticDatabase.initialize(network, referenceFrame);
     }
 
-    public void run2(int numReqDes, int fleetSize) throws MalformedURLException, Exception {
+    public void run2(int numReqDes) throws MalformedURLException, Exception {
         long apoSeed = 1234;
-        AidoPopulationPreparer.run(network, population, scenOpt, configMatsim, apoSeed, numReqDes);
+        AidoPopulationPreparer.run(network, population, scenOpt, config, apoSeed, numReqDes);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
-        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt, fleetSize);
+        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt, numRt);
 
         /** create a simulation MATSim config file linking the created input data */
-        ConfigCreator.createSimulationConfigFile(configMatsim, scenOpt);
+        ConfigCreator.createSimulationConfigFile(config, scenOpt);
     }
 
     public Tensor getBoundingBox() {
         /** send initial data (bounding box), {{minX, minY}, {maxX, maxY}} */
         double[] bbox = NetworkUtils.getBoundingBox(network.getNodes().values());
 
-        return Tensors.of(
-                TensorCoords.toTensor( //
-                        scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
+        return Tensors.of(TensorCoords.toTensor( //
+                scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
                 TensorCoords.toTensor( //
                         scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[2], bbox[3]))));
     }

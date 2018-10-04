@@ -47,12 +47,14 @@ public enum ScenarioPreparer {
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** MATSim config */
-        AVConfigGroup avCg = new AVConfigGroup();
-        Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName(),avCg);
+        // Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName());
+        AVConfigGroup avConfigGroup = new AVConfigGroup();
+        Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName(), avConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        AVConfig avC = ProvideAVConfig.with(config, avCg);
-        AVGeneratorConfig genConfig = avC.getOperatorConfigs().iterator().next().getGeneratorConfig();
-        int numRt = (int) genConfig.getNumberOfVehicles();                
+        AVConfig avConfig = ProvideAVConfig.with(config, avConfigGroup);
+        AVGeneratorConfig genConfig = avConfig.getOperatorConfigs().iterator().next().getGeneratorConfig();
+        int numRt = (int) genConfig.getNumberOfVehicles();
+        System.out.println("NumberOfVehicles=" + numRt);
 
         /** adaption of MATSim network, e.g., radius cutting */
         Network network = scenario.getNetwork();
@@ -64,7 +66,7 @@ public enum ScenarioPreparer {
         PopulationPreparer.run(network, population, scenarioOptions, config, apoSeed);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
-        VirtualNetworkPreparer.INSTANCE.create(network, population, scenarioOptions, numRt);
+        VirtualNetworkPreparer.INSTANCE.create(network, population, scenarioOptions, numRt); //
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(config, scenarioOptions);
