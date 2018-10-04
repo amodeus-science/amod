@@ -3,9 +3,9 @@ package amod.aido;
 
 import java.io.File;
 
-import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
-import ch.ethz.idsc.amodeus.aido.AidoScoreElement;
-import ch.ethz.idsc.amodeus.aido.ScoreParameters;
+import amod.aido.core.AidoDispatcherHost;
+import amod.aido.core.AidoScoreElement;
+import amod.aido.core.ScoreParameters;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;

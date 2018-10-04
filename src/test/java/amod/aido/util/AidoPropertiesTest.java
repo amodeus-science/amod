@@ -3,7 +3,7 @@ package amod.aido.util;
 
 import java.util.Properties;
 
-import ch.ethz.idsc.amodeus.aido.ScoreParameters;
+import amod.aido.core.ScoreParameters;
 import ch.ethz.idsc.tensor.io.ResourceData;
 import junit.framework.TestCase;
 
