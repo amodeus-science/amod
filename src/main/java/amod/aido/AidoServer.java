@@ -27,6 +27,7 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
@@ -110,6 +111,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
         controler.addOverridingModule(new AidoModule(stringSocket, numReqTot));
+        controler.addOverridingModule(new AmodeusDatabaseModule(db));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
