@@ -4,7 +4,7 @@ package amod.aido;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.ethz.idsc.amodeus.aido.AidoScoreElement;
+import amod.aido.core.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.element.DistanceElement;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlBodyElement;

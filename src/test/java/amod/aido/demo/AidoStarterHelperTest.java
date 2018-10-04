@@ -11,7 +11,7 @@ import java.util.Properties;
 import java.util.Random;
 
 import amod.aido.AidoHost;
-import ch.ethz.idsc.amodeus.aido.CleanAidoScenarios;
+import amod.aido.core.CleanAidoScenarios;
 import ch.ethz.idsc.amodeus.util.io.FileDelete;
 import ch.ethz.idsc.tensor.io.ResourceData;
 import junit.framework.TestCase;

@@ -20,8 +20,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
+import amod.aido.core.AidoDispatcherHost;
 import amod.demo.ext.Static;
-import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
