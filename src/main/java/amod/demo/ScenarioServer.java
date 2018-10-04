@@ -36,7 +36,7 @@ import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
-import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
@@ -109,7 +109,7 @@ public enum ScenarioServer {
         System.out.println(linkSpeedDataFile.toString());
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
 
-        MatsimStaticDatabase db = MatsimStaticDatabase.initialize(network, referenceFrame);
+        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(new DvrpTravelTimeModule());

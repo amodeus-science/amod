@@ -15,7 +15,7 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.gfx.AmodeusComponent;
 import ch.ethz.idsc.amodeus.gfx.AmodeusViewerFrame;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
-import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
@@ -61,7 +61,7 @@ public enum ScenarioViewer {
         System.out.println("INFO total nodes " + network.getNodes().size());
 
         /** initializing the viewer */
-        MatsimStaticDatabase db = MatsimStaticDatabase.initialize(network, referenceFrame);
+        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db);
 
         /** virtual network layer, should not cause problems if layer does not exist */

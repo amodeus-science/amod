@@ -24,7 +24,7 @@ import ch.ethz.idsc.amodeus.gfx.VirtualNetworkLayer;
 import ch.ethz.idsc.amodeus.gfx.VirtualNodeShader;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.IterationFolder;
-import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.amodeus.net.StorageSupplier;
 import ch.ethz.idsc.amodeus.net.StorageUtils;
@@ -67,7 +67,7 @@ public enum SimulationVideo {
         System.out.println("INFO total nodes " + network.getNodes().size());
 
         // load viewer
-        MatsimStaticDatabase db = MatsimStaticDatabase.initialize(network, referenceFrame);
+        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         AmodeusComponent amodeusComponent = new AmodeusComponent(db);
 
         amodeusComponent.setTileSource(GrayMapnikTileSource.INSTANCE);

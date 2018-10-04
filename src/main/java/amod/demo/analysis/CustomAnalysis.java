@@ -13,7 +13,7 @@ import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
-import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
@@ -40,7 +40,7 @@ public enum CustomAnalysis {
         Network network = NetworkLoader.fromConfigFile(configFile);
         LocationSpec locationSpec = scenOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
-        MatsimStaticDatabase db = MatsimStaticDatabase.initialize(network, referenceFrame);
+        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
         /** the analysis is created */
         Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory), db);
