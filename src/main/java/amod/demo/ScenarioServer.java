@@ -30,6 +30,7 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
@@ -108,7 +109,7 @@ public enum ScenarioServer {
         System.out.println(linkSpeedDataFile.toString());
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
 
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+        MatsimStaticDatabase db = MatsimStaticDatabase.initialize(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(new DvrpTravelTimeModule());
@@ -117,6 +118,7 @@ public enum ScenarioServer {
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
+        controler.addOverridingModule(new AmodeusDatabaseModule(db));
 
         /** uncomment to include custom routers
          * controler.addOverridingModule(new AbstractModule() {
@@ -167,7 +169,7 @@ public enum ScenarioServer {
 
         /** perform analysis of simulation, a demo of how to add custom
          * analysis methods is provided in the package amod.demo.analysis */
-        Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory));
+        Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory),db);
         CustomAnalysis.addTo(analysis);
         analysis.run();
 

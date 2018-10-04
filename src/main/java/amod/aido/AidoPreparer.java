@@ -14,6 +14,9 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import amod.demo.ext.Static;
+import ch.ethz.idsc.amodeus.data.LocationSpec;
+import ch.ethz.idsc.amodeus.data.ReferenceFrame;
+import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
@@ -33,6 +36,7 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
     private final ScenarioOptions scenOpt;
     private final Config configMatsim;
     private final Network network;
+    private final MatsimStaticDatabase db;
 
     /** loads scenario preparer in the {@link File} workingDirectory
      * 
@@ -57,6 +61,10 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
 
         /** adaption of MATSim population, e.g., radius cutting */
         population = scenario.getPopulation();
+
+        LocationSpec locationSpec = scenOpt.getLocationSpec();
+        ReferenceFrame referenceFrame = locationSpec.referenceFrame();
+        this.db = MatsimStaticDatabase.initialize(network, referenceFrame);
     }
 
     public void run2(int numReqDes, int fleetSize) throws MalformedURLException, Exception {
@@ -83,6 +91,10 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
 
     public Population getPopulation() {
         return population;
+    }
+    
+    public MatsimStaticDatabase getDatabase(){
+        return this.db;
     }
 
 }

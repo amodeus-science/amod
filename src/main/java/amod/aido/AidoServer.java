@@ -99,7 +99,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
 
         Objects.requireNonNull(network);
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+        MatsimStaticDatabase db = MatsimStaticDatabase.initialize(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(new DvrpTravelTimeModule());

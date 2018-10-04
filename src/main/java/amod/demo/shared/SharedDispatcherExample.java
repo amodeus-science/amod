@@ -28,6 +28,7 @@ import ch.ethz.idsc.amodeus.dispatcher.util.EuclideanDistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.GlobalBipartiteMatching;
 import ch.ethz.idsc.amodeus.dispatcher.util.RandomVirtualNodeDest;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
+import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
 import ch.ethz.idsc.amodeus.traveldata.TravelData;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
@@ -64,8 +65,9 @@ public class SharedDispatcherExample extends SharedPartitionedDispatcher {
             VirtualNetwork<Link> virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher, //
-            TravelData travelData) {
-        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
+            TravelData travelData, //
+            MatsimStaticDatabase db) {
+        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork, db);
         virtualNodeDest = abstractVirtualNodeDest;
         vehicleDestMatcher = abstractVehicleDestMatcher;
         this.travelData = travelData;
@@ -214,6 +216,9 @@ public class SharedDispatcherExample extends SharedPartitionedDispatcher {
         @Inject
         private Config config;
 
+        @Inject
+        private MatsimStaticDatabase db;
+
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
             AVGeneratorConfig generatorConfig = avconfig.getParent().getGeneratorConfig();
@@ -221,8 +226,8 @@ public class SharedDispatcherExample extends SharedPartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
             AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher = new GlobalBipartiteMatching(EuclideanDistanceFunction.INSTANCE);
 
-            return new SharedDispatcherExample(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork, abstractVirtualNodeDest,
-                    abstractVehicleDestMatcher, travelData);
+            return new SharedDispatcherExample(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork,
+                    abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData, db);
         }
     }
 

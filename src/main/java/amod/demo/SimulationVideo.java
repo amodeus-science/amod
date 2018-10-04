@@ -67,8 +67,8 @@ public enum SimulationVideo {
         System.out.println("INFO total nodes " + network.getNodes().size());
 
         // load viewer
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-        AmodeusComponent amodeusComponent = new AmodeusComponent(MatsimStaticDatabase.INSTANCE);
+        MatsimStaticDatabase db = MatsimStaticDatabase.initialize(network, referenceFrame);
+        AmodeusComponent amodeusComponent = new AmodeusComponent(db);
 
         amodeusComponent.setTileSource(GrayMapnikTileSource.INSTANCE);
 
@@ -118,7 +118,7 @@ public enum SimulationVideo {
 
         Dimension resolution = SimulationObjectsVideo.RESOLUTION_FullHD;
         amodeusComponent.setSize(resolution);
-        AmodeusComponentUtil.adjustMapZoom(amodeusComponent, network, scenarioOptions);
+        AmodeusComponentUtil.adjustMapZoom(amodeusComponent, network, scenarioOptions,db);
         amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();

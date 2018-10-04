@@ -61,15 +61,15 @@ public enum ScenarioViewer {
         System.out.println("INFO total nodes " + network.getNodes().size());
 
         /** initializing the viewer */
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(MatsimStaticDatabase.INSTANCE);
+        MatsimStaticDatabase db = MatsimStaticDatabase.initialize(network, referenceFrame);
+        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db);
 
         /** virtual network layer, should not cause problems if layer does not exist */
         amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
         /** starting the viewer */
         AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory, network);
-        amodeusViewerFrame.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
+        amodeusViewerFrame.setDisplayPosition(db.getCenter(), 12);
         amodeusViewerFrame.jFrame.setSize(900, 900);
         amodeusViewerFrame.jFrame.setVisible(true);
     }
