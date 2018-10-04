@@ -4,7 +4,6 @@ package amod.aido.core;
 import java.io.File;
 import java.io.IOException;
 
-import amod.aido.core.AidoScenarioDownload;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import junit.framework.TestCase;
 

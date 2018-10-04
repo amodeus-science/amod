@@ -1,8 +1,6 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.aido.core;
 
-import amod.aido.core.ScoreParameters;
-import amod.aido.core.ServiceQualityScore;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.NumberQ;
 import ch.ethz.idsc.tensor.qty.Quantity;
