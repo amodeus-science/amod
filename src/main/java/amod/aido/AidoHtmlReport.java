@@ -8,6 +8,7 @@ import ch.ethz.idsc.amodeus.aido.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.element.DistanceElement;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlBodyElement;
+import ch.ethz.idsc.amodeus.analysis.report.HtmlGenerator;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlReportElement;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -48,13 +49,13 @@ import ch.ethz.idsc.tensor.red.Total;
         {
             HtmlBodyElement aRElement = new HtmlBodyElement();
 
-            aRElement.getHTMLGenerator().insertTextLeft(aRElement.getHTMLGenerator().bold("Scores during Simulation"));
+            aRElement.getHTMLGenerator().insertTextLeft(HtmlGenerator.bold("Scores during Simulation"));
             aRElement.getHTMLGenerator().newLine();
             aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE_INCR + ".png", 800, 600);
             aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE_INTG + ".png", 800, 600);
             aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE3_INTG + ".png", 800, 600);
 
-            aRElement.getHTMLGenerator().insertTextLeft(aRElement.getHTMLGenerator().bold("Final Scores") + //
+            aRElement.getHTMLGenerator().insertTextLeft(HtmlGenerator.bold("Final Scores") + //
                     "\n\t" + "final service quality score:" + //
                     "\n\t" + "final efficiency score:" + //
                     "\n\t" + "final fleet size score:" //

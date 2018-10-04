@@ -24,7 +24,7 @@ import ch.ethz.idsc.amodeus.gfx.VirtualNetworkLayer;
 import ch.ethz.idsc.amodeus.gfx.VirtualNodeShader;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.IterationFolder;
-import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.amodeus.net.StorageSupplier;
 import ch.ethz.idsc.amodeus.net.StorageUtils;
@@ -67,8 +67,8 @@ public enum SimulationVideo {
         System.out.println("INFO total nodes " + network.getNodes().size());
 
         // load viewer
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-        AmodeusComponent amodeusComponent = new AmodeusComponent(MatsimStaticDatabase.INSTANCE);
+        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
+        AmodeusComponent amodeusComponent = new AmodeusComponent(db);
 
         amodeusComponent.setTileSource(GrayMapnikTileSource.INSTANCE);
 
@@ -118,7 +118,7 @@ public enum SimulationVideo {
 
         Dimension resolution = SimulationObjectsVideo.RESOLUTION_FullHD;
         amodeusComponent.setSize(resolution);
-        AmodeusComponentUtil.adjustMapZoom(amodeusComponent, network, scenarioOptions);
+        AmodeusComponentUtil.adjustMapZoom(amodeusComponent, network, scenarioOptions, db);
         amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();

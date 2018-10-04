@@ -21,6 +21,7 @@ import ch.ethz.idsc.amodeus.dispatcher.core.RebalancingDispatcher;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.util.DrivebyRequestStopper;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.matsim.av.config.AVDispatcherConfig;
 import ch.ethz.matsim.av.dispatcher.AVDispatcher;
 import ch.ethz.matsim.av.framework.AVModule;
@@ -37,8 +38,9 @@ public class DemoDispatcher extends RebalancingDispatcher {
     private int total_abortTrip = 0;
 
     private DemoDispatcher(Config config, AVDispatcherConfig avconfig, TravelTime travelTime, //
-            AVRouter router, EventsManager eventsManager, Network network) {
-        super(config, avconfig, travelTime, router, eventsManager);
+            AVRouter router, EventsManager eventsManager, Network network, //
+            MatsimAmodeusDatabase db) {
+        super(config, avconfig, travelTime, router, eventsManager, db);
         links = new ArrayList<>(network.getLinks().values());
         Collections.shuffle(links, randGen);
         SafeConfig safeConfig = SafeConfig.wrap(avconfig);
@@ -94,9 +96,12 @@ public class DemoDispatcher extends RebalancingDispatcher {
         @Inject
         private Config config;
 
+        @Inject
+        private MatsimAmodeusDatabase db;
+
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
-            return new DemoDispatcher(config, avconfig, travelTime, router, eventsManager, network);
+            return new DemoDispatcher(config, avconfig, travelTime, router, eventsManager, network, db);
         }
     }
 

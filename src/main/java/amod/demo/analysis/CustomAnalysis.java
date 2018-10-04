@@ -3,12 +3,17 @@ package amod.demo.analysis;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
 import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
+import ch.ethz.idsc.amodeus.data.LocationSpec;
+import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
+import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
@@ -32,9 +37,13 @@ public enum CustomAnalysis {
         File configFile = new File(workingDirectory, scenOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(configFile.toString());
         String outputdirectory = config.controler().getOutputDirectory();
+        Network network = NetworkLoader.fromConfigFile(configFile);
+        LocationSpec locationSpec = scenOptions.getLocationSpec();
+        ReferenceFrame referenceFrame = locationSpec.referenceFrame();
+        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
         /** the analysis is created */
-        Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory));
+        Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory), db);
 
         /** create and add a custom element */
         addTo(analysis);
