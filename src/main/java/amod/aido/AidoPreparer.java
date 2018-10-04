@@ -20,15 +20,20 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
+import ch.ethz.idsc.amodeus.util.io.ProvideAVConfig;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.matsim.av.config.AVConfig;
+import ch.ethz.matsim.av.config.AVGeneratorConfig;
+import ch.ethz.matsim.av.framework.AVConfigGroup;
 
 /* package */ class AidoPreparer {
 
     private final Population population;
     private final ScenarioOptions scenOpt;
-    private final Config configMatsim;
+    private final Config config;
     private final Network network;
+    private final int numRt;
 
     /** loads scenario preparer in the {@link File} workingDirectory
      * 
@@ -42,11 +47,15 @@ import ch.ethz.idsc.tensor.Tensors;
         scenOpt = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** MATSim config */
-        configMatsim = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName());
-        // AVConfigGroup avCg = new AVConfigGroup();
-        // configMatsim = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName(), avCg);
+        // configMatsim = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName());
+        AVConfigGroup avConfigGroup = new AVConfigGroup();
+        config = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName(), avConfigGroup);
 
-        Scenario scenario = ScenarioUtils.loadScenario(configMatsim);
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        AVConfig avConfig = ProvideAVConfig.with(config, avConfigGroup);
+        AVGeneratorConfig genConfig = avConfig.getOperatorConfigs().iterator().next().getGeneratorConfig();
+        numRt = (int) genConfig.getNumberOfVehicles();
+        System.out.println("aidoprep NumberOfVehicles=" + numRt);
 
         /** adaption of MATSim network, e.g., radius cutting */
         Network network = scenario.getNetwork();
@@ -58,13 +67,13 @@ import ch.ethz.idsc.tensor.Tensors;
 
     public void run2(int numReqDes) throws MalformedURLException, Exception {
         long apoSeed = 1234;
-        AidoPopulationPreparer.run(network, population, scenOpt, configMatsim, apoSeed, numReqDes);
+        AidoPopulationPreparer.run(network, population, scenOpt, config, apoSeed, numReqDes);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
-        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt);
+        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt, numRt);
 
         /** create a simulation MATSim config file linking the created input data */
-        ConfigCreator.createSimulationConfigFile(configMatsim, scenOpt);
+        ConfigCreator.createSimulationConfigFile(config, scenOpt);
     }
 
     public Tensor getBoundingBox() {
