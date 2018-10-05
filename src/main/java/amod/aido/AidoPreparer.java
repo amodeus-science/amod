@@ -38,6 +38,7 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
     private final Network network;
     private final MatsimAmodeusDatabase db;
     private final int numRt;
+    private final int endTime;
 
     /** loads scenario preparer in the {@link File} workingDirectory
      * 
@@ -59,6 +60,8 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
         AVConfig avConfig = ProvideAVConfig.with(config, avConfigGroup);
         AVGeneratorConfig genConfig = avConfig.getOperatorConfigs().iterator().next().getGeneratorConfig();
         numRt = (int) genConfig.getNumberOfVehicles();
+        endTime = (int) config.qsim().getEndTime();
+
         System.out.println("aidoprep NumberOfVehicles=" + numRt);
 
         /** adaption of MATSim network, e.g., radius cutting */
@@ -78,7 +81,7 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
         AidoPopulationPreparer.run(network, population, scenOpt, config, apoSeed, numReqDes);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
-        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt, numRt);
+        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt, numRt, endTime);
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(config, scenOpt);
