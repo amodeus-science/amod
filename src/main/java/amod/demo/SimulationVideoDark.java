@@ -135,7 +135,7 @@ public enum SimulationVideoDark {
         int count = 0;
         int base = 1;
         try (SimulationObjectsVideo simulationObjectsVideo = //
-                new SimulationObjectsVideo("recording008.mp4", resolution, 25, amodeusComponent)) {
+                new SimulationObjectsVideo("recording-RAMoD-Reactive-001.mp4", resolution, 25, amodeusComponent)) {
 
             simulationObjectsVideo.millis = 20000;
 
