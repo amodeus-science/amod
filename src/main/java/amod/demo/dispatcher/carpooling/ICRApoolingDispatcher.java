@@ -112,15 +112,15 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		System.out.println("Using DistanceHeuristics: " + distanceHeuristics.name());
 		this.distanceFunction = distanceHeuristics.getDistanceFunction(network);
 		this.config = config;
-		this.timeStep = 15;
+		this.timeStep = 10;
 		// dispatchPeriod = safeConfig.getInteger("dispatchPeriod", timeStep *
 		// 60);
 		dispatchPeriod = timeStep * 60;
 		this.planningHorizon = 10;
 		this.fixedCarCapacity = 2;
 		this.router = router;
-		this.predictedDemand = true;
-		this.allowAssistance = true;
+		this.predictedDemand = false;
+		this.allowAssistance = false;
 		this.poolingFlag = true;
 		this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);
 
@@ -143,8 +143,10 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 
 			linkWait = new LinkWait(new HashMap<VirtualNode<Link>, List<Link>>());
 			HashMap<VirtualNode<Link>, List<Link>> linkMap = linkWait.getLinkWait();
+//			Pair<List<double[][]>, HashMap<VirtualNode<Link>, List<Link>>> FlowsOutpair = ICRApoolingDispatcherUtils
+//					.getFlowsOut(network, virtualNetwork, planningHorizon, timeStep, config, round_now, linkMap);
 			Pair<List<double[][]>, HashMap<VirtualNode<Link>, List<Link>>> FlowsOutpair = ICRApoolingDispatcherUtils
-					.getFlowsOut(network, virtualNetwork, planningHorizon, timeStep, config, round_now, linkMap);
+					.getFlowsOutForMATLAB(network, virtualNetwork, planningHorizon, timeStep, config, round_now, linkMap);
 			List<double[][]> FlowsOut = FlowsOutpair.getLeft();
 			linkMap = FlowsOutpair.getRight();
 			linkWait.setLinkWait(linkMap);

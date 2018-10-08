@@ -1,4 +1,4 @@
-function SMPCandMATSimConnection(server)
+function IAMoDandMATSimConnection(server)
 % routine is terminated anytime by pressing Ctrl+C
 
 while 1
