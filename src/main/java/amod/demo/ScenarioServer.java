@@ -30,12 +30,13 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
-import ch.ethz.idsc.amodeus.matsim.mod.DefaultVirtualNetworkModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
-import ch.ethz.idsc.amodeus.net.MatsimStaticDatabase;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
@@ -53,8 +54,6 @@ public enum ScenarioServer {
     public static void main(String[] args) throws MalformedURLException, Exception {
         simulate();
         // General todo's to be completed:
-        // TODO finish ride-sharing API support. (capacity >= 1)
-        // TODO enable external routing
         // TODO add time-varying dispatcher
 
     }
@@ -63,7 +62,6 @@ public enum ScenarioServer {
      * 
      * @throws MalformedURLException
      * @throws Exception */
-    @SuppressWarnings("unused")
     public static void simulate() throws MalformedURLException, Exception {
         Static.setup();
 
@@ -111,15 +109,16 @@ public enum ScenarioServer {
         System.out.println(linkSpeedDataFile.toString());
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
 
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(new DvrpTravelTimeModule());
         controler.addOverridingModule(new TrafficDataModule(lsData));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
-        controler.addOverridingModule(new AmodeusGeneratorModule());
+        controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
+        controler.addOverridingModule(new AmodeusDatabaseModule(db));
 
         /** uncomment to include custom routers
          * controler.addOverridingModule(new AbstractModule() {
@@ -133,8 +132,10 @@ public enum ScenarioServer {
          *           }
          *           }); */
 
-        controler.addOverridingModule(new DefaultVirtualNetworkModule()); // Added by Lukas June 06,
-                                                                          // 2018
+        /** You need to activate this if you want to use a dispatcher that needs a virtual
+         * network! */
+        controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -160,12 +161,6 @@ public enum ScenarioServer {
             }
         });
 
-        /** You need to activate this if you want to use a dispatcher that needs a virtual
-         * network! */
-        if (false) {
-            controler.addOverridingModule(new DefaultVirtualNetworkModule());
-        }
-
         /** run simulation */
         controler.run();
 
@@ -174,7 +169,7 @@ public enum ScenarioServer {
 
         /** perform analysis of simulation, a demo of how to add custom
          * analysis methods is provided in the package amod.demo.analysis */
-        Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory));
+        Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory), db);
         CustomAnalysis.addTo(analysis);
         analysis.run();
 

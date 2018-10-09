@@ -7,10 +7,10 @@ services:
     - 9382
     # TODO: Either omit version from JAR name or pass as ENV variable
     # TODO: Set heap size somewhere besides the command line argument?
-    command: java -Xmx10000m -cp amod-1.2.6.jar amod.aido.AidoHost
+    command: java -Xmx10000m -cp amod-1.4.8.jar amod.aido.AidoHost
   aido-guest:
     build: .
     image: duckietown/amod
     links:
       - aido-host
-    command: java -Xmx10000m -cp amod-1.2.6.jar amod.aido.demo.AidoGuest aido-host
+    command: java -Xmx10000m -cp amod-1.4.8.jar amod.aido.demo.AidoGuest aido-host

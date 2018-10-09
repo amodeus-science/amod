@@ -4,6 +4,8 @@ package amod.aido.util;
 import java.io.File;
 import java.io.IOException;
 
+import ch.ethz.idsc.amodeus.util.io.ContentType;
+import ch.ethz.idsc.amodeus.util.io.HttpDownloader;
 import ch.ethz.idsc.amodeus.util.math.UserHome;
 import junit.framework.TestCase;
 
@@ -22,10 +24,11 @@ public class HttpDownloaderTest extends TestCase {
         File file = UserHome.file("scenario.zip");
         assertFalse(file.exists());
 
-        HttpDownloader.download("https://polybox.ethz.ch/index.php/s/C3QUuk3cuWWSGmy/download", ContentType.APPLICATION_ZIP).to(file);
+        HttpDownloader.download("https://polybox.ethz.ch/index.php/s/AP9zPPk8wT4KWit/download", ContentType.APPLICATION_ZIP).to(file);
 
         assertTrue(file.isFile());
-        assertEquals(file.length(), 5310145);
+        // System.out.println(file.length());
+        assertEquals(file.length(), 2284774);
 
         file.delete();
     }

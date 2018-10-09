@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import ch.ethz.idsc.amodeus.util.io.Unzip;
 import ch.ethz.idsc.amodeus.util.math.UserHome;
 
 enum UnzipDemo {
