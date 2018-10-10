@@ -5,3 +5,5 @@ jdk:
 notifications:
   email: false
 
+script:
+  - ./gradlew build -x test
