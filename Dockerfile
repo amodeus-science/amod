@@ -4,7 +4,7 @@ FROM maven
 COPY . amod
 
 # Builds JAR file
-RUN mvn -f amod install
+RUN mvn -DskipTests -f amod install
 
 # Move to output directory for easy access to JAR
 WORKDIR /amod/target/
