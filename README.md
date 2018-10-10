@@ -73,6 +73,8 @@ San Francisco
 
 To build a Docker image locally, run either `./gradlew jibDockerBuild` or `mvn compile jib:dockerBuild`.
 
+To push a Docker image to [`duckietown/amod`](https://hub.docker.com/r/duckietown/amod), run either `./gradlew jib` or `mvn compile jib:build` (you must have credentials to push to Docker)
+
 Run `docker-compose up` to run the San Fransisco simulation. This will run two services, `aido-host` and `aido-guest`, which will communicate over port `9382`.
 
 The protocol is specified [here](https://github.com/idsc-frazzoli/amod/blob/master/doc/aido-client-protocol.md).

@@ -1,16 +1,14 @@
 version: '3'
 services:
   aido-host:
-    build: .
-    image: duckietown/amod
+    image: duckietown/amod:1.4.8
     expose:
     - 9382
     # TODO: Either omit version from JAR name or pass as ENV variable
     # TODO: Set heap size somewhere besides the command line argument?
-    command: java -Xmx10000m -cp amod-1.4.8.jar amod.aido.AidoHost
+    entrypoint: ["java", "-Xmx10000m","-cp","/app/resources:/app/classes:/app/libs/*","amod.aido.AidoHost"]
   aido-guest:
-    build: .
-    image: duckietown/amod
+    image: duckietown/amod:1.4.8
     links:
       - aido-host
-    command: java -Xmx10000m -cp amod-1.4.8.jar amod.aido.demo.AidoGuest aido-host
+    entrypoint: ["java", "-Xmx10000m","-cp","/app/resources:/app/classes:/app/libs/*","amod.aido.demo.AidoGuest", "aido-host"]

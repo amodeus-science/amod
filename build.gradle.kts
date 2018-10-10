@@ -1,6 +1,7 @@
 plugins {
   application
   id("com.google.cloud.tools.jib") version "0.9.12"
+  id("com.avast.gradle.docker-compose") version "0.8.8"
 }
 
 application {
@@ -40,5 +41,16 @@ jib {
   container {
     jvmFlags = listOf("-Xmx10000m")
     mainClass = "amod.demo.ScenarioStandalone"
+  }
+}
+
+
+tasks {
+  val aido by creating(DefaultTask::class)
+
+  dockerCompose {
+    useComposeFiles = listOf("docker-compose.yml")
+    isRequiredBy(aido)
+    stopContainers = false
   }
 }

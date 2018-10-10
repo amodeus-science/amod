@@ -152,6 +152,9 @@
 						</tags>
 					</to>
 					<container>
+						<jvmFlags>
+							<jvmFlag>-Xmx10000m</jvmFlag>
+						</jvmFlags>
 						<mainClass>amod.demo.ScenarioStandalone</mainClass>
 					</container>
 				</configuration>
