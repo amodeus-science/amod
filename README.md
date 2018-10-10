@@ -29,7 +29,6 @@ Try it, orchestrate your own fleet of amod-taxis! Watch a [visualization](https:
 - Install Java SE Development Kit (version 8, or above)
 - Install Apache Maven
 - Install IDE (ideally Eclipse Oxygen or Photon, or IntelliJ IDEA)
-        - To install IntelliJ IDEA, simply run `./gradlew runIde` or `gradlew.bat runIde` from the project directory
 - Install GLPK and GLPK for Java (Ensure you install compatible versions, e.g. [here](http://glpk-java.sourceforge.net/gettingStarted.html))
 	- Prerequisites are: GCC, Libtool, Swig and Subversion
 - Install Git and connect to GitHub with [SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
