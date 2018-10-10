@@ -1,5 +1,6 @@
 plugins {
   application
+  id("com.google.cloud.tools.jib") version "0.9.12"
 }
 
 application {
@@ -21,7 +22,6 @@ dependencies {
 repositories {
   maven("http://download.osgeo.org/webdav/geotools")
   jcenter()
-  mavenCentral()
   maven("https://raw.github.com/idsc-frazzoli/tensor/mvn-repo/")
   maven("https://raw.github.com/idsc-frazzoli/amodeus/mvn-repo/")
   maven("http://dl.bintray.com/matsim-eth/matsim")
@@ -29,4 +29,16 @@ repositories {
 }
 
 group = "ch.ethz.idsc"
-version = "1.2.8"
+version = "1.4.8"
+
+jib {
+  to {
+    image = "duckietown/amod"
+    tags = setOf("latest", "$version")
+  }
+
+  container {
+    jvmFlags = listOf("-Xmx10000m")
+    mainClass = "amod.demo.ScenarioStandalone"
+  }
+}
