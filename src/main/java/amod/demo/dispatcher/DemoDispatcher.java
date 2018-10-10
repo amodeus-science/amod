@@ -4,6 +4,7 @@ package amod.demo.dispatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.network.Link;
@@ -20,9 +21,11 @@ import ch.ethz.idsc.amodeus.dispatcher.core.RebalancingDispatcher;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.util.DrivebyRequestStopper;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.matsim.av.config.AVDispatcherConfig;
 import ch.ethz.matsim.av.dispatcher.AVDispatcher;
 import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.router.AVRouter;
 
 /** Dispatcher sends vehicles to all links in the network and lets them pickup
@@ -35,8 +38,9 @@ public class DemoDispatcher extends RebalancingDispatcher {
     private int total_abortTrip = 0;
 
     private DemoDispatcher(Config config, AVDispatcherConfig avconfig, TravelTime travelTime, //
-            AVRouter router, EventsManager eventsManager, Network network) {
-        super(config, avconfig, travelTime, router, eventsManager);
+            AVRouter router, EventsManager eventsManager, Network network, //
+            MatsimAmodeusDatabase db) {
+        super(config, avconfig, travelTime, router, eventsManager, db);
         links = new ArrayList<>(network.getLinks().values());
         Collections.shuffle(links, randGen);
         SafeConfig safeConfig = SafeConfig.wrap(avconfig);
@@ -47,8 +51,10 @@ public class DemoDispatcher extends RebalancingDispatcher {
     public void redispatch(double now) {
 
         /** stop all vehicles which are driving by an open request */
-        total_abortTrip += DrivebyRequestStopper //
+        // TODO CR check again
+        Map<RoboTaxi, AVRequest> stopDrivingBy = DrivebyRequestStopper //
                 .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
+        total_abortTrip += stopDrivingBy.size();
 
         /** send vehicles to travel around the city to random links (random loitering) */
         final long round_now = Math.round(now);
@@ -90,9 +96,12 @@ public class DemoDispatcher extends RebalancingDispatcher {
         @Inject
         private Config config;
 
+        @Inject
+        private MatsimAmodeusDatabase db;
+
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
-            return new DemoDispatcher(config, avconfig, travelTime, router, eventsManager, network);
+            return new DemoDispatcher(config, avconfig, travelTime, router, eventsManager, network, db);
         }
     }
 

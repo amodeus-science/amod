@@ -3,7 +3,7 @@ package amod.aido;
 
 import java.io.File;
 
-import ch.ethz.idsc.amodeus.aido.AidoScoreElement;
+import amod.aido.core.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.UnitSaveUtils;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;

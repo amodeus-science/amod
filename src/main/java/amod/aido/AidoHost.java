@@ -3,9 +3,9 @@ package amod.aido;
 
 import java.io.File;
 
-import ch.ethz.idsc.amodeus.aido.AidoDispatcherHost;
-import ch.ethz.idsc.amodeus.aido.AidoScoreElement;
-import ch.ethz.idsc.amodeus.aido.ScoreParameters;
+import amod.aido.core.AidoDispatcherHost;
+import amod.aido.core.AidoScoreElement;
+import amod.aido.core.ScoreParameters;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
@@ -90,8 +90,8 @@ public enum AidoHost {
 
             /** analyze and send final score */
             Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
-                    aidoServer.getOutputDirectory());
-            AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize, numReqDes);
+                    aidoServer.getOutputDirectory(), preparer.getDatabase());
+            AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize, numReqDes, preparer.getDatabase());
             analysis.addAnalysisElement(aidoScoreElement);
 
             AidoExport aidoExport = new AidoExport(aidoScoreElement);

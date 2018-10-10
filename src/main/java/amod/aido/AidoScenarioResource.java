@@ -8,9 +8,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import ch.ethz.idsc.amodeus.aido.AidoScenarioDownload;
-import ch.ethz.idsc.amodeus.aido.util.Unzip;
+import amod.aido.core.AidoScenarioDownload;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.amodeus.util.io.Unzip;
 
 public enum AidoScenarioResource {
     ;
