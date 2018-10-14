@@ -49,6 +49,7 @@ import ch.ethz.idsc.amodeus.dispatcher.util.FeasibleRebalanceCreator;
 import ch.ethz.idsc.amodeus.dispatcher.util.GlobalBipartiteMatching;
 import ch.ethz.idsc.amodeus.dispatcher.util.RandomVirtualNodeDest;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.prep.NetworkCreatorUtils;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
@@ -95,8 +96,9 @@ public class SMPCDispatcher extends PartitionedDispatcher {
             Network network, //
             VirtualNetwork<Link> virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
-            AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher) {
-        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
+            AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher, //
+            MatsimAmodeusDatabase db) {
+        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork, db);
         virtualNodeDest = abstractVirtualNodeDest;
         vehicleDestMatcher = abstractVehicleDestMatcher;
         numRobotaxi = (int) generatorConfig.getNumberOfVehicles();
@@ -183,6 +185,9 @@ public class SMPCDispatcher extends PartitionedDispatcher {
 
         @Inject
         private Config config;
+        
+        @Inject
+        private MatsimAmodeusDatabase db;
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
@@ -192,7 +197,7 @@ public class SMPCDispatcher extends PartitionedDispatcher {
             AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher = new GlobalBipartiteMatching(EuclideanDistanceFunction.INSTANCE);
 
             return new SMPCDispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork, abstractVirtualNodeDest,
-                    abstractVehicleDestMatcher);
+                    abstractVehicleDestMatcher, db);
         }
     }
 }

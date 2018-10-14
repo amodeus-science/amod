@@ -26,6 +26,7 @@ import ch.ethz.idsc.amodeus.dispatcher.util.EuclideanDistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.GlobalBipartiteMatching;
 import ch.ethz.idsc.amodeus.dispatcher.util.RandomVirtualNodeDest;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.matsim.av.config.AVDispatcherConfig;
 import ch.ethz.matsim.av.config.AVGeneratorConfig;
@@ -46,8 +47,8 @@ public class WaitNorthPoleSharedDispatcher extends SharedRebalancingDispatcher {
 
     protected WaitNorthPoleSharedDispatcher(Network network, //
             Config config, AVDispatcherConfig avDispatcherConfig, //
-            TravelTime travelTime, AVRouter router, EventsManager eventsManager) {
-        super(config, avDispatcherConfig, travelTime, router, eventsManager);
+            TravelTime travelTime, AVRouter router, EventsManager eventsManager, MatsimAmodeusDatabase db) {
+        super(config, avDispatcherConfig, travelTime, router, eventsManager, db);
         this.cityNorthPole = getNorthPole(network);
         this.equatorLinks = getEquator(network);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
@@ -152,6 +153,9 @@ public class WaitNorthPoleSharedDispatcher extends SharedRebalancingDispatcher {
 
         @Inject
         private Config config;
+        
+        @Inject
+        private MatsimAmodeusDatabase db;
 
         @Override
 
@@ -164,7 +168,7 @@ public class WaitNorthPoleSharedDispatcher extends SharedRebalancingDispatcher {
             @SuppressWarnings("unused")
             AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher = new GlobalBipartiteMatching(EuclideanDistanceFunction.INSTANCE);
 
-            return new WaitNorthPoleSharedDispatcher(network, config, avconfig, travelTime, router, eventsManager);
+            return new WaitNorthPoleSharedDispatcher(network, config, avconfig, travelTime, router, eventsManager, db);
         }
     }
 }

@@ -25,6 +25,7 @@ import ch.ethz.idsc.amodeus.dispatcher.util.EuclideanDistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.GlobalBipartiteMatching;
 import ch.ethz.idsc.amodeus.dispatcher.util.RandomVirtualNodeDest;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.traveldata.TravelData;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
@@ -60,8 +61,9 @@ public class FlowsOut extends SharedPartitionedDispatcher {
 			VirtualNetwork<Link> virtualNetwork, //
 			AbstractVirtualNodeDest abstractVirtualNodeDest, //
 			AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher, //
-			TravelData travelData) {
-		super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
+			TravelData travelData, //
+			MatsimAmodeusDatabase db) {
+		super(config, avconfig, travelTime, router, eventsManager, virtualNetwork, db);
 		this.network = network;
 		SafeConfig safeConfig = SafeConfig.wrap(avconfig);
 		distanceHeuristics = DistanceHeuristics.valueOf(safeConfig.getString("distanceHeuristics", //
@@ -160,6 +162,9 @@ public class FlowsOut extends SharedPartitionedDispatcher {
 
 		@Inject
 		private Config config;
+		
+		@Inject
+        private MatsimAmodeusDatabase db;
 
 		@Override
 		public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
@@ -170,7 +175,7 @@ public class FlowsOut extends SharedPartitionedDispatcher {
 					EuclideanDistanceFunction.INSTANCE);
 
 			return new FlowsOut(config, avconfig, generatorConfig, travelTime, router, eventsManager,
-					network, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData);
+					network, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData, db);
 		}
 	}
 

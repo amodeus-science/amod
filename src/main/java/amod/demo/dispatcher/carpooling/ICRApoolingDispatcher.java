@@ -36,6 +36,7 @@ import ch.ethz.idsc.amodeus.dispatcher.util.EuclideanDistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.GlobalBipartiteMatching;
 import ch.ethz.idsc.amodeus.dispatcher.util.RandomVirtualNodeDest;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.traveldata.TravelData;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
@@ -86,6 +87,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 	private final boolean poolingFlag;
 	private List<Link> linkList;
 	static private final Logger logger = Logger.getLogger(ICRApoolingDispatcher.class);
+	private final  int endTime;
 
 	protected ICRApoolingDispatcher(Config config, //
 			AVDispatcherConfig avconfig, //
@@ -97,8 +99,9 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 			VirtualNetwork<Link> virtualNetwork, //
 			AbstractVirtualNodeDest abstractVirtualNodeDest, //
 			AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher, //
-			TravelData travelData) {
-		super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
+			TravelData travelData, //
+			MatsimAmodeusDatabase db) {
+		super(config, avconfig, travelTime, router, eventsManager, virtualNetwork, db);
 		virtualNodeDest = abstractVirtualNodeDest;
 		vehicleDestMatcher = abstractVehicleDestMatcher;
 		this.travelData = travelData;
@@ -112,18 +115,18 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		System.out.println("Using DistanceHeuristics: " + distanceHeuristics.name());
 		this.distanceFunction = distanceHeuristics.getDistanceFunction(network);
 		this.config = config;
-		this.timeStep = 10;
+		this.timeStep = 15;
 		// dispatchPeriod = safeConfig.getInteger("dispatchPeriod", timeStep *
 		// 60);
 		dispatchPeriod = timeStep * 60;
 		this.planningHorizon = 10;
 		this.fixedCarCapacity = 2;
 		this.router = router;
-		this.predictedDemand = false;
-		this.allowAssistance = false;
+		this.predictedDemand = true;
+		this.allowAssistance = true;
 		this.poolingFlag = true;
 		this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);
-
+		this.endTime = (int) config.qsim().getEndTime();
 	}
 
 	@Override
@@ -1040,6 +1043,9 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 
 		@Inject
 		private Config config;
+		
+		@Inject
+        private MatsimAmodeusDatabase db;
 
 		@Override
 		public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
@@ -1050,7 +1056,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 					EuclideanDistanceFunction.INSTANCE);
 
 			return new ICRApoolingDispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager,
-					network, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData);
+					network, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData, db);
 		}
 	}
 

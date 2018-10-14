@@ -278,7 +278,8 @@ public enum ICRApoolingDispatcherUtils {
 			List<Link> linkList = new ArrayList<>();
 			linkMap.put(vNod, linkList);
 		}
-		Set<Request> avRequests = PopulationTools.getAVRequests(population, network);
+		int endTime = (int) config.qsim().getEndTime();
+		Set<Request> avRequests = PopulationTools.getAVRequests(population, network, endTime);
 		int numberVirtualNodes = virtualNetwork.getVirtualNodes().size();
 		for (int t = 0; t < PlanningHorizon; t++) {
 			double[][] FlowsOutMatrix = new double[numberVirtualNodes][numberVirtualNodes];

@@ -39,6 +39,7 @@ import ch.ethz.idsc.amodeus.dispatcher.util.EuclideanDistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.GlobalBipartiteMatching;
 import ch.ethz.idsc.amodeus.dispatcher.util.RandomVirtualNodeDest;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.traveldata.TravelData;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
@@ -98,8 +99,9 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
             VirtualNetwork<Link> virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher, //
-            TravelData travelData) {
-        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
+            TravelData travelData, //
+            MatsimAmodeusDatabase db) {
+        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork, db);
         virtualNodeDest = abstractVirtualNodeDest;
         vehicleDestMatcher = abstractVehicleDestMatcher;
         this.travelData = travelData;
@@ -914,6 +916,9 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
         @Inject
         private Config config;
 
+        @Inject
+        private MatsimAmodeusDatabase db;
+        
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
             AVGeneratorConfig generatorConfig = avconfig.getParent().getGeneratorConfig();
@@ -923,7 +928,7 @@ public class CarPooling2Dispatcher extends SharedPartitionedDispatcher {
                     EuclideanDistanceFunction.INSTANCE);
 
             return new CarPooling2Dispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager,
-                    network, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData);
+                    network, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData, db);
         }
     }
 

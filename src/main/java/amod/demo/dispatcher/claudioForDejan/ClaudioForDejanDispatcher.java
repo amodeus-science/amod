@@ -43,6 +43,7 @@ import ch.ethz.idsc.amodeus.dispatcher.util.EuclideanDistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.GlobalBipartiteMatching;
 import ch.ethz.idsc.amodeus.dispatcher.util.RandomVirtualNodeDest;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
@@ -112,8 +113,9 @@ public class ClaudioForDejanDispatcher extends PartitionedDispatcher {
             Network network, //
             VirtualNetwork<Link> virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
-            AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher) {
-        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
+            AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher, //
+            MatsimAmodeusDatabase db) {
+        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork, db);
         virtualNodeDest = abstractVirtualNodeDest;
         vehicleDestMatcher = abstractVehicleDestMatcher;
         numRobotaxi = (int) generatorConfig.getNumberOfVehicles();
@@ -420,6 +422,9 @@ public class ClaudioForDejanDispatcher extends PartitionedDispatcher {
 
         @Inject
         private Config config;
+        
+        @Inject
+        private MatsimAmodeusDatabase db;
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
@@ -429,7 +434,7 @@ public class ClaudioForDejanDispatcher extends PartitionedDispatcher {
             AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher = new GlobalBipartiteMatching(EuclideanDistanceFunction.INSTANCE);
 
             return new ClaudioForDejanDispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork, abstractVirtualNodeDest,
-                    abstractVehicleDestMatcher);
+                    abstractVehicleDestMatcher, db);
         }
     }
 }
