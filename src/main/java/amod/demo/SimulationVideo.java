@@ -44,7 +44,12 @@ import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
  * run ScenarioServer first to generate the simulation objects */
 public enum SimulationVideo {
     ;
+
     public static void main(String[] args) throws Exception {
+        run();
+    }
+
+    public static void run() throws Exception {
         Static.setup();
 
         File workingDirectory = MultiFileTools.getWorkingDirectory();

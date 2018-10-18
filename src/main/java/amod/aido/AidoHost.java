@@ -6,6 +6,8 @@ import java.io.File;
 import amod.aido.core.AidoDispatcherHost;
 import amod.aido.core.AidoScoreElement;
 import amod.aido.core.ScoreParameters;
+import amod.demo.SimulationVideo;
+import amod.demo.SimulationVideoDark;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
@@ -101,6 +103,10 @@ public enum AidoHost {
             analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
 
+            /** create a video */
+            SimulationVideo.run();
+            SimulationVideoDark.run();
+            
             /** send final score,
              * {total waiting time, total distance with customer, total empty distance} */
             stringSocket.writeln(Total.of(aidoScoreElement.getScoreDiffHistory()));
