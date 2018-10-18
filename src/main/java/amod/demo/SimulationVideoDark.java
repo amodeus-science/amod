@@ -49,8 +49,9 @@ public enum SimulationVideoDark {
     public static void main(String[] args) throws Exception {
         run();
     }
-    
+
     public static void run() throws Exception {
+        System.err.println("now starting the dark video!");
         Static.setup();
 
         File workingDirectory = MultiFileTools.getWorkingDirectory();
@@ -66,6 +67,30 @@ public enum SimulationVideoDark {
 
         Network network = NetworkLoader.fromNetworkFile(new File(workingDirectory, config.network().getInputFile()));
 
+        run2(network, referenceFrame, scenarioOptions, outputSubDirectory);
+    }
+
+    public static void run2(Network network, ReferenceFrame referenceFrame, //
+            ScenarioOptions scenarioOptions, File outputSubDirectory) throws Exception {
+        // System.err.println("now starting the dark video!");
+        // Static.setup();
+        //
+        // File workingDirectory = MultiFileTools.getWorkingDirectory();
+        //
+        // // load options
+        // ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory,
+        // ScenarioOptionsBase.getDefault());
+        // Config config = ConfigUtils.loadConfig(scenarioOptions.getSimulationConfigName());
+        // final File outputSubDirectory = new
+        // File(config.controler().getOutputDirectory()).getAbsoluteFile();
+        // GlobalAssert.that(outputSubDirectory.isDirectory());
+        //
+        // ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
+        // /** reference frame needs to be set manually in IDSCOptions.properties file */
+        //
+        // Network network = NetworkLoader.fromNetworkFile(new File(workingDirectory,
+        // config.network().getInputFile()));
+        //
         GlobalAssert.that(Objects.nonNull(network));
 
         System.out.println("INFO network loaded");
@@ -140,7 +165,7 @@ public enum SimulationVideoDark {
         int count = 0;
         int base = 1;
         try (SimulationObjectsVideo simulationObjectsVideo = //
-                new SimulationObjectsVideo("recording.mp4", resolution, 15, amodeusComponent)) {
+                new SimulationObjectsVideo("videoDark.mp4", resolution, 15, amodeusComponent)) {
 
             simulationObjectsVideo.millis = 20000;
 
@@ -156,10 +181,6 @@ public enum SimulationVideoDark {
                     base *= 2;
                 }
             }
-
         }
-
-        System.exit(0);
     }
-
 }

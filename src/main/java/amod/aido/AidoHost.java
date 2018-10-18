@@ -3,6 +3,8 @@ package amod.aido;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.network.Network;
+
 import amod.aido.core.AidoDispatcherHost;
 import amod.aido.core.AidoScoreElement;
 import amod.aido.core.ScoreParameters;
@@ -104,9 +106,11 @@ public enum AidoHost {
             analysis.run();
 
             /** create a video */
-            SimulationVideo.run();
-            SimulationVideoDark.run();
-            
+            SimulationVideo.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
+                    aidoServer.getScenarioOptions(),aidoServer.getOutputDirectory().getAbsoluteFile());
+            SimulationVideoDark.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
+                    aidoServer.getScenarioOptions(),aidoServer.getOutputDirectory().getAbsoluteFile());
+
             /** send final score,
              * {total waiting time, total distance with customer, total empty distance} */
             stringSocket.writeln(Total.of(aidoScoreElement.getScoreDiffHistory()));
