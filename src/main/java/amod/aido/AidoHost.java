@@ -3,8 +3,6 @@ package amod.aido;
 
 import java.io.File;
 
-import org.matsim.api.core.v01.network.Network;
-
 import amod.aido.core.AidoDispatcherHost;
 import amod.aido.core.AidoScoreElement;
 import amod.aido.core.ScoreParameters;
