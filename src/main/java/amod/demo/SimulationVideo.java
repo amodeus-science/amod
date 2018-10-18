@@ -70,23 +70,6 @@ public enum SimulationVideo {
 
     public static void run2(Network network, ReferenceFrame referenceFrame, //
             ScenarioOptions scenarioOptions, File outputSubDirectory) throws Exception {
-        // Static.setup();
-        //
-        // File workingDirectory = MultiFileTools.getWorkingDirectory();
-        //
-        // // load options
-        // ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory,
-        // ScenarioOptionsBase.getDefault());
-        // Config config = ConfigUtils.loadConfig(scenarioOptions.getSimulationConfigName());
-        // final File outputSubDirectory = new
-        // File(config.controler().getOutputDirectory()).getAbsoluteFile();
-        // GlobalAssert.that(outputSubDirectory.isDirectory());
-        //
-        // ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
-        // /** reference frame needs to be set manually in IDSCOptions.properties file */
-        //
-        // Network network = NetworkLoader.fromNetworkFile(new File(workingDirectory,
-        // config.network().getInputFile()));
 
         GlobalAssert.that(Objects.nonNull(network));
 
@@ -159,11 +142,8 @@ public enum SimulationVideo {
 
         int count = 0;
         int base = 1;
-        try (SimulationObjectsVideo simulationObjectsVideo = //
-                new SimulationObjectsVideo("video.mp4", resolution, 25, amodeusComponent)) {
-
+        try (SimulationObjectsVideo simulationObjectsVideo = new SimulationObjectsVideo("video.mp4", resolution, 25, amodeusComponent)) {
             simulationObjectsVideo.millis = 20000;
-
             int intervalEstimate = storageSupplier.getIntervalEstimate(); // 10
             int hrs = 60 * 60 / intervalEstimate;
             final int start = 5 * hrs;
@@ -171,12 +151,18 @@ public enum SimulationVideo {
             for (int index = start; index < end; index += 1) {
                 SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
                 simulationObjectsVideo.append(simulationObject);
-
                 if (++count >= base) {
                     System.out.println("render simObj " + count + "/" + (end - start));
                     base *= 2;
                 }
             }
-        }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            System.out.println("in finally block");
+            // deliberately empty but needed to close AutoCloseable SimulationObjectsVideo
+        }        
+        System.out.println("after finally block");
+        return;
     }
 }

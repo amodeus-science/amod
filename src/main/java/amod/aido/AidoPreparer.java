@@ -78,7 +78,8 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
         AidoPopulationPreparer.run(network, population, scenOpt, config, apoSeed, numReqDes);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
-        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt, numRt);
+        int endTime = (int) config.qsim().getEndTime();
+        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt, numRt,endTime);
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(config, scenOpt);

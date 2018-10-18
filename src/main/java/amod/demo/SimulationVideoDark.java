@@ -2,6 +2,7 @@
 package amod.demo;
 
 import java.awt.Dimension;
+import java.io.Closeable;
 import java.io.File;
 import java.util.Objects;
 
@@ -48,10 +49,10 @@ public enum SimulationVideoDark {
 
     public static void main(String[] args) throws Exception {
         run();
+        System.err.println("really done!");
     }
 
     public static void run() throws Exception {
-        System.err.println("now starting the dark video!");
         Static.setup();
 
         File workingDirectory = MultiFileTools.getWorkingDirectory();
@@ -72,25 +73,7 @@ public enum SimulationVideoDark {
 
     public static void run2(Network network, ReferenceFrame referenceFrame, //
             ScenarioOptions scenarioOptions, File outputSubDirectory) throws Exception {
-        // System.err.println("now starting the dark video!");
-        // Static.setup();
-        //
-        // File workingDirectory = MultiFileTools.getWorkingDirectory();
-        //
-        // // load options
-        // ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory,
-        // ScenarioOptionsBase.getDefault());
-        // Config config = ConfigUtils.loadConfig(scenarioOptions.getSimulationConfigName());
-        // final File outputSubDirectory = new
-        // File(config.controler().getOutputDirectory()).getAbsoluteFile();
-        // GlobalAssert.that(outputSubDirectory.isDirectory());
-        //
-        // ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
-        // /** reference frame needs to be set manually in IDSCOptions.properties file */
-        //
-        // Network network = NetworkLoader.fromNetworkFile(new File(workingDirectory,
-        // config.network().getInputFile()));
-        //
+
         GlobalAssert.that(Objects.nonNull(network));
 
         System.out.println("INFO network loaded");
@@ -181,6 +164,13 @@ public enum SimulationVideoDark {
                     base *= 2;
                 }
             }
-        }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            System.out.println("in finally block");
+            // deliberately empty but needed to close AutoCloseable SimulationObjectsVideo
+        }        
+        System.out.println("after finally block");
+        return;
     }
 }
