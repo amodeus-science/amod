@@ -161,7 +161,7 @@ public enum SimulationVideo {
         } finally {
             System.out.println("in finally block");
             // deliberately empty but needed to close AutoCloseable SimulationObjectsVideo
-        }        
+        }
         System.out.println("after finally block");
         return;
     }

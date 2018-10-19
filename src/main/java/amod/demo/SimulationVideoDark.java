@@ -2,7 +2,6 @@
 package amod.demo;
 
 import java.awt.Dimension;
-import java.io.Closeable;
 import java.io.File;
 import java.util.Objects;
 
@@ -169,7 +168,7 @@ public enum SimulationVideoDark {
         } finally {
             System.out.println("in finally block");
             // deliberately empty but needed to close AutoCloseable SimulationObjectsVideo
-        }        
+        }
         System.out.println("after finally block");
         return;
     }

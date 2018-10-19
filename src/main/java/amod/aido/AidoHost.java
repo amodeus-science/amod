@@ -105,9 +105,9 @@ public enum AidoHost {
 
             /** create a video */
             SimulationVideo.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
-                    aidoServer.getScenarioOptions(),aidoServer.getOutputDirectory().getAbsoluteFile());
+                    aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
             SimulationVideoDark.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
-                    aidoServer.getScenarioOptions(),aidoServer.getOutputDirectory().getAbsoluteFile());
+                    aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
 
             /** send final score,
              * {total waiting time, total distance with customer, total empty distance} */

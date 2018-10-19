@@ -18,8 +18,6 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.core.SharedPartitionedDispatcher;
-import ch.ethz.idsc.amodeus.dispatcher.shared.SharedMealType;
-import ch.ethz.idsc.amodeus.dispatcher.shared.SharedMenu;
 import ch.ethz.idsc.amodeus.dispatcher.util.AbstractRoboTaxiDestMatcher;
 import ch.ethz.idsc.amodeus.dispatcher.util.AbstractVirtualNodeDest;
 import ch.ethz.idsc.amodeus.dispatcher.util.DistanceFunction;
@@ -136,9 +134,9 @@ public class SharedDispatcherExample extends SharedPartitionedDispatcher {
                                 // Pair taxi to request
                                 subList.stream().forEach(avr -> addSharedRoboTaxiPickup(sRt, avr));
                                 // TODO SHARED reorder menu
-//                                SharedMenu menu = taxisToPair.get(i).getMenu();
-//                                @SuppressWarnings("unused")
-//                                List<Integer> pickupIndeces = menu.getPickupOrDropOffCoursesIndeces(SharedMealType.PICKUP);
+                                // SharedMenu menu = taxisToPair.get(i).getMenu();
+                                // @SuppressWarnings("unused")
+                                // List<Integer> pickupIndeces = menu.getPickupOrDropOffCoursesIndeces(SharedMealType.PICKUP);
                                 // SharedAVCourse sharedAVCourse = new
                                 // SharedAVCourse(secondRequest.getId(), SharedAVMealType.PICKUP);
 

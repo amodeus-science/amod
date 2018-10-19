@@ -18,7 +18,7 @@ import ch.ethz.matsim.av.passenger.AVRequest;
     }
 
     public Tensor compile(Collection<AVRequest> requests) {
-        return Tensor.of(requests.stream().map(r -> this.of(r)));
+        return Tensor.of(requests.stream().map(this::of));
     }
 
     private Tensor of(AVRequest request) {
