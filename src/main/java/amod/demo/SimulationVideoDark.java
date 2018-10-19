@@ -45,7 +45,13 @@ import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
  * run ScenarioServer first to generate the simulation objects */
 public enum SimulationVideoDark {
     ;
+
     public static void main(String[] args) throws Exception {
+        run();
+        System.err.println("really done!");
+    }
+
+    public static void run() throws Exception {
         Static.setup();
 
         File workingDirectory = MultiFileTools.getWorkingDirectory();
@@ -60,6 +66,12 @@ public enum SimulationVideoDark {
         /** reference frame needs to be set manually in IDSCOptions.properties file */
 
         Network network = NetworkLoader.fromNetworkFile(new File(workingDirectory, config.network().getInputFile()));
+
+        run2(network, referenceFrame, scenarioOptions, outputSubDirectory);
+    }
+
+    public static void run2(Network network, ReferenceFrame referenceFrame, //
+            ScenarioOptions scenarioOptions, File outputSubDirectory) throws Exception {
 
         GlobalAssert.that(Objects.nonNull(network));
 
@@ -135,7 +147,7 @@ public enum SimulationVideoDark {
         int count = 0;
         int base = 1;
         try (SimulationObjectsVideo simulationObjectsVideo = //
-                new SimulationObjectsVideo("recording.mp4", resolution, 15, amodeusComponent)) {
+                new SimulationObjectsVideo("videoDark.mp4", resolution, 15, amodeusComponent)) {
 
             simulationObjectsVideo.millis = 20000;
 
@@ -151,10 +163,9 @@ public enum SimulationVideoDark {
                     base *= 2;
                 }
             }
-
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-
-        System.exit(0);
+        System.out.println("finished dark video");
     }
-
 }

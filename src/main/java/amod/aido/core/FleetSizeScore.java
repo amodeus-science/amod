@@ -19,8 +19,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 /* package */ class FleetSizeScore {
     private final Scalar wMax;
     private final Scalar fleetSize;
-    private Scalar scoreFinal = Quantity.of(0, SI.ONE);
-    private Scalar scoreFinalPrev = Quantity.of(0, SI.ONE);
+    private Scalar scoreFinal = RealScalar.ZERO;
+    private Scalar scoreFinalPrev = RealScalar.ZERO;
     private Scalar timeViolate = Quantity.of(-1, SI.SECOND);
     private Scalar totalWait = Quantity.of(0, SI.SECOND);
     private boolean firstTime = true;
@@ -29,7 +29,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         Scalar wmean = scoreParameters.wmean;
         wMax = wmean.multiply(RealScalar.of(totReq));
         this.fleetSize = RationalScalar.of(fleetSize, 1);
-        this.scoreFinal = Quantity.of(0, SI.ONE);
+        this.scoreFinal = RealScalar.ZERO;
     }
 
     public void update(Scalar incrWait, Scalar time) {
@@ -58,7 +58,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
     public Scalar getScoreDiff() {
         Scalar scoreDiff = scoreFinal.subtract(scoreFinalPrev);
         if (Double.isNaN(scoreDiff.number().doubleValue()))
-            return Quantity.of(0, SI.ONE);
+            return RealScalar.ZERO;
         return scoreDiff;
     }
 

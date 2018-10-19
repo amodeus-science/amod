@@ -6,11 +6,14 @@ import java.io.File;
 import amod.aido.core.AidoDispatcherHost;
 import amod.aido.core.AidoScoreElement;
 import amod.aido.core.ScoreParameters;
+import amod.demo.SimulationVideo;
+import amod.demo.SimulationVideoDark;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
 import ch.ethz.idsc.amodeus.prep.LegCount;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.amodeus.util.math.UserHome;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.Scalar;
@@ -100,6 +103,15 @@ public enum AidoHost {
             AidoHtmlReport aidoHtmlReport = new AidoHtmlReport(aidoScoreElement);
             analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
+
+            /** create a video */
+            String username = UserHome.file("").getName();
+            if (!username.equalsIgnoreCase("travis")) { // TODO hack
+                SimulationVideo.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
+                        aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+                SimulationVideoDark.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
+                        aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+            }
 
             /** send final score,
              * {total waiting time, total distance with customer, total empty distance} */
