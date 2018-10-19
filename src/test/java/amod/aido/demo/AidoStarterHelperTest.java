@@ -52,10 +52,20 @@ public class AidoStarterHelperTest extends TestCase {
 
             /** files */
             CleanAidoScenarios.now();
-            /** virtual network folder */
-            FileDelete.of(new File("virtualNetwork"), 1, 4);
-            /** output folder */
-            FileDelete.of(new File("output"), 5, 25000);
+
+            { // folder should not exist
+                /** virtual network file "virtualNetwork" should not exist for AIDO */
+                File file = new File("virtualNetwork");
+                if (file.exists())
+                    FileDelete.of(file, 1, 4);
+            }
+
+            {
+                /** output folder */
+                File file = new File("output");
+                if (file.isDirectory())
+                    FileDelete.of(file, 5, 25000);
+            }
         }
     }
 }
