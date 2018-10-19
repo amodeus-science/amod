@@ -43,7 +43,7 @@ public class AidoStarterHelperTest extends TestCase {
 
         Collections.shuffle(list);
 
-        list = list.subList(0, 3);
+        list = list.subList(0, 1);
 
         Random random = new Random();
         for (String index : list) {
