@@ -165,11 +165,7 @@ public enum SimulationVideoDark {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            System.out.println("in finally block");
-            // deliberately empty but needed to close AutoCloseable SimulationObjectsVideo
         }
-        System.out.println("after finally block");
-        return;
+        System.out.println("finished dark video");
     }
 }

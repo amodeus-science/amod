@@ -142,7 +142,8 @@ public enum SimulationVideo {
 
         int count = 0;
         int base = 1;
-        try (SimulationObjectsVideo simulationObjectsVideo = new SimulationObjectsVideo("video.mp4", resolution, 25, amodeusComponent)) {
+        try (SimulationObjectsVideo simulationObjectsVideo = //
+                new SimulationObjectsVideo("video.mp4", resolution, 25, amodeusComponent)) {
             simulationObjectsVideo.millis = 20000;
             int intervalEstimate = storageSupplier.getIntervalEstimate(); // 10
             int hrs = 60 * 60 / intervalEstimate;
@@ -158,11 +159,7 @@ public enum SimulationVideo {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            System.out.println("in finally block");
-            // deliberately empty but needed to close AutoCloseable SimulationObjectsVideo
         }
         System.out.println("after finally block");
-        return;
     }
 }

@@ -13,6 +13,7 @@ import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
 import ch.ethz.idsc.amodeus.prep.LegCount;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.amodeus.util.math.UserHome;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.Scalar;
@@ -104,10 +105,13 @@ public enum AidoHost {
             analysis.run();
 
             /** create a video */
-            SimulationVideo.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
-                    aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
-            SimulationVideoDark.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
-                    aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+            String username = UserHome.file("").getName();
+            if (!username.equalsIgnoreCase("travis")) { // TODO hack
+                SimulationVideo.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
+                        aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+                SimulationVideoDark.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
+                        aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+            }
 
             /** send final score,
              * {total waiting time, total distance with customer, total empty distance} */
