@@ -16,6 +16,7 @@ import ch.ethz.idsc.tensor.Tensors;
 // tracked fields are of type Tensor/Scalar/String/Boolean
 // can assign default values, will be overwritten by values in file
 public class ViewerConfig {
+    // TODO fields should have default values defined here
     public Tensor coord;
     public Scalar zoom = RealScalar.of(3);
     public Scalar width;

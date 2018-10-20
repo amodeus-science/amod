@@ -1,16 +1,14 @@
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.demo;
-
-import ch.ethz.idsc.amodeus.net.TensorCoords;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.io.ResourceData;
-import ch.ethz.idsc.tensor.io.TensorProperties;
-import org.matsim.api.core.v01.Coord;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
+import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.tensor.io.Import;
+import ch.ethz.idsc.tensor.io.ResourceData;
+import ch.ethz.idsc.tensor.io.TensorProperties;
 
 // only for testing purpose, later tobe part of ScenarioViewer
 public enum ScenarioViewerTest {
@@ -22,15 +20,15 @@ public enum ScenarioViewerTest {
     }
 
     public static void run(File workingDirectory) throws IOException {
+        // TODO no need to create a default values properties file
+        // ... as default values are declared in ViewerConfig class
+        Properties properties = ResourceData.properties("/gui/viewer_default.properties");
         File config = new File(workingDirectory, "viewer.properties");
-        ViewerConfig viewerConfig = new ViewerConfig();
-        if (config.exists()) {
-            TensorProperties.wrap(viewerConfig).load(config);
-        } else {
-            Properties properties = ResourceData.properties("/gui/viewer_default.properties");
-            TensorProperties.wrap(viewerConfig).set(properties);
-        }
-
+        if (config.exists())
+            properties = Import.properties(config);
+        // ---
+        ViewerConfig viewerConfig = TensorProperties.wrap(new ViewerConfig()).set(properties);
+        // ---
         // Coord coord = TensorCoords.toCoord(Tensors.vector(1, 2));
         // System.out.println(coord);
 
@@ -41,6 +39,7 @@ public enum ScenarioViewerTest {
         System.out.println("height = " + viewerConfig.height);
         // what is the correct format of boolean in *.properties?
         System.out.println("bool = " + viewerConfig.visibility);
+        System.out.println(viewerConfig.getDimension());
     }
 
 }
