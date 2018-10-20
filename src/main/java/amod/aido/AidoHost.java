@@ -14,7 +14,6 @@ import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
 import ch.ethz.idsc.amodeus.prep.LegCount;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.amodeus.util.math.UserHome;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.Scalar;
@@ -34,6 +33,7 @@ public enum AidoHost {
     private static final String ENV_SCENARIO = "SCENARIO";
     private static final String ENV_FLEET_SIZE = "FLEET_SIZE";
     private static final String ENV_REQUESTS_SIZE = "REQUESTS_SIZE";
+    private static final String ENV_VIDEO_EXPORT = "VIDEO_EXPORT";
 
     public static void main(String[] args) throws Exception {
         /** open String server and wait for initial command */
@@ -132,13 +132,14 @@ public enum AidoHost {
             analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
 
-            /** create a video */
-            String username = UserHome.file("").getName();
-            if (!username.equalsIgnoreCase("travis")) { // TODO hack
-                SimulationVideo.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
-                        aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
-                SimulationVideoDark.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
-                        aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+            { /** create a video if environment variable is set */
+                String env = System.getenv(ENV_VIDEO_EXPORT);
+                if (Objects.nonNull(env) && env.equalsIgnoreCase("true")) {
+                    SimulationVideo.export(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
+                            aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+                    SimulationVideoDark.export(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
+                            aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+                }
             }
 
             /** send final score,
