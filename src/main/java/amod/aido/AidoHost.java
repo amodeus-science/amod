@@ -2,6 +2,7 @@
 package amod.aido;
 
 import java.io.File;
+import java.util.Objects;
 
 import amod.aido.core.AidoDispatcherHost;
 import amod.aido.core.AidoScoreElement;
@@ -13,7 +14,6 @@ import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
 import ch.ethz.idsc.amodeus.prep.LegCount;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.amodeus.util.math.UserHome;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.Scalar;
@@ -30,6 +30,10 @@ import ch.ethz.idsc.tensor.sca.Round;
 public enum AidoHost {
     ;
     public static final int PORT = 9382;
+    private static final String ENV_SCENARIO = "SCENARIO";
+    private static final String ENV_FLEET_SIZE = "FLEET_SIZE";
+    private static final String ENV_REQUESTS_SIZE = "REQUESTS_SIZE";
+    private static final String ENV_VIDEO_EXPORT = "VIDEO_EXPORT";
 
     public static void main(String[] args) throws Exception {
         /** open String server and wait for initial command */
@@ -42,6 +46,11 @@ public enum AidoHost {
             System.out.println("AidoHost config: " + config);
             Thread.sleep(1000);
             String scenarioTag = config.Get(0).toString();
+            {
+                String env = System.getenv(ENV_SCENARIO);
+                if (Objects.nonNull(env))
+                    env = scenarioTag;
+            }
 
             /** download the chosen scenario */
             try {
@@ -79,6 +88,25 @@ public enum AidoHost {
             int numReqDes = config2.Get(0).number().intValue();
             int fleetSize = config2.Get(1).number().intValue();
 
+            {
+                String env = System.getenv(ENV_REQUESTS_SIZE);
+                if (Objects.nonNull(env))
+                    try {
+                        numReqDes = Integer.parseInt(env);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+            }
+            {
+                String env = System.getenv(ENV_FLEET_SIZE);
+                if (Objects.nonNull(env))
+                    try {
+                        fleetSize = Integer.parseInt(env);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+            }
+
             /** run second part of preparer */
             preparer.run2(numReqDes);
 
@@ -104,13 +132,14 @@ public enum AidoHost {
             analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
 
-            /** create a video */
-            String username = UserHome.file("").getName();
-            if (!username.equalsIgnoreCase("travis")) { // TODO hack
-                SimulationVideo.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
-                        aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
-                SimulationVideoDark.run2(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
-                        aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+            { /** create a video if environment variable is set */
+                String env = System.getenv(ENV_VIDEO_EXPORT);
+                if (Objects.nonNull(env) && env.equalsIgnoreCase("true")) {
+                    SimulationVideo.export(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
+                            aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+                    SimulationVideoDark.export(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
+                            aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+                }
             }
 
             /** send final score,

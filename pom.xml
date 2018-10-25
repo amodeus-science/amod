@@ -4,6 +4,7 @@
 	<groupId>ch.ethz.idsc</groupId>
 	<artifactId>amod</artifactId>
 	<version>1.5.2</version>
+	<packaging>jar</packaging>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>

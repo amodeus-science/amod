@@ -65,10 +65,10 @@ public enum SimulationVideo {
 
         Network network = NetworkLoader.fromNetworkFile(new File(workingDirectory, config.network().getInputFile()));
 
-        run2(network, referenceFrame, scenarioOptions, outputSubDirectory);
+        export(network, referenceFrame, scenarioOptions, outputSubDirectory);
     }
 
-    public static void run2(Network network, ReferenceFrame referenceFrame, //
+    public static void export(Network network, ReferenceFrame referenceFrame, //
             ScenarioOptions scenarioOptions, File outputSubDirectory) throws Exception {
 
         GlobalAssert.that(Objects.nonNull(network));
