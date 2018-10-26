@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import ch.ethz.idsc.tensor.io.Import;
-import ch.ethz.idsc.tensor.io.TensorProperties;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -52,7 +50,7 @@ public enum ScenarioViewer {
         File outputDirectory = outputSubDirectory.getParentFile();
         System.out.println("showing simulation results from outputDirectory=" + outputDirectory);
 
-        /** geopgrahic information, .e.g., coordinate system */
+        /** geographic information, .e.g., coordinate system */
         LocationSpec locationSpec = simOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
 
@@ -65,7 +63,7 @@ public enum ScenarioViewer {
         /** initializing the viewer */
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db);
-        ViewerConfig viewerConfig = ViewerConfig.from(db, workingDirectory);
+        ViewerConfig viewerConfig = ViewerConfig.fromDefaults(db);
         System.out.println(viewerConfig);
 
         /** virtual network layer, should not cause problems if layer does not exist */
@@ -76,6 +74,8 @@ public enum ScenarioViewer {
         amodeusViewerFrame.setDisplayPosition(viewerConfig.getCoord(), viewerConfig.zoom.number().intValue());
         amodeusViewerFrame.jFrame.setSize(viewerConfig.getDimension().width, viewerConfig.getDimension().height);
         amodeusViewerFrame.jFrame.setVisible(viewerConfig.visibility);
+
+        viewerConfig.save(amodeusComponent, workingDirectory);
     }
 
 }
