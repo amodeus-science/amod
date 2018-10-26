@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import ch.ethz.idsc.amodeus.gfx.ViewerConfig;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -63,19 +64,17 @@ public enum ScenarioViewer {
         /** initializing the viewer */
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db);
-        ViewerConfig viewerConfig = ViewerConfig.fromDefaults(db);
-        System.out.println(viewerConfig);
 
         /** virtual network layer, should not cause problems if layer does not exist */
         amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
         /** starting the viewer */
+        ViewerConfig viewerConfig = ViewerConfig.fromDefaults(db);
+        System.out.println(viewerConfig);
         AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory, network);
-        amodeusViewerFrame.setDisplayPosition(viewerConfig.getCoord(), viewerConfig.zoom.number().intValue());
-        amodeusViewerFrame.jFrame.setSize(viewerConfig.getDimension().width, viewerConfig.getDimension().height);
-        amodeusViewerFrame.jFrame.setVisible(viewerConfig.visibility);
-
-        viewerConfig.save(amodeusComponent, workingDirectory);
+        amodeusViewerFrame.setDisplayPosition(viewerConfig.settings.coord, viewerConfig.settings.zoom);
+        amodeusViewerFrame.jFrame.setSize(viewerConfig.settings.dimensions);
+        amodeusViewerFrame.jFrame.setVisible(true);
     }
 
 }
