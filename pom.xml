@@ -145,6 +145,9 @@
 				<artifactId>jib-maven-plugin</artifactId>
 				<version>0.9.11</version>
 				<configuration>
+					<from>
+						<image>tianon/jenkins</image>
+					</from>
 					<to>
 						<image>duckietown/amod</image>
 						<tags>
