@@ -39,6 +39,7 @@ import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.router.AVRouter;
 
+@SuppressWarnings("unused")
 public class SharedDispatcherExample extends SharedPartitionedDispatcher {
 
     private final int dispatchPeriod;
@@ -147,9 +148,9 @@ public class SharedDispatcherExample extends SharedPartitionedDispatcher {
                         }
 
                         // TODO SHARED GBPM
-                        @SuppressWarnings("unused")
                         List<AVRequest> nonShareableOnes = sameDestRequests.values().stream() //
-                                .filter(l -> l.size() <= 1).map(l -> l.get(0)) //
+                                .filter(list -> list.size() == 1) //
+                                .map(list -> list.get(0)) //
                                 .collect(Collectors.toList());
 
                         availableVehicles = getVirtualNodeDivertableUnassignedRoboTaxi();
