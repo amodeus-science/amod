@@ -7,9 +7,9 @@ import amod.aido.core.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.UnitSaveUtils;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
-import ch.ethz.idsc.amodeus.analysis.plot.ColorScheme;
 import ch.ethz.idsc.amodeus.analysis.plot.TimeChart;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.img.ColorDataIndexed;
 
 /* package */ class AidoExport implements AnalysisExport {
 
@@ -28,7 +28,7 @@ import ch.ethz.idsc.tensor.Tensor;
     }
 
     @Override
-    public void summaryTarget(AnalysisSummary analysisSummary, File relativeDirectory, ColorScheme colorScheme) {
+    public void summaryTarget(AnalysisSummary analysisSummary, File relativeDirectory, ColorDataIndexed colorScheme) {
 
         Tensor scoreDiffHistory = aidoScoreElement.getScoreDiffHistory();
         Tensor scoreIntgHistory = aidoScoreElement.getScoreIntgHistory();

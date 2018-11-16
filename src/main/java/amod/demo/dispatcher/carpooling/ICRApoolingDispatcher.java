@@ -754,10 +754,10 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 					if (Arrays.stream(xdoQueue).sum() != 0) {
 						List<RoboTaxi> freecar = getVirtualNodeSORoboTaxi().get(fromNode).stream()
 								.filter(car -> (car.getMenu().getStarterCourse().getMealType() == SharedMealType.DROPOFF
-										&& toNode.getLinks().contains(car.getCurrentDriveDestination())
+										&& toNode.getLinks().contains(car.getCurrentDriveDestination()))
 										|| (car.getMenu().getStarterCourse().getMealType() == SharedMealType.REDIRECT
 												&& toNode.getLinks()
-														.contains(car.getMenu().getCourses().get(1).getLink()))))
+														.contains(car.getMenu().getCourses().get(1).getLink())))
 								.collect(Collectors.toList());
 						GlobalAssert.that(freecar.isEmpty());
 					}

@@ -5,7 +5,6 @@ import java.io.File;
 
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
-import ch.ethz.idsc.amodeus.analysis.plot.ColorScheme;
 import ch.ethz.idsc.amodeus.analysis.plot.DiagramSettings;
 import ch.ethz.idsc.amodeus.analysis.plot.HistogramPlot;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
@@ -13,6 +12,7 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.img.ColorDataIndexed;
 import ch.ethz.idsc.tensor.pdf.BinCounts;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.matsim.av.passenger.AVRequest;
@@ -28,7 +28,7 @@ import ch.ethz.matsim.av.passenger.AVRequest;
     }
 
     @Override
-    public void summaryTarget(AnalysisSummary analysisSummary, File relativeDirectory, ColorScheme colorScheme) {
+    public void summaryTarget(AnalysisSummary analysisSummary, File relativeDirectory, ColorDataIndexed colorScheme) {
 
         /** the data for the histogram is gathered from the RoboTaxiRequestRecorder, basic
          * information can also be retrieved from the analsysisSummary */

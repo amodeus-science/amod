@@ -36,10 +36,10 @@ public class XSOControl {
 				List<RoboTaxi> availableCarsNotFiltered = soRoboTaxi.get(fromNode);
 				List<RoboTaxi> availableCars = availableCarsNotFiltered.stream()
 						.filter(car -> (car.getMenu().getStarterCourse().getMealType() == SharedMealType.DROPOFF
-								&& destinationNode.getLinks().contains(car.getCurrentDriveDestination())
+								&& destinationNode.getLinks().contains(car.getCurrentDriveDestination()))
 								|| (car.getMenu().getStarterCourse().getMealType() == SharedMealType.REDIRECT
 										&& destinationNode.getLinks()
-												.contains(car.getMenu().getCourses().get(1).getLink()))))
+												.contains(car.getMenu().getCourses().get(1).getLink())))
 						.collect(Collectors.toList());
 
 				if (availableCars.isEmpty()) {

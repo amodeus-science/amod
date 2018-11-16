@@ -80,7 +80,7 @@ public enum SimulationVideoDark {
         VehiclesLayer vehiclesLayer = new VehiclesLayer();
         vehiclesLayer.showLocation = true;
         // vehiclesLayer.
-        vehiclesLayer.statusColors = RoboTaxiStatusColors.ICRA;
+        vehiclesLayer.statusColors = RoboTaxiStatusColors.Pop;
         amodeusComponent.addLayer(vehiclesLayer);
 
         RequestsLayer requestsLayer = new RequestsLayer();
