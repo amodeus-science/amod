@@ -85,14 +85,14 @@ public enum SimulationVideo {
 
         amodeusComponent.mapGrayCover = 255;
         amodeusComponent.mapAlphaCover = 128;
-        amodeusComponent.addLayer(new TilesLayer());
+        amodeusComponent.addLayer(new TilesLayer(amodeusComponent));
 
-        VehiclesLayer vehiclesLayer = new VehiclesLayer();
+        VehiclesLayer vehiclesLayer = new VehiclesLayer(amodeusComponent);
         vehiclesLayer.showLocation = true;
         vehiclesLayer.statusColors = RoboTaxiStatusColors.Standard;
         amodeusComponent.addLayer(vehiclesLayer);
 
-        RequestsLayer requestsLayer = new RequestsLayer();
+        RequestsLayer requestsLayer = new RequestsLayer(amodeusComponent);
         requestsLayer.drawNumber = false;
         requestsLayer.requestHeatMap.setShow(false);
         requestsLayer.requestHeatMap.setColorSchemes(ColorSchemes.Jet);
@@ -104,21 +104,21 @@ public enum SimulationVideo {
         // linkLayer.linkLimit = 16384;
         // amodeusComponent.addLayer(linkLayer);
 
-        LoadLayer loadLayer = new LoadLayer();
+        LoadLayer loadLayer = new LoadLayer(amodeusComponent);
         loadLayer.drawLoad = true;
         loadLayer.historyLength = 5;
         loadLayer.loadScale = 15;
         amodeusComponent.addLayer(loadLayer);
 
-        amodeusComponent.addLayer(new HudLayer());
+        amodeusComponent.addLayer(new HudLayer(amodeusComponent));
         amodeusComponent.setFontSize(0);
-        ClockLayer clockLayer = new ClockLayer();
+        ClockLayer clockLayer = new ClockLayer(amodeusComponent);
         clockLayer.alpha = 128;
         amodeusComponent.addLayer(clockLayer);
 
         /** this is optional and should not cause problems if file does not
          * exist. temporary solution */
-        VirtualNetworkLayer virtualNetworkLayer = new VirtualNetworkLayer();
+        VirtualNetworkLayer virtualNetworkLayer = new VirtualNetworkLayer(amodeusComponent);
         amodeusComponent.addLayer(virtualNetworkLayer);
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(network); // may be null
         System.out.println("has vn: " + (virtualNetwork != null));
