@@ -24,6 +24,9 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
     TEL_AVIV( //
             new GeotoolsTransformation("EPSG:2039", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:2039")),//
+    NY( //
+            new GeotoolsTransformation("EPSG:3628", "WGS84"), //
+            new GeotoolsTransformation("WGS84", "EPSG:3628")),
     ;
     // ---
     private final CoordinateTransformation coords_toWGS84;

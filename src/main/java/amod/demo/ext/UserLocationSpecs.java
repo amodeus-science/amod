@@ -19,6 +19,11 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
     TEL_AVIV( //
             UserReferenceFrames.TEL_AVIV, //
             new Coord(179549.58, 665848.14)), //
+    NY( //
+            UserReferenceFrames.NY, //
+            new Coord(-74.005, 40.712)// Updated
+    ), //
+
     ;
 
     private final ReferenceFrame referenceFrame;
