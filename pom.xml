@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.ethz.idsc</groupId>
 	<artifactId>amod</artifactId>
-	<version>1.5.3</version>
+	<version>1.5.4</version>
 	<packaging>jar</packaging>
 
 	<properties>
@@ -16,7 +16,7 @@
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>amodeus</artifactId>
-			<version>1.5.3</version>
+			<version>1.5.4</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
