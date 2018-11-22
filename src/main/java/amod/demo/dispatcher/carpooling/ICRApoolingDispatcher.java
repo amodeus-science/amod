@@ -88,6 +88,8 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 	private List<Link> linkList;
 	static private final Logger logger = Logger.getLogger(ICRApoolingDispatcher.class);
 	private final  int endTime;
+	private final int reserveFleet;
+	private final boolean discardAVRequetsFlag;
 
 	protected ICRApoolingDispatcher(Config config, //
 			AVDispatcherConfig avconfig, //
@@ -115,18 +117,20 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 		System.out.println("Using DistanceHeuristics: " + distanceHeuristics.name());
 		this.distanceFunction = distanceHeuristics.getDistanceFunction(network);
 		this.config = config;
-		this.timeStep = 15;
+		this.timeStep = 5;
 		// dispatchPeriod = safeConfig.getInteger("dispatchPeriod", timeStep *
 		// 60);
 		dispatchPeriod = timeStep * 60;
-		this.planningHorizon = 10;
+		this.planningHorizon = 15;
 		this.fixedCarCapacity = 2;
 		this.router = router;
-		this.predictedDemand = true;
+		this.predictedDemand = false;
 		this.allowAssistance = true;
-		this.poolingFlag = true;
+		this.poolingFlag = false;
 		this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);
 		this.endTime = (int) config.qsim().getEndTime();
+		this.reserveFleet = 20;
+		this.discardAVRequetsFlag = true;
 	}
 
 	@Override
@@ -633,9 +637,10 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 			}
 		}
 
+		
 		// Assign unassigned requests
 		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
-				&& round_now < (dispatchTime + timeStep * 60) && getRoboTaxisFree().size() > 100
+				&& round_now < (dispatchTime + timeStep * 60) && getRoboTaxisFree().size() > reserveFleet
 				&& allowAssistance == true)
 				|| (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60)
 						&& getRoboTaxisFree().size() > 100 && allowAssistance == true)) {
@@ -704,6 +709,17 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
 				}
 			}
 
+		}
+		
+		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
+                && round_now < (dispatchTime + timeStep * 60) && discardAVRequetsFlag == true)
+                || (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60) && discardAVRequetsFlag == true)) {
+		    List<AVRequest> avrequests = getUnassignedAVRequests();
+		    for(AVRequest avreq: avrequests) {
+		        if(avreq.getSubmissionTime() + 15*60 > round_now) {
+		            avreq.getPassenger().endActivityAndComputeNextState(now);
+		        }
+		    }
 		}
 
 		if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime

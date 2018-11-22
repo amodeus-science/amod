@@ -125,7 +125,7 @@ public enum SimulationVideoDark {
         amodeusComponent.zoomIn();
 //        amodeusComponent.zoomIn();
         // amodeusComponent.zoomIn();
-        amodeusComponent.moveMap(-50, 100);
+//        amodeusComponent.moveMap(-50, 100);
 
         StorageUtils storageUtils = new StorageUtils(outputSubDirectory);
         IterationFolder iterationFolder = storageUtils.getAvailableIterations().get(0);

@@ -71,7 +71,7 @@ Passengers.FlowsOut = FlowsOut;
 use_outpax = 1;
 Flags.milpflag = 1;
 Flags.ignorerealpax = 1 - use_outpax;
-Flags.pooling_flag = 1;
+Flags.pooling_flag = 0;
 
 RebWeight = 5.0;
 

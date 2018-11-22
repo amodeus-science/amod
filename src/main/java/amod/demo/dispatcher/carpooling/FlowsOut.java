@@ -70,7 +70,7 @@ public class FlowsOut extends SharedPartitionedDispatcher {
 				DistanceHeuristics.EUCLIDEAN.name()).toUpperCase());
 		System.out.println("Using DistanceHeuristics: " + distanceHeuristics.name());
 		this.config = config;
-		this.timeStep = 15;
+		this.timeStep = 5;
 		// dispatchPeriod = safeConfig.getInteger("dispatchPeriod", timeStep *
 		// 60);
 		dispatchPeriod = timeStep * 60;
@@ -88,13 +88,15 @@ public class FlowsOut extends SharedPartitionedDispatcher {
 
 			// travel times
 			
-			linkWait = new LinkWait(new HashMap<VirtualNode<Link>, List<Link>>());
-			HashMap<VirtualNode<Link>, List<Link>> linkMap = linkWait.getLinkWait();
-			Pair<List<double[][]>, HashMap<VirtualNode<Link>, List<Link>>> FlowsOutpair = ICRApoolingDispatcherUtils
-					.getFlowsOut(network, virtualNetwork, planningHorizon, timeStep, config, round_now, linkMap);
-			List<double[][]> FlowsOut = FlowsOutpair.getLeft();
-			linkMap = FlowsOutpair.getRight();
-			linkWait.setLinkWait(linkMap);
+//			linkWait = new LinkWait(new HashMap<VirtualNode<Link>, List<Link>>());
+//			HashMap<VirtualNode<Link>, List<Link>> linkMap = linkWait.getLinkWait();
+//			Pair<List<double[][]>, HashMap<VirtualNode<Link>, List<Link>>> FlowsOutpair = ICRApoolingDispatcherUtils
+//					.getFlowsOut(network, virtualNetwork, planningHorizon, timeStep, config, round_now, linkMap);
+//			List<double[][]> FlowsOut = FlowsOutpair.getLeft();
+//			linkMap = FlowsOutpair.getRight();
+//			linkWait.setLinkWait(linkMap);
+		    
+		    double[] numberRequests = NumberRequestsPopulation.getNumberRequests(network, timeStep, config);
 
 			try {
 				// initialize server
@@ -103,21 +105,23 @@ public class FlowsOut extends SharedPartitionedDispatcher {
 
 				{ // add inputs to server
 					Container container = new Container("Network");
+					
+                    container.add((new DoubleArray("NumberRequests", new int[] { numberRequests.length }, numberRequests)));
 
-					int flowIndex = 0;
-					for (double[][] flows : FlowsOut) {
-						double[] flowsOutAt = new double[flows.length];
-						for (int index = 0; index < flows.length; ++index) {
-							flowsOutAt = flows[index];
-							container.add((new DoubleArray("flowsOut" + flowIndex + 0 + index,
-									new int[] { flows.length }, flowsOutAt)));
-						}
-						flowIndex = flowIndex + 1;
-					}
-
-					// add planning horizon to container
-					double[] PlanningHorizonDouble = new double[] { planningHorizon };
-					container.add((new DoubleArray("PlanningHorizon", new int[] { 1 }, PlanningHorizonDouble)));
+//					int flowIndex = 0;
+//					for (double[][] flows : FlowsOut) {
+//						double[] flowsOutAt = new double[flows.length];
+//						for (int index = 0; index < flows.length; ++index) {
+//							flowsOutAt = flows[index];
+//							container.add((new DoubleArray("flowsOut" + flowIndex + 0 + index,
+//									new int[] { flows.length }, flowsOutAt)));
+//						}
+//						flowIndex = flowIndex + 1;
+//					}
+//
+//					// add planning horizon to container
+//					double[] PlanningHorizonDouble = new double[] { planningHorizon };
+//					container.add((new DoubleArray("PlanningHorizon", new int[] { 1 }, PlanningHorizonDouble)));
 
 					System.out.println("Sending to server");
 					javaContainerSocket.writeContainer(container);
