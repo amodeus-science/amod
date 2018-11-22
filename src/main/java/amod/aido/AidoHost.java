@@ -7,8 +7,6 @@ import java.util.Objects;
 import amod.aido.core.AidoDispatcherHost;
 import amod.aido.core.AidoScoreElement;
 import amod.aido.core.ScoreParameters;
-import amod.demo.SimulationVideo;
-import amod.demo.SimulationVideoDark;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
@@ -16,6 +14,7 @@ import ch.ethz.idsc.amodeus.prep.LegCount;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
+import ch.ethz.idsc.amodeus.video.VideoGenerator;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
@@ -135,10 +134,7 @@ public enum AidoHost {
             { /** create a video if environment variable is set */
                 String env = System.getenv(ENV_VIDEO_EXPORT);
                 if (Objects.nonNull(env) && env.equalsIgnoreCase("true")) {
-                    SimulationVideo.export(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
-                            aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
-                    SimulationVideoDark.export(aidoServer.getNetwork(), aidoServer.getReferenceFrame(), //
-                            aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory().getAbsoluteFile());
+                    new VideoGenerator(workingDirectory).start();
                 }
             }
 
