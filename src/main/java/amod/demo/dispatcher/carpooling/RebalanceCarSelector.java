@@ -2,6 +2,7 @@ package amod.demo.dispatcher.carpooling;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -12,40 +13,46 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
+import ch.ethz.idsc.amodeus.dispatcher.shared.SharedMealType;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
 
 public class RebalanceCarSelector {
     private List<double[]> controlLaw;
-    
-    
+
     public RebalanceCarSelector(List<double[]> controlLaw) {
         this.controlLaw = controlLaw;
     }
-    
-    public List<Pair<RoboTaxi, Link>> getRebalanceCommands(VirtualNode<Link> from, Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles, VirtualNetwork<Link> virtualNetwork, List<Link> linkList) throws Exception {
+
+    public List<Pair<RoboTaxi, Link>> getRebalanceCommands(VirtualNode<Link> from,
+            Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles, VirtualNetwork<Link> virtualNetwork,
+            List<Link> linkList, Collection<RoboTaxi> emptyDrivingVehicles, int maxDrivingEmptyCars) throws Exception {
 
         List<RoboTaxi> avTaxis = availableVehicles.get(from);
         int indexFromNode = from.getIndex();
         List<Pair<RoboTaxi, Link>> rebalanceCommandsList = new ArrayList<>();
         double[] controlInput = controlLaw.get(indexFromNode);
-        
-        if(Arrays.stream(controlInput).sum()==0) {
+
+        int numberAssignedCars = 0;
+        boolean rebalanceFlag = false;
+        List<RoboTaxi> rebalancingCars = new ArrayList<RoboTaxi>();
+        List<RoboTaxi> findRoboTaxi = new ArrayList<RoboTaxi>();
+
+        if (Arrays.stream(controlInput).sum() == 0) {
             return null;
         }
-        
-        if(avTaxis.isEmpty()) {
+
+        if (avTaxis.isEmpty()) {
             return null;
         }
-        
-        
+
         int iteration = 0;
         List<Integer> removeElements = new ArrayList<Integer>();
         for (double node : controlInput) {
             node = node - 1;
             int indexNode = (int) node;
-            
-            if(indexNode<0) {
+
+            if (indexNode < 0) {
                 iteration = iteration + 1;
                 continue;
             }
@@ -54,10 +61,27 @@ public class RebalanceCarSelector {
                 break;
             }
 
-            RoboTaxi nextRoboTaxi = avTaxis.get(0);
+            if (emptyDrivingVehicles.size() + numberAssignedCars >= maxDrivingEmptyCars) {
+                rebalancingCars = avTaxis.stream()
+                        .filter(car -> car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT)
+                        .collect(Collectors.toList());
+                if (rebalancingCars.isEmpty()) {
+                    break;
+                }
+                rebalanceFlag = true;
+            }
+
+            if (rebalanceFlag) {
+                findRoboTaxi = rebalancingCars;
+            } else {
+                findRoboTaxi = avTaxis;
+                numberAssignedCars = numberAssignedCars + 1;
+            }
+
+            RoboTaxi nextRoboTaxi = findRoboTaxi.get(0);
             avTaxis.remove(nextRoboTaxi);
             availableVehicles.get(from).remove(nextRoboTaxi);
-            
+
             VirtualNode<Link> toNode = virtualNetwork.getVirtualNode((int) node);
             Link rebalanceLink = linkList.get(toNode.getIndex());
 
@@ -67,26 +91,24 @@ public class RebalanceCarSelector {
             iteration = iteration + 1;
 
         }
-        
-        if(!removeElements.isEmpty()) {
-            for(int removeArray: removeElements) {
+
+        if (!removeElements.isEmpty()) {
+            for (int removeArray : removeElements) {
                 controlInput[removeArray] = 0;
             }
 
             controlLaw.set(indexFromNode, controlInput);
         }
-        
-        
-        if(rebalanceCommandsList.isEmpty()) {
+
+        if (rebalanceCommandsList.isEmpty()) {
             return null;
         }
         return rebalanceCommandsList;
-       
 
     }
-    
-    List<double[]> getControlLawRebalance(){
-        return controlLaw;   
+
+    List<double[]> getControlLawRebalance() {
+        return controlLaw;
     }
 
 }

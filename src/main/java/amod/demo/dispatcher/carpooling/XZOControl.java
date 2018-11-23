@@ -2,16 +2,19 @@ package amod.demo.dispatcher.carpooling;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
+import ch.ethz.idsc.amodeus.dispatcher.shared.SharedMealType;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
 import ch.ethz.matsim.av.passenger.AVRequest;
@@ -26,9 +29,14 @@ public class XZOControl {
     List<Triple<RoboTaxi, AVRequest, Link>> getXZOCommands(VirtualNetwork<Link> virtualNetwork,
             Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi,
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests,
-            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests, List<Link> linkList) throws Exception {
+            Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests, List<Link> linkList,
+            Collection<RoboTaxi> emptyDrivingVehicles, int maxDrivingEmptyCars) throws Exception {
 
         List<Triple<RoboTaxi, AVRequest, Link>> xZOCommandsList = new ArrayList<>();
+        int numberAssignedCars = 0;
+        boolean rebalanceFlag = false;
+        List<RoboTaxi> rebalancingCars = new ArrayList<RoboTaxi>();
+        List<RoboTaxi> findRoboTaxi = new ArrayList<RoboTaxi>();
 
         for (VirtualNode<Link> destinationNode : virtualNetwork.getVirtualNodes()) {
 
@@ -39,8 +47,8 @@ public class XZOControl {
             for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
 
                 List<RoboTaxi> availableCars = stayRoboTaxi.get(fromNode);
-                
-                if(availableCars.isEmpty()) {
+
+                if (availableCars.isEmpty()) {
                     continue;
                 }
 
@@ -73,6 +81,14 @@ public class XZOControl {
                     if (availableCars.isEmpty()) {
                         break;
                     }
+                    
+                    if(emptyDrivingVehicles.size() + numberAssignedCars >= maxDrivingEmptyCars) {
+                        rebalancingCars = availableCars.stream().filter(car -> car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT).collect(Collectors.toList());
+                        if(rebalancingCars.isEmpty()) {
+                            break;
+                        }
+                        rebalanceFlag = true;        
+                    }
 
                     AVRequest avRequest = fromToRequest.get(0);
                     fromToRequest.remove(avRequest);
@@ -81,10 +97,16 @@ public class XZOControl {
                     virtualNodeAVFromRequests.get(fromNode).remove(avRequest);
                     virtualNodeAVToRequests.get(destinationNode).remove(avRequest);
 
-                    RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, availableCars);
+                    if(rebalanceFlag) {
+                        findRoboTaxi = rebalancingCars;
+                    } else {
+                        findRoboTaxi = availableCars;
+                        numberAssignedCars = numberAssignedCars + 1;
+                    }
+                    RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest, findRoboTaxi);
                     availableCars.remove(closestRoboTaxi);
                     stayRoboTaxi.get(fromNode).remove(closestRoboTaxi);
-
+                    
                     VirtualNode<Link> toVirtualNodeRedirect = virtualNetwork.getVirtualNode(toNodeRedirect);
                     Link redirectLink = linkList.get(toVirtualNodeRedirect.getIndex());
 
