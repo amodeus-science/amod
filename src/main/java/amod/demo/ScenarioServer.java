@@ -22,7 +22,6 @@ import com.google.inject.name.Names;
 
 import amod.demo.analysis.CustomAnalysis;
 import amod.demo.dispatcher.DemoDispatcher;
-import amod.demo.dispatcher.DemoDispatcherShared;
 import amod.demo.ext.Static;
 import amod.demo.generator.DemoGenerator;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
@@ -157,12 +156,14 @@ public enum ScenarioServer {
                 AVUtils.registerDispatcherFactory(binder(), "DemoDispatcher", DemoDispatcher.Factory.class);
             }
         });
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "DemoDispatcherShared", DemoDispatcherShared.Factory.class);
-            }
-        });
+        // TODO @ Lukas this produces problems.
+        // controler.addOverridingModule(new AbstractModule() {
+        // @Override
+        // public void install() {
+        // AVUtils.registerDispatcherFactory(binder(), "DemoDispatcherShared",
+        // DemoDispatcherShared.Factory.class);
+        // }
+        // });
 
         /** here an additional user-defined initial placement logic called generator is added,
          * functionality in class DemoGenerator */
