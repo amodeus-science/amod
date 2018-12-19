@@ -63,7 +63,8 @@ public class RebalanceCarSelector {
 
             if (emptyDrivingVehicles.size() + numberAssignedCars >= maxDrivingEmptyCars) {
                 rebalancingCars = avTaxis.stream()
-                        .filter(car -> car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT)
+                        .filter(car -> !car.getMenu().getCourses().isEmpty()
+                                && car.getMenu().getStarterCourse().getMealType().equals(SharedMealType.REDIRECT))
                         .collect(Collectors.toList());
                 if (rebalancingCars.isEmpty()) {
                     break;
@@ -107,7 +108,7 @@ public class RebalanceCarSelector {
 
     }
 
-    List<double[]> getControlLawRebalance() {
+    public List<double[]> getControlLawRebalance() {
         return controlLaw;
     }
 

@@ -1,34 +1,30 @@
-package amod.demo.dispatcher.carpooling;
+package amod.demo.dispatcher.remote;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
+import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.qty.Quantity;
 import ch.ethz.matsim.av.router.AVRouter;
 
-public enum TravelTimeCalculatorForVirtualNetwork {
+public enum TravelTimeCalculatorVirtualNetwork {
     ;
     
-public static Map<VirtualLink<Link>,Double> computeTravelTimes(Collection<VirtualLink<Link>> vLinks, Scalar now, AVRouter router, List<Link> linkList){
+public static Tensor computeTravelTimes(VirtualNetwork<Link> virtualNetwork, Scalar now, AVRouter router, List<Link> linkList){
         
-        Map<VirtualLink<Link>,Double> tTimes = new HashMap<>();
+        Tensor tTimes = Array.zeros(virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
+        Collection<VirtualLink<Link>> vLinks = virtualNetwork.getVirtualLinks();
         
         for(VirtualLink<Link> vLink : vLinks){
             VirtualNode<Link> fromNode = vLink.getFrom();
@@ -40,7 +36,7 @@ public static Map<VirtualLink<Link>,Double> computeTravelTimes(Collection<Virtua
             
             Scalar travelTime = timeFromTo(linkFrom, linkTo, now, router);
             
-            tTimes.put(vLink, travelTime.number().doubleValue());
+            tTimes.set(travelTime, fromNode.getIndex(), toNode.getIndex());
         }
         
         return tTimes;

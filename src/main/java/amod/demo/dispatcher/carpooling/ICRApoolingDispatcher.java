@@ -91,6 +91,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
     private final int reserveFleet;
     private final boolean discardAVRequetsFlag;
     private int maxDrivingEmptyCars;
+    private final boolean checkControlInputsFlag;
 
     protected ICRApoolingDispatcher(Config config, //
             AVDispatcherConfig avconfig, //
@@ -132,7 +133,8 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
         this.endTime = (int) config.qsim().getEndTime();
         this.reserveFleet = 20;
         this.discardAVRequetsFlag = false;
-        this.maxDrivingEmptyCars = 1000000;
+        this.maxDrivingEmptyCars = 40;
+        this.checkControlInputsFlag = false;
     }
 
     @Override
@@ -683,6 +685,21 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
                                 if (availableCars.isEmpty()) {
                                     continue;
                                 }
+                                
+                                Collection<RoboTaxi> emptyDrivingVehicles = getEmptyDrivingRoboTaxis();
+                                
+                                if(emptyDrivingVehicles.size() >= maxDrivingEmptyCars) {
+                                    List<RoboTaxi> rebalancingCars = availableCars.stream()
+                                            .filter(car -> !car.getMenu().getCourses().isEmpty()
+                                                    && car.getMenu().getStarterCourse().getMealType().equals(SharedMealType.REDIRECT))
+                                            .collect(Collectors.toList());
+                                    if (rebalancingCars.isEmpty()) {
+                                        continue;
+                                    }
+                                    
+                                    availableCars = rebalancingCars;
+                                }
+                                
                                 RoboTaxi closestRoboTaxi = StaticHelperCarPooling.findClostestVehicle(avRequest,
                                         availableCars);
                                 if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu()
@@ -742,10 +759,12 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
             System.out.println("Number of DO Cars: " + doRoboTaxis.size());
             System.out.println("Number of SO Cars: " + soRoboTaxis.size());
             System.out.println("Number of empty Cars: " + emptyRoboTaxis.size());
+            Collection<RoboTaxi> emptyDrivingVehicles = getEmptyDrivingRoboTaxis();
+            System.out.println("Number of empty driving vehicles: " + emptyDrivingVehicles.size());
         }
 
         // check if control inputs used
-        if (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60)) {
+        if (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60) && checkControlInputsFlag == true) {
             List<List<double[]>> controlLawXZO = xZOControl.getControlLawXZO();
             List<List<double[]>> controlLawXDO = xSOControl.getControlLawXSO();
             List<List<double[]>> controlLawPZO = pZOControl.getControlLawPZO();
@@ -874,6 +893,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
                 logger.warn("Open Requests");
                 System.out.println("Number of open requests: " + unassignedRequests.size());
             }
+            
         }
 
         // Assign last unassigned requests

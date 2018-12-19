@@ -14,7 +14,7 @@ public class LinkWait {
         this.linkMap = linkMap;
     }
     
-    HashMap<VirtualNode<Link>, List<Link>> getLinkWait(){
+    public HashMap<VirtualNode<Link>, List<Link>> getLinkWait(){
         return linkMap;
     }
     
