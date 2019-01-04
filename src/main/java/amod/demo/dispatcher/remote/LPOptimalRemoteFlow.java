@@ -21,8 +21,7 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
 
-
-public class LPOptimalFlow {
+public class LPOptimalRemoteFlow {
     /** map with variableIDs in problem set up and linkIDs of virtualNetwork */
     private final Map<List<Integer>, Integer> rIDvarID = new HashMap<>();
     private final Map<List<Integer>, Integer> xIDvarID = new HashMap<>();
@@ -58,7 +57,7 @@ public class LPOptimalFlow {
      *            the virtual network (not necessarily complete graph) on which
      *            the optimization is computed.
      */
-    public LPOptimalFlow(VirtualNetwork<Link> virtualNetwork, int timeHorizon, Tensor travelTimes, Tensor starters,
+    public LPOptimalRemoteFlow(VirtualNetwork<Link> virtualNetwork, int timeHorizon, Tensor travelTimes, Tensor starters,
             Tensor lambda, boolean milpFlag) {
         this.timeHorizon = timeHorizon;
         this.travelTimes = travelTimes;
