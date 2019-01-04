@@ -133,7 +133,7 @@ public class ICRApoolingDispatcher extends SharedPartitionedDispatcher {
         this.endTime = (int) config.qsim().getEndTime();
         this.reserveFleet = 20;
         this.discardAVRequetsFlag = false;
-        this.maxDrivingEmptyCars = 40;
+        this.maxDrivingEmptyCars = 10000000;
         this.checkControlInputsFlag = false;
     }
 

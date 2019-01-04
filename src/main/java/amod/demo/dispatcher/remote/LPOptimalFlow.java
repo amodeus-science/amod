@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.measure.unit.SystemOfUnits;
-
 import org.gnu.glpk.GLPK;
 import org.gnu.glpk.GLPKConstants;
 import org.gnu.glpk.GlpkException;
@@ -18,7 +16,6 @@ import org.gnu.glpk.glp_smcp;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -33,11 +30,9 @@ public class LPOptimalFlow {
     /** map with variableIDs in problem set up and linkIDs of virtualNetwork */
     private final Map<List<Integer>, Integer> rIDvarID = new HashMap<>();
     private final Map<List<Integer>, Integer> xIDvarID = new HashMap<>();
-    private final Map<List<Integer>, Integer> aIDvarID = new HashMap<>();
     private final Map<List<Integer>, Integer> dIDvarID = new HashMap<>();
-//    private final glp_smcp parm = new glp_smcp();
-    private final glp_iocp parm = new glp_iocp();
-    private final VirtualNetwork<Link> virtualNetwork;
+    private final glp_smcp parmLP = new glp_smcp();
+    private final glp_iocp parmMILP = new glp_iocp();
     private final int nvNodes;
     private final int timeHorizon;
     private final Tensor travelTimes;
@@ -46,20 +41,19 @@ public class LPOptimalFlow {
     private final int nRvariables;
     private final int nXvariables;
     private final int nDvariables;
-    private final int nAvariables;
     private final int nVehcileCons;
-    private final int nServedCustom;
     private final int nWaitingCustom;
-    private final int nEqualityEntries;
     private final int rowTotal;
     private final int columnTotal;
     private final double tuningCoeffD;
     private final double tuningCoeffR;
-    private final double tuningCoeffX;
+    private final boolean milpFlag;
     // ---
     private glp_prob lp;
     private Tensor r_ij;
     private Tensor x_ij;
+    private Tensor r_ijNotRound;
+    private Tensor x_ijNotRound;
     private int columnId;
     private int rowId;
 
@@ -69,35 +63,37 @@ public class LPOptimalFlow {
      *            the optimization is computed.
      */
     public LPOptimalFlow(VirtualNetwork<Link> virtualNetwork, int timeHorizon, Tensor travelTimes, Tensor starters,
-            Tensor lambda) {
-        this.virtualNetwork = virtualNetwork;
+            Tensor lambda, boolean milpFlag) {
         this.timeHorizon = timeHorizon;
         this.travelTimes = travelTimes;
         this.lambda = lambda;
         this.starters = starters;
+        this.milpFlag = milpFlag;
         nvNodes = virtualNetwork.getvNodesCount();
         nRvariables = nvNodes * nvNodes * timeHorizon;
         nXvariables = nvNodes * nvNodes * timeHorizon;
         nDvariables = nvNodes * nvNodes * timeHorizon;
-        nAvariables = nvNodes * nvNodes * timeHorizon;
-        columnTotal = nRvariables + nXvariables + nDvariables + nAvariables;
+        columnTotal = nRvariables + nXvariables + nDvariables;
         nVehcileCons = nvNodes * timeHorizon;
-        nServedCustom = nvNodes * nvNodes * timeHorizon;
         nWaitingCustom = nvNodes * nvNodes * timeHorizon;
-        rowTotal = nVehcileCons + nWaitingCustom + nServedCustom; //
-        tuningCoeffD = 10000000;
+        rowTotal = nVehcileCons + nWaitingCustom;
+        tuningCoeffD = 10000;
         tuningCoeffR = 5;
-        tuningCoeffX = 100000 / timeHorizon;
-        nEqualityEntries = nvNodes*nvNodes*(4*nvNodes);
 
-        // gamma_ij =
-        // LPUtils.getEuclideanTravelTimeBetweenVSCenters(virtualNetwork,
-        // LPUtils.AVERAGE_VEL);
         r_ij = Array.zeros(nvNodes, nvNodes);
         x_ij = Array.zeros(nvNodes, nvNodes);
+        r_ijNotRound = Array.zeros(nvNodes, nvNodes);
+        x_ijNotRound = Array.zeros(nvNodes, nvNodes);
+        
+        if(milpFlag) {
+            System.out.println("creating min flow MILP for system with " + rowTotal + " number of constraints and "
+                    + columnTotal + " optimization variables.");
+        } else {
+            System.out.println("creating min flow LP for system with " + rowTotal + " number of constraints and "
+                    + columnTotal + " optimization variables.");
+        }
 
-        System.out.println("creating min flow LP for system with " + rowTotal + " number of constraints and "
-                + columnTotal + " optimization variables.");
+        
     }
 
     /** initiate the linear program */
@@ -113,10 +109,10 @@ public class LPOptimalFlow {
 
             initColumnR_ijt();
             initColumnX_ijt();
-            initColumnA_ijt();
             initColumnD_ijt();
-
-            // GlobalAssert.that(columnTotal == columnId);
+            
+            GlobalAssert.that(columnTotal == columnId);
+            
 
             // initiate auxiliary ROW variables
             GLPK.glp_add_rows(lp, rowTotal);
@@ -155,37 +151,39 @@ public class LPOptimalFlow {
     public void solveLP(boolean mute) {
 
         GLPK.glp_term_out(mute ? GLPK.GLP_OFF : GLPK.GLP_ON);
+        int ret = 0;
+        int stat = 0;
 
-//        GLPK.glp_init_smcp(parm);
-        GLPK.glp_init_iocp(parm);
-        parm.setPresolve(GLPK.GLP_ON);
-        parm.setMip_gap(0.01);
-//        int ret = GLPK.glp_simplex(lp, parm); // ret==0 indicates of the
-                                              // algorithm ran correctly
+        if(milpFlag == true) {
+
+            GLPK.glp_init_iocp(parmMILP);
+            parmMILP.setPresolve(GLPK.GLP_ON);
+            parmMILP.setMip_gap(0.1);
+//            parm.setTm_lim(10000);
+            ret = GLPK.glp_intopt(lp, parmMILP); // ret==0 indicates of the
+            // algorithm ran correctly
+            stat = GLPK.glp_mip_status(lp);
+        } else {
+          GLPK.glp_init_smcp(parmLP);
+          ret = GLPK.glp_simplex(lp, parmLP); // ret==0 indicates of the
+                                    //           algorithm ran correctly
+          stat = GLPK.glp_get_status(lp);
+        } 
         
-        int ret = GLPK.glp_intopt(lp, parm); // ret==0 indicates of the
-                                                // algorithm ran correctly
+        GlobalAssert.that(ret == 0 || ret == 14);
         
-        System.out.println(ret);
-        
-        if(ret != 0) {
-            System.out.println(ret);
-        }
-        
-        GlobalAssert.that(ret == 0);
-//        int stat = GLPK.glp_get_status(lp);
-        
-        int stat = GLPK.glp_mip_status(lp);
         if (stat == GLPK.GLP_NOFEAS) {
             System.out.println("LP has found infeasible solution");
             closeLP();
             GlobalAssert.that(false);
         }
 
-        if (stat != GLPK.GLP_OPT) {
-            System.out.println("LP has found suboptimal");
-            closeLP();
-            GlobalAssert.that(false);
+        if (stat == GLPK.GLP_FEAS) {
+            System.out.println("LP has found suboptimal feasible solution");
+        }
+        
+        if (stat == GLPK.GLP_OPT) {
+            System.out.println("LP has found optimal solution");
         }
         readRandXoptimal();
         writeLPSolution();
@@ -207,7 +205,7 @@ public class LPOptimalFlow {
                     // variable name and initialization
                     String varName = ("r" + "_" + i + "," + j + "," + t);
                     GLPK.glp_set_col_name(lp, columnId, varName);
-                    if (t == 1) {
+                    if (t == 1 && milpFlag==true) {
                         GLPK.glp_set_col_kind(lp, columnId, GLPKConstants.GLP_IV);
                     } else {
                         GLPK.glp_set_col_kind(lp, columnId, GLPKConstants.GLP_CV);
@@ -233,7 +231,7 @@ public class LPOptimalFlow {
                     // variable name and initialization
                     String varName = ("x" + "_" + i + "," + j + "," + t);
                     GLPK.glp_set_col_name(lp, columnId, varName);
-                    if (t == 1) {
+                    if (t == 1 && milpFlag == true) {
                         GLPK.glp_set_col_kind(lp, columnId, GLPKConstants.GLP_IV);
                     } else {
                         GLPK.glp_set_col_kind(lp, columnId, GLPKConstants.GLP_CV);
@@ -250,31 +248,6 @@ public class LPOptimalFlow {
         }
     }
 
-    private void initColumnA_ijt() {
-        // optimization variable alpha_ij
-        for(int i=0; i<nvNodes; i++) {
-            for(int j=0; j<nvNodes; j++) {
-                for (int t = 1; t <= timeHorizon; t++) {
-                    columnId++;
-                    // variable name and initialization
-                    String varName = ("a" + "_" + i + "," + j + "," + t);
-                    GLPK.glp_set_col_name(lp, columnId, varName);
-                    if (t == 1) {
-                        GLPK.glp_set_col_kind(lp, columnId, GLPKConstants.GLP_IV);
-                    } else {
-                        GLPK.glp_set_col_kind(lp, columnId, GLPKConstants.GLP_CV);
-                    }
-
-                    GLPK.glp_set_col_bnds(lp, columnId, GLPKConstants.GLP_LO, 0.0, 0.0); // Lower
-                                                                                         // bound:
-                                                                                         // second
-                                                                                         // number
-                                                                                         // irrelevant
-                    aIDvarID.put(Arrays.asList(i, j, t), columnId);
-                }
-            }
-        }
-    }
 
     private void initColumnD_ijt() {
         // optimization variable alpha_ij
@@ -285,7 +258,7 @@ public class LPOptimalFlow {
                     // variable name and initialization
                     String varName = ("d" + "_" + i + "," + j + "," + t);
                     GLPK.glp_set_col_name(lp, columnId, varName);
-                    if (t == 1) {
+                    if (t == 1 && milpFlag == true) {
                         GLPK.glp_set_col_kind(lp, columnId, GLPKConstants.GLP_IV);
                     } else {
                         GLPK.glp_set_col_kind(lp, columnId, GLPKConstants.GLP_CV);
@@ -315,50 +288,26 @@ public class LPOptimalFlow {
                 rowId++;
                 String varName = ("C" + "_" + rowId);
                 GLPK.glp_set_row_name(lp, rowId, varName);
-                int s_it = starters.Get(i, t-1).number().intValue();
-                GLPK.glp_set_row_bnds(lp, rowId, GLPKConstants.GLP_FX, s_it, s_it);
+                double s_it = starters.Get(i, t-1).number().doubleValue();
+                GLPK.glp_set_row_bnds(lp, rowId, GLPKConstants.GLP_FX, s_it, 0.0);
                 for (int j = 0; j < nvNodes; j++) {
-                    int tau_ij = travelTimes.Get(i, j).number().intValue();
-                    if (t > tau_ij) {
-                        int indexRarrive = rIDvarID.get(Arrays.asList(i, j, (t - tau_ij)));
+                    int tau_ji = travelTimes.Get(j, i).number().intValue();
+                    if (t > tau_ji) {
+                        int indexRarrive = rIDvarID.get(Arrays.asList(j, i, (t - tau_ji)));
                         GLPK.intArray_setitem(ind, indexRarrive, indexRarrive);
-                        GLPK.doubleArray_setitem(val, indexRarrive, -1);
-                        int indexXarrive = xIDvarID.get(Arrays.asList(i, j, (t - tau_ij)));
+                        GLPK.doubleArray_setitem(val, indexRarrive, -1.0);
+                        int indexXarrive = xIDvarID.get(Arrays.asList(j, i, (t - tau_ji)));
                         GLPK.intArray_setitem(ind, indexXarrive, indexXarrive);
-                        GLPK.doubleArray_setitem(val, indexXarrive, -1);
+                        GLPK.doubleArray_setitem(val, indexXarrive, -1.0);
                     }
                     int indexR = rIDvarID.get(Arrays.asList(i, j, t));
                     GLPK.intArray_setitem(ind, indexR, indexR);
-                    GLPK.doubleArray_setitem(val, indexR, 1);
+                    GLPK.doubleArray_setitem(val, indexR, 1.0);
                     int indexX = xIDvarID.get(Arrays.asList(i, j, t));
                     GLPK.intArray_setitem(ind, indexX, indexX);
-                    GLPK.doubleArray_setitem(val, indexX, 1);
+                    GLPK.doubleArray_setitem(val, indexX, 1.0);
                 }
                 GLPK.glp_set_mat_row(lp, rowId, columnTotal, ind, val);
-            }
-        }
-
-        // served customers
-        for (int t = 1; t <= timeHorizon; t++) {
-            for (int i = 0; i < nvNodes; i++) {
-                // set all coefficient entries of matrix A to zero first
-                for (int j = 0; j < nvNodes; j++) {
-                    for (int var = 1; var <= columnTotal; var++) {
-                        GLPK.intArray_setitem(ind, var, var);
-                        GLPK.doubleArray_setitem(val, var, 0.0);
-                    }
-                    rowId++;
-                    String varName = ("C" + "_" + rowId);
-                    GLPK.glp_set_row_name(lp, rowId, varName);
-                    GLPK.glp_set_row_bnds(lp, rowId, GLPKConstants.GLP_FX, 0, 0);
-                    int indexX = xIDvarID.get(Arrays.asList(i, j, t));
-                    GLPK.intArray_setitem(ind, indexX, indexX);
-                    GLPK.doubleArray_setitem(val, indexX, 1);
-                    int indexA = aIDvarID.get(Arrays.asList(i, j, t));
-                    GLPK.intArray_setitem(ind, indexA, indexA);
-                    GLPK.doubleArray_setitem(val, indexA, -1);
-                    GLPK.glp_set_mat_row(lp, rowId, columnTotal, ind, val);
-                }
             }
         }
 
@@ -375,16 +324,16 @@ public class LPOptimalFlow {
                     GLPK.glp_set_row_name(lp, rowId, varName);
                     int indexD = dIDvarID.get(Arrays.asList(i, j, t));
                     GLPK.intArray_setitem(ind, indexD, indexD);
-                    GLPK.doubleArray_setitem(val, indexD, 1);
-                    int lambdasum = 0;
+                    GLPK.doubleArray_setitem(val, indexD, 1.0);
+                    double lambdasum = 0;
                     for (int tau = 1; tau <= t; tau++) {
-                        int indexA = aIDvarID.get(Arrays.asList(i, j, tau));
-                        GLPK.intArray_setitem(ind, indexA, indexA);
-                        GLPK.doubleArray_setitem(val, indexA, 1);
-                        int lambda_ijt = lambda.Get(i, j, tau-1).number().intValue();
+                        int indexX = xIDvarID.get(Arrays.asList(i, j, tau));
+                        GLPK.intArray_setitem(ind, indexX, indexX);
+                        GLPK.doubleArray_setitem(val, indexX, 1.0);
+                        double lambda_ijt = lambda.Get(i, j, tau-1).number().doubleValue();
                         lambdasum = lambdasum + lambda_ijt;
                     }
-                    GLPK.glp_set_row_bnds(lp, rowId, GLPKConstants.GLP_FX, lambdasum, lambdasum);
+                    GLPK.glp_set_row_bnds(lp, rowId, GLPKConstants.GLP_FX, lambdasum, 0.0);
                     GLPK.glp_set_mat_row(lp, rowId, columnTotal, ind, val);
                 }
             }
@@ -399,15 +348,19 @@ public class LPOptimalFlow {
                     int tij = travelTimes.Get(i, j).number().intValue();
                     int indexD = dIDvarID.get(Arrays.asList(i, j, t));
                     GLPK.glp_set_obj_coef(lp, indexD, tuningCoeffD);
+                    
                     int indexR = rIDvarID.get(Arrays.asList(i, j, t));
                     if(i==j) {
-                        GLPK.glp_set_obj_coef(lp, indexR, 1*tuningCoeffR * tij);
+                        double costRii = 0.7*tuningCoeffR * tij;
+                        GLPK.glp_set_obj_coef(lp, indexR, costRii);
                     } else {
-                        GLPK.glp_set_obj_coef(lp, indexR, tuningCoeffR * tij);
+                        double costRij = tuningCoeffR*tij;
+                        GLPK.glp_set_obj_coef(lp, indexR, costRij);
                     }
                     
-                    int indexX = xIDvarID.get(Arrays.asList(i, j, t));
-                    GLPK.glp_set_obj_coef(lp, indexX, tuningCoeffX * tij);
+//                    int indexX = xIDvarID.get(Arrays.asList(i, j, t));
+//                    double costX = tuningCoeffX * tij;
+//                    GLPK.glp_set_obj_coef(lp, indexX, costX);
                 }
             }
         }
@@ -419,28 +372,72 @@ public class LPOptimalFlow {
             for(int j=0; j<nvNodes; j++) {
                 int indexR = rIDvarID.get(Arrays.asList(i, j, 1));
                 int indexX = xIDvarID.get(Arrays.asList(i, j, 1));
-//                if(RealScalar.of(GLPK.glp_get_col_prim(lp, indexR)).number().doubleValue() != 0) {
-//                    System.out.println(GLPK.glp_get_col_prim(lp, indexR));
-//                    System.out.println("test");
-//                }
-//                r_ij.set(RealScalar.of(Math.round(GLPK.glp_get_col_prim(lp, indexR))), i, j);
-//                x_ij.set(RealScalar.of(Math.round(GLPK.glp_get_col_prim(lp, indexX))), i, j);
-                if(i == j) {
-                    r_ij.set(RealScalar.of(0), i, j);
+                if(milpFlag == true) {
+                    if(i == j) {
+                        r_ij.set(RealScalar.of(0), i, j);
+                        r_ijNotRound.set(RealScalar.of(0), i, j);
+                    } else {
+                        r_ij.set(RealScalar.of(Math.round(GLPK.glp_mip_col_val(lp, indexR))), i, j);
+                        r_ijNotRound.set(RealScalar.of(GLPK.glp_mip_col_val(lp, indexR)), i, j);
+                    }
+                    
+                    x_ij.set(RealScalar.of(Math.round(GLPK.glp_mip_col_val(lp, indexX))), i, j);
+                    x_ijNotRound.set(RealScalar.of(GLPK.glp_mip_col_val(lp, indexX)), i, j);
                 } else {
-                    r_ij.set(RealScalar.of(Math.round(GLPK.glp_mip_col_val(lp, indexR))), i, j);
+                    if(i == j) {
+                        r_ij.set(RealScalar.of(0), i, j);
+                        r_ijNotRound.set(RealScalar.of(0), i, j);
+                    } else {
+                        System.out.println(GLPK.glp_get_col_prim(lp, indexR));
+                        r_ij.set(RealScalar.of(Math.round(GLPK.glp_get_col_prim(lp, indexR))), i, j);
+                        r_ijNotRound.set(RealScalar.of(GLPK.glp_get_col_prim(lp, indexR)), i, j);
+                    }
+                    System.out.println(GLPK.glp_get_col_prim(lp, indexX));
+                    x_ij.set(RealScalar.of(Math.round(GLPK.glp_get_col_prim(lp, indexX))), i, j);
+                    x_ijNotRound.set(RealScalar.of(GLPK.glp_get_col_prim(lp, indexX)), i, j);
                 }
                 
-                x_ij.set(RealScalar.of(Math.round(GLPK.glp_mip_col_val(lp, indexX))), i, j);
             }
         }
     }
 
     /** writes the solution of the LP on the consoles */
     public void writeLPSolution() {
-        System.out.println("The MILP solution is:");
+        System.out.println("The solution is:");
         System.out.println("The Rebalancing: " + r_ij);
         System.out.println("The Dispatching: " + x_ij);
+        
+        int lambdasum = 0;
+        double servedCustomer = 0;
+        if(milpFlag == true) {
+            for(int i=0; i<nvNodes; i++) {
+                for(int j=0; j<nvNodes; j++) {
+                    for(int t=1; t<=timeHorizon; t++) {
+                        lambdasum = lambdasum + lambda.Get(i,j,t-1).number().intValue();
+                        int xIndex = xIDvarID.get(Arrays.asList(i, j, t));
+                        servedCustomer = servedCustomer + GLPK.glp_mip_col_val(lp, xIndex);
+                    }
+                }
+            }
+        } else {
+            for(int i=0; i<nvNodes; i++) {
+                for(int j=0; j<nvNodes; j++) {
+                    for(int t=1; t<=timeHorizon; t++) {
+                        lambdasum = lambdasum + lambda.Get(i,j,t-1).number().intValue();
+                        int xIndex = xIDvarID.get(Arrays.asList(i, j, t));
+                        servedCustomer = servedCustomer + GLPK.glp_get_col_prim(lp, xIndex);
+                    }
+                }
+            }
+        }
+ 
+        
+        double droppedCustomers = lambdasum - servedCustomer;
+        
+        System.out.println("Number of customers: " + lambdasum);
+        System.out.println("Number of served customers: " + servedCustomer);
+        System.out.println("Number of dropped customers: " + droppedCustomers);
+   
     }
 
     /**

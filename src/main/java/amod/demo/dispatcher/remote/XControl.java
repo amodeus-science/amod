@@ -39,92 +39,89 @@ public class XControl {
         boolean rebalanceFlag = false;
         List<RoboTaxi> rebalancingCars = new ArrayList<RoboTaxi>();
         List<RoboTaxi> findRoboTaxi = new ArrayList<RoboTaxi>();
-        Collection<VirtualLink<Link>> vLinks =  virtualNetwork.getVirtualLinks();
+        Collection<VirtualNode<Link>> vNodes = virtualNetwork.getVirtualNodes();
 
         
-            for (VirtualLink<Link> vLink : vLinks) {
-                
-                VirtualNode<Link> fromNode = vLink.getFrom();
-                VirtualNode<Link> toNode = vLink.getTo();
-                
-
+            for (VirtualNode<Link> fromNode : vNodes) {
                 List<RoboTaxi> availableCars = stayRoboTaxi.get(fromNode);
-
-                if (availableCars.isEmpty()) {
-                    continue;
-                }
-
-                List<AVRequest> fromRequests = virtualNodeAVFromRequests.get(fromNode);
-                if (fromRequests.isEmpty()) {
-                    continue;
-                }
-                
-                List<AVRequest> toRequests = virtualNodeAVToRequests.get(toNode);
-                if (toRequests.isEmpty()) {
-                    continue;
-                }
-                
-                List<AVRequest> fromToRequest = fromRequests.stream().filter(req -> toRequests.contains(req))
-                        .collect(Collectors.toList());
-
-                double controlX = controlLaw.Get(fromNode.getIndex(), toNode.getIndex()).number().doubleValue();
-
-                if (controlX == 0) {
-                    continue;
-                }
-                
-                int counter = 0;
-                
-                for(int i=1; i<=controlX; i++) {
-                      
-                    if (fromToRequest.isEmpty()) {
-                        break;
-                    }
+                for(VirtualNode<Link> toNode: vNodes) {
+                    
                     if (availableCars.isEmpty()) {
-                        break;
+                        continue;
+                    }
+
+                    List<AVRequest> fromRequests = virtualNodeAVFromRequests.get(fromNode);
+                    if (fromRequests.isEmpty()) {
+                        continue;
                     }
                     
-                    if (emptyDrivingVehicles.size() + numberAssignedCars >= maxDrivingEmptyCars) {
-                        rebalancingCars = availableCars.stream()
-                                .filter(car -> !car.getMenu().getCourses().isEmpty()
-                                        && car.getMenu().getStarterCourse().getMealType().equals(SharedMealType.REDIRECT))
-                                .collect(Collectors.toList());
+                    List<AVRequest> toRequests = virtualNodeAVToRequests.get(toNode);
+                    if (toRequests.isEmpty()) {
+                        continue;
+                    }
+                    
+                    List<AVRequest> fromToRequest = fromRequests.stream().filter(req -> toRequests.contains(req))
+                            .collect(Collectors.toList());
 
-                        if (rebalancingCars.isEmpty()) {
+                    double controlX = controlLaw.Get(fromNode.getIndex(), toNode.getIndex()).number().doubleValue();
+
+                    if (controlX == 0) {
+                        continue;
+                    }
+                    
+                    int counter = 0;
+                    
+                    for(int i=1; i<=controlX; i++) {
+                          
+                        if (fromToRequest.isEmpty()) {
                             break;
                         }
-                        rebalanceFlag = true;
+                        if (availableCars.isEmpty()) {
+                            break;
+                        }
+                        
+                        if (emptyDrivingVehicles.size() + numberAssignedCars >= maxDrivingEmptyCars) {
+                            rebalancingCars = availableCars.stream()
+                                    .filter(car -> !car.getMenu().getCourses().isEmpty()
+                                            && car.getMenu().getStarterCourse().getMealType().equals(SharedMealType.REDIRECT))
+                                    .collect(Collectors.toList());
+
+                            if (rebalancingCars.isEmpty()) {
+                                break;
+                            }
+                            rebalanceFlag = true;
+                        }
+                        
+                        AVRequest avRequest = fromToRequest.get(0);
+                        fromToRequest.remove(avRequest);
+                        fromRequests.remove(avRequest);
+                        toRequests.remove(avRequest);
+                        virtualNodeAVFromRequests.get(fromNode).remove(avRequest);
+                        virtualNodeAVToRequests.get(toNode).remove(avRequest);
+
+                        if (rebalanceFlag) {
+                            findRoboTaxi = rebalancingCars;
+                            rebalanceFlag = false;
+                        } else {
+                            findRoboTaxi = availableCars;
+                            numberAssignedCars = numberAssignedCars + 1;
+                        }
+                        RoboTaxi closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest, findRoboTaxi);
+                        availableCars.remove(closestRoboTaxi);
+                        stayRoboTaxi.get(fromNode).remove(closestRoboTaxi);
+
+                        Pair<RoboTaxi, AVRequest> xZOCommands = Pair.of(closestRoboTaxi, avRequest);
+                        xCommandsList.add(xZOCommands);
+                        
+                        counter = i;
+                        
                     }
                     
-                    AVRequest avRequest = fromToRequest.get(0);
-                    fromToRequest.remove(avRequest);
-                    fromRequests.remove(avRequest);
-                    toRequests.remove(avRequest);
-                    virtualNodeAVFromRequests.get(fromNode).remove(avRequest);
-                    virtualNodeAVToRequests.get(toNode).remove(avRequest);
-
-                    if (rebalanceFlag) {
-                        findRoboTaxi = rebalancingCars;
-                        rebalanceFlag = false;
-                    } else {
-                        findRoboTaxi = availableCars;
-                        numberAssignedCars = numberAssignedCars + 1;
-                    }
-                    RoboTaxi closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest, findRoboTaxi);
-                    availableCars.remove(closestRoboTaxi);
-                    stayRoboTaxi.get(fromNode).remove(closestRoboTaxi);
-
-                    Pair<RoboTaxi, AVRequest> xZOCommands = Pair.of(closestRoboTaxi, avRequest);
-                    xCommandsList.add(xZOCommands);
+                    RealScalar newControlLaw = DoubleScalar.of(controlX-counter);
                     
-                    counter = i;
-                    
+                    controlLaw.set(newControlLaw, fromNode.getIndex(), toNode.getIndex());
                 }
-                
-                RealScalar newControlLaw = DoubleScalar.of(controlX-counter);
-                
-                controlLaw.set(newControlLaw, fromNode.getIndex(), toNode.getIndex());
-                                
+                                 
             }
         
 

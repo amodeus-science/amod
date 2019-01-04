@@ -58,8 +58,10 @@ import ch.ethz.idsc.jmex.DoubleArray;
 import ch.ethz.idsc.jmex.java.JavaContainerSocket;
 import ch.ethz.idsc.jmex.matlab.MfileContainerServer;
 import ch.ethz.idsc.tensor.DoubleScalar;
+import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.qty.Quantity;
 import ch.ethz.matsim.av.config.AVDispatcherConfig;
 import ch.ethz.matsim.av.config.AVGeneratorConfig;
@@ -101,6 +103,8 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
     private final boolean discardAVRequetsFlag;
     private int maxDrivingEmptyCars;
     private final boolean checkControlInputsFlag;
+    private final boolean skipZeroFlow;
+    private final boolean milpFlag;
 
     protected RemoteControllerDispatcher(Config config, //
             AVDispatcherConfig avconfig, //
@@ -132,7 +136,7 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
         // dispatchPeriod = safeConfig.getInteger("dispatchPeriod", timeStep *
         // 60);
         dispatchPeriod = timeStep * 60;
-        this.planningHorizon = 15;
+        this.planningHorizon = 8;
         this.fixedCarCapacity = 2;
         this.router = router;
         this.predictedDemand = false;
@@ -143,7 +147,9 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
         this.reserveFleet = 20;
         this.discardAVRequetsFlag = false;
         this.maxDrivingEmptyCars = 10000;
-        this.checkControlInputsFlag = false;
+        this.checkControlInputsFlag = true;
+        this.skipZeroFlow = true;
+        this.milpFlag = true;
     }
 
     @Override
@@ -180,10 +186,14 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
                 linkWait.addLinkWaitElement(virtualNetwork.getVirtualNode(req.getToLink()), req.getFromLink());
             }
 
+            double sumFlow = 0;
             for (int i = 0; i < virtualNetwork.getvNodesCount(); i++) {
                 for (int j = 0; j < virtualNetwork.getvNodesCount(); j++) {
                     int flowsOutUnassigned = flowsOut.Get(i, j, 0).number().intValue() + pastUnassignedRequests[i][j];
                     flowsOut.set(DoubleScalar.of(flowsOutUnassigned), i, j, 0);
+                    for(int t=0; t<planningHorizon; t++) {
+                        sumFlow = flowsOut.Get(i,j,t).number().doubleValue() + sumFlow;
+                    }
                 }
             }
             
@@ -193,16 +203,48 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
 
             Tensor rState = RemoteControllerUtils.getRState(round_now, planningHorizon, timeStep, fixedCarCapacity,
                     stayRoboTaxi, rebalancingTaxi, oneCustomerRoboTaxi, virtualNetwork, router);
+            
+            int sumRstate = 0;
+            for(int i=0; i<nVNodes; i++) {
+                for(int t=0; t<planningHorizon; t++) {
+                    sumRstate = sumRstate + rState.Get(i,t).number().intValue();
+                }
+            }
+            
+            if(sumRstate != getRoboTaxis().size()) {
+                logger.warn("Not all starter vehicles are captured");
+            }
+                        
+            boolean isFlowsZero;
+            
+            if(skipZeroFlow==false) {
+                isFlowsZero = false;
+            } else {
+                if(sumFlow==0) {
+                    isFlowsZero = true;
+                } else {
+                    isFlowsZero = false;
+                }
+                
+            }
+            
+            if(isFlowsZero==false) {
+                LPOptimalFlow milpOptimalFlow = new LPOptimalFlow(virtualNetwork, planningHorizon, travelTimesStations, rState,
+                        flowsOut, milpFlag);
+                milpOptimalFlow.initiateLP();
+                milpOptimalFlow.solveLP(false);
+                Tensor r_ij = milpOptimalFlow.getr_ij();
+                Tensor x_ij = milpOptimalFlow.getx_ij();
 
-            LPOptimalFlow milpOptimalFlow = new LPOptimalFlow(virtualNetwork, planningHorizon, travelTimesStations, rState,
-                    flowsOut);
-            milpOptimalFlow.initiateLP();
-            milpOptimalFlow.solveLP(false);
-            Tensor r_ij = milpOptimalFlow.getr_ij();
-            Tensor x_ij = milpOptimalFlow.getx_ij();
-
-            rControl = new RControl(r_ij);
-            xControl = new XControl(x_ij);
+                rControl = new RControl(r_ij);
+                xControl = new XControl(x_ij);
+            } else {
+                Tensor r_ij = Array.zeros(virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
+                Tensor x_ij = Array.zeros(virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
+                
+                rControl = new RControl(r_ij);
+                xControl = new XControl(x_ij);
+            }
             
             dispatchTime = round_now;
 
@@ -379,9 +421,9 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
             double numberX = 0;
             for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
                 for (VirtualNode<Link> toNode : virtualNetwork.getVirtualNodes()) {
-                    double rebalancequeue = (double) controlLawRebalance.Get(fromNode.getIndex(), toNode.getIndex()).number();
+                    double rebalancequeue = controlLawRebalance.Get(fromNode.getIndex(), toNode.getIndex()).number().doubleValue();
                     numberRebalance = numberRebalance + rebalancequeue;
-                    double xque = (double) controlLawX.Get(fromNode.getIndex(), toNode.getIndex()).number();
+                    double xque = controlLawX.Get(fromNode.getIndex(), toNode.getIndex()).number().doubleValue();
                     numberX = numberX + xque;
                     if (xque != 0) {
                         List<AVRequest> fromRequests = getVirtualNodeFromAVRequest().get(fromNode);
@@ -446,48 +488,12 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
         return virtualNetwork.binToVirtualNode(taxiList, RoboTaxi::getDivertableLocation);
     }
 
-    private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeWaitingRoboTaxi() {
-        List<RoboTaxi> taxiList = getRoboTaxis().stream()
-                .filter(car -> !car.getMenu().getCourses().isEmpty()
-                        && car.getMenu().getStarterCourse().getMealType() == SharedMealType.WAITFORCUSTOMER)
-                .collect(Collectors.toList());
-        return virtualNetwork.binToVirtualNode(taxiList, RoboTaxi::getDivertableLocation);
-    }
-
     private Map<VirtualNode<Link>, List<RoboTaxi>> getDestinationVirtualNodeRedirectOnlyRoboTaxi() {
         List<RoboTaxi> rebalancingTaxi = getRoboTaxisWithNumberOfCustomer(0).stream()
                 .filter(car -> car.getMenu().getCourses().size() == 1
                         && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT)
                 .collect(Collectors.toList());
         return virtualNetwork.binToVirtualNode(rebalancingTaxi, RoboTaxi::getCurrentDriveDestination);
-    }
-
-    private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeSORoboTaxi() {
-        List<RoboTaxi> soFiltered = getRoboTaxisWithNumberOfCustomer(1).stream()
-                .filter(car -> (car.getMenu().getCourses().size() == 1
-                        && car.getMenu().getStarterCourse().getMealType() == SharedMealType.DROPOFF)
-                        || (car.getMenu().getCourses().size() == 2
-                                && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
-                                && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
-                                        .getVirtualNode(car.getDivertableLocation())))
-                .collect(Collectors.toList());
-        return virtualNetwork.binToVirtualNode(soFiltered, RoboTaxi::getDivertableLocation);
-    }
-
-    private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeSORedirectRoboTaxi() {
-        List<RoboTaxi> soFiltered = getRoboTaxisWithNumberOfCustomer(1).stream()
-                .filter(car -> (car.getMenu().getCourses().size() == 2
-                        && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT))
-                .collect(Collectors.toList());
-        return virtualNetwork.binToVirtualNode(soFiltered, RoboTaxi::getCurrentDriveDestination);
-    }
-
-    private Map<VirtualNode<Link>, List<RoboTaxi>> getDestinationVirtualNodeDORoboTaxiOnlyDropoff() {
-        List<RoboTaxi> doFiltered = getRoboTaxisWithNumberOfCustomer(2).stream()
-                .filter(car -> car.getMenu().getCourses().size() == 2 && car.getMenu().getCourses().get(0)
-                        .getMealType() == car.getMenu().getCourses().get(1).getMealType())
-                .collect(Collectors.toList());
-        return virtualNetwork.binToVirtualNode(doFiltered, RoboTaxi::getCurrentDriveDestination);
     }
 
     private Map<VirtualNode<Link>, List<AVRequest>> getVirtualNodeFromAVRequest() {

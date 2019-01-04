@@ -204,8 +204,8 @@ public enum RemoteControllerUtils {
         }
         int endTime = (int) config.qsim().getEndTime();
         Set<Request> avRequests = PopulationTools.getAVRequests(population, network, endTime);
+        double flowsCounter = 0;
         for (int t = 0; t < planningHorizon; t++) {
-            double flowsCounter = 0;
             for (Request avRequest : avRequests) {
                 double startTime = avRequest.startTime();
                 if (startTime >= (round_now + t * timeStep * 60)
