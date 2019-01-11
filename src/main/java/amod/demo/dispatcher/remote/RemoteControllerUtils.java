@@ -33,13 +33,10 @@ import ch.ethz.idsc.amodeus.prep.Request;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
-import ch.ethz.idsc.jmex.Container;
-import ch.ethz.idsc.jmex.DoubleArray;
 import ch.ethz.idsc.tensor.DoubleScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.router.AVRouter;
 
@@ -270,44 +267,6 @@ public enum RemoteControllerUtils {
         return numberCars;
     }
 
-    private static int getNumberOfArrivingCarsXstate(double Time, int t, int timeStep, List<RoboTaxi> roboTaxiList,
-            AVRouter router) {
-
-        int numberCars = 0;
-        for (RoboTaxi roboTaxi : roboTaxiList) {
-            Map<String, Scalar> arrivals = ExpectedCarPoolingArrival.of(roboTaxi, Time, router);
-            Scalar arrivalTimeDO = arrivals.get(roboTaxi.getMenu().getCourses().get(0).getRequestId());
-            if (arrivalTimeDO.number().doubleValue() > Time + t * timeStep * 60
-                    && arrivalTimeDO.number().doubleValue() <= Time + (t + 1) * timeStep * 60) {
-                numberCars = numberCars + 1;
-            }
-        }
-
-        return numberCars;
-    }
-
-    public static void printArray(Container container, String field) {
-        if (container.contains(field)) {
-            DoubleArray doubleArray = container.get(field);
-            System.out.println(doubleArray);
-            for (int index = 0; index < doubleArray.value.length; ++index)
-                System.out.print("[" + index + "]=" + doubleArray.value[index] + ", ");
-            System.out.println();
-        } else {
-            System.out.println(" !!! field '" + field + "' not present !!! ");
-        }
-    }
-
-    public static double[] getArray(Container container, String field) {
-        if (container.contains(field)) {
-            DoubleArray doubleArray = container.get(field);
-            double[] array = doubleArray.value;
-            return array;
-        } else {
-            throw new EmptyStackException();
-        }
-
-    }
 
     public static List<List<AVRequest>> getFromToAVRequests(VirtualNetwork<Link> virtualNetwork,
             List<AVRequest> fromRequest, Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests) {
