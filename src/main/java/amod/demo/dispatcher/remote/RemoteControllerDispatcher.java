@@ -23,7 +23,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import amod.demo.dispatcher.carpooling.CarPooling2DispatcherUtils;
-import amod.demo.dispatcher.carpooling.ICRApoolingDispatcher;
 import amod.demo.dispatcher.carpooling.ICRApoolingDispatcherUtils;
 import amod.demo.dispatcher.carpooling.LinkWait;
 import amod.demo.dispatcher.carpooling.PSOControl;
@@ -97,7 +96,7 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
     private final boolean allowAssistance;
     private final boolean poolingFlag;
     private List<Link> linkList;
-    static private final Logger logger = Logger.getLogger(ICRApoolingDispatcher.class);
+    static private final Logger logger = Logger.getLogger(RemoteControllerDispatcher.class);
     private final int endTime;
     private final int reserveFleet;
     private final boolean discardAVRequetsFlag;

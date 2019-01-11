@@ -26,6 +26,7 @@ public class LPOptimalRemoteFlow {
     private final Map<List<Integer>, Integer> rIDvarID = new HashMap<>();
     private final Map<List<Integer>, Integer> xIDvarID = new HashMap<>();
     private final Map<List<Integer>, Integer> dIDvarID = new HashMap<>();
+    private final Map<List<Integer>, Integer> qIDvarID = new HashMap<>();
     private final glp_smcp parmLP = new glp_smcp();
     private final glp_iocp parmMILP = new glp_iocp();
     private final int nvNodes;
@@ -36,7 +37,10 @@ public class LPOptimalRemoteFlow {
     private final int nRvariables;
     private final int nXvariables;
     private final int nDvariables;
+    private final int nQvariables;
     private final int nVehcileCons;
+    private final int nRemoteCons;
+    private final int nRemoteMaxCons;
     private final int nWaitingCustom;
     private final int rowTotal;
     private final int columnTotal;
@@ -68,10 +72,13 @@ public class LPOptimalRemoteFlow {
         nRvariables = nvNodes * nvNodes * timeHorizon;
         nXvariables = nvNodes * nvNodes * timeHorizon;
         nDvariables = nvNodes * nvNodes * timeHorizon;
-        columnTotal = nRvariables + nXvariables + nDvariables;
+        nQvariables = nvNodes * nvNodes * timeHorizon;
+        columnTotal = nRvariables + nXvariables + nDvariables + nQvariables;
         nVehcileCons = nvNodes * timeHorizon;
+        nRemoteCons = nvNodes * nvNodes * timeHorizon;
+        nRemoteMaxCons = timeHorizon;
         nWaitingCustom = nvNodes * nvNodes * timeHorizon;
-        rowTotal = nVehcileCons + nWaitingCustom;
+        rowTotal = nVehcileCons + nWaitingCustom + nRemoteCons + nRemoteMaxCons;
         tuningCoeffD = 10000;
         tuningCoeffR = 5;
 
@@ -105,6 +112,7 @@ public class LPOptimalRemoteFlow {
             initColumnR_ijt();
             initColumnX_ijt();
             initColumnD_ijt();
+            initColumnQ_ijt();
             
             GlobalAssert.that(columnTotal == columnId);
             
@@ -269,6 +277,32 @@ public class LPOptimalRemoteFlow {
             }
         }
     }
+    
+    private void initColumnQ_ijt() {
+        // optimization variable alpha_ij
+        for(int i=0; i<nvNodes; i++) {
+            for(int j=0; j<nvNodes; j++) {
+                for (int t = 1; t <= timeHorizon; t++) {
+                    columnId++;
+                    // variable name and initialization
+                    String varName = ("q" + "_" + i + "," + j + "," + t);
+                    GLPK.glp_set_col_name(lp, columnId, varName);
+                    if (t == 1 && milpFlag == true) {
+                        GLPK.glp_set_col_kind(lp, columnId, GLPKConstants.GLP_IV);
+                    } else {
+                        GLPK.glp_set_col_kind(lp, columnId, GLPKConstants.GLP_CV);
+                    }
+
+                    GLPK.glp_set_col_bnds(lp, columnId, GLPKConstants.GLP_LO, 0.0, 0.0); // Lower
+                                                                                         // bound:
+                                                                                         // second
+                                                                                         // number
+                                                                                         // irrelevant
+                    qIDvarID.put(Arrays.asList(i, j, t), columnId);
+                }
+            }
+        }
+    }
 
     private void initRowConstraints(SWIGTYPE_p_int ind, SWIGTYPE_p_double val) {
 
@@ -305,7 +339,61 @@ public class LPOptimalRemoteFlow {
                 GLPK.glp_set_mat_row(lp, rowId, columnTotal, ind, val);
             }
         }
+        
+        for (int t = 1; t <= timeHorizon; t++) {
+         // set all coefficient entries of matrix A to zero first
+            for (int var = 1; var <= columnTotal; var++) {
+                GLPK.intArray_setitem(ind, var, var);
+                GLPK.doubleArray_setitem(val, var, 0.0);
+            }
+            rowId++;
+            String varName = ("C" + "_" + rowId);
+            GLPK.glp_set_row_name(lp, rowId, varName);
+            GLPK.glp_set_row_bnds(lp, rowId, GLPKConstants.GLP_FX, 0, 0.0);
+            for (int i = 0; i < nvNodes; i++) {             
+                for (int j = 0; j < nvNodes; j++) {
+                    int tau_ji = travelTimes.Get(j, i).number().intValue();
+                    if (t < tau_ji) {
+                        int indexRarrive = rIDvarID.get(Arrays.asList(j, i, (t - tau_ji)));
+                        GLPK.intArray_setitem(ind, indexRarrive, indexRarrive);
+                        GLPK.doubleArray_setitem(val, indexRarrive, -1.0);
+                        int indexXarrive = xIDvarID.get(Arrays.asList(j, i, (t - tau_ji)));
+                        GLPK.intArray_setitem(ind, indexXarrive, indexXarrive);
+                        GLPK.doubleArray_setitem(val, indexXarrive, -1.0);
+                    }
+                    int indexQ = qIDvarID.get(Arrays.asList(i, j, t));
+                    GLPK.intArray_setitem(ind, indexQ, indexQ);
+                    GLPK.doubleArray_setitem(val, indexQ, 1.0);
+                }
+            }
+            GLPK.glp_set_mat_row(lp, rowId, columnTotal, ind, val);
+        }
 
+        for (int t = 1; t <= timeHorizon; t++) {
+            for (int i = 0; i < nvNodes; i++) {
+                for (int j = 0; j < nvNodes; j++) {
+                    for (int var = 1; var <= columnTotal; var++) {
+                        GLPK.intArray_setitem(ind, var, var);
+                        GLPK.doubleArray_setitem(val, var, 0.0);
+                    }
+                    rowId++;
+                    String varName = ("C" + "_" + rowId);
+                    GLPK.glp_set_row_name(lp, rowId, varName);
+                    int indexQ = qIDvarID.get(Arrays.asList(i, j, t));
+                    GLPK.intArray_setitem(ind, indexQ, indexQ);
+                    GLPK.doubleArray_setitem(val, indexQ, 1.0);
+                    int indexX = xIDvarID.get(Arrays.asList(i, j, t));
+                    GLPK.intArray_setitem(ind, indexX, indexX);
+                    GLPK.doubleArray_setitem(val, indexX, -1.0);
+                    int indexR = rIDvarID.get(Arrays.asList(i, j, t));
+                    GLPK.intArray_setitem(ind, indexR, indexR);
+                    GLPK.doubleArray_setitem(val, indexR, -1.0);
+                    GLPK.glp_set_row_bnds(lp, rowId, GLPKConstants.GLP_FX, 0, 0.0);
+                    GLPK.glp_set_mat_row(lp, rowId, columnTotal, ind, val);
+                }
+            }
+        }
+        
         // waiting customers
         for (int t = 1; t <= timeHorizon; t++) {
             for (int i = 0; i < nvNodes; i++) {
