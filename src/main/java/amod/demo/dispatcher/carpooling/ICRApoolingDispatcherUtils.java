@@ -35,8 +35,8 @@ import ch.ethz.idsc.amodeus.prep.Request;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
-import ch.ethz.idsc.jmex.Container;
-import ch.ethz.idsc.jmex.DoubleArray;
+//import ch.ethz.idsc.jmex.Container;
+//import ch.ethz.idsc.jmex.DoubleArray;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.router.AVRouter;
@@ -364,28 +364,28 @@ public enum ICRApoolingDispatcherUtils {
 		return numberCars;
 	}
 
-	public static void printArray(Container container, String field) {
-		if (container.contains(field)) {
-			DoubleArray doubleArray = container.get(field);
-			System.out.println(doubleArray);
-			for (int index = 0; index < doubleArray.value.length; ++index)
-				System.out.print("[" + index + "]=" + doubleArray.value[index] + ", ");
-			System.out.println();
-		} else {
-			System.out.println(" !!! field '" + field + "' not present !!! ");
-		}
-	}
-
-	public static double[] getArray(Container container, String field) {
-		if (container.contains(field)) {
-			DoubleArray doubleArray = container.get(field);
-			double[] array = doubleArray.value;
-			return array;
-		} else {
-			throw new EmptyStackException();
-		}
-
-	}
+//	public static void printArray(Container container, String field) {
+//		if (container.contains(field)) {
+//			DoubleArray doubleArray = container.get(field);
+//			System.out.println(doubleArray);
+//			for (int index = 0; index < doubleArray.value.length; ++index)
+//				System.out.print("[" + index + "]=" + doubleArray.value[index] + ", ");
+//			System.out.println();
+//		} else {
+//			System.out.println(" !!! field '" + field + "' not present !!! ");
+//		}
+//	}
+//
+//	public static double[] getArray(Container container, String field) {
+//		if (container.contains(field)) {
+//			DoubleArray doubleArray = container.get(field);
+//			double[] array = doubleArray.value;
+//			return array;
+//		} else {
+//			throw new EmptyStackException();
+//		}
+//
+//	}
 
 	public static List<List<AVRequest>> getFromToAVRequests(VirtualNetwork<Link> virtualNetwork,
 			List<AVRequest> fromRequest, Map<VirtualNode<Link>, List<AVRequest>> VirtualNodeAVToRequests) {
