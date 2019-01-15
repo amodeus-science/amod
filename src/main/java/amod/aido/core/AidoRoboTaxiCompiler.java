@@ -19,7 +19,7 @@ import ch.ethz.idsc.tensor.qty.Boole;
     }
 
     public Tensor compile(List<RoboTaxi> roboTaxis) {
-        return Tensor.of(roboTaxis.stream().map(rt -> this.ofTaxi(rt)));
+        return Tensor.of(roboTaxis.stream().map(this::ofTaxi));
     }
 
     private Tensor ofTaxi(RoboTaxi roboTaxi) {

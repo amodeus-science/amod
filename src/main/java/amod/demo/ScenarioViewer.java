@@ -14,6 +14,7 @@ import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.gfx.AmodeusComponent;
 import ch.ethz.idsc.amodeus.gfx.AmodeusViewerFrame;
+import ch.ethz.idsc.amodeus.gfx.ViewerConfig;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
@@ -50,7 +51,7 @@ public enum ScenarioViewer {
         File outputDirectory = outputSubDirectory.getParentFile();
         System.out.println("showing simulation results from outputDirectory=" + outputDirectory);
 
-        /** geopgrahic information, .e.g., coordinate system */
+        /** geographic information, .e.g., coordinate system */
         LocationSpec locationSpec = simOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
 
@@ -68,9 +69,11 @@ public enum ScenarioViewer {
         amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
         /** starting the viewer */
+        ViewerConfig viewerConfig = ViewerConfig.fromDefaults(db);
+        System.out.println(viewerConfig);
         AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory, network);
-        amodeusViewerFrame.setDisplayPosition(db.getCenter(), 12);
-        amodeusViewerFrame.jFrame.setSize(900, 900);
+        amodeusViewerFrame.setDisplayPosition(viewerConfig.settings.coord, viewerConfig.settings.zoom);
+        amodeusViewerFrame.jFrame.setSize(viewerConfig.settings.dimensions);
         amodeusViewerFrame.jFrame.setVisible(true);
     }
 

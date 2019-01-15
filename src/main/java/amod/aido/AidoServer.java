@@ -31,7 +31,6 @@ import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -50,6 +49,9 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
     private File configFile;
     private File outputDirectory;
+    private Network network;
+    private ReferenceFrame referenceFrame;
+    private ScenarioOptions scenarioOptions;
 
     /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml
      * 
@@ -62,7 +64,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
         /** working directory and options */
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
+        scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** set to true in order to make server wait for at least 1 client, for
          * instance viewer client, for fals the ScenarioServer starts the simulation
@@ -71,7 +73,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
         /** geographic information */
         LocationSpec locationSpec = scenarioOptions.getLocationSpec();
-        ReferenceFrame referenceFrame = locationSpec.referenceFrame();
+        referenceFrame = locationSpec.referenceFrame();
 
         /** open server port for clients to connect to */
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
@@ -89,7 +91,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
         /** load MATSim scenario for simulation */
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        Network network = scenario.getNetwork();
+        network = scenario.getNetwork();
         Population population = scenario.getPopulation();
         GlobalAssert.that(Objects.nonNull(network));
         GlobalAssert.that(Objects.nonNull(population));
@@ -108,7 +110,8 @@ import ch.ethz.matsim.av.framework.AVUtils;
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
-        controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+        // VirtualNetwork shouldn't be necessary
+        // controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
         controler.addOverridingModule(new AidoModule(stringSocket, numReqTot));
         controler.addOverridingModule(new AmodeusDatabaseModule(db));
@@ -146,4 +149,17 @@ import ch.ethz.matsim.av.framework.AVUtils;
     /* package */ File getConfigFile() {
         return configFile;
     }
+
+    /* package */ Network getNetwork() {
+        return network;
+    }
+
+    /* package */ ReferenceFrame getReferenceFrame() {
+        return referenceFrame;
+    }
+
+    /* package */ ScenarioOptions getScenarioOptions() {
+        return scenarioOptions;
+    }
+
 }

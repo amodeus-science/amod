@@ -34,6 +34,7 @@ import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleToVSGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
@@ -135,6 +136,9 @@ public enum ScenarioServer {
         /** You need to activate this if you want to use a dispatcher that needs a virtual
          * network! */
         controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+        controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
+
+        // ===============================================
 
         controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -152,6 +156,15 @@ public enum ScenarioServer {
                 AVUtils.registerDispatcherFactory(binder(), "DemoDispatcher", DemoDispatcher.Factory.class);
             }
         });
+        // TODO @ Lukas this produces problems.
+        // controler.addOverridingModule(new AbstractModule() {
+        // @Override
+        // public void install() {
+        // AVUtils.registerDispatcherFactory(binder(), "DemoDispatcherShared",
+        // DemoDispatcherShared.Factory.class);
+        // }
+        // });
+
         /** here an additional user-defined initial placement logic called generator is added,
          * functionality in class DemoGenerator */
         controler.addOverridingModule(new AbstractModule() {
