@@ -58,8 +58,8 @@ public class RControl {
                     
                     if (emptyDrivingVehicles.size() + numberAssignedCars >= maxDrivingEmptyCars) {
                         rebalancingCars = avTaxis.stream()
-                                .filter(car -> !car.getMenu().getCourses().isEmpty()
-                                        && car.getMenu().getStarterCourse().getMealType().equals(SharedMealType.REDIRECT))
+                                .filter(car -> !car.getUnmodifiableViewOfCourses().isEmpty()
+                                        && car.getUnmodifiableViewOfCourses().get(0).getMealType().equals(SharedMealType.REDIRECT))
                                 .collect(Collectors.toList());
                         if (rebalancingCars.isEmpty()) {
                             break;

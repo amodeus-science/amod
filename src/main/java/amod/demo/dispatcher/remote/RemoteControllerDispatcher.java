@@ -22,8 +22,10 @@ import amod.demo.dispatcher.carpooling.ICRApoolingDispatcherUtils;
 import amod.demo.dispatcher.carpooling.LinkWait;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
+import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiUtils;
 import ch.ethz.idsc.amodeus.dispatcher.core.SharedPartitionedDispatcher;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedCourse;
+import ch.ethz.idsc.amodeus.dispatcher.shared.SharedCourseListUtils;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedMealType;
 import ch.ethz.idsc.amodeus.dispatcher.util.AbstractRoboTaxiDestMatcher;
 import ch.ethz.idsc.amodeus.dispatcher.util.AbstractVirtualNodeDest;
@@ -245,15 +247,16 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
                 if (xZOControlPolicy != null) {
                     for (Pair<RoboTaxi, AVRequest> pair : xZOControlPolicy) {
                         RoboTaxi roboTaxi = pair.getLeft();
-                        if (!roboTaxi.getMenu().getCourses().isEmpty() && roboTaxi.getMenu().getCourses().size() == 1
-                                && roboTaxi.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
-                            roboTaxi.getMenu().clearWholeMenu();
+                        if (!roboTaxi.getUnmodifiableViewOfCourses().isEmpty() && roboTaxi.getUnmodifiableViewOfCourses().size() == 1
+                                && roboTaxi.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
+                            roboTaxi.cleanAndAbandonMenu();
+                            GlobalAssert.that(roboTaxi.getUnmodifiableViewOfCourses().isEmpty());
                         }
                         AVRequest avRequest = pair.getRight();
                         addSharedRoboTaxiPickup(roboTaxi, avRequest);
 
-                        GlobalAssert.that(roboTaxi.getMenu().getCourses().size() == 2);
-                        GlobalAssert.that(roboTaxi.checkMenuConsistency());
+                        GlobalAssert.that(roboTaxi.getUnmodifiableViewOfCourses().size() == 2);
+                        GlobalAssert.that(RoboTaxiUtils.checkMenuConsistency(roboTaxi));
 
                     }
 
@@ -283,21 +286,21 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
 
                         if (virtualNetwork.getVirtualNode(roboTaxi.getDivertableLocation()) == virtualNetwork
                                 .getVirtualNode(redirectLink)) {
-                            GlobalAssert.that(roboTaxi.getMenu().getCourses().size() == 0);
-                            GlobalAssert.that(roboTaxi.checkMenuConsistency());
+                            GlobalAssert.that(roboTaxi.getUnmodifiableViewOfCourses().size() == 0);
+                            GlobalAssert.that(RoboTaxiUtils.checkMenuConsistency(roboTaxi));
                             continue;
                         }
 
-                        if (!roboTaxi.getMenu().getCourses().isEmpty() && roboTaxi.getMenu().getCourses().size() == 1
-                                && roboTaxi.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
-                            roboTaxi.getMenu().clearWholeMenu();
+                        if (!roboTaxi.getUnmodifiableViewOfCourses().isEmpty() && roboTaxi.getUnmodifiableViewOfCourses().size() == 1
+                                && roboTaxi.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
+                            roboTaxi.cleanAndAbandonMenu();
                         }
 
                         SharedCourse redirectCourse = SharedCourse.redirectCourse(redirectLink, //
                                 Double.toString(now) + roboTaxi.getId().toString());
                         addSharedRoboTaxiRedirect(roboTaxi, redirectCourse);
-                        GlobalAssert.that(roboTaxi.getMenu().getCourses().size() == 1);
-                        GlobalAssert.that(roboTaxi.checkMenuConsistency());
+                        GlobalAssert.that(roboTaxi.getUnmodifiableViewOfCourses().size() == 1);
+                        GlobalAssert.that(RoboTaxiUtils.checkMenuConsistency(roboTaxi));
                     }
 
                 }
@@ -336,8 +339,7 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
 
                                 if (emptyDrivingVehicles.size() >= maxDrivingEmptyCars) {
                                     List<RoboTaxi> rebalancingCars = availableCars.stream()
-                                            .filter(car -> !car.getMenu().getCourses().isEmpty() && car.getMenu()
-                                                    .getStarterCourse().getMealType().equals(SharedMealType.REDIRECT))
+                                            .filter(car -> !car.getUnmodifiableViewOfCourses().isEmpty() && car.getUnmodifiableViewOfCourses().get(0).getMealType().equals(SharedMealType.REDIRECT))
                                             .collect(Collectors.toList());
                                     if (rebalancingCars.isEmpty()) {
                                         continue;
@@ -348,15 +350,15 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
 
                                 RoboTaxi closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest,
                                         availableCars);
-                                if (!closestRoboTaxi.getMenu().getCourses().isEmpty() && closestRoboTaxi.getMenu()
-                                        .getCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
-                                    closestRoboTaxi.getMenu().removeAVCourse(0);
-                                    GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+                                if (!closestRoboTaxi.getUnmodifiableViewOfCourses().isEmpty() && closestRoboTaxi.getUnmodifiableViewOfCourses().get(0)
+                                        .getMealType() == SharedMealType.REDIRECT) {
+                                    closestRoboTaxi.cleanAndAbandonMenu();
+                                    GlobalAssert.that(RoboTaxiUtils.checkMenuConsistency(closestRoboTaxi));
                                 }
 
                                 addSharedRoboTaxiPickup(closestRoboTaxi, avRequest);
-                                GlobalAssert.that(closestRoboTaxi.getMenu().getCourses().size() == 2);
-                                GlobalAssert.that(closestRoboTaxi.checkMenuConsistency());
+                                GlobalAssert.that(closestRoboTaxi.getUnmodifiableViewOfCourses().size() == 2);
+                                GlobalAssert.that(RoboTaxiUtils.checkMenuConsistency(closestRoboTaxi));
 
                             }
 
@@ -446,10 +448,10 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
 
     private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayWithoutCustomerRoboTaxi() {
         List<RoboTaxi> taxiList = getDivertableUnassignedRoboTaxis().stream()
-                .filter(car -> (car.isInStayTask() && car.getCurrentNumberOfCustomersOnBoard() == 0
-                        && car.getMenu().getCourses().isEmpty())
-                        || (car.getMenu().getCourses().size() == 1
-                                && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
+                .filter(car -> (car.isInStayTask() && RoboTaxiUtils.getNumberOnBoardRequests(car) == 0
+                        && car.getUnmodifiableViewOfCourses().isEmpty())
+                        || (car.getUnmodifiableViewOfCourses().size() == 1
+                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT
                                 && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
                                         .getVirtualNode(car.getDivertableLocation())))
                 .collect(Collectors.toList());
@@ -458,10 +460,9 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
 
     private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayWithoutCustomerOrRebalanceRoboTaxi() {
         List<RoboTaxi> taxiList = getRoboTaxis().stream()
-                .filter(car -> (car.isInStayTask() && car.getCurrentNumberOfCustomersOnBoard() == 0
-                        && car.getMenu().getCourses().isEmpty())
-                        || (car.getMenu().getCourses().size() == 1
-                                && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
+                .filter(car -> (car.isInStayTask() && RoboTaxiUtils.getNumberOnBoardRequests(car) == 0
+                        && car.getUnmodifiableViewOfCourses().size() == 1
+                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT
                                 && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
                                         .getVirtualNode(car.getDivertableLocation())))
                 .collect(Collectors.toList());
@@ -470,8 +471,8 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
 
     private Map<VirtualNode<Link>, List<RoboTaxi>> getDestinationVirtualNodeRedirectOnlyRoboTaxi() {
         List<RoboTaxi> rebalancingTaxi = getRoboTaxisWithNumberOfCustomer(0).stream()
-                .filter(car -> car.getMenu().getCourses().size() == 1
-                        && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT)
+                .filter(car -> car.getUnmodifiableViewOfCourses().size() == 1
+                        && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT)
                 .collect(Collectors.toList());
         return virtualNetwork.binToVirtualNode(rebalancingTaxi, RoboTaxi::getCurrentDriveDestination);
     }
@@ -486,10 +487,10 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
 
     private Collection<RoboTaxi> getRoboTaxisFree() {
         return getRoboTaxis().stream()
-                .filter(car -> (car.isInStayTask() && car.getCurrentNumberOfCustomersOnBoard() == 0
-                        && car.getMenu().getCourses().isEmpty())
-                        || (car.getMenu().getCourses().size() == 1
-                                && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
+                .filter(car -> (car.isInStayTask() && RoboTaxiUtils.getNumberOnBoardRequests(car) == 0
+                        && car.getUnmodifiableViewOfCourses().isEmpty())
+                        || (car.getUnmodifiableViewOfCourses().size() == 1
+                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT
                                 && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
                                         .getVirtualNode(car.getDivertableLocation())))
                 .collect(Collectors.toList());
@@ -497,41 +498,36 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
 
     protected final Collection<RoboTaxi> getRoboTaxisWithNumberOfCustomer(int x) {
         return getDivertableRoboTaxis().stream() //
-                .filter(rt -> rt.getCurrentNumberOfCustomersOnBoard() == x) //
+                .filter(rt -> RoboTaxiUtils.getNumberOnBoardRequests(rt) == x) //
                 .collect(Collectors.toList());
     }
 
     protected final Collection<RoboTaxi> getRoboTaxisAvailable(AVRequest avRequest) {
         VirtualNode<Link> toVirtualNode = virtualNetwork.getVirtualNode(avRequest.getToLink());
         List<RoboTaxi> availableCars = getRoboTaxis().stream() //
-                .filter(car -> (car.isInStayTask() && car.getCurrentNumberOfCustomersOnBoard() == 0
-                        && car.getMenu().getCourses().isEmpty())
-                        || (car.getMenu().getCourses().size() == 1
-                                && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
+                .filter(car -> (car.isInStayTask() && RoboTaxiUtils.getNumberOnBoardRequests(car) == 0
+                        && car.getUnmodifiableViewOfCourses().size() == 1
+                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT
                                 && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
                                         .getVirtualNode(car.getDivertableLocation()))
-                        || (!car.getMenu().getCourses().isEmpty()
-                                && car.getMenu().getStarterCourse().getMealType() == SharedMealType.WAITFORCUSTOMER
-                                && car.getMenu().getStarterCourse().getRequestId().toString().split("-")[0]
-                                        .equals(toVirtualNode.getId()))
-                        || (car.getMenu().getCourses().size() == 1
-                                && car.getMenu().getStarterCourse().getMealType() == SharedMealType.DROPOFF
+                        || (car.getUnmodifiableViewOfCourses().size() == 1
+                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.DROPOFF
                                 && toVirtualNode.getLinks().contains(car.getCurrentDriveDestination()))
-                        || (car.getMenu().getCourses().size() == 2
-                                && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
+                        || (car.getUnmodifiableViewOfCourses().size() == 2
+                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT
                                 && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
                                         .getVirtualNode(car.getDivertableLocation())
-                                && toVirtualNode.getLinks().contains(car.getMenu().getCourses().get(1).getLink()))) //
+                                && toVirtualNode.getLinks().contains(car.getUnmodifiableViewOfCourses().get(1).getLink()))) //
                 .collect(Collectors.toList());
         return availableCars;
     }
 
     protected final Collection<RoboTaxi> getRoboTaxisAvailableSO() {
         List<RoboTaxi> availableCars = getRoboTaxis().stream() //
-                .filter(car -> (car.isInStayTask() && car.getCurrentNumberOfCustomersOnBoard() == 0
-                        && car.getMenu().getCourses().isEmpty())
-                        || (car.getMenu().getCourses().size() == 1
-                                && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT
+                .filter(car -> (car.isInStayTask() && RoboTaxiUtils.getNumberOnBoardRequests(car) == 0
+                        && car.getUnmodifiableViewOfCourses().isEmpty())
+                        || (car.getUnmodifiableViewOfCourses().size() == 1
+                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT
                                 && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
                                         .getVirtualNode(car.getDivertableLocation())))
                 .collect(Collectors.toList());
@@ -540,10 +536,10 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
 
     protected final Collection<RoboTaxi> getEmptyDrivingRoboTaxis() {
         List<RoboTaxi> availableCars = getRoboTaxis().stream() //
-                .filter(car -> (car.getCurrentNumberOfCustomersOnBoard() == 0 && car.getMenu().getCourses().size() == 1
-                        && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.REDIRECT)
-                        || (car.getMenu().getCourses().size() == 2
-                                && car.getMenu().getCourses().get(0).getMealType() == SharedMealType.PICKUP))
+                .filter(car -> (RoboTaxiUtils.getNumberOnBoardRequests(car) == 0 && car.getUnmodifiableViewOfCourses().size() == 1
+                        && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT)
+                        || (car.getUnmodifiableViewOfCourses().size() == 2
+                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.PICKUP))
                 .collect(Collectors.toList());
         return availableCars;
     }

@@ -26,8 +26,8 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
-import amod.demo.dispatcher.carpooling.ExpectedCarPoolingArrival;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
+import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiUtils;
 import ch.ethz.idsc.amodeus.prep.PopulationTools;
 import ch.ethz.idsc.amodeus.prep.Request;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
@@ -81,8 +81,8 @@ public enum RemoteControllerUtils {
             List<RoboTaxi> stayCarsAtNode = stayRoboTaxi.get(node);
             List<RoboTaxi> rebalanceCarsAtNode = rebalanceRoboTaxi.get(node);
             List<RoboTaxi> soCarsAtNode = soRoboTaxi.stream()
-                    .filter(car -> car.getMenu().getCourses().size() == 1
-                            && node.getLinks().contains(car.getMenu().getCourses().get(0).getLink()))
+                    .filter(car -> car.getUnmodifiableViewOfCourses().size() == 1
+                            && node.getLinks().contains(car.getUnmodifiableViewOfCourses().get(0).getLink()))
                     .collect(Collectors.toList());
 
             if (stayCarsAtNode.isEmpty() == true) {
@@ -231,21 +231,21 @@ public enum RemoteControllerUtils {
 
         int numberCars = 0;
         for (RoboTaxi roboTaxi : roboTaxiList) {
-            Map<String, Scalar> arrivals = ExpectedCarPoolingArrival.of(roboTaxi, Time, router);
-            if (roboTaxi.getCurrentNumberOfCustomersOnBoard() == 0) {
-                Scalar arrivalTimeReb = arrivals.get(roboTaxi.getMenu().getStarterCourse().getRequestId());
+            Map<String, Scalar> arrivals = ExpectedArrival.of(roboTaxi, Time, router);
+            if (RoboTaxiUtils.getNumberOnBoardRequests(roboTaxi) == 0) {
+                Scalar arrivalTimeReb = arrivals.get(roboTaxi.getUnmodifiableViewOfCourses().get(0).getCourseId().toString());
                 if (arrivalTimeReb.number().doubleValue() > Time + t * timeStep * 60
                         && arrivalTimeReb.number().doubleValue() <= Time + (t + 1) * timeStep * 60) {
                     numberCars = numberCars + 1;
                 }
             }
 
-            if (roboTaxi.getCurrentNumberOfCustomersOnBoard() == 1) {
+            if (RoboTaxiUtils.getNumberOnBoardRequests(roboTaxi) == 1) {
                 Scalar arrivalTimeSO = null;
-                if (roboTaxi.getMenu().getCourses().size() > 1) {
-                    arrivalTimeSO = arrivals.get(roboTaxi.getMenu().getCourses().get(0).getRequestId());
+                if (roboTaxi.getUnmodifiableViewOfCourses().size() > 1) {
+                    arrivalTimeSO = arrivals.get(roboTaxi.getUnmodifiableViewOfCourses().get(0).getCourseId().toString());
                 } else {
-                    arrivalTimeSO = arrivals.get(roboTaxi.getMenu().getStarterCourse().getRequestId());
+                    arrivalTimeSO = arrivals.get(roboTaxi.getUnmodifiableViewOfCourses().get(0).getCourseId().toString());
                 }
 
                 if (arrivalTimeSO.number().doubleValue() > Time + t * timeStep * 60
@@ -254,8 +254,8 @@ public enum RemoteControllerUtils {
                 }
             }
 
-            if (roboTaxi.getCurrentNumberOfCustomersOnBoard() == 2) {
-                Scalar arrivalTimeDO = arrivals.get(roboTaxi.getMenu().getCourses().get(1).getRequestId());
+            if (RoboTaxiUtils.getNumberOnBoardRequests(roboTaxi)== 2) {
+                Scalar arrivalTimeDO = arrivals.get(roboTaxi.getUnmodifiableViewOfCourses().get(1).getCourseId().toString());
                 if (arrivalTimeDO.number().doubleValue() > Time + t * timeStep * 60
                         && arrivalTimeDO.number().doubleValue() <= Time + (t + 1) * timeStep * 60) {
                     numberCars = numberCars + 1;
