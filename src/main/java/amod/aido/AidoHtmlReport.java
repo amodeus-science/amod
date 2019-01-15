@@ -34,16 +34,16 @@ import ch.ethz.idsc.tensor.red.Total;
     @Override
     public Map<String, HtmlBodyElement> process(AnalysisSummary analysisSummary) {
 
-        this.totalMeanWaitingTime = analysisSummary.getTravelTimeAnalysis().getWaitAggrgte().Get(1);
+        totalMeanWaitingTime = analysisSummary.getTravelTimeAnalysis().getWaitAggrgte().Get(1);
 
         {
             DistanceElement distanceElement = analysisSummary.getDistanceElement();
             double sum = distanceElement.totalDistancePicku + distanceElement.totalDistanceRebal;
             // if totalDistance == 0.0, the ratio is NaN
-            this.totalEfficiencyRatio = RealScalar.of(sum / distanceElement.totalDistance);
+            totalEfficiencyRatio = RealScalar.of(sum / distanceElement.totalDistance);
         }
 
-        this.numberOfVehicles = RealScalar.of(analysisSummary.getSimulationInformationElement().vehicleSize());
+        numberOfVehicles = RealScalar.of(analysisSummary.getSimulationInformationElement().vehicleSize());
 
         Map<String, HtmlBodyElement> bodyElements = new HashMap<>();
         {

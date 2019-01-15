@@ -22,7 +22,6 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
-import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
 import ch.ethz.idsc.amodeus.util.io.ProvideAVConfig;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
@@ -38,7 +37,6 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
     private final Network network;
     private final MatsimAmodeusDatabase db;
     private final int numRt;
-    private final int endTime;
 
     /** loads scenario preparer in the {@link File} workingDirectory
      * 
@@ -60,7 +58,6 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
         AVConfig avConfig = ProvideAVConfig.with(config, avConfigGroup);
         AVGeneratorConfig genConfig = avConfig.getOperatorConfigs().iterator().next().getGeneratorConfig();
         numRt = (int) genConfig.getNumberOfVehicles();
-        endTime = (int) config.qsim().getEndTime();
         System.out.println("aidoprep NumberOfVehicles=" + numRt);
 
         /** adaption of MATSim network, e.g., radius cutting */
@@ -79,8 +76,9 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
         long apoSeed = 1234;
         AidoPopulationPreparer.run(network, population, scenOpt, config, apoSeed, numReqDes);
 
-        /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
-        VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt, numRt, endTime);
+        // /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
+        // int endTime = (int) config.qsim().getEndTime();
+        // VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt, numRt,endTime);
 
         /** create a simulation MATSim config file linking the created input data */
         ConfigCreator.createSimulationConfigFile(config, scenOpt);
@@ -101,7 +99,7 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
     }
 
     public MatsimAmodeusDatabase getDatabase() {
-        return this.db;
+        return db;
     }
 
 }

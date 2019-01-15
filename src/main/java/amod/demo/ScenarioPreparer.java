@@ -54,7 +54,6 @@ public enum ScenarioPreparer {
         AVConfig avConfig = ProvideAVConfig.with(config, avConfigGroup);
         AVGeneratorConfig genConfig = avConfig.getOperatorConfigs().iterator().next().getGeneratorConfig();
         int numRt = (int) genConfig.getNumberOfVehicles();
-        int endTime = (int) config.qsim().getEndTime();
         System.out.println("NumberOfVehicles=" + numRt);
 
         /** adaption of MATSim network, e.g., radius cutting */
@@ -67,6 +66,7 @@ public enum ScenarioPreparer {
         PopulationPreparer.run(network, population, scenarioOptions, config, apoSeed);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
+        int endTime = (int) config.qsim().getEndTime();
         VirtualNetworkPreparer.INSTANCE.create(network, population, scenarioOptions, numRt, endTime); //
 
         /** create a simulation MATSim config file linking the created input data */

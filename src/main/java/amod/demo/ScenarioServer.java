@@ -22,12 +22,6 @@ import com.google.inject.name.Names;
 
 import amod.demo.analysis.CustomAnalysis;
 import amod.demo.dispatcher.DemoDispatcher;
-import amod.demo.dispatcher.WaitNorthPoleSharedDispatcher;
-//import amod.demo.dispatcher.SMPC.SMPCRebalancer;
-//import amod.demo.dispatcher.carpooling.CarPooling2Dispatcher;
-//import amod.demo.dispatcher.carpooling.ICRApoolingDispatcher;
-import amod.demo.dispatcher.remote.RemoteControllerDispatcher;
-//import amod.demo.dispatcher.IAMoD.IAMoDdispatcher;
 import amod.demo.ext.Static;
 import amod.demo.generator.DemoGenerator;
 import amod.demo.router.IAMoDRouter;
@@ -41,6 +35,7 @@ import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleToVSGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
@@ -142,6 +137,9 @@ public enum ScenarioServer {
         /** You need to activate this if you want to use a dispatcher that needs a virtual
          * network! */
         controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+        controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
+
+        // ===============================================
 
         controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -174,7 +172,7 @@ public enum ScenarioServer {
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "WaitNorthPoleSharedDispatcher", WaitNorthPoleSharedDispatcher.Factory.class);                
+                AVUtils.registerDispatcherFactory(binder(), "DemoDispatcher", DemoDispatcher.Factory.class);
             }
         });
         
