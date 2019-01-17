@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -23,6 +25,7 @@ import amod.demo.dispatcher.carpooling.LinkWait;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiUtils;
+import ch.ethz.idsc.amodeus.dispatcher.core.SharedMPCPartitionedDispatcher;
 import ch.ethz.idsc.amodeus.dispatcher.core.SharedPartitionedDispatcher;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedCourse;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedCourseListUtils;
@@ -35,6 +38,7 @@ import ch.ethz.idsc.amodeus.dispatcher.util.EuclideanDistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.GlobalBipartiteMatching;
 import ch.ethz.idsc.amodeus.dispatcher.util.RandomVirtualNodeDest;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
+import ch.ethz.idsc.amodeus.mpcsetup.MPCsetup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.traveldata.TravelData;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
@@ -53,7 +57,7 @@ import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.router.AVRouter;
 
-public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
+public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
 
     private final int dispatchPeriod;
     private final int rebalancingPeriod;
@@ -77,10 +81,8 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
     private LinkWait linkWait;
     private final boolean predictedDemand;
     private final boolean allowAssistance;
-    private final boolean poolingFlag;
     private List<Link> linkList;
     static private final Logger logger = Logger.getLogger(RemoteControllerDispatcher.class);
-    private final int endTime;
     private final int reserveFleet;
     private final boolean discardAVRequetsFlag;
     private int maxDrivingEmptyCars;
@@ -99,8 +101,9 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractRoboTaxiDestMatcher abstractVehicleDestMatcher, //
             TravelData travelData, //
+            MPCsetup mpcSetup, //
             MatsimAmodeusDatabase db) {
-        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork, db);
+        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork, mpcSetup, db);
         virtualNodeDest = abstractVirtualNodeDest;
         vehicleDestMatcher = abstractVehicleDestMatcher;
         this.travelData = travelData;
@@ -114,31 +117,29 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
         System.out.println("Using DistanceHeuristics: " + distanceHeuristics.name());
         this.distanceFunction = distanceHeuristics.getDistanceFunction(network);
         this.config = config;
-        this.timeStep = 5;
+        this.timeStep = mpcSetup.getTimeStep();
         // dispatchPeriod = safeConfig.getInteger("dispatchPeriod", timeStep *
         // 60);
         dispatchPeriod = timeStep * 60;
-        this.planningHorizon = 8;
+        this.planningHorizon = mpcSetup.getPlanningHorizon();
         this.fixedCarCapacity = 2;
         this.router = router;
         this.predictedDemand = false;
-        this.allowAssistance = true;
-        this.poolingFlag = false;
+        this.allowAssistance = mpcSetup.getAssistanceFlag();
         this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);
-        this.endTime = (int) config.qsim().getEndTime();
         this.reserveFleet = 20;
         this.discardAVRequetsFlag = false;
         this.maxDrivingEmptyCars = 10000;
         this.checkControlInputsFlag = true;
         this.skipZeroFlow = true;
-        this.milpFlag = true;
+        this.milpFlag = mpcSetup.getMILPflag();
     }
 
     @Override
     protected void redispatch(double now) {
 
         final long round_now = Math.round(now);
-
+        
         if (round_now % dispatchPeriod == 0 && round_now >= dispatchPeriod) {
 
             // travel times
@@ -561,6 +562,9 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
 
         @Inject(optional = true)
         private VirtualNetwork<Link> virtualNetwork;
+        
+        @Inject(optional = true)
+        private MPCsetup mpcSetup;
 
         @Inject
         private Config config;
@@ -577,7 +581,7 @@ public class RemoteControllerDispatcher extends SharedPartitionedDispatcher {
                     EuclideanDistanceFunction.INSTANCE);
 
             return new RemoteControllerDispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager,
-                    network, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData, db);
+                    network, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData, mpcSetup, db);
         }
     }
 

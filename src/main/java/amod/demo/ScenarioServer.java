@@ -35,6 +35,7 @@ import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusMPCSetupModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleToVSGeneratorModule;
@@ -140,6 +141,7 @@ public enum ScenarioServer {
          * network! */
         controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
+        controler.addOverridingModule(new AmodeusMPCSetupModule());
 
         // ===============================================
 
@@ -228,6 +230,12 @@ public enum ScenarioServer {
          * network! */
         if (true) {
             controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+        }
+        
+        /** You need to activate this if you want to use a MPC dispatcher that needs a virtual
+         * network! */
+        if (true) {
+            controler.addOverridingModule(new AmodeusMPCSetupModule());
         }
         
         controler.addOverridingModule(new AbstractModule() {
