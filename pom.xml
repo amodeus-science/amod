@@ -16,12 +16,12 @@
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>amodeus</artifactId>
-			<version>1.5.7</version>
+			<version>1.5.8</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>tensor</artifactId>
-			<version>0.6.4</version>
+			<version>0.6.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>

@@ -6,12 +6,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import ch.ethz.idsc.amodeus.util.io.Unzip;
-import ch.ethz.idsc.amodeus.util.math.UserHome;
+import ch.ethz.idsc.tensor.io.HomeDirectory;
 
 enum UnzipDemo {
     ;
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        File file = UserHome.file("aido-scenario.zip");
-        Unzip.of(file, UserHome.file("SCEN_OUT"), true);
+        File file = HomeDirectory.file("aido-scenario.zip");
+        Unzip.of(file, HomeDirectory.file("SCEN_OUT"), true);
     }
 }
