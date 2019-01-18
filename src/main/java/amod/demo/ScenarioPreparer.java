@@ -12,6 +12,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import amod.demo.ext.Static;
+import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
+import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.ConfigCreator;
@@ -45,6 +47,9 @@ public enum ScenarioPreparer {
 
         /** amodeus options */
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
+        
+        XmlNumberOfVehiclesChanger.of(workingDirectory, scenarioOptions.getNumberVehicles());
+        XmlDispatcherChanger.of(workingDirectory, scenarioOptions.getDispatcher());
 
         /** MATSim config */
         // Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName());
