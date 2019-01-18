@@ -23,7 +23,6 @@ import com.google.inject.name.Names;
 import amod.demo.analysis.CustomAnalysis;
 import amod.demo.dispatcher.DemoDispatcher;
 import amod.demo.dispatcher.remote.RemoteControllerDispatcher;
-import amod.demo.dispatcher.TestPariking;
 import amod.demo.ext.Static;
 //import amod.demo.generator.DemoGenerator;
 import amod.demo.router.IAMoDRouter;
@@ -198,14 +197,6 @@ public enum ScenarioServer {
             }
         });
         
-        /** here an additional user-defined dispatcher is added, functionality in class
-         * DemoDispatcher */
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "TestPariking", TestPariking.Factory.class);                
-            }
-        });
         
 //        /** here an additional user-defined dispatcher is added, functionality in class
 //         * DemoDispatcher */
