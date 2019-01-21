@@ -46,12 +46,15 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.video.VideoGenerator;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.framework.AVUtils;
 
-/** only one ScenarioServer can run at one time, since a fixed network port is
- * reserved to serve the simulation status */
+/**
+ * only one ScenarioServer can run at one time, since a fixed network port is
+ * reserved to serve the simulation status
+ */
 public enum ScenarioServer {
     ;
 
@@ -62,10 +65,13 @@ public enum ScenarioServer {
 
     }
 
-    /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml
+    /**
+     * runs a simulation run using input data from Amodeus.properties, av.xml
+     * and MATSim config.xml
      * 
      * @throws MalformedURLException
-     * @throws Exception */
+     * @throws Exception
+     */
     public static void simulate() throws MalformedURLException, Exception {
         Static.setup();
 
@@ -75,9 +81,11 @@ public enum ScenarioServer {
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
-        /** set to true in order to make server wait for at least 1 client, for
-         * instance viewer client, for fals the ScenarioServer starts the simulation
-         * immediately */
+        /**
+         * set to true in order to make server wait for at least 1 client, for
+         * instance viewer client, for fals the ScenarioServer starts the
+         * simulation immediately
+         */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
         File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
         /** geographic information */
@@ -88,14 +96,18 @@ public enum ScenarioServer {
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
         SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
-        /** load MATSim configs - including av.xml configurations, load routing packages */
+        /**
+         * load MATSim configs - including av.xml configurations, load routing
+         * packages
+         */
         GlobalAssert.that(configFile.exists());
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
         config.planCalcScore().addActivityParams(new ActivityParams("activity"));
         for (ActivityParams activityParams : config.planCalcScore().getActivityParams()) {
-            activityParams.setTypicalDuration(3600.0); // TODO fix this to meaningful values
+            activityParams.setTypicalDuration(3600.0); // TODO fix this to
+                                                       // meaningful values
         }
 
         /** output directory for saving results */
@@ -124,20 +136,21 @@ public enum ScenarioServer {
         controler.addOverridingModule(new AmodeusDispatcherModule());
         controler.addOverridingModule(new AmodeusDatabaseModule(db));
 
-        /** uncomment to include custom routers
-         * controler.addOverridingModule(new AbstractModule() {
+        /**
+         * uncomment to include custom routers controler.addOverridingModule(new
+         * AbstractModule() {
          * 
-         * @Override
-         *           public void install() {
-         *           bind(CustomRouter.Factory.class);
+         * @Override public void install() { bind(CustomRouter.Factory.class);
          *           AVUtils.bindRouterFactory(binder(),
          *           CustomRouter.class.getSimpleName()).to(CustomRouter.Factory.class);
          * 
-         *           }
-         *           }); */
+         *           } });
+         */
 
-        /** You need to activate this if you want to use a dispatcher that needs a virtual
-         * network! */
+        /**
+         * You need to activate this if you want to use a dispatcher that needs
+         * a virtual network!
+         */
         controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
         controler.addOverridingModule(new AmodeusMPCSetupModule());
@@ -151,91 +164,111 @@ public enum ScenarioServer {
             }
         });
         controler.addOverridingModule(new AmodeusModule());
-        
-        /** here an additional user-defined dispatcher is added, functionality in class
-         * DemoDispatcher */
-//        controler.addOverridingModule(new AbstractModule() {
-//            @Override
-//            public void install() {
-//                AVUtils.registerDispatcherFactory(binder(), "SMPCRebalancer", SMPCRebalancer.Factory.class);                
-//            }
-//        });
-        
-        /** here an additional user-defined dispatcher is added, functionality in class
-         * DemoDispatcher */
-//        controler.addOverridingModule(new AbstractModule() {
-//            @Override
-//            public void install() {
-//                AVUtils.registerDispatcherFactory(binder(), "CarPooling2Dispatcher", CarPooling2Dispatcher.Factory.class);                
-//            }
-//        });
-        
-        /** here an additional user-defined dispatcher is added, functionality in class
-         * DemoDispatcher */
+
+        /**
+         * here an additional user-defined dispatcher is added, functionality in
+         * class DemoDispatcher
+         */
+        // controler.addOverridingModule(new AbstractModule() {
+        // @Override
+        // public void install() {
+        // AVUtils.registerDispatcherFactory(binder(), "SMPCRebalancer",
+        // SMPCRebalancer.Factory.class);
+        // }
+        // });
+
+        /**
+         * here an additional user-defined dispatcher is added, functionality in
+         * class DemoDispatcher
+         */
+        // controler.addOverridingModule(new AbstractModule() {
+        // @Override
+        // public void install() {
+        // AVUtils.registerDispatcherFactory(binder(), "CarPooling2Dispatcher",
+        // CarPooling2Dispatcher.Factory.class);
+        // }
+        // });
+
+        /**
+         * here an additional user-defined dispatcher is added, functionality in
+         * class DemoDispatcher
+         */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 AVUtils.registerDispatcherFactory(binder(), "DemoDispatcher", DemoDispatcher.Factory.class);
             }
         });
-        
-//        /** here an additional user-defined dispatcher is added, functionality in class
-//         * DemoDispatcher */
-//        controler.addOverridingModule(new AbstractModule() {
-//            @Override
-//            public void install() {
-//                AVUtils.registerDispatcherFactory(binder(), "ICRApoolingDispatcher", ICRApoolingDispatcher.Factory.class);                
-//            }
-//        });
-        
-        /** here an additional user-defined dispatcher is added, functionality in class
-         * DemoDispatcher */
+
+        // /** here an additional user-defined dispatcher is added,
+        // functionality in class
+        // * DemoDispatcher */
+        // controler.addOverridingModule(new AbstractModule() {
+        // @Override
+        // public void install() {
+        // AVUtils.registerDispatcherFactory(binder(), "ICRApoolingDispatcher",
+        // ICRApoolingDispatcher.Factory.class);
+        // }
+        // });
+
+        /**
+         * here an additional user-defined dispatcher is added, functionality in
+         * class DemoDispatcher
+         */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "RemoteControllerDispatcher", RemoteControllerDispatcher.Factory.class);                
+                AVUtils.registerDispatcherFactory(binder(), "RemoteControllerDispatcher",
+                        RemoteControllerDispatcher.Factory.class);
             }
         });
-        
-        
-//        /** here an additional user-defined dispatcher is added, functionality in class
-//         * DemoDispatcher */
-//        controler.addOverridingModule(new AbstractModule() {
-//            @Override
-//            public void install() {
-//                AVUtils.registerDispatcherFactory(binder(), "IAMoDdispatcher", IAMoDdispatcher.Factory.class);                
-//            }
-//        });
-        
-        
-        /** here an additional user-defined initial placement logic called generator is added,
-         * functionality in class DemoGenerator */
-//        controler.addOverridingModule(new AbstractModule() {
-//            @Override
-//            public void install() {
-//                AVUtils.registerGeneratorFactory(binder(), "DemoGenerator", DemoGenerator.Factory.class);
-//            }
-//        });
 
-        /** You need to activate this if you want to use a dispatcher that needs a virtual
-         * network! */
+        // /** here an additional user-defined dispatcher is added,
+        // functionality in class
+        // * DemoDispatcher */
+        // controler.addOverridingModule(new AbstractModule() {
+        // @Override
+        // public void install() {
+        // AVUtils.registerDispatcherFactory(binder(), "IAMoDdispatcher",
+        // IAMoDdispatcher.Factory.class);
+        // }
+        // });
+
+        /**
+         * here an additional user-defined initial placement logic called
+         * generator is added, functionality in class DemoGenerator
+         */
+        // controler.addOverridingModule(new AbstractModule() {
+        // @Override
+        // public void install() {
+        // AVUtils.registerGeneratorFactory(binder(), "DemoGenerator",
+        // DemoGenerator.Factory.class);
+        // }
+        // });
+
+        /**
+         * You need to activate this if you want to use a dispatcher that needs
+         * a virtual network!
+         */
         if (true) {
             controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         }
-        
-        /** You need to activate this if you want to use a MPC dispatcher that needs a virtual
-         * network! */
+
+        /**
+         * You need to activate this if you want to use a MPC dispatcher that
+         * needs a virtual network!
+         */
         if (true) {
             controler.addOverridingModule(new AmodeusMPCSetupModule());
         }
-        
+
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 bind(IAMoDRouter.Factory.class);
                 AVUtils.bindRouterFactory(binder(), IAMoDRouter.class.getSimpleName()).to(IAMoDRouter.Factory.class);
             }
-         });
+        });
 
         /** run simulation */
         controler.run();
@@ -243,15 +276,24 @@ public enum ScenarioServer {
         /** close port for visualizaiton */
         SimulationServer.INSTANCE.stopAccepting();
 
-        /** perform analysis of simulation, a demo of how to add custom
-         * analysis methods is provided in the package amod.demo.analysis */
+        /**
+         * perform analysis of simulation, a demo of how to add custom analysis
+         * methods is provided in the package amod.demo.analysis
+         */
         Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory), db);
         CustomAnalysis.addTo(analysis);
         analysis.run();
 
+        { /** create a video if environment variable is set */
+            if (scenarioOptions.getMakeVideo()) {
+                new VideoGenerator(workingDirectory).start();
+            }
+        }
+
     }
 
     public static void clearMemory() {
-        // TODO clear memory for the sequential server such that RAM is not limiting
+        // TODO clear memory for the sequential server such that RAM is not
+        // limiting
     }
 }
