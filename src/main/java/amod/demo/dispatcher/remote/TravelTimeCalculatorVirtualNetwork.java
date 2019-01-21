@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualLink;
 import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetwork;
@@ -26,17 +27,23 @@ public static Tensor computeTravelTimes(VirtualNetwork<Link> virtualNetwork, Sca
         Tensor tTimes = Array.zeros(virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
         Collection<VirtualLink<Link>> vLinks = virtualNetwork.getVirtualLinks();
         
-        for(VirtualLink<Link> vLink : vLinks){
-            VirtualNode<Link> fromNode = vLink.getFrom();
-            VirtualNode<Link> toNode = vLink.getTo();
-            
-            Link linkFrom = linkList.get(fromNode.getIndex());
-                       
-            Link linkTo = linkList.get(toNode.getIndex());
-            
-            Scalar travelTime = timeFromTo(linkFrom, linkTo, now, router);
-            
-            tTimes.set(travelTime, fromNode.getIndex(), toNode.getIndex());
+        for(int i=0; i<virtualNetwork.getvNodesCount(); i++) {
+            for(int j=0; j<virtualNetwork.getvNodesCount(); j++) {
+                
+                Link linkFrom = linkList.get(i);
+                GlobalAssert.that(virtualNetwork.getVirtualNode(i).getLinks().contains(linkFrom));
+                           
+                Link linkTo = linkList.get(j);
+                GlobalAssert.that(virtualNetwork.getVirtualNode(j).getLinks().contains(linkTo));
+                
+                Scalar travelTime = timeFromTo(linkFrom, linkTo, now, router);
+                if(i!=j && travelTime.equals(Quantity.of(0, SI.SECOND))) {
+                    GlobalAssert.that(false);
+                }
+                
+                tTimes.set(travelTime, i, j);
+                
+            }
         }
         
         return tTimes;
@@ -56,6 +63,9 @@ private static Scalar timeFromTo(Link from, Link to, Scalar now, AVRouter router
         travelTime = path.get().travelTime;
     } catch (Exception e) {
         System.err.println("Calculation of expected arrival failed.");
+    }
+    if(travelTime==0) {
+        System.out.println("zero travel time!!");
     }
     return Quantity.of(travelTime, SI.SECOND);
 }

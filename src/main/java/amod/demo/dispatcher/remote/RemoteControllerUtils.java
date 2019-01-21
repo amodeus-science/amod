@@ -46,22 +46,22 @@ public enum RemoteControllerUtils {
 
         int nodeNumber = virtualNetwork.getvNodesCount();
         Tensor travelTimesInteger = Array.zeros(nodeNumber, nodeNumber);
-        Collection<VirtualLink<Link>> vLinks = virtualNetwork.getVirtualLinks();
 
-        for (VirtualLink<Link> link : vLinks) {
-            int fromNode = link.getFrom().getIndex();
-            int toNode = link.getTo().getIndex();
-            double timeI = Math.round(travelTimes.Get(fromNode, toNode).number().doubleValue() / (timeStep * 60));
-            travelTimesInteger.set(DoubleScalar.of(timeI), fromNode, toNode);
-            if (travelTimesInteger.Get(fromNode, toNode).number().doubleValue() == 0) {
-                travelTimesInteger.set(DoubleScalar.of(1), fromNode, toNode);
+        for(int i=0; i<nodeNumber; i++) {
+            for(int j=0; j<nodeNumber; j++) {
+                double timeI = Math.round(travelTimes.Get(i, j).number().doubleValue() / (timeStep * 60));
+                travelTimesInteger.set(DoubleScalar.of(timeI), i, j);
+                if(i==j) {
+                    travelTimesInteger.set(DoubleScalar.of(1), i, j);
+                }
+                
+                if (travelTimesInteger.Get(i, j).number().doubleValue() == 0) {
+                    travelTimesInteger.set(DoubleScalar.of(1), i, j);
+                }
+                
             }
-
         }
-
-        for (int i = 0; i < nodeNumber; ++i) {
-            travelTimesInteger.set(DoubleScalar.of(1), i, i);
-        }
+        
 
         return travelTimesInteger;
 
