@@ -83,7 +83,7 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
     private final boolean allowAssistance;
     private List<Link> linkList;
     static private final Logger logger = Logger.getLogger(RemoteControllerDispatcher.class);
-    private final int reserveFleet;
+    private int reserveFleet;
     private final boolean discardAVRequetsFlag;
     private int maxDrivingEmptyCars;
     private final boolean checkControlInputsFlag;
@@ -126,8 +126,7 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
         this.router = router;
         this.predictedDemand = false;
         this.allowAssistance = mpcSetup.getAssistanceFlag();
-        this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);
-        this.reserveFleet = 20;
+        this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);   
         this.discardAVRequetsFlag = false;
         this.maxDrivingEmptyCars = 10000;
         this.checkControlInputsFlag = true;
@@ -141,6 +140,8 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
         final long round_now = Math.round(now);
         
         if (round_now % dispatchPeriod == 0 && round_now >= dispatchPeriod) {
+            
+            reserveFleet = Math.toIntExact(Math.round(0.1 * getRoboTaxis().size()));
 
             // travel times
             Tensor travelTimes = TravelTimeCalculatorVirtualNetwork.computeTravelTimes(virtualNetwork,
