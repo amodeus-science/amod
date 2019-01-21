@@ -2,7 +2,6 @@ package amod.demo.dispatcher.remote;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -202,7 +201,6 @@ public enum RemoteControllerUtils {
         int endTime = (int) config.qsim().getEndTime();
         Set<Request> avRequests = PopulationTools.getAVRequests(population, network, endTime);
         double flowsCounter = 0;
-        System.out.println(avRequests.size());
         for (int t = 0; t < planningHorizon; t++) {
             for (Request avRequest : avRequests) {
                 double startTime = avRequest.startTime();

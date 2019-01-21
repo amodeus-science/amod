@@ -155,7 +155,7 @@ public class LPOptimalFlow {
             GLPK.glp_init_iocp(parmMILP);
             parmMILP.setPresolve(GLPK.GLP_ON);
             parmMILP.setMip_gap(0.1);
-//            parm.setTm_lim(10000);
+            parmMILP.setTm_lim(10000);
             ret = GLPK.glp_intopt(lp, parmMILP); // ret==0 indicates of the
             // algorithm ran correctly
             stat = GLPK.glp_mip_status(lp);
@@ -384,11 +384,9 @@ public class LPOptimalFlow {
                         r_ij.set(RealScalar.of(0), i, j);
                         r_ijNotRound.set(RealScalar.of(0), i, j);
                     } else {
-                        System.out.println(GLPK.glp_get_col_prim(lp, indexR));
                         r_ij.set(RealScalar.of(Math.round(GLPK.glp_get_col_prim(lp, indexR))), i, j);
                         r_ijNotRound.set(RealScalar.of(GLPK.glp_get_col_prim(lp, indexR)), i, j);
                     }
-                    System.out.println(GLPK.glp_get_col_prim(lp, indexX));
                     x_ij.set(RealScalar.of(Math.round(GLPK.glp_get_col_prim(lp, indexX))), i, j);
                     x_ijNotRound.set(RealScalar.of(GLPK.glp_get_col_prim(lp, indexX)), i, j);
                 }
