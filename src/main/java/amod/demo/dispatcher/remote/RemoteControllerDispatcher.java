@@ -126,7 +126,7 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
         this.router = router;
         this.predictedDemand = false;
         this.allowAssistance = mpcSetup.getAssistanceFlag();
-        this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);   
+        this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);
         this.discardAVRequetsFlag = false;
         this.maxDrivingEmptyCars = 10000;
         this.checkControlInputsFlag = true;
@@ -138,9 +138,9 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
     protected void redispatch(double now) {
 
         final long round_now = Math.round(now);
-        
+
         if (round_now % dispatchPeriod == 0 && round_now >= dispatchPeriod) {
-            
+
             reserveFleet = Math.toIntExact(Math.round(0.1 * getRoboTaxis().size()));
 
             // travel times
@@ -161,8 +161,7 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
             linkWait.setLinkWait(linkMap);
 
             List<AVRequest> requests = getUnassignedAVRequests();
-            int[][] pastUnassignedRequests = new int[virtualNetwork.getvNodesCount()][virtualNetwork
-                    .getvNodesCount()];
+            int[][] pastUnassignedRequests = new int[virtualNetwork.getvNodesCount()][virtualNetwork.getvNodesCount()];
             for (AVRequest req : requests) {
                 int fromLink = virtualNetwork.getVirtualNode(req.getFromLink()).getIndex();
                 int toLink = virtualNetwork.getVirtualNode(req.getToLink()).getIndex();
@@ -175,46 +174,46 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
                 for (int j = 0; j < virtualNetwork.getvNodesCount(); j++) {
                     int flowsOutUnassigned = flowsOut.Get(i, j, 0).number().intValue() + pastUnassignedRequests[i][j];
                     flowsOut.set(DoubleScalar.of(flowsOutUnassigned), i, j, 0);
-                    for(int t=0; t<planningHorizon; t++) {
-                        sumFlow = flowsOut.Get(i,j,t).number().doubleValue() + sumFlow;
+                    for (int t = 0; t < planningHorizon; t++) {
+                        sumFlow = flowsOut.Get(i, j, t).number().doubleValue() + sumFlow;
                     }
                 }
             }
-            
+
             Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi = getVirtualNodeStayRoboTaxi();
             Map<VirtualNode<Link>, List<RoboTaxi>> rebalancingTaxi = getDestinationVirtualNodeRedirectOnlyRoboTaxi();
             Collection<RoboTaxi> oneCustomerRoboTaxi = getRoboTaxisWithNumberOfCustomer(1);
 
             Tensor rState = RemoteControllerUtils.getRState(round_now, planningHorizon, timeStep, fixedCarCapacity,
                     stayRoboTaxi, rebalancingTaxi, oneCustomerRoboTaxi, virtualNetwork, router);
-            
+
             int sumRstate = 0;
-            for(int i=0; i<nVNodes; i++) {
-                for(int t=0; t<planningHorizon; t++) {
-                    sumRstate = sumRstate + rState.Get(i,t).number().intValue();
+            for (int i = 0; i < nVNodes; i++) {
+                for (int t = 0; t < planningHorizon; t++) {
+                    sumRstate = sumRstate + rState.Get(i, t).number().intValue();
                 }
             }
-            
-            if(sumRstate != getRoboTaxis().size()) {
+
+            if (sumRstate != getRoboTaxis().size()) {
                 logger.warn("Not all starter vehicles are captured");
             }
-                        
+
             boolean isFlowsZero;
-            
-            if(skipZeroFlow==false) {
+
+            if (skipZeroFlow == false) {
                 isFlowsZero = false;
             } else {
-                if(sumFlow==0) {
+                if (sumFlow == 0) {
                     isFlowsZero = true;
                 } else {
                     isFlowsZero = false;
                 }
-                
+
             }
-            
-            if(isFlowsZero==false) {
-                LPOptimalFlow milpOptimalFlow = new LPOptimalFlow(virtualNetwork, planningHorizon, travelTimesStations, rState,
-                        flowsOut, milpFlag);
+
+            if (isFlowsZero == false) {
+                LPOptimalFlow milpOptimalFlow = new LPOptimalFlow(virtualNetwork, planningHorizon, travelTimesStations,
+                        rState, flowsOut, milpFlag);
                 milpOptimalFlow.initiateLP();
                 milpOptimalFlow.solveLP(false);
                 Tensor r_ij = milpOptimalFlow.getr_ij();
@@ -225,11 +224,11 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
             } else {
                 Tensor r_ij = Array.zeros(virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
                 Tensor x_ij = Array.zeros(virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
-                
+
                 rControl = new RControl(r_ij);
                 xControl = new XControl(x_ij);
             }
-            
+
             dispatchTime = round_now;
 
         }
@@ -238,7 +237,7 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
         if ((round_now % 10 == 0 && round_now > dispatchPeriod && round_now >= dispatchTime
                 && round_now < (dispatchTime + timeStep * 60))
                 || (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60))) {
-            Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi = getVirtualNodeStayWithoutCustomerOrRebalanceRoboTaxi();
+            Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi = getVirtualNodeStayWithoutCustomerRoboTaxi();
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests = getVirtualNodeFromAVRequest();
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests = getVirtualNodeToAVRequest();
             Collection<RoboTaxi> emptyDrivingVehicles = getEmptyDrivingRoboTaxis();
@@ -249,8 +248,10 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
                 if (xZOControlPolicy != null) {
                     for (Pair<RoboTaxi, AVRequest> pair : xZOControlPolicy) {
                         RoboTaxi roboTaxi = pair.getLeft();
-                        if (!roboTaxi.getUnmodifiableViewOfCourses().isEmpty() && roboTaxi.getUnmodifiableViewOfCourses().size() == 1
-                                && roboTaxi.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
+                        if (!roboTaxi.getUnmodifiableViewOfCourses().isEmpty()
+                                && roboTaxi.getUnmodifiableViewOfCourses().size() == 1
+                                && roboTaxi.getUnmodifiableViewOfCourses().get(0)
+                                        .getMealType() == SharedMealType.REDIRECT) {
                             roboTaxi.cleanAndAbandonMenu();
                             GlobalAssert.that(roboTaxi.getUnmodifiableViewOfCourses().isEmpty());
                         }
@@ -293,8 +294,10 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
                             continue;
                         }
 
-                        if (!roboTaxi.getUnmodifiableViewOfCourses().isEmpty() && roboTaxi.getUnmodifiableViewOfCourses().size() == 1
-                                && roboTaxi.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT) {
+                        if (!roboTaxi.getUnmodifiableViewOfCourses().isEmpty()
+                                && roboTaxi.getUnmodifiableViewOfCourses().size() == 1
+                                && roboTaxi.getUnmodifiableViewOfCourses().get(0)
+                                        .getMealType() == SharedMealType.REDIRECT) {
                             roboTaxi.cleanAndAbandonMenu();
                         }
 
@@ -317,7 +320,7 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
                 && round_now < (dispatchTime + timeStep * 60) && getRoboTaxisFree().size() > reserveFleet
                 && allowAssistance == true)
                 || (round_now > dispatchPeriod && round_now == (dispatchTime - 1 + timeStep * 60)
-                        && getRoboTaxisFree().size() > 100 && allowAssistance == true)) {
+                        && getRoboTaxisFree().size() > reserveFleet && allowAssistance == true)) {
             for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
                 for (VirtualNode<Link> toNode : virtualNetwork.getVirtualNodes()) {
                     Tensor controlLawX = xControl.getControlLawX();
@@ -341,7 +344,9 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
 
                                 if (emptyDrivingVehicles.size() >= maxDrivingEmptyCars) {
                                     List<RoboTaxi> rebalancingCars = availableCars.stream()
-                                            .filter(car -> !car.getUnmodifiableViewOfCourses().isEmpty() && car.getUnmodifiableViewOfCourses().get(0).getMealType().equals(SharedMealType.REDIRECT))
+                                            .filter(car -> !car.getUnmodifiableViewOfCourses().isEmpty()
+                                                    && car.getUnmodifiableViewOfCourses().get(0).getMealType()
+                                                            .equals(SharedMealType.REDIRECT))
                                             .collect(Collectors.toList());
                                     if (rebalancingCars.isEmpty()) {
                                         continue;
@@ -352,8 +357,9 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
 
                                 RoboTaxi closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest,
                                         availableCars);
-                                if (!closestRoboTaxi.getUnmodifiableViewOfCourses().isEmpty() && closestRoboTaxi.getUnmodifiableViewOfCourses().get(0)
-                                        .getMealType() == SharedMealType.REDIRECT) {
+                                if (!closestRoboTaxi.getUnmodifiableViewOfCourses().isEmpty()
+                                        && closestRoboTaxi.getUnmodifiableViewOfCourses().get(0)
+                                                .getMealType() == SharedMealType.REDIRECT) {
                                     closestRoboTaxi.cleanAndAbandonMenu();
                                     GlobalAssert.that(RoboTaxiUtils.checkMenuConsistency(closestRoboTaxi));
                                 }
@@ -405,14 +411,15 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
             double numberX = 0;
             for (VirtualNode<Link> fromNode : virtualNetwork.getVirtualNodes()) {
                 for (VirtualNode<Link> toNode : virtualNetwork.getVirtualNodes()) {
-                    double rebalancequeue = controlLawRebalance.Get(fromNode.getIndex(), toNode.getIndex()).number().doubleValue();
+                    double rebalancequeue = controlLawRebalance.Get(fromNode.getIndex(), toNode.getIndex()).number()
+                            .doubleValue();
                     numberRebalance = numberRebalance + rebalancequeue;
                     double xque = controlLawX.Get(fromNode.getIndex(), toNode.getIndex()).number().doubleValue();
                     numberX = numberX + xque;
                     if (xque != 0) {
                         List<AVRequest> fromRequests = getVirtualNodeFromAVRequest().get(fromNode);
                         List<AVRequest> toRequests = getVirtualNodeToAVRequest().get(toNode);
-                        List<RoboTaxi> freecar = getVirtualNodeStayWithoutCustomerOrRebalanceRoboTaxi().get(fromNode);
+                        List<RoboTaxi> freecar = getVirtualNodeStayWithoutCustomerRoboTaxi().get(fromNode);
                         List<AVRequest> fromToRequest = fromRequests.stream().filter(req -> toRequests.contains(req))
                                 .collect(Collectors.toList());
                         GlobalAssert.that(freecar.isEmpty() || fromToRequest.isEmpty());
@@ -455,21 +462,11 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
                         || (car.getUnmodifiableViewOfCourses().size() == 1
                                 && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT
                                 && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
-                                        .getVirtualNode(car.getDivertableLocation())))
+                                        .getVirtualNode(car.getDivertableLocation()) && car.isDivertable()))
                 .collect(Collectors.toList());
         return virtualNetwork.binToVirtualNode(taxiList, RoboTaxi::getDivertableLocation);
     }
 
-    private Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayWithoutCustomerOrRebalanceRoboTaxi() {
-        List<RoboTaxi> taxiList = getRoboTaxis().stream()
-                .filter(car -> (car.isInStayTask() && RoboTaxiUtils.getNumberOnBoardRequests(car) == 0
-                        && car.getUnmodifiableViewOfCourses().size() == 1
-                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT
-                                && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
-                                        .getVirtualNode(car.getDivertableLocation())))
-                .collect(Collectors.toList());
-        return virtualNetwork.binToVirtualNode(taxiList, RoboTaxi::getDivertableLocation);
-    }
 
     private Map<VirtualNode<Link>, List<RoboTaxi>> getDestinationVirtualNodeRedirectOnlyRoboTaxi() {
         List<RoboTaxi> rebalancingTaxi = getRoboTaxisWithNumberOfCustomer(0).stream()
@@ -504,25 +501,6 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
                 .collect(Collectors.toList());
     }
 
-    protected final Collection<RoboTaxi> getRoboTaxisAvailable(AVRequest avRequest) {
-        VirtualNode<Link> toVirtualNode = virtualNetwork.getVirtualNode(avRequest.getToLink());
-        List<RoboTaxi> availableCars = getRoboTaxis().stream() //
-                .filter(car -> (car.isInStayTask() && RoboTaxiUtils.getNumberOnBoardRequests(car) == 0
-                        && car.getUnmodifiableViewOfCourses().size() == 1
-                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT
-                                && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
-                                        .getVirtualNode(car.getDivertableLocation()))
-                        || (car.getUnmodifiableViewOfCourses().size() == 1
-                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.DROPOFF
-                                && toVirtualNode.getLinks().contains(car.getCurrentDriveDestination()))
-                        || (car.getUnmodifiableViewOfCourses().size() == 2
-                                && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT
-                                && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
-                                        .getVirtualNode(car.getDivertableLocation())
-                                && toVirtualNode.getLinks().contains(car.getUnmodifiableViewOfCourses().get(1).getLink()))) //
-                .collect(Collectors.toList());
-        return availableCars;
-    }
 
     protected final Collection<RoboTaxi> getRoboTaxisAvailableSO() {
         List<RoboTaxi> availableCars = getRoboTaxis().stream() //
@@ -531,14 +509,15 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
                         || (car.getUnmodifiableViewOfCourses().size() == 1
                                 && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT
                                 && virtualNetwork.getVirtualNode(car.getCurrentDriveDestination()) == virtualNetwork
-                                        .getVirtualNode(car.getDivertableLocation())))
+                                        .getVirtualNode(car.getDivertableLocation()) && car.isDivertable()))
                 .collect(Collectors.toList());
         return availableCars;
     }
 
     protected final Collection<RoboTaxi> getEmptyDrivingRoboTaxis() {
         List<RoboTaxi> availableCars = getRoboTaxis().stream() //
-                .filter(car -> (RoboTaxiUtils.getNumberOnBoardRequests(car) == 0 && car.getUnmodifiableViewOfCourses().size() == 1
+                .filter(car -> (RoboTaxiUtils.getNumberOnBoardRequests(car) == 0
+                        && car.getUnmodifiableViewOfCourses().size() == 1
                         && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT)
                         || (car.getUnmodifiableViewOfCourses().size() == 2
                                 && car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.PICKUP))
@@ -563,7 +542,7 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
 
         @Inject(optional = true)
         private VirtualNetwork<Link> virtualNetwork;
-        
+
         @Inject(optional = true)
         private MPCsetup mpcSetup;
 
@@ -582,7 +561,8 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
                     EuclideanDistanceFunction.INSTANCE);
 
             return new RemoteControllerDispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager,
-                    network, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData, mpcSetup, db);
+                    network, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher, travelData, mpcSetup,
+                    db);
         }
     }
 
