@@ -286,11 +286,11 @@ public enum ScenarioServer {
 
         { /** create a video if environment variable is set */
             if (scenarioOptions.getMakeVideo()) {
-                new VideoGenerator(workingDirectory).start();
-                scenarioOptions.setMakeVideo(false);
+                VideoGenerator videoGenerator = new VideoGenerator(workingDirectory);
+                videoGenerator.start();
             }
         }
-
+        
     }
 
     public static void clearMemory() {
