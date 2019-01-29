@@ -23,6 +23,7 @@ import com.google.inject.name.Names;
 import amod.demo.analysis.CustomAnalysis;
 import amod.demo.dispatcher.DemoDispatcher;
 import amod.demo.dispatcher.remote.RemoteControllerDispatcher;
+import amod.demo.dispatcher.remote.TestParking;
 import amod.demo.ext.Static;
 //import amod.demo.generator.DemoGenerator;
 import amod.demo.router.IAMoDRouter;
@@ -32,6 +33,7 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusAVSpatialCapacity;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusMPCSetupModule;
@@ -154,6 +156,7 @@ public enum ScenarioServer {
         controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
         controler.addOverridingModule(new AmodeusMPCSetupModule());
+        controler.addOverridingModule(new AmodeusAVSpatialCapacity(network));
 
         // ===============================================
 
@@ -220,6 +223,15 @@ public enum ScenarioServer {
             public void install() {
                 AVUtils.registerDispatcherFactory(binder(), "RemoteControllerDispatcher",
                         RemoteControllerDispatcher.Factory.class);
+            }
+        });
+        
+              
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerDispatcherFactory(binder(), "TestParking",
+                        TestParking.Factory.class);
             }
         });
 
