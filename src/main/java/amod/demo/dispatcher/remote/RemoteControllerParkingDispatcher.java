@@ -263,8 +263,6 @@ public class RemoteControllerParkingDispatcher extends SharedMPCPartitionedDispa
                         SharedCourse redirectCourse = SharedCourse.redirectCourse(parkingLink, //
                                 Double.toString(now) + roboTaxi.getId().toString());
                         addSharedRoboTaxiRedirect(roboTaxi, redirectCourse);
-                        roboTaxi.moveAVCourseToNext(redirectCourse);
-                        roboTaxi.moveAVCourseToNext(redirectCourse);
                         
                         GlobalAssert.that(roboTaxi.getUnmodifiableViewOfCourses().size() == 3);
                         GlobalAssert.that(roboTaxi.getUnmodifiableViewOfCourses().get(2).getMealType().equals(SharedMealType.REDIRECT));
