@@ -19,10 +19,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-
 import amod.demo.analysis.CustomAnalysis;
 import amod.demo.dispatcher.DemoDispatcher;
 import amod.demo.dispatcher.remote.RemoteControllerDispatcher;
+import amod.demo.dispatcher.remote.RemoteControllerParkingDispatcher;
 import amod.demo.ext.Static;
 //import amod.demo.generator.DemoGenerator;
 import amod.demo.router.IAMoDRouter;
@@ -220,6 +220,18 @@ public enum ScenarioServer {
             public void install() {
                 AVUtils.registerDispatcherFactory(binder(), "RemoteControllerDispatcher",
                         RemoteControllerDispatcher.Factory.class);
+            }
+        });
+        
+        /**
+         * here an additional user-defined dispatcher is added, functionality in
+         * class DemoDispatcher
+         */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.registerDispatcherFactory(binder(), "RemoteControllerParkingDispatcher",
+                        RemoteControllerParkingDispatcher.Factory.class);
             }
         });
 

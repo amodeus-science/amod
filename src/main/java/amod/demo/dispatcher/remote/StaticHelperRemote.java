@@ -15,6 +15,7 @@ import org.matsim.core.network.NetworkUtils;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNode;
 import ch.ethz.matsim.av.passenger.AVRequest;
 
 public enum StaticHelperRemote {
@@ -125,6 +126,7 @@ public enum StaticHelperRemote {
         }
         return linkAVRequestMap;
     }
+    
 
 }
 
