@@ -24,8 +24,11 @@ import ch.ethz.matsim.av.config.AVConfig;
 import ch.ethz.matsim.av.config.AVGeneratorConfig;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 
-/** Class to prepare a given scenario for MATSim, includes preparation of
+/** Deprecated: use the new {@link ScenarioPreparerBasic} instead
+ * 
+ * Class to prepare a given scenario for MATSim, includes preparation of
  * network, population, creation of virtualNetwork and travelData objects. */
+@Deprecated
 public enum ScenarioPreparer {
     ;
 

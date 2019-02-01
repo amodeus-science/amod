@@ -47,8 +47,10 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.framework.AVUtils;
 
-/** only one ScenarioServer can run at one time, since a fixed network port is
+/** Deprecated: Use the new {@link ScenarioServerBasic} instead
+ * only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
+@Deprecated
 public enum ScenarioServer {
     ;
 
