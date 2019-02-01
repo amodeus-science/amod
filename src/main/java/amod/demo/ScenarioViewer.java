@@ -21,7 +21,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
+import ch.ethz.idsc.amodeus.virtualnetwork.core.VirtualNetworkGet;
 
 /** the viewer allows to connect to the scenario server or to view saved simulation results. */
 public enum ScenarioViewer {
@@ -45,7 +45,10 @@ public enum ScenarioViewer {
         Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
         System.out.println(simOptions.getSimulationConfigName());
         final File outputSubDirectory = new File(config.controler().getOutputDirectory()).getAbsoluteFile();
-        GlobalAssert.that(outputSubDirectory.isDirectory());
+        if(!outputSubDirectory.isDirectory()){
+            System.err.println("output directory: " +  outputSubDirectory.getAbsolutePath() + " not found.");
+            GlobalAssert.that(false);
+        }
         System.out.println("outputSubDirectory=" + outputSubDirectory);
         System.out.println(outputSubDirectory.getAbsolutePath());
         File outputDirectory = outputSubDirectory.getParentFile();
