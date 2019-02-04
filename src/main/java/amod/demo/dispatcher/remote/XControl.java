@@ -32,7 +32,7 @@ public class XControl {
             Map<VirtualNode<Link>, List<RoboTaxi>> stayRoboTaxi,
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVFromRequests,
             Map<VirtualNode<Link>, List<AVRequest>> virtualNodeAVToRequests, List<Link> linkList,
-            Collection<RoboTaxi> emptyDrivingVehicles, int maxDrivingEmptyCars) throws Exception {
+            Collection<RoboTaxi> emptyDrivingVehicles, int maxDrivingEmptyCars, boolean firstRebalance) throws Exception {
 
         List<Pair<RoboTaxi, AVRequest>> xCommandsList = new ArrayList<>();
         int numberAssignedCars = 0;
@@ -106,9 +106,23 @@ public class XControl {
                             findRoboTaxi = availableCars;
                             numberAssignedCars = numberAssignedCars + 1;
                         }
-                        RoboTaxi closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest, findRoboTaxi);
-                        availableCars.remove(closestRoboTaxi);
-                        stayRoboTaxi.get(fromNode).remove(closestRoboTaxi);
+                        
+                        RoboTaxi closestRoboTaxi;
+                        
+                        List<RoboTaxi> rebalanceCars = findRoboTaxi.stream().filter(car -> !car.getUnmodifiableViewOfCourses().isEmpty()
+    							&& car.getUnmodifiableViewOfCourses().get(0).getMealType() == SharedMealType.REDIRECT)
+    							.collect(Collectors.toList());
+                        
+                        if(!rebalanceCars.isEmpty() && firstRebalance) {
+                        	closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest, rebalanceCars);
+                        	rebalanceCars.remove(closestRoboTaxi);
+                            availableCars.remove(closestRoboTaxi);
+                            stayRoboTaxi.get(fromNode).remove(closestRoboTaxi);
+                        } else {
+                        	closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest, findRoboTaxi);
+                            availableCars.remove(closestRoboTaxi);
+                            stayRoboTaxi.get(fromNode).remove(closestRoboTaxi);
+                        }
 
                         Pair<RoboTaxi, AVRequest> xZOCommands = Pair.of(closestRoboTaxi, avRequest);
                         xCommandsList.add(xZOCommands);

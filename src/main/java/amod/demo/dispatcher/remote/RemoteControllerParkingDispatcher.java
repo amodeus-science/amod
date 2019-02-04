@@ -87,6 +87,7 @@ public class RemoteControllerParkingDispatcher extends SharedMPCPartitionedDispa
     private final boolean skipZeroFlow;
     private final boolean milpFlag;
     private final double rebalancePunisher;
+    private final boolean firstRebalance;
 
     protected RemoteControllerParkingDispatcher(Config config, //
             AVDispatcherConfig avconfig, //
@@ -131,6 +132,7 @@ public class RemoteControllerParkingDispatcher extends SharedMPCPartitionedDispa
         this.skipZeroFlow = true;
         this.milpFlag = mpcSetup.getMILPflag();
         this.rebalancePunisher = mpcSetup.getRebalancePunisher();
+        this.firstRebalance = mpcSetup.getFirstRebalance();
     }
 
     @Override
@@ -243,7 +245,7 @@ public class RemoteControllerParkingDispatcher extends SharedMPCPartitionedDispa
             try {
                 List<Pair<RoboTaxi, AVRequest>> xZOControlPolicy = xControl.getXCommands(virtualNetwork, stayRoboTaxi,
                         virtualNodeAVFromRequests, virtualNodeAVToRequests, linkList, emptyDrivingVehicles,
-                        maxDrivingEmptyCars);
+                        maxDrivingEmptyCars, firstRebalance);
                 if (xZOControlPolicy != null) {
                     for (Pair<RoboTaxi, AVRequest> pair : xZOControlPolicy) {
                         RoboTaxi roboTaxi = pair.getLeft();
@@ -291,7 +293,7 @@ public class RemoteControllerParkingDispatcher extends SharedMPCPartitionedDispa
             try {
                 Collection<RoboTaxi> emptyDrivingVehicles = getEmptyDrivingRoboTaxis();
                 List<Pair<RoboTaxi, Link>> controlPolicy = rControl.getRebalanceCommands(stayRoboTaxi, virtualNetwork,
-                        linkList, emptyDrivingVehicles, maxDrivingEmptyCars);
+                        linkList, emptyDrivingVehicles, maxDrivingEmptyCars, firstRebalance);
                 if (controlPolicy != null) {
                     for (Pair<RoboTaxi, Link> pair : controlPolicy) {
                         RoboTaxi roboTaxi = pair.getLeft();
