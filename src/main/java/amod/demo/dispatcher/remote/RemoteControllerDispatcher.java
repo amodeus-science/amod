@@ -89,6 +89,7 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
     private final boolean checkControlInputsFlag;
     private final boolean skipZeroFlow;
     private final boolean milpFlag;
+    private final double rebalancePunisher;
 
     protected RemoteControllerDispatcher(Config config, //
             AVDispatcherConfig avconfig, //
@@ -132,6 +133,7 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
         this.checkControlInputsFlag = true;
         this.skipZeroFlow = true;
         this.milpFlag = mpcSetup.getMILPflag();
+        this.rebalancePunisher = mpcSetup.getRebalancePunisher();
     }
 
     @Override
@@ -213,7 +215,7 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
 
             if (isFlowsZero == false) {
                 LPOptimalFlow milpOptimalFlow = new LPOptimalFlow(virtualNetwork, planningHorizon, travelTimesStations,
-                        rState, flowsOut, milpFlag);
+                        rState, flowsOut, milpFlag, rebalancePunisher);
                 milpOptimalFlow.initiateLP();
                 milpOptimalFlow.solveLP(false);
                 Tensor r_ij = milpOptimalFlow.getr_ij();

@@ -75,6 +75,7 @@ fabric.properties
 
 # Simulation data
 simulation/
+scenario/
 
 # Matlab data too big
 matlab/SMPC

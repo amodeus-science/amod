@@ -44,6 +44,7 @@ public class LPOptimalFlow {
     private final double tuningCoeffD;
     private final double tuningCoeffR;
     private final boolean milpFlag;
+    private final double rebalancePunisher;
     // ---
     private glp_prob lp;
     private Tensor r_ij;
@@ -59,12 +60,13 @@ public class LPOptimalFlow {
      *            the optimization is computed.
      */
     public LPOptimalFlow(VirtualNetwork<Link> virtualNetwork, int timeHorizon, Tensor travelTimes, Tensor starters,
-            Tensor lambda, boolean milpFlag) {
+            Tensor lambda, boolean milpFlag, double rebalancePunisher) {
         this.timeHorizon = timeHorizon;
         this.travelTimes = travelTimes;
         this.lambda = lambda;
         this.starters = starters;
         this.milpFlag = milpFlag;
+        this.rebalancePunisher = rebalancePunisher;
         nvNodes = virtualNetwork.getvNodesCount();
         nRvariables = nvNodes * nvNodes * timeHorizon;
         nXvariables = nvNodes * nvNodes * timeHorizon;
@@ -347,7 +349,7 @@ public class LPOptimalFlow {
                     
                     int indexR = rIDvarID.get(Arrays.asList(i, j, t));
                     if(i==j) {
-                        double costRii = 0.7*tuningCoeffR * tij;
+                        double costRii = rebalancePunisher*tuningCoeffR * tij;
                         GLPK.glp_set_obj_coef(lp, indexR, costRii);
                     } else {
                         double costRij = tuningCoeffR*tij;
