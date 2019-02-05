@@ -24,7 +24,7 @@ public enum ParkingLinkCalculator {
 
         for (Link link : allLinks) {
             Scalar time = timeFromTo(fromLink, link, now, router);
-            if (time.number().doubleValue() >= 2.25 * 60 && time.number().doubleValue() <= 2.75 * 60) {
+            if (time.number().doubleValue() >= 1.75 * 60 && time.number().doubleValue() <= 2.25 * 60) {
                 return link;
             }
         }

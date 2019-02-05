@@ -130,7 +130,7 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
         this.allowAssistance = mpcSetup.getAssistanceFlag();
         this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);
         this.discardAVRequetsFlag = false;
-        this.maxDrivingEmptyCars = 10000;
+        this.maxDrivingEmptyCars = mpcSetup.getMaxNumberDrivingEmptyVehicles();
         this.checkControlInputsFlag = true;
         this.skipZeroFlow = true;
         this.milpFlag = mpcSetup.getMILPflag();
