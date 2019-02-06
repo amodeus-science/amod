@@ -128,7 +128,7 @@ public class RemoteControllerParkingDispatcher extends SharedMPCPartitionedDispa
         this.linkList = ICRApoolingDispatcherUtils.getLinkforStation(network, config, virtualNetwork);
         this.discardAVRequetsFlag = false;
         this.maxDrivingEmptyCars = mpcSetup.getMaxNumberDrivingEmptyVehicles();
-        this.checkControlInputsFlag = true;
+        this.checkControlInputsFlag = false;
         this.skipZeroFlow = true;
         this.milpFlag = mpcSetup.getMILPflag();
         this.rebalancePunisher = mpcSetup.getRebalancePunisher();
