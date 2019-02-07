@@ -27,7 +27,8 @@ public class RControlParking {
 
 	public List<Pair<RoboTaxi, Link>> getRebalanceCommands(Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles,
 			VirtualNetwork<Link> virtualNetwork, List<Link> linkList, Collection<RoboTaxi> emptyDrivingVehicles,
-			int maxDrivingEmptyCars, boolean firstRebalance, Map<VirtualNode<Link>, List<RoboTaxi>> waitVehicles) throws Exception {
+			int maxDrivingEmptyCars, boolean firstRebalance, Map<VirtualNode<Link>, List<RoboTaxi>> waitVehicles)
+			throws Exception {
 
 		Collection<VirtualNode<Link>> vNodes = virtualNetwork.getVirtualNodes();
 		List<Pair<RoboTaxi, Link>> rebalanceCommandsList = new ArrayList<>();
@@ -39,7 +40,7 @@ public class RControlParking {
 				double controlInput = controlLaw.Get(fromNode.getIndex(), toNode.getIndex()).number().doubleValue();
 				int numberAssignedCars = 0;
 				boolean rebalanceFlag = false;
-				List<RoboTaxi> rebalancingCars = new ArrayList<RoboTaxi>();
+				List<RoboTaxi> rebalancingParkingCars = new ArrayList<RoboTaxi>();
 
 				if (controlInput == 0) {
 					continue;
@@ -52,39 +53,41 @@ public class RControlParking {
 				int iteration = 0;
 
 				for (int i = 1; i <= controlInput; i++) {
-					if (avTaxis.isEmpty()&& waitavTaxis.isEmpty()) {
+					if (avTaxis.isEmpty() && waitavTaxis.isEmpty()) {
 						break;
 					}
-					
-					rebalancingCars = avTaxis.stream()
-							.filter(car -> !car.getUnmodifiableViewOfCourses().isEmpty()
-									&& car.getUnmodifiableViewOfCourses().get(0).getMealType()
-											.equals(SharedMealType.REDIRECT))
+
+					rebalancingParkingCars = avTaxis.stream().filter(
+							car -> (!car.getUnmodifiableViewOfCourses().isEmpty() && car.getUnmodifiableViewOfCourses()
+									.get(0).getMealType().equals(SharedMealType.REDIRECT))
+									|| (!car.getUnmodifiableViewOfCourses().isEmpty()
+											&& car.getUnmodifiableViewOfCourses().get(0).getMealType()
+													.equals(SharedMealType.PARK)))
 							.collect(Collectors.toList());
 
-					if (emptyDrivingVehicles.size() + numberAssignedCars >= maxDrivingEmptyCars) {						
-						if (rebalancingCars.isEmpty()) {
+					if (emptyDrivingVehicles.size() + numberAssignedCars >= maxDrivingEmptyCars) {
+						if (rebalancingParkingCars.isEmpty()) {
 							break;
 						}
 						rebalanceFlag = true;
 					}
-					
+
 					RoboTaxi nextRoboTaxi = null;
 
 					if (rebalanceFlag) {
-						nextRoboTaxi = rebalancingCars.get(0);
-						rebalancingCars.remove(nextRoboTaxi);
+						nextRoboTaxi = rebalancingParkingCars.get(0);
+						rebalancingParkingCars.remove(nextRoboTaxi);
 						avTaxis.remove(nextRoboTaxi);
 						availableVehicles.get(fromNode).remove(nextRoboTaxi);
-					} else {						
-						if(!waitavTaxis.isEmpty()) {
+					} else {
+						if (!waitavTaxis.isEmpty()) {
 							nextRoboTaxi = waitavTaxis.get(0);
 							waitavTaxis.remove(nextRoboTaxi);
 							waitVehicles.get(fromNode).remove(nextRoboTaxi);
 							numberAssignedCars = numberAssignedCars + 1;
-						} else if(!rebalancingCars.isEmpty()){
-							nextRoboTaxi = rebalancingCars.get(0);
-							rebalancingCars.remove(nextRoboTaxi);
+						} else if (!rebalancingParkingCars.isEmpty()) {
+							nextRoboTaxi = rebalancingParkingCars.get(0);
+							rebalancingParkingCars.remove(nextRoboTaxi);
 							avTaxis.remove(nextRoboTaxi);
 							availableVehicles.get(fromNode).remove(nextRoboTaxi);
 						} else {
@@ -93,12 +96,11 @@ public class RControlParking {
 							availableVehicles.get(fromNode).remove(nextRoboTaxi);
 							numberAssignedCars = numberAssignedCars + 1;
 						}
-						
+
 					}
-		
 
 					GlobalAssert.that(nextRoboTaxi != null);
-					
+
 					Link rebalanceLink = linkList.get(toNode.getIndex());
 
 					Pair<RoboTaxi, Link> xZOCommands = Pair.of(nextRoboTaxi, rebalanceLink);
@@ -124,4 +126,3 @@ public class RControlParking {
 	}
 
 }
-
