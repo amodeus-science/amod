@@ -392,11 +392,9 @@ public class RemoteControllerParkingDispatcher extends SharedMPCPartitionedDispa
 								.collect(Collectors.toList());
 						if (!fromToRequests.isEmpty()) {
 							for (AVRequest avRequest : fromToRequests) {
-								Collection<RoboTaxi> availableCars = new ArrayList<RoboTaxi>();
+								Collection<RoboTaxi> availableCars = getVirtualNodeStayWithoutCustomerAndWaitingRoboTaxi().get(fromNode);
 
-								availableCars = getRoboTaxisAvailableSO();
-
-								Collection<RoboTaxi> waitingCars = getAllWaitRoboTaxi();
+								Collection<RoboTaxi> waitingCars = getWaitingCars().get(fromNode);
 
 								if (availableCars.isEmpty() && waitingCars.isEmpty()) {
 									continue;
@@ -422,11 +420,13 @@ public class RemoteControllerParkingDispatcher extends SharedMPCPartitionedDispa
 
 								RoboTaxi closestRoboTaxi = null;
 
-								if (!waitingCars.isEmpty() && rebalance==false) {
-									closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest, waitingCars);
-								} else {
-									closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest, availableCars);
-								}
+//								if (!waitingCars.isEmpty() && rebalance==false) {
+//									closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest, waitingCars);
+//								} else {
+//									closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest, availableCars);
+//								}
+								
+								closestRoboTaxi = StaticHelperRemote.findClostestVehicle(avRequest, availableCars);
 
 								GlobalAssert.that(closestRoboTaxi != null);
 
