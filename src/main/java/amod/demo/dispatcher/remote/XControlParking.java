@@ -83,7 +83,7 @@ public class XControlParking {
 									.get(0).getMealType().equals(SharedMealType.REDIRECT))
 									|| (!car.getUnmodifiableViewOfCourses().isEmpty()
 											&& car.getUnmodifiableViewOfCourses().get(0).getMealType()
-													.equals(SharedMealType.REDIRECT)))
+													.equals(SharedMealType.PARK)))
 							.collect(Collectors.toList());
 
 					if (emptyDrivingVehicles.size() + numberAssignedCars >= maxDrivingEmptyCars) {
