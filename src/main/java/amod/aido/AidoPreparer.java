@@ -22,7 +22,6 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
-import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
 import ch.ethz.idsc.amodeus.util.io.ProvideAVConfig;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
@@ -89,9 +88,8 @@ public class AidoPreparer {
         /** send initial data (bounding box), {{minX, minY}, {maxX, maxY}} */
         double[] bbox = NetworkUtils.getBoundingBox(network.getNodes().values());
 
-        return Tensors.of(
-                TensorCoords.toTensor( //
-                        scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
+        return Tensors.of(TensorCoords.toTensor( //
+                scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
                 TensorCoords.toTensor( //
                         scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[2], bbox[3]))));
     }

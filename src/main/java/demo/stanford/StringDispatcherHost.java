@@ -57,11 +57,10 @@ import ch.ethz.matsim.av.router.AVRouter;
     private final AidoRoboTaxiCompiler aidoRobTaxComp;
     // ---
     private AidoScoreCompiler aidoScoreCompiler;
-    // -- 
+    // --
     private final Network network;
     private final DistanceFunction distanceFunction;
     private final BipartiteMatchingUtils bipartiteMatchingUtils;
-
 
     protected StringDispatcherHost(Network network, Config config, AVDispatcherConfig avDispatcherConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager, //
