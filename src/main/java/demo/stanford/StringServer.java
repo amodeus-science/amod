@@ -31,6 +31,7 @@ import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
+import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -39,6 +40,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.framework.AVUtils;
@@ -122,17 +124,20 @@ import ch.ethz.matsim.av.framework.AVUtils;
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), AidoDispatcherHost.class.getSimpleName(), AidoDispatcherHost.Factory.class);
+                AVUtils.registerDispatcherFactory(binder(), StringDispatcherHost.class.getSimpleName(), StringDispatcherHost.Factory.class);
             }
         });
-        controler.addOverridingModule(new AbstractModule() {            
+        controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 AVUtils.bindGeneratorFactory(binder(), RandomDensityGenerator.class.getSimpleName()).//
-                        to(RandomDensityGenerator.Factory.class);                                
+                to(RandomDensityGenerator.Factory.class);
             }
         });
-        
+
+        /** change the standard AidoDispatcherHost setting in av.xml to
+         * StringDispatcherHost */
+        XmlDispatcherChanger.of(workingDirectory, "StringDispatcherHost");
 
         /** run simulation */
         controler.run();
