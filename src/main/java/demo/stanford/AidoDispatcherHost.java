@@ -44,7 +44,7 @@ import ch.ethz.matsim.av.router.AVRouter;
  * interface.
  * 
  * @author clruch */
-public class StringDispatcherHost extends RebalancingDispatcher {
+/* package */ class AidoDispatcherHost extends RebalancingDispatcher {
     private final MatsimAmodeusDatabase db;
 
     private final Map<Integer, RoboTaxi> idRoboTaxiMap = new HashMap<>();
@@ -63,7 +63,7 @@ public class StringDispatcherHost extends RebalancingDispatcher {
     private final BipartiteMatchingUtils bipartiteMatchingUtils;
 
 
-    protected StringDispatcherHost(Network network, Config config, AVDispatcherConfig avDispatcherConfig, TravelTime travelTime,
+    protected AidoDispatcherHost(Network network, Config config, AVDispatcherConfig avDispatcherConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager, //
             StringSocket clientSocket, int numReqTot, //
             MatsimAmodeusDatabase db) {
@@ -165,7 +165,7 @@ public class StringDispatcherHost extends RebalancingDispatcher {
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
-            return new StringDispatcherHost(network, config, avconfig, travelTime, router, eventsManager, //
+            return new AidoDispatcherHost(network, config, avconfig, travelTime, router, eventsManager, //
                     stringSocket, numReqTot, db);
         }
     }

@@ -16,15 +16,13 @@ public enum StarterHelper {
             @Override
             public void run() {
                 try {
-                    AidoHost.main(args);
+                    StringHost.main(args);
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
             }
         }).start();
-
         Thread.sleep(1000);
-
         /** {@link AidoGuest} executes the dispatching logic of the user participating
          * in the artificial intelligence driving olympics (AIDO) */
         AidoGuest.main(args);
