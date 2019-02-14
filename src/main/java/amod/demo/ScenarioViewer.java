@@ -21,7 +21,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.virtualnetwork.core.VirtualNetworkGet;
+import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
 
 /** the viewer allows to connect to the scenario server or to view saved simulation results. */
 public enum ScenarioViewer {

@@ -29,7 +29,7 @@ import ch.ethz.matsim.av.config.AVConfig;
 import ch.ethz.matsim.av.config.AVGeneratorConfig;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 
-/* package */ class AidoPreparer {
+public class AidoPreparer {
 
     private final Population population;
     private final ScenarioOptions scenOpt;

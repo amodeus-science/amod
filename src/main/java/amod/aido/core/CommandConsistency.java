@@ -8,7 +8,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 
-/* package */ enum CommandConsistency {
+public enum CommandConsistency {
     ;
 
     /** Performs the following consistency checks on the commands received and fails if >=1
