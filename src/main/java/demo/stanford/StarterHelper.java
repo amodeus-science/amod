@@ -6,7 +6,7 @@ import amod.aido.demo.AidoGuest;
 
 /** function starts {@link AidoHost} process and {@link AidoGuest} process
  * in different threads for testing. */
-public enum StarterHelper {
+/* package */ enum StarterHelper {
     ;
 
     public static void main(String[] args) throws Exception {

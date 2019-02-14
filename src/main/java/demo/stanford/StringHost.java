@@ -17,9 +17,11 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.amodeus.video.VideoGenerator;
+import ch.ethz.idsc.tensor.DoubleScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
 
@@ -28,7 +30,7 @@ import ch.ethz.idsc.tensor.sca.Round;
  * 
  * Usage:
  * java -cp target/amod-VERSION.jar amod.aido.AidoHost [city] */
-public enum StringHost {
+/* package */ enum StringHost {
     ;
     public static final int PORT = 9382;
     private static final String ENV_SCENARIO = "SCENARIO";
@@ -60,12 +62,12 @@ public enum StringHost {
                 /** send empty tensor "{}" to stop */
                 stringSocket.writeln(Tensors.empty());
                 /** send fictitious costs */
-                stringSocket.writeln(StaticHelper.FAILURE_SCORE);
+                stringSocket.writeln(Array.of(l -> DoubleScalar.NEGATIVE_INFINITY, 3).toString());
                 throw exception;
             }
 
             /** setup environment variables */
-            StaticHelper.setup();
+            System.setProperty("matsim.preferLocalDtds", "true");
 
             /** scenario preparer */
             File workingDirectory = MultiFileTools.getWorkingDirectory();
