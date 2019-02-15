@@ -127,7 +127,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
                 AVUtils.registerDispatcherFactory(binder(), "AidoDispatcherHost", AidoDispatcherHost.Factory.class);
             }
         });
-        
+
         /** adding an initial vehicle placer */
         controler.addOverridingModule(new AbstractModule() {
             @Override
