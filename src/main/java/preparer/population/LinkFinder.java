@@ -50,36 +50,13 @@ public class LinkFinder {
         // load scenario for simulation
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
-        double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
-        Rect outerBoundsRect = new Rect(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
 
-        /** this is required to not have nodes without links asociated to it. Actually it would be saver t use a network which is already cleaned*/
+        /** this is required to not have nodes without links asociated to it. Actually it would be saver t use a network which is already cleaned */
         NetworkUtils.runNetworkCleaner(network);
-        
+
         Population population = scenario.getPopulation();
 
-        Iterator<? extends Person> itPerson = population.getPersons().values().iterator();
-        while (itPerson.hasNext()) {
-            Person person = itPerson.next();
-            for (Plan plan : person.getPlans()) {
-                for (PlanElement planElement : plan.getPlanElements()) {
-                    if (planElement instanceof Activity) {
-                        Activity act = (Activity) planElement;
-                        /** if you want to remove a person with activities outside of the network bounds, you can use this condition: */
-                        if (!outerBoundsRect.contains(act.getCoord().getX(), act.getCoord().getY())) {
-                            System.err.println("There was an activity outside of the Bounding box of the Network. But Lets proceed for now");
-                            System.err.println(" Its Coordinates: X: " + act.getCoord().getX() + ", Y: " + act.getCoord().getY());
-                        }
-                        if (!outerBoundsRect.contains(act.getCoord().getX(), act.getCoord().getY())) {
-                            /** This is where the actual magic happens. We find for each activity the closest link and save it to the activity */
-                            Link link = NetworkUtils.getNearestLink(network, act.getCoord());
-                            Id<Link> linkId = link.getId();
-                            act.setLinkId(linkId);
-                        }
-                    }
-                }
-            }
-        }
+        findLinks(population, network);
 
         // 8. Export the new generated Population to the defined Name
         final File fileExportGz = new File("population_withLinks" + ".xml.gz");
@@ -98,5 +75,34 @@ public class LinkFinder {
             e.printStackTrace();
         }
 
+    }
+
+    public static void findLinks(Population population, Network network) {
+        double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
+        Rect outerBoundsRect = new Rect(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
+        Iterator<? extends Person> itPerson = population.getPersons().values().iterator();
+        while (itPerson.hasNext()) {
+            Person person = itPerson.next();
+            for (Plan plan : person.getPlans()) {
+                for (PlanElement planElement : plan.getPlanElements()) {
+                    if (planElement instanceof Activity) {
+                        Activity act = (Activity) planElement;
+                        if (Objects.isNull(act.getLinkId())) {
+                            /** if you want to remove a person with activities outside of the network bounds, you can use this condition: */
+                            if (!outerBoundsRect.contains(act.getCoord().getX(), act.getCoord().getY())) {
+                                System.err.println("There was an activity outside of the Bounding box of the Network. But Lets proceed for now");
+                                System.err.println(" Its Coordinates: X: " + act.getCoord().getX() + ", Y: " + act.getCoord().getY());
+                            }
+                            if (!outerBoundsRect.contains(act.getCoord().getX(), act.getCoord().getY())) {
+                                /** This is where the actual magic happens. We find for each activity the closest link and save it to the activity */
+                                Link link = NetworkUtils.getNearestLink(network, act.getCoord());
+                                Id<Link> linkId = link.getId();
+                                act.setLinkId(linkId);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
