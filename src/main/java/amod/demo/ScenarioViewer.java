@@ -45,8 +45,8 @@ public enum ScenarioViewer {
         Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
         System.out.println(simOptions.getSimulationConfigName());
         final File outputSubDirectory = new File(config.controler().getOutputDirectory()).getAbsoluteFile();
-        if(!outputSubDirectory.isDirectory()){
-            System.err.println("output directory: " +  outputSubDirectory.getAbsolutePath() + " not found.");
+        if (!outputSubDirectory.isDirectory()) {
+            System.err.println("output directory: " + outputSubDirectory.getAbsolutePath() + " not found.");
             GlobalAssert.that(false);
         }
         System.out.println("outputSubDirectory=" + outputSubDirectory);
