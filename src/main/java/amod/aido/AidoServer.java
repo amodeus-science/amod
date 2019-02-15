@@ -28,9 +28,8 @@ import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
+import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -109,10 +108,8 @@ import ch.ethz.matsim.av.framework.AVUtils;
         controler.addOverridingModule(new TrafficDataModule(lsData));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
-        controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
-        // VirtualNetwork shouldn't be necessary
+        /** VirtualNetwork shouldn't be necessary */
         // controler.addOverridingModule(new AmodeusVirtualNetworkModule());
-        controler.addOverridingModule(new AmodeusDispatcherModule());
         controler.addOverridingModule(new AidoModule(stringSocket, numReqTot));
         controler.addOverridingModule(new AmodeusDatabaseModule(db));
         controler.addOverridingModule(new AbstractModule() {
@@ -123,10 +120,20 @@ import ch.ethz.matsim.av.framework.AVUtils;
         });
         controler.addOverridingModule(new AmodeusModule());
 
+        /** adding the dispatcher to receive and process string fleet commands */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 AVUtils.registerDispatcherFactory(binder(), "AidoDispatcherHost", AidoDispatcherHost.Factory.class);
+            }
+        });
+        
+        /** adding an initial vehicle placer */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                AVUtils.bindGeneratorFactory(binder(), RandomDensityGenerator.class.getSimpleName()).//
+                to(RandomDensityGenerator.Factory.class);
             }
         });
 
