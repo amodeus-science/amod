@@ -16,6 +16,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import com.google.inject.Inject;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
+import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
 import ch.ethz.matsim.av.config.AVGeneratorConfig;
 import ch.ethz.matsim.av.data.AVVehicle;
 import ch.ethz.matsim.av.generator.AVGenerator;

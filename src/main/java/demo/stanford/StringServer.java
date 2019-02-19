@@ -1,5 +1,5 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.aido;
+package demo.stanford;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -20,7 +20,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
-import amod.aido.core.AidoDispatcherHost;
+import amod.aido.AidoModule;
 import amod.demo.ext.Static;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
@@ -29,7 +29,9 @@ import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
+import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -44,7 +46,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
-/* package */ class AidoServer {
+/* package */ class StringServer {
 
     private File configFile;
     private File outputDirectory;
@@ -108,10 +110,9 @@ import ch.ethz.matsim.av.framework.AVUtils;
         controler.addOverridingModule(new TrafficDataModule(lsData));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
-        /** VirtualNetwork shouldn't be necessary */
-        // controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         controler.addOverridingModule(new AidoModule(stringSocket, numReqTot));
         controler.addOverridingModule(new AmodeusDatabaseModule(db));
+        controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -119,16 +120,12 @@ import ch.ethz.matsim.av.framework.AVUtils;
             }
         });
         controler.addOverridingModule(new AmodeusModule());
-
-        /** adding the dispatcher to receive and process string fleet commands */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "AidoDispatcherHost", AidoDispatcherHost.Factory.class);
+                AVUtils.registerDispatcherFactory(binder(), StringDispatcherHost.class.getSimpleName(), StringDispatcherHost.Factory.class);
             }
         });
-
-        /** adding an initial vehicle placer */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -136,6 +133,10 @@ import ch.ethz.matsim.av.framework.AVUtils;
                 to(RandomDensityGenerator.Factory.class);
             }
         });
+
+        /** change the standard AidoDispatcherHost setting in av.xml to
+         * StringDispatcherHost */
+        XmlDispatcherChanger.of(workingDirectory, "StringDispatcherHost");
 
         /** run simulation */
         controler.run();
