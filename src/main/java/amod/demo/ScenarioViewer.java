@@ -28,7 +28,7 @@ public enum ScenarioViewer {
     ;
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         run(workingDirectory);
     }
 
@@ -66,15 +66,15 @@ public enum ScenarioViewer {
 
         /** initializing the viewer */
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
-        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db);
+        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db, workingDirectory);
 
         /** virtual network layer, should not cause problems if layer does not exist */
-        amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
+        amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network, simOptions));
 
         /** starting the viewer */
         ViewerConfig viewerConfig = ViewerConfig.fromDefaults(db);
         System.out.println(viewerConfig);
-        AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory, network);
+        AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory, network, simOptions);
         amodeusViewerFrame.setDisplayPosition(viewerConfig.settings.coord, viewerConfig.settings.zoom);
         amodeusViewerFrame.jFrame.setSize(viewerConfig.settings.dimensions);
         amodeusViewerFrame.jFrame.setVisible(true);

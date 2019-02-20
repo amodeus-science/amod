@@ -36,8 +36,6 @@ import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
@@ -63,15 +61,11 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
         Static.setup();
 
-        /** working directory and options */
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
-        scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
-
         /** set to true in order to make server wait for at least 1 client, for
          * instance viewer client, for fals the ScenarioServer starts the simulation
          * immediately */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
-        configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
+        configFile = new File(scenarioOptions.getWorkingDirectory(), scenarioOptions.getSimulationConfigName());
         /** geographic information */
         LocationSpec locationSpec = scenarioOptions.getLocationSpec();
         referenceFrame = locationSpec.referenceFrame();
@@ -98,7 +92,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         GlobalAssert.that(Objects.nonNull(population));
 
         // load linkSpeedData
-        File linkSpeedDataFile = new File(workingDirectory, scenarioOptions.getLinkSpeedDataName());
+        File linkSpeedDataFile = new File(scenarioOptions.getWorkingDirectory(), scenarioOptions.getLinkSpeedDataName());
         System.out.println(linkSpeedDataFile.toString());
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
 
@@ -112,7 +106,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AidoModule(stringSocket, numReqTot));
         controler.addOverridingModule(new AmodeusDatabaseModule(db));
-        controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+        controler.addOverridingModule(new AmodeusVirtualNetworkModule(scenarioOptions));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -136,7 +130,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
         /** change the standard AidoDispatcherHost setting in av.xml to
          * StringDispatcherHost */
-        XmlDispatcherChanger.of(workingDirectory, "StringDispatcherHost");
+        XmlDispatcherChanger.of(scenarioOptions.getWorkingDirectory(), "StringDispatcherHost");
 
         /** run simulation */
         controler.run();

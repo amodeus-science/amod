@@ -7,7 +7,6 @@ import java.util.Properties;
 
 import ch.ethz.idsc.amodeus.util.io.ContentType;
 import ch.ethz.idsc.amodeus.util.io.HttpDownloader;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.io.Unzip;
 import ch.ethz.idsc.tensor.io.ResourceData;
 
@@ -16,10 +15,10 @@ public enum AidoScenarioDownload {
 
     /** @param key for instance "SanFrancisco.20080519"
      * @throws Exception */
-    public static void extract(String key) throws IOException {
-        File file = new File(MultiFileTools.getWorkingDirectory(), "scenario.zip");
+    public static void extract(File workingDirectory, String key) throws IOException {
+        File file = new File(workingDirectory, "scenario.zip");
         of(key, file);
-        Unzip.of(file, MultiFileTools.getWorkingDirectory(), true);
+        Unzip.of(file, workingDirectory, true);
         file.delete();
     }
 

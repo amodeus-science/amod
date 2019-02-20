@@ -35,6 +35,10 @@ public enum AidoHost {
     private static final String ENV_VIDEO_EXPORT = "VIDEO_EXPORT";
 
     public static void main(String[] args) throws Exception {
+        /** working directory */
+        File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
+        System.out.println("Using scenario directory: " + workingDirectory);
+
         /** open String server and wait for initial command */
         try (StringServerSocket serverSocket = new StringServerSocket(PORT)) {
             StringSocket stringSocket = serverSocket.getSocketWait();
@@ -53,7 +57,7 @@ public enum AidoHost {
 
             /** download the chosen scenario */
             try {
-                AidoScenarioResource.extract(scenarioTag);
+                AidoScenarioResource.extract(workingDirectory, scenarioTag);
             } catch (Exception exception) {
                 /** send empty tensor "{}" to stop */
                 stringSocket.writeln(Tensors.empty());
@@ -64,10 +68,6 @@ public enum AidoHost {
 
             /** setup environment variables */
             StaticHelper.setup();
-
-            /** scenario preparer */
-            File workingDirectory = MultiFileTools.getWorkingDirectory();
-            System.out.println("Using scenario directory: " + workingDirectory);
 
             /** run first part of preparer */
             AidoPreparer preparer = new AidoPreparer(workingDirectory);
@@ -113,7 +113,7 @@ public enum AidoHost {
             XmlDispatcherChanger.of(workingDirectory, AidoDispatcherHost.class.getSimpleName());
             XmlNumberOfVehiclesChanger.of(workingDirectory, fleetSize);
             AidoServer aidoServer = new AidoServer();
-            aidoServer.simulate(stringSocket, numReqDes);
+            aidoServer.simulate(workingDirectory, stringSocket, numReqDes);
 
             /** send empty tensor "{}" to stop */
             stringSocket.writeln(Tensors.empty());
