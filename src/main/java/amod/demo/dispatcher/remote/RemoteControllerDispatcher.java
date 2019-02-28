@@ -142,9 +142,10 @@ public class RemoteControllerDispatcher extends SharedMPCPartitionedDispatcher {
     protected void redispatch(double now) {
 
         final long round_now = Math.round(now);
+        
 
         if (round_now % dispatchPeriod == 0 && round_now >= dispatchPeriod) {
-
+        	
             reserveFleet = Math.toIntExact(Math.round(0.1 * getRoboTaxis().size()));
 
             // travel times

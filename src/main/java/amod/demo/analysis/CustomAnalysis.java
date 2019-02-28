@@ -15,6 +15,8 @@ import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
+import ch.ethz.idsc.amodeus.net.StorageSupplier;
+import ch.ethz.idsc.amodeus.net.StorageUtils;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 
@@ -44,15 +46,21 @@ public enum CustomAnalysis {
 
         /** the analysis is created */
         Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory), db);
+        
+        StorageUtils storageUtils = new StorageUtils(new File(outputdirectory));
+        storageUtils.printStorageProperties();
+        StorageSupplier storageSupplier = new StorageSupplier(storageUtils.getFirstAvailableIteration());
+        int size = storageSupplier.size();
+        int numVehicles = storageSupplier.getSimulationObject(1).vehicles.size();
 
         /** create and add a custom element */
-        addTo(analysis);
+        addTo(analysis, numVehicles, size, db);
 
         /** finally, the analysis is run with the introduced custom element */
         analysis.run();
     }
 
-    public static void addTo(Analysis analysis) {
+    public static void addTo(Analysis analysis, int numVehicles, int size, MatsimAmodeusDatabase db) {
         /** first an element to gather the necessary data is defined, it is an implementation of the
          * interface AnalysisElement */
         RoboTaxiRequestRecorder roboTaxiRequestRecorder = new RoboTaxiRequestRecorder();
@@ -70,6 +78,42 @@ public enum CustomAnalysis {
         analysis.addAnalysisElement(roboTaxiRequestRecorder);
         analysis.addAnalysisExport(roboTaxiRequestExport);
         analysis.addHtmlElement(roboTaxiRequestRecorderHtml);
+        
+        /** first an element to gather the necessary data is defined, it is an implementation of the
+         * interface AnalysisElement */
+        RoboTaxiDistanceRecorder roboTaxiDistanceRecorder = new RoboTaxiDistanceRecorder(numVehicles, size, db);
+
+        /** next an element to export the processed data to an image or other element is defined, it
+         * is an implementation of the interface AnalysisExport */
+        RoboTaxiDistanceHistoGramExport roboTaxiDistanceExport = new RoboTaxiDistanceHistoGramExport(roboTaxiDistanceRecorder);
+
+        /** finally a section for the HTML report is defined, which is an implementation of the
+         * interface
+         * HtmlReportElement */
+        RoboTaxiDistanceRecorderHtml roboTaxiDistanceRecorderHtml = new RoboTaxiDistanceRecorderHtml(roboTaxiDistanceRecorder);
+
+        /** all are added to the Analysis before running */
+        analysis.addAnalysisElement(roboTaxiDistanceRecorder);
+        analysis.addAnalysisExport(roboTaxiDistanceExport);
+        analysis.addHtmlElement(roboTaxiDistanceRecorderHtml);
+        
+        /** first an element to gather the necessary data is defined, it is an implementation of the
+         * interface AnalysisElement */
+        TimeElement timeElement = new TimeElement();
+
+        /** next an element to export the processed data to an image or other element is defined, it
+         * is an implementation of the interface AnalysisExport */
+        TimeHistoGramExport timeHistoGramExport = new TimeHistoGramExport(timeElement);
+
+        /** finally a section for the HTML report is defined, which is an implementation of the
+         * interface
+         * HtmlReportElement */
+        TimeElementHtml timeElementHtml = new TimeElementHtml(timeElement);
+
+        /** all are added to the Analysis before running */
+        analysis.addAnalysisElement(timeElement);
+        analysis.addAnalysisExport(timeHistoGramExport);
+        analysis.addHtmlElement(timeElementHtml);
 
     }
 

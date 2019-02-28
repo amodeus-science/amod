@@ -42,6 +42,8 @@ import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
+import ch.ethz.idsc.amodeus.net.StorageSupplier;
+import ch.ethz.idsc.amodeus.net.StorageUtils;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
@@ -293,7 +295,13 @@ public enum ScenarioServer {
          * methods is provided in the package amod.demo.analysis
          */
         Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory), db);
-        CustomAnalysis.addTo(analysis);
+        
+        StorageUtils storageUtils = new StorageUtils(new File(outputdirectory));
+        storageUtils.printStorageProperties();
+        StorageSupplier storageSupplier = new StorageSupplier(storageUtils.getFirstAvailableIteration());
+        int size = storageSupplier.size();
+        int numVehicles = storageSupplier.getSimulationObject(1).vehicles.size();
+        CustomAnalysis.addTo(analysis, numVehicles, size, db);
         analysis.run();
 
         { /** create a video if environment variable is set */
