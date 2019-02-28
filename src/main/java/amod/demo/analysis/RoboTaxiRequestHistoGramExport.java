@@ -10,10 +10,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.subare.plot.Histogram;
 import ch.ethz.idsc.subare.plot.VisualRow;
 import ch.ethz.idsc.subare.plot.VisualSet;
-import ch.ethz.idsc.tensor.RealScalar;
-import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Scalars;
-import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.img.ColorDataIndexed;
 import ch.ethz.idsc.tensor.pdf.BinCounts;
 import ch.ethz.idsc.tensor.red.Total;
@@ -49,15 +46,18 @@ import org.jfree.chart.axis.CategoryLabelPositions;
         Tensor histogramEntryPairs = BinCounts.of(requestsPerRoboTaxi, histogramBinSize);
         histogramEntryPairs = histogramEntryPairs.divide(numberOfRoboTaxis).multiply(RealScalar.of(100));
 
-        VisualRow visualRow = new VisualRow();
+//        VisualRow visualRow = new VisualRow();
+        Tensor points = Tensors.empty();
         for (int i = 0; i < histogramEntryPairs.length(); i++) {
-            visualRow.add(RealScalar.of(i).multiply(histogramBinSize), histogramEntryPairs.Get(i));
+//            visualRow.add(RealScalar.of(i).multiply(histogramBinSize), histogramEntryPairs.Get(i));
+            points.append(Tensors.of(RealScalar.of(i).multiply(histogramBinSize), histogramEntryPairs.Get(i)));
         }
-        VisualSet visualSet = new VisualSet(visualRow);
+        VisualSet visualSet = new VisualSet(); // new VisualSet(visualRow);
+        VisualRow visualRow = visualSet.add(points);
         visualSet.setPlotLabel("Number of Requests Served per RoboTaxi");
-        visualSet.setRangeAxisLabel("% of RoboTaxis");
-        visualSet.setDomainAxisLabel("Requests");
-        visualSet.setColors(colorScheme);
+        visualSet.setAxesLabelY("% of RoboTaxis");
+        visualSet.setAxesLabelX("Requests");
+//        visualSet.setColors(colorScheme);
 
         final Scalar size = histogramBinSize;
         JFreeChart chart = Histogram.of(visualSet, s -> "[" + s.number() + " , " + s.add(size).number() + ")");

@@ -9,7 +9,7 @@ import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.UnitSaveUtils;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.subare.plot.TimeChart;
+import ch.ethz.idsc.subare.plot.TimedChart;
 import ch.ethz.idsc.subare.plot.VisualRow;
 import ch.ethz.idsc.subare.plot.VisualSet;
 import ch.ethz.idsc.tensor.Tensor;
@@ -97,17 +97,16 @@ import org.jfree.chart.JFreeChart;
         for (int i = 0; i < labels.length; i++) {
             Tensor values = Transpose.of(vals).get(i);
             values = FILTER_ON ? MeanFilter.of(values, FILTERSIZE) : values;
-            VisualRow visualRow = new VisualRow(time, values);
-            visualSet.add(visualRow);
-            visualSet.setRowLabel(i, labels[i]);
+            VisualRow visualRow = visualSet.add(time, values);
+            visualRow.setColor(colorDataIndexed.getColor(i));
+            visualRow.setLabel(labels[i]);
         }
 
         visualSet.setPlotLabel(title);
-        visualSet.setDomainAxisLabel("time of day");
-        visualSet.setRangeAxisLabel("scores integrated");
-        visualSet.setColors(colorDataIndexed);
+        visualSet.setAxesLabelX("time of day");
+        visualSet.setAxesLabelY("scores integrated");
 
-        JFreeChart chart = TimeChart.of(visualSet);
+        JFreeChart chart = TimedChart.of(visualSet);
         if (Objects.nonNull(limits))
             GlobalAssert.that(limits[0] < limits[1]);
             chart.getXYPlot().getRangeAxis().setRange(limits[0], limits[1]);
