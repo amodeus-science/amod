@@ -52,7 +52,7 @@ import org.jfree.chart.axis.CategoryLabelPositions;
 //            visualRow.add(RealScalar.of(i).multiply(histogramBinSize), histogramEntryPairs.Get(i));
             points.append(Tensors.of(RealScalar.of(i).multiply(histogramBinSize), histogramEntryPairs.Get(i)));
         }
-        VisualSet visualSet = new VisualSet(); // new VisualSet(visualRow);
+        VisualSet visualSet = new VisualSet(colorScheme); // new VisualSet(visualRow);
         VisualRow visualRow = visualSet.add(points);
         visualSet.setPlotLabel("Number of Requests Served per RoboTaxi");
         visualSet.setAxesLabelY("% of RoboTaxis");

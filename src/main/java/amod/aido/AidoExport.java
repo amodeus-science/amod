@@ -93,12 +93,11 @@ import org.jfree.chart.JFreeChart;
 
     private void generatePlot(File relativeDirectory, String fileName, Tensor time, Tensor vals, Double[] limits, //
                              String[] labels, String title, ColorDataIndexed colorDataIndexed) throws Exception {
-        VisualSet visualSet = new VisualSet();
+        VisualSet visualSet = new VisualSet(colorDataIndexed);
         for (int i = 0; i < labels.length; i++) {
             Tensor values = Transpose.of(vals).get(i);
             values = FILTER_ON ? MeanFilter.of(values, FILTERSIZE) : values;
             VisualRow visualRow = visualSet.add(time, values);
-            visualRow.setColor(colorDataIndexed.getColor(i));
             visualRow.setLabel(labels[i]);
         }
 
