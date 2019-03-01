@@ -114,6 +114,24 @@ public enum CustomAnalysis {
         analysis.addAnalysisElement(timeElement);
         analysis.addAnalysisExport(timeHistoGramExport);
         analysis.addHtmlElement(timeElementHtml);
+        
+        /** first an element to gather the necessary data is defined, it is an implementation of the
+         * interface AnalysisElement */
+        WaitingTimeRoboTaxiRecorder waitRecorder = new WaitingTimeRoboTaxiRecorder();
+
+        /** next an element to export the processed data to an image or other element is defined, it
+         * is an implementation of the interface AnalysisExport */
+        WaitingTimeRoboTaxiExport waitExport = new WaitingTimeRoboTaxiExport(waitRecorder);
+
+        /** finally a section for the HTML report is defined, which is an implementation of the
+         * interface
+         * HtmlReportElement */
+        WaitingTimeRoboTaxiHtml waitHtml = new WaitingTimeRoboTaxiHtml(waitRecorder);
+
+        /** all are added to the Analysis before running */
+        analysis.addAnalysisElement(waitRecorder);
+        analysis.addAnalysisExport(waitExport);
+        analysis.addHtmlElement(waitHtml);
 
     }
 

@@ -42,7 +42,7 @@ public class TimeElementHtml implements HtmlReportElement {
         aRElement.getHTMLGenerator().insertTextLeft(Time.writeTime(maxDriveTime) + //
         		"\n" + Time.writeTime(minDriveTime) + "\n" + Time.writeTime(meanDriveTime));
         aRElement.getHTMLGenerator().newLine();
-        aRElement.getHTMLGenerator().insertTextLeft("This histogram shows the total distance driven (all drive modes) by each RoboTaxi:");
+        aRElement.getHTMLGenerator().insertTextLeft("This histogram shows the total drive time (all drive modes) by each RoboTaxi:");
         aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + TimeHistoGramExport.FILENAME + ".png", 800, 600);
 
         /** add together with title of section */
