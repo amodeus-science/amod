@@ -48,7 +48,7 @@ public class RoboTaxiDistanceHistoGramExport implements AnalysisExport {
                     "Total Distance per RoboTaxi", //
                     Math.round(histoGrambinSize.number().doubleValue()), //
                     "% of RoboTaxis", //
-                    "Distance [m]", //
+                    "Distance [km]", //
                     DiagramSettings.WIDTH, DiagramSettings.HEIGHT, colorScheme);
         } catch (Exception e) {
             System.err.println("Plot of the Total Distance per RoboTaxi Failed");

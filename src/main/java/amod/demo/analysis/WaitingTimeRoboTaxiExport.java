@@ -47,7 +47,7 @@ public class WaitingTimeRoboTaxiExport implements AnalysisExport {
                     "Total Wait Times per RoboTaxi", //
                     Math.round(histoGrambinSize.number().doubleValue()), //
                     "% of RoboTaxis", //
-                    "Total Wait Times [min]", //
+                    "Total Wait Times [s]", //
                     DiagramSettings.WIDTH, DiagramSettings.HEIGHT, colorScheme);
         } catch (Exception e) {
             System.err.println("Plot of the Total Wait Times per RoboTaxi Failed");
