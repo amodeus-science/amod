@@ -511,6 +511,8 @@ public class RemoteControllerParkingDispatcher extends SharedMPCPartitionedDispa
 			System.out.println("Number of empty Cars: " + emptyRoboTaxis.size());
 			Collection<RoboTaxi> emptyDrivingVehicles = getEmptyDrivingRoboTaxis();
 			System.out.println("Number of empty driving vehicles: " + emptyDrivingVehicles.size());
+			Collection<RoboTaxi> waitingVehicles = getAllWaitRoboTaxi();
+			System.out.println("Number of waiting vehicles: " + waitingVehicles.size());
 		}
 
 		// check if control inputs used
