@@ -20,119 +20,219 @@ import ch.ethz.idsc.amodeus.net.StorageUtils;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 
-/** This is a demonstration of the functionality of AMoDeus that customized analysis and reporting
- * elements can be easily added. In this example, we present the case in which for every
- * {@link RoboTaxi} the number of served requests is recorded and then a Histogram image is added
- * to the HTML report */
+/**
+ * This is a demonstration of the functionality of AMoDeus that customized
+ * analysis and reporting elements can be easily added. In this example, we
+ * present the case in which for every {@link RoboTaxi} the number of served
+ * requests is recorded and then a Histogram image is added to the HTML report
+ */
 public enum CustomAnalysis {
-    ;
+	;
 
-    /** to be executed in simulation directory to perform analysis, i.e., the directory must
-     * contain the "output" folder that is compiled during a simulation. In the output folder, there
-     * is a list of {@link SimulationObject} which contain the data stored for the simulation.
-     * 
-     * @throws Exception */
-    public static void main(String[] args) throws Exception {
-        Static.setup();
-        File workingDirectory = new File("").getCanonicalFile();
-        ScenarioOptions scenOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
-        File configFile = new File(workingDirectory, scenOptions.getString("simuConfig"));
-        Config config = ConfigUtils.loadConfig(configFile.toString());
-        String outputdirectory = config.controler().getOutputDirectory();
-        Network network = NetworkLoader.fromConfigFile(configFile);
-        LocationSpec locationSpec = scenOptions.getLocationSpec();
-        ReferenceFrame referenceFrame = locationSpec.referenceFrame();
-        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
+	/**
+	 * to be executed in simulation directory to perform analysis, i.e., the
+	 * directory must contain the "output" folder that is compiled during a
+	 * simulation. In the output folder, there is a list of {@link SimulationObject}
+	 * which contain the data stored for the simulation.
+	 * 
+	 * @throws Exception
+	 */
+	public static void main(String[] args) throws Exception {
+		Static.setup();
+		File workingDirectory = new File("").getCanonicalFile();
+		ScenarioOptions scenOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
+		File configFile = new File(workingDirectory, scenOptions.getString("simuConfig"));
+		Config config = ConfigUtils.loadConfig(configFile.toString());
+		String outputdirectory = config.controler().getOutputDirectory();
+		Network network = NetworkLoader.fromConfigFile(configFile);
+		LocationSpec locationSpec = scenOptions.getLocationSpec();
+		ReferenceFrame referenceFrame = locationSpec.referenceFrame();
+		MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
-        /** the analysis is created */
-        Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory), db);
-        
-        StorageUtils storageUtils = new StorageUtils(new File(outputdirectory));
-        storageUtils.printStorageProperties();
-        StorageSupplier storageSupplier = new StorageSupplier(storageUtils.getFirstAvailableIteration());
-        int size = storageSupplier.size();
-        int numVehicles = storageSupplier.getSimulationObject(1).vehicles.size();
+		/** the analysis is created */
+		Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory), db);
 
-        /** create and add a custom element */
-        addTo(analysis, numVehicles, size, db);
+		StorageUtils storageUtils = new StorageUtils(new File(outputdirectory));
+		storageUtils.printStorageProperties();
+		StorageSupplier storageSupplier = new StorageSupplier(storageUtils.getFirstAvailableIteration());
+		int size = storageSupplier.size();
+		int numVehicles = storageSupplier.getSimulationObject(1).vehicles.size();
 
-        /** finally, the analysis is run with the introduced custom element */
-        analysis.run();
-    }
+		/** create and add a custom element */
+		addTo(analysis, numVehicles, size, db);
 
-    public static void addTo(Analysis analysis, int numVehicles, int size, MatsimAmodeusDatabase db) {
-        /** first an element to gather the necessary data is defined, it is an implementation of the
-         * interface AnalysisElement */
-        RoboTaxiRequestRecorder roboTaxiRequestRecorder = new RoboTaxiRequestRecorder();
+		/** finally, the analysis is run with the introduced custom element */
+		analysis.run();
+	}
 
-        /** next an element to export the processed data to an image or other element is defined, it
-         * is an implementation of the interface AnalysisExport */
-        RoboTaxiRequestHistoGramExport roboTaxiRequestExport = new RoboTaxiRequestHistoGramExport(roboTaxiRequestRecorder);
+	public static void addTo(Analysis analysis, int numVehicles, int size, MatsimAmodeusDatabase db) {
+		/**
+		 * first an element to gather the necessary data is defined, it is an
+		 * implementation of the interface AnalysisElement
+		 */
+		RoboTaxiRequestRecorder roboTaxiRequestRecorder = new RoboTaxiRequestRecorder();
 
-        /** finally a section for the HTML report is defined, which is an implementation of the
-         * interface
-         * HtmlReportElement */
-        RoboTaxiRequestRecorderHtml roboTaxiRequestRecorderHtml = new RoboTaxiRequestRecorderHtml(roboTaxiRequestRecorder);
+		/**
+		 * next an element to export the processed data to an image or other element is
+		 * defined, it is an implementation of the interface AnalysisExport
+		 */
+		RoboTaxiRequestHistoGramExport roboTaxiRequestExport = new RoboTaxiRequestHistoGramExport(
+				roboTaxiRequestRecorder);
 
-        /** all are added to the Analysis before running */
-        analysis.addAnalysisElement(roboTaxiRequestRecorder);
-        analysis.addAnalysisExport(roboTaxiRequestExport);
-        analysis.addHtmlElement(roboTaxiRequestRecorderHtml);
-        
-        /** first an element to gather the necessary data is defined, it is an implementation of the
-         * interface AnalysisElement */
-        RoboTaxiDistanceRecorder roboTaxiDistanceRecorder = new RoboTaxiDistanceRecorder(numVehicles, size, db);
+		/**
+		 * finally a section for the HTML report is defined, which is an implementation
+		 * of the interface HtmlReportElement
+		 */
+		RoboTaxiRequestRecorderHtml roboTaxiRequestRecorderHtml = new RoboTaxiRequestRecorderHtml(
+				roboTaxiRequestRecorder);
 
-        /** next an element to export the processed data to an image or other element is defined, it
-         * is an implementation of the interface AnalysisExport */
-        RoboTaxiDistanceHistoGramExport roboTaxiDistanceExport = new RoboTaxiDistanceHistoGramExport(roboTaxiDistanceRecorder);
+		/** all are added to the Analysis before running */
+		analysis.addAnalysisElement(roboTaxiRequestRecorder);
+		analysis.addAnalysisExport(roboTaxiRequestExport);
+		analysis.addHtmlElement(roboTaxiRequestRecorderHtml);
 
-        /** finally a section for the HTML report is defined, which is an implementation of the
-         * interface
-         * HtmlReportElement */
-        RoboTaxiDistanceRecorderHtml roboTaxiDistanceRecorderHtml = new RoboTaxiDistanceRecorderHtml(roboTaxiDistanceRecorder);
+		/**
+		 * first an element to gather the necessary data is defined, it is an
+		 * implementation of the interface AnalysisElement
+		 */
+		RoboTaxiDistanceRecorder roboTaxiDistanceRecorder = new RoboTaxiDistanceRecorder(numVehicles, size, db);
 
-        /** all are added to the Analysis before running */
-        analysis.addAnalysisElement(roboTaxiDistanceRecorder);
-        analysis.addAnalysisExport(roboTaxiDistanceExport);
-        analysis.addHtmlElement(roboTaxiDistanceRecorderHtml);
-        
-        /** first an element to gather the necessary data is defined, it is an implementation of the
-         * interface AnalysisElement */
-        TimeElement timeElement = new TimeElement();
+		/**
+		 * next an element to export the processed data to an image or other element is
+		 * defined, it is an implementation of the interface AnalysisExport
+		 */
+		RoboTaxiDistanceHistoGramExport roboTaxiDistanceExport = new RoboTaxiDistanceHistoGramExport(
+				roboTaxiDistanceRecorder);
 
-        /** next an element to export the processed data to an image or other element is defined, it
-         * is an implementation of the interface AnalysisExport */
-        TimeHistoGramExport timeHistoGramExport = new TimeHistoGramExport(timeElement);
+		/**
+		 * finally a section for the HTML report is defined, which is an implementation
+		 * of the interface HtmlReportElement
+		 */
+		RoboTaxiDistanceRecorderHtml roboTaxiDistanceRecorderHtml = new RoboTaxiDistanceRecorderHtml(
+				roboTaxiDistanceRecorder);
 
-        /** finally a section for the HTML report is defined, which is an implementation of the
-         * interface
-         * HtmlReportElement */
-        TimeElementHtml timeElementHtml = new TimeElementHtml(timeElement);
+		/** all are added to the Analysis before running */
+		analysis.addAnalysisElement(roboTaxiDistanceRecorder);
+		analysis.addAnalysisExport(roboTaxiDistanceExport);
+		analysis.addHtmlElement(roboTaxiDistanceRecorderHtml);
 
-        /** all are added to the Analysis before running */
-        analysis.addAnalysisElement(timeElement);
-        analysis.addAnalysisExport(timeHistoGramExport);
-        analysis.addHtmlElement(timeElementHtml);
-        
-        /** first an element to gather the necessary data is defined, it is an implementation of the
-         * interface AnalysisElement */
-        WaitingTimeRoboTaxiRecorder waitRecorder = new WaitingTimeRoboTaxiRecorder();
+		/**
+		 * first an element to gather the necessary data is defined, it is an
+		 * implementation of the interface AnalysisElement
+		 */
+		TimeElement timeElement = new TimeElement();
 
-        /** next an element to export the processed data to an image or other element is defined, it
-         * is an implementation of the interface AnalysisExport */
-        WaitingTimeRoboTaxiExport waitExport = new WaitingTimeRoboTaxiExport(waitRecorder);
+		/**
+		 * next an element to export the processed data to an image or other element is
+		 * defined, it is an implementation of the interface AnalysisExport
+		 */
+		TimeHistoGramExport timeHistoGramExport = new TimeHistoGramExport(timeElement);
 
-        /** finally a section for the HTML report is defined, which is an implementation of the
-         * interface
-         * HtmlReportElement */
-        WaitingTimeRoboTaxiHtml waitHtml = new WaitingTimeRoboTaxiHtml(waitRecorder);
+		/**
+		 * finally a section for the HTML report is defined, which is an implementation
+		 * of the interface HtmlReportElement
+		 */
+		TimeElementHtml timeElementHtml = new TimeElementHtml(timeElement);
 
-        /** all are added to the Analysis before running */
-        analysis.addAnalysisElement(waitRecorder);
-        analysis.addAnalysisExport(waitExport);
-        analysis.addHtmlElement(waitHtml);
+		/** all are added to the Analysis before running */
+		analysis.addAnalysisElement(timeElement);
+		analysis.addAnalysisExport(timeHistoGramExport);
+		analysis.addHtmlElement(timeElementHtml);
 
-    }
+		/**
+		 * first an element to gather the necessary data is defined, it is an
+		 * implementation of the interface AnalysisElement
+		 */
+		EmptyDriveTimesElement emptyTimeElement = new EmptyDriveTimesElement();
+
+		/**
+		 * next an element to export the processed data to an image or other element is
+		 * defined, it is an implementation of the interface AnalysisExport
+		 */
+		EmptyDriveTimesExport emptyTimeExport = new EmptyDriveTimesExport(emptyTimeElement);
+
+		/**
+		 * finally a section for the HTML report is defined, which is an implementation
+		 * of the interface HtmlReportElement
+		 */
+		EmptyDriveTimeHtml emptyTimeHtml = new EmptyDriveTimeHtml(emptyTimeElement, timeElement);
+
+		/** all are added to the Analysis before running */
+		analysis.addAnalysisElement(emptyTimeElement);
+		analysis.addAnalysisExport(emptyTimeExport);
+		analysis.addHtmlElement(emptyTimeHtml);
+
+		/**
+		 * first an element to gather the necessary data is defined, it is an
+		 * implementation of the interface AnalysisElement
+		 */
+		PickupTimeElement pickupTimeElement = new PickupTimeElement();
+		RebalanceTimeElement rebTimeElement = new RebalanceTimeElement();
+		ParkingTimeElement parkTimeElement = new ParkingTimeElement();
+		CustomerDriveTimeElement custTimeElement = new CustomerDriveTimeElement();
+
+		/**
+		 * next an element to export the processed data to an image or other element is
+		 * defined, it is an implementation of the interface AnalysisExport
+		 */
+		DriveTimeAnalysisExport driveTimeExport = new DriveTimeAnalysisExport(timeElement, emptyTimeElement,
+				pickupTimeElement, rebTimeElement, parkTimeElement, custTimeElement);
+
+		/**
+		 * finally a section for the HTML report is defined, which is an implementation
+		 * of the interface HtmlReportElement
+		 */
+		DrivetimeAnalysisHtml driveTimeHtml = new DrivetimeAnalysisHtml(timeElement, emptyTimeElement,
+				pickupTimeElement, rebTimeElement, parkTimeElement, custTimeElement);
+
+		/** all are added to the Analysis before running */
+		analysis.addAnalysisElement(pickupTimeElement);
+		analysis.addAnalysisElement(rebTimeElement);
+		analysis.addAnalysisElement(parkTimeElement);
+		analysis.addAnalysisElement(custTimeElement);
+		analysis.addAnalysisExport(driveTimeExport);
+		analysis.addHtmlElement(driveTimeHtml);
+		
+		/**
+		 * next an element to export the processed data to an image or other element is
+		 * defined, it is an implementation of the interface AnalysisExport
+		 */
+//		TotalDriveTimeExport totalDriveTimeExport = new TotalDriveTimeExport(timeElement, emptyTimeElement,
+//				pickupTimeElement, rebTimeElement, parkTimeElement, custTimeElement);
+
+		/**
+		 * finally a section for the HTML report is defined, which is an implementation
+		 * of the interface HtmlReportElement
+		 */
+//		TotalDriveTimeHtml totalDriveTimeHtml = new TotalDriveTimeHtml(timeElement, emptyTimeElement,
+//				pickupTimeElement, rebTimeElement, parkTimeElement, custTimeElement);
+		
+//		analysis.addAnalysisExport(totalDriveTimeExport);
+//		analysis.addHtmlElement(totalDriveTimeHtml);
+
+		/**
+		 * first an element to gather the necessary data is defined, it is an
+		 * implementation of the interface AnalysisElement
+		 */
+		WaitingTimeRoboTaxiRecorder waitRecorder = new WaitingTimeRoboTaxiRecorder();
+
+		/**
+		 * next an element to export the processed data to an image or other element is
+		 * defined, it is an implementation of the interface AnalysisExport
+		 */
+		WaitingTimeRoboTaxiExport waitExport = new WaitingTimeRoboTaxiExport(waitRecorder);
+
+		/**
+		 * finally a section for the HTML report is defined, which is an implementation
+		 * of the interface HtmlReportElement
+		 */
+		WaitingTimeRoboTaxiHtml waitHtml = new WaitingTimeRoboTaxiHtml(waitRecorder);
+
+		/** all are added to the Analysis before running */
+		analysis.addAnalysisElement(waitRecorder);
+		analysis.addAnalysisExport(waitExport);
+		analysis.addHtmlElement(waitHtml);
+
+	}
 
 }

@@ -12,9 +12,9 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-public class TimeElement implements AnalysisElement {
+public class PickupTimeElement implements AnalysisElement {
 
-    private Map<Integer, Double> vehicleDriveTime = new HashMap<>();
+    private Map<Integer, Double> vehiclePickupTime = new HashMap<>();
     private Map<Integer, RoboTaxiStatus> prevStatus = new HashMap<>();
     private Map<Integer, Double> prevvehicleTime = new HashMap<>();
     private Map<Integer, Double> vehicleTime = new HashMap<>();
@@ -25,27 +25,26 @@ public class TimeElement implements AnalysisElement {
     	double time = (double) simulationObject.now;
 
         /** initialize map when first simulationObject arrives */
-        if (vehicleDriveTime.size() == 0) {
-            simulationObject.vehicles.stream().forEach(vc -> vehicleDriveTime.put(vc.vehicleIndex, 0.0));
+        if (vehiclePickupTime.size() == 0) {
+            simulationObject.vehicles.stream().forEach(vc -> vehiclePickupTime.put(vc.vehicleIndex, 0.0));
             simulationObject.vehicles.stream().forEach(vc -> prevStatus.put(vc.vehicleIndex, RoboTaxiStatus.STAY));
             simulationObject.vehicles.stream().forEach(vc -> prevvehicleTime.put(vc.vehicleIndex, 0.0));
             simulationObject.vehicles.stream().forEach(vc -> vehicleTime.put(vc.vehicleIndex, 0.0));
         }
 
-        /** whenever status changes to DriveWithCustomer, the taxi has served a request */
         simulationObject.vehicles.stream().forEach(vc -> //
         {
             int vehicle = vc.vehicleIndex;
-            if (!vc.roboTaxiStatus.equals(RoboTaxiStatus.STAY) && !vc.roboTaxiStatus.equals(RoboTaxiStatus.WAITING) //
-                    && (prevStatus.get(vehicle).equals(RoboTaxiStatus.STAY) || prevStatus.get(vehicle).equals(RoboTaxiStatus.WAITING))) {
+            if (vc.roboTaxiStatus.equals(RoboTaxiStatus.DRIVETOCUSTOMER) //
+                    && (!prevStatus.get(vehicle).equals(RoboTaxiStatus.DRIVETOCUSTOMER))) {
             	prevvehicleTime.put(vehicle, time);
             }
-            if ((vc.roboTaxiStatus.equals(RoboTaxiStatus.STAY) || vc.roboTaxiStatus.equals(RoboTaxiStatus.WAITING)) //
-                    && (!prevStatus.get(vehicle).equals(RoboTaxiStatus.STAY) && !prevStatus.get(vehicle).equals(RoboTaxiStatus.WAITING))) {
+            if ((!vc.roboTaxiStatus.equals(RoboTaxiStatus.DRIVETOCUSTOMER)) //
+                    && (prevStatus.get(vehicle).equals(RoboTaxiStatus.DRIVETOCUSTOMER))) {
             	vehicleTime.put(vehicle, time);
-            	Double driveTime = vehicleTime.get(vehicle) - prevvehicleTime.get(vehicle);
-            	GlobalAssert.that(driveTime >= 0);
-            	vehicleDriveTime.put(vehicle, vehicleDriveTime.get(vehicle) + driveTime);
+				Double driveTime = vehicleTime.get(vehicle) - prevvehicleTime.get(vehicle);
+				GlobalAssert.that(driveTime >= 0);
+				vehiclePickupTime.put(vehicle, vehiclePickupTime.get(vehicle) + driveTime);
             }
         });
 
@@ -59,10 +58,10 @@ public class TimeElement implements AnalysisElement {
     }
 
     /** @return {@link Tensor} containing the requests served for each {@link RoboTaxi} */
-    public Tensor getDriveTimePerRoboTaxi() {
-        Tensor driveTimes = Tensors.empty();
-        vehicleDriveTime.values().stream().forEach(time -> driveTimes.append(RealScalar.of(time)));
-        return driveTimes;
+    public Tensor getPickupTimePerRoboTaxi() {
+        Tensor waitTimes = Tensors.empty();
+        vehiclePickupTime.values().stream().forEach(time -> waitTimes.append(RealScalar.of(time)));
+        return waitTimes;
     }
 
 }

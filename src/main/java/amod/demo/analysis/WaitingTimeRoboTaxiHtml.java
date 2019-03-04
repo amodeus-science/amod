@@ -46,7 +46,7 @@ public class WaitingTimeRoboTaxiHtml implements HtmlReportElement {
         aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + WaitingTimeRoboTaxiExport.FILENAME + ".png", 800, 600);
 
         /** add together with title of section */
-        bodyElements.put("Total Drive Times per RoboTaxi Analysis", aRElement);
+        bodyElements.put("Waiting Times RoboTaxi Analysis", aRElement);
         return bodyElements;
     }
 

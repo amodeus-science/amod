@@ -1,6 +1,7 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.demo.analysis;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import ch.ethz.idsc.tensor.red.Total;
  * compiled in the class {@link RoboTaxiRequestHistoGramExport} */
 /* package */ class RoboTaxiRequestRecorderHtml implements HtmlReportElement {
     private static final String IMAGE_FOLDER = "../data"; // relative to report folder
-
+    private static final DecimalFormat DECIMAL = new DecimalFormat("#0.00");
     RoboTaxiRequestRecorder roboTaxiRequestRecorder;
 
     public RoboTaxiRequestRecorderHtml(RoboTaxiRequestRecorder roboTaxiRequestRecorder) {
@@ -41,7 +42,7 @@ import ch.ethz.idsc.tensor.red.Total;
         aRElement.getHTMLGenerator().insertTextLeft("Maximum Number of Requests of a Vehice:" + //
         		"\n" + "Minimum Number of Requests of a Vehice" + "\n" + "Average Number of Requests per Vehice");
         aRElement.getHTMLGenerator().insertTextLeft(String.valueOf(maxNumberRequests) + //
-        		"\n" + String.valueOf(minNumberRequests) + "\n" + String.valueOf(meanNumberRequests));
+        		"\n" + String.valueOf(minNumberRequests) + "\n" + String.valueOf(DECIMAL.format(meanNumberRequests)));
         aRElement.getHTMLGenerator().newLine();
         aRElement.getHTMLGenerator().insertTextLeft("This histogram shows the number of reuquest served by each RoboTaxi:");
         aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + RoboTaxiRequestHistoGramExport.FILENAME + ".png", 800, 600);
