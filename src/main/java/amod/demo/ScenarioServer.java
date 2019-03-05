@@ -22,6 +22,7 @@ import com.google.inject.name.Names;
 
 import amod.demo.analysis.CustomAnalysis;
 import amod.demo.dispatcher.DemoDispatcher;
+import amod.demo.dispatcher.DemoDispatcherShared;
 import amod.demo.ext.Static;
 import amod.demo.generator.DemoGenerator;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
@@ -153,15 +154,16 @@ public enum ScenarioServer {
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "DemoDispatcher", DemoDispatcher.Factory.class);
+                AVUtils.registerDispatcherFactory(binder(), //
+                        DemoDispatcher.class.getSimpleName(), DemoDispatcher.Factory.class);
             }
         });
-        // TODO @ Lukas this produces problems.
+        // TODO check if still causes problems.
         // controler.addOverridingModule(new AbstractModule() {
         // @Override
         // public void install() {
-        // AVUtils.registerDispatcherFactory(binder(), "DemoDispatcherShared",
-        // DemoDispatcherShared.Factory.class);
+        // AVUtils.registerDispatcherFactory(binder(), //
+        // DemoDispatcherShared.class.getSimpleName(), DemoDispatcherShared.Factory.class);
         // }
         // });
 
