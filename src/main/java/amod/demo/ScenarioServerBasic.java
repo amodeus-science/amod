@@ -10,6 +10,7 @@ import org.matsim.core.controler.Controler;
 
 import amod.demo.analysis.CustomAnalysis;
 import amod.demo.dispatcher.DemoDispatcher;
+import amod.demo.ext.AmodeusParkingModuleConstantSpots;
 import amod.demo.ext.Static;
 import amod.demo.generator.DemoGenerator;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
@@ -26,7 +27,7 @@ public class ScenarioServerBasic {
     public static void main(String[] args) throws IOException {
         Static.setup();
         Static.checkGLPKLib();
-        
+
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         SimulationProperties simulationProperties = SimulationProperties.load(workingDirectory);
 
@@ -69,12 +70,21 @@ public class ScenarioServerBasic {
          * network! */
         controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
-        controler.addOverridingModule(new AmodeusParkingModule(simulationProperties.getScenarioOptions()));
-
 
         /**********************************************************/
-        /** uncomment to include custom routers
-         * controler.addOverridingModule(new AbstractModule() {
+        /** uncomment to include parking. The Capacity has to be stored in the Network
+         * You have to choose which strategy you would like to have to solve the problem.
+         * Write one of the Options: LP, RANDOMDIFUSION, ADVANCEDDIFUSION, NONE behind the parkingStrategy Tag in the Amodeus Options */
+        // For a NetworkBased Capacitiy use the following Line and write NETWORKBASED in the Amodeus Options as the parkingCapacityGenerator.
+        // controler.addOverridingModule(new AmodeusParkingModule(simulationProperties.getScenarioOptions()));
+
+        // If you prefer to have a Uniform distibution you can use the following Module or write a similar one yourself.
+        Long numberSpotsPerLink = (long) 100;
+        controler.addOverridingModule(new AmodeusParkingModuleConstantSpots(simulationProperties.getScenarioOptions(), numberSpotsPerLink));
+
+        /**********************************************************/
+        /** uncomment to include custom routers */
+        /** controler.addOverridingModule(new AbstractModule() {
          * 
          * @Override
          *           public void install() {
