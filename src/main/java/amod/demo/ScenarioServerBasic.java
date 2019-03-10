@@ -1,6 +1,8 @@
 /* amod - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.demo;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 
 import org.matsim.core.controler.AbstractModule;
@@ -11,19 +13,22 @@ import amod.demo.dispatcher.DemoDispatcher;
 import amod.demo.ext.Static;
 import amod.demo.generator.DemoGenerator;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
+import ch.ethz.idsc.amodeus.dispatcher.parking.AmodeusParkingModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleToVSGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
-import ch.ethz.idsc.amodeus.simulation.ScenarioServerHelper;
 import ch.ethz.idsc.amodeus.simulation.SimulationProperties;
+import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.matsim.av.framework.AVUtils;
 
 public class ScenarioServerBasic {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Static.setup();
         Static.checkGLPKLib();
-        SimulationProperties simulationProperties = SimulationProperties.load();
+        
+        File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
+        SimulationProperties simulationProperties = SimulationProperties.load(workingDirectory);
 
         simulate(simulationProperties);
 
@@ -55,7 +60,7 @@ public class ScenarioServerBasic {
 
         ScenarioServerHelper.setActivityDurations(simulationProperties, 3600.0);
 
-        Controler controler = ScenarioServerHelper.setUpStandardControlerAmodeus(simulationProperties);
+        Controler controler = ScenarioServerHelper.setUpStandardControler(simulationProperties);
 
         /**********************************************************/
         /** Here is the space to add new modules to the controler */
@@ -64,6 +69,8 @@ public class ScenarioServerBasic {
          * network! */
         controler.addOverridingModule(new AmodeusVirtualNetworkModule());
         controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
+        controler.addOverridingModule(new AmodeusParkingModule(simulationProperties.getScenarioOptions()));
+
 
         /**********************************************************/
         /** uncomment to include custom routers
