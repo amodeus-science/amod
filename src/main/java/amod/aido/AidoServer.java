@@ -57,12 +57,12 @@ import ch.ethz.matsim.av.framework.AVUtils;
      * @throws MalformedURLException
      * @throws Exception */
 
-    public void simulate(StringSocket stringSocket, int numReqTot) throws MalformedURLException, Exception {
+    public void simulate(File workingDirectory, StringSocket stringSocket, int numReqTot) //
+            throws MalformedURLException, Exception {
 
         Static.setup();
 
         /** working directory and options */
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
         scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** set to true in order to make server wait for at least 1 client, for

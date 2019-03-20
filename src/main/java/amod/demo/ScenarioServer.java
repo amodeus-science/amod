@@ -54,23 +54,19 @@ public enum ScenarioServer {
     ;
 
     public static void main(String[] args) throws MalformedURLException, Exception {
-        simulate();
-        // General todo's to be completed:
-        // TODO add time-varying dispatcher
-
+        simulate(MultiFileTools.getDefaultWorkingDirectory());
     }
 
     /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml
      * 
      * @throws MalformedURLException
      * @throws Exception */
-    public static void simulate() throws MalformedURLException, Exception {
+    public static void simulate(File workingDirectory) throws MalformedURLException, Exception {
         Static.setup();
 
         Static.checkGLPKLib();
 
         /** working directory and options */
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** set to true in order to make server wait for at least 1 client, for
@@ -136,7 +132,7 @@ public enum ScenarioServer {
 
         /** You need to activate this if you want to use a dispatcher that needs a virtual
          * network! */
-        controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+        controler.addOverridingModule(new AmodeusVirtualNetworkModule(scenarioOptions));
         controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
 
         // ===============================================

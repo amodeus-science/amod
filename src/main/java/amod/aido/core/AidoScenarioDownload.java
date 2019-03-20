@@ -16,10 +16,10 @@ public enum AidoScenarioDownload {
 
     /** @param key for instance "SanFrancisco.20080519"
      * @throws Exception */
-    public static void extract(String key) throws IOException {
-        File file = new File(MultiFileTools.getWorkingDirectory(), "scenario.zip");
+    public static void extract(File workingDirecotry,String key) throws IOException {
+        File file = new File(workingDirecotry, "scenario.zip");
         of(key, file);
-        Unzip.of(file, MultiFileTools.getWorkingDirectory(), true);
+        Unzip.of(file, workingDirecotry, true);
         file.delete();
     }
 
