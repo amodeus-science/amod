@@ -17,6 +17,7 @@ import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
+import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 
 /** This is a demonstration of the functionality of AMoDeus that customized analysis and reporting
  * elements can be easily added. In this example, we present the case in which for every
@@ -32,7 +33,7 @@ public enum CustomAnalysis {
      * @throws Exception */
     public static void main(String[] args) throws Exception {
         Static.setup();
-        File workingDirectory = new File("").getCanonicalFile();
+        File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         ScenarioOptions scenOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
         File configFile = new File(workingDirectory, scenOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(configFile.toString());
@@ -43,7 +44,7 @@ public enum CustomAnalysis {
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
         /** the analysis is created */
-        Analysis analysis = Analysis.setup(workingDirectory, configFile, new File(outputdirectory), db);
+        Analysis analysis = Analysis.setup(scenOptions, configFile, new File(outputdirectory), network, db);
 
         /** create and add a custom element */
         addTo(analysis);

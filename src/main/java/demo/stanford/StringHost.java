@@ -123,8 +123,8 @@ import ch.ethz.idsc.tensor.sca.Round;
             stringSocket.writeln(Tensors.empty());
 
             /** analyze and send final score */
-            Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
-                    aidoServer.getOutputDirectory(), preparer.getDatabase());
+            Analysis analysis = Analysis.setup(aidoServer.getScenarioOptions(), aidoServer.getConfigFile(), //
+                    aidoServer.getOutputDirectory(), aidoServer.getNetwork(), preparer.getDatabase());
             AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize, numReqDes, preparer.getDatabase());
             analysis.addAnalysisElement(aidoScoreElement);
             analysis.run();
