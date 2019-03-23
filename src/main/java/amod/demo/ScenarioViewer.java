@@ -70,7 +70,7 @@ public enum ScenarioViewer {
         AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db);
 
         /** virtual network layer, should not cause problems if layer does not exist */
-        amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network,scenarioOptions));
+        amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network, scenarioOptions));
 
         /** starting the viewer */
         ViewerConfig viewerConfig = ViewerConfig.fromDefaults(db);
