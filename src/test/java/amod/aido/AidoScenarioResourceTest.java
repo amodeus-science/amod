@@ -11,14 +11,14 @@ import junit.framework.TestCase;
 public class AidoScenarioResourceTest extends TestCase {
     public void testLocal() throws IOException {
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
-        List<File> list = AidoScenarioResource.extract(workingDirectory, "SanFrancisco.20080518");
+        List<File> list = AidoScenarioResource.extract("SanFrancisco.20080518", workingDirectory);
         assertEquals(list.size(), 7);
         list.stream().forEach(File::delete);
     }
 
     public void testDownload() throws IOException {
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
-        List<File> list = AidoScenarioResource.extract(workingDirectory, "SanFrancisco.20080519");
+        List<File> list = AidoScenarioResource.extract("SanFrancisco.20080519", workingDirectory);
         assertEquals(list.size(), 7);
         list.stream().forEach(File::delete);
     }

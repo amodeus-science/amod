@@ -17,7 +17,7 @@ public enum AidoScenarioResource {
 
     /** @param key for instance "SanFrancisco.20080518"
      * @throws IOException */
-    public static List<File> extract(File workingDirectory, final String key) throws IOException {
+    public static List<File> extract(final String key, File workingDirectory) throws IOException {
         /** file name is arbitrary, file will be deleted after un-zipping */
         final File file = new File(workingDirectory, SCENARIO_ZIP);
         String resource = "/scenario/" + key.replace('.', '/') + "/" + SCENARIO_ZIP;
