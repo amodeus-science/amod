@@ -37,7 +37,6 @@ import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
@@ -59,12 +58,11 @@ import ch.ethz.matsim.av.framework.AVUtils;
      * @throws MalformedURLException
      * @throws Exception */
 
-    public void simulate(StringSocket stringSocket, int numReqTot) throws MalformedURLException, Exception {
+    public void simulate(File workingDirectory, StringSocket stringSocket, int numReqTot) throws MalformedURLException, Exception {
 
         Static.setup();
 
         /** working directory and options */
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
         scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** set to true in order to make server wait for at least 1 client, for
@@ -112,7 +110,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AidoModule(stringSocket, numReqTot));
         controler.addOverridingModule(new AmodeusDatabaseModule(db));
-        controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+        controler.addOverridingModule(new AmodeusVirtualNetworkModule(scenarioOptions));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

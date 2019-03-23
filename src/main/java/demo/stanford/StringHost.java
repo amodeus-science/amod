@@ -120,14 +120,14 @@ import ch.ethz.idsc.tensor.sca.Round;
             XmlDispatcherChanger.of(workingDirectory, AidoDispatcherHost.class.getSimpleName());
             XmlNumberOfVehiclesChanger.of(workingDirectory, fleetSize);
             StringServer aidoServer = new StringServer();
-            aidoServer.simulate(stringSocket, numReqDes);
+            aidoServer.simulate(workingDirectory, stringSocket, numReqDes);
 
             /** send empty tensor "{}" to stop */
             stringSocket.writeln(Tensors.empty());
 
             /** analyze and send final score */
-            Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
-                    aidoServer.getOutputDirectory(), preparer.getDatabase());
+            Analysis analysis = Analysis.setup(aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory(), //
+                    aidoServer.getNetwork(), preparer.getDatabase());
             AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize, numReqDes, preparer.getDatabase());
             analysis.addAnalysisElement(aidoScoreElement);
             analysis.run();

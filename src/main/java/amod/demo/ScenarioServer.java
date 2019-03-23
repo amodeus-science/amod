@@ -22,6 +22,7 @@ import com.google.inject.name.Names;
 
 import amod.demo.analysis.CustomAnalysis;
 import amod.demo.dispatcher.DemoDispatcher;
+import amod.demo.dispatcher.DemoDispatcherShared;
 import amod.demo.ext.Static;
 import amod.demo.generator.DemoGenerator;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
@@ -53,23 +54,19 @@ public enum ScenarioServer {
     ;
 
     public static void main(String[] args) throws MalformedURLException, Exception {
-        simulate();
-        // General todo's to be completed:
-        // TODO add time-varying dispatcher
-
+        simulate(MultiFileTools.getDefaultWorkingDirectory());
     }
 
     /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml
      * 
      * @throws MalformedURLException
      * @throws Exception */
-    public static void simulate() throws MalformedURLException, Exception {
+    public static void simulate(File workingDirectory) throws MalformedURLException, Exception {
         Static.setup();
 
         Static.checkGLPKLib();
 
         /** working directory and options */
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** set to true in order to make server wait for at least 1 client, for
@@ -135,7 +132,7 @@ public enum ScenarioServer {
 
         /** You need to activate this if you want to use a dispatcher that needs a virtual
          * network! */
-        controler.addOverridingModule(new AmodeusVirtualNetworkModule());
+        controler.addOverridingModule(new AmodeusVirtualNetworkModule(scenarioOptions));
         controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
 
         // ===============================================
@@ -153,15 +150,16 @@ public enum ScenarioServer {
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "DemoDispatcher", DemoDispatcher.Factory.class);
+                AVUtils.registerDispatcherFactory(binder(), //
+                        DemoDispatcher.class.getSimpleName(), DemoDispatcher.Factory.class);
             }
         });
-        // TODO @ Lukas this produces problems.
+        // TODO check if still causes problems.
         // controler.addOverridingModule(new AbstractModule() {
         // @Override
         // public void install() {
-        // AVUtils.registerDispatcherFactory(binder(), "DemoDispatcherShared",
-        // DemoDispatcherShared.Factory.class);
+        // AVUtils.registerDispatcherFactory(binder(), //
+        // DemoDispatcherShared.class.getSimpleName(), DemoDispatcherShared.Factory.class);
         // }
         // });
 
@@ -182,7 +180,7 @@ public enum ScenarioServer {
 
         /** perform analysis of simulation, a demo of how to add custom
          * analysis methods is provided in the package amod.demo.analysis */
-        Analysis analysis = Analysis.setup(null, configFile, new File(outputdirectory), db);
+        Analysis analysis = Analysis.setup(scenarioOptions, new File(outputdirectory), network, db);
         CustomAnalysis.addTo(analysis);
         analysis.run();
 

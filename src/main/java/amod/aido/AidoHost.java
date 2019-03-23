@@ -60,7 +60,7 @@ public enum AidoHost {
 
             /** download the chosen scenario */
             try {
-                AidoScenarioResource.extract(scenarioTag,workingDirectory);
+                AidoScenarioResource.extract(scenarioTag, workingDirectory);
             } catch (Exception exception) {
                 /** send empty tensor "{}" to stop */
                 stringSocket.writeln(Tensors.empty());
@@ -116,14 +116,14 @@ public enum AidoHost {
             XmlDispatcherChanger.of(workingDirectory, AidoDispatcherHost.class.getSimpleName());
             XmlNumberOfVehiclesChanger.of(workingDirectory, fleetSize);
             AidoServer aidoServer = new AidoServer();
-            aidoServer.simulate(stringSocket, numReqDes,workingDirectory);
+            aidoServer.simulate(stringSocket, numReqDes, workingDirectory);
 
             /** send empty tensor "{}" to stop */
             stringSocket.writeln(Tensors.empty());
 
             /** analyze and send final score */
-            Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
-                    aidoServer.getOutputDirectory(), preparer.getDatabase());
+            Analysis analysis = Analysis.setup(aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory(), //
+                    aidoServer.getNetwork(), preparer.getDatabase());
             AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize, numReqDes, preparer.getDatabase());
             analysis.addAnalysisElement(aidoScoreElement);
 
