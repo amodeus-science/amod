@@ -122,7 +122,8 @@ import ch.ethz.matsim.av.router.AVRouter;
 
                     Tensor pickups = commands.get(0);
                     /** pickups are simply ignored as they are done via bipartite matching */
-                    for (Tensor pickup : pickups) {
+                    for (@SuppressWarnings("unused")
+                    Tensor pickup : pickups) {
                         // -- deliberately empty, for execution of demands, see class AidoDispatcherHost
                     }
 
