@@ -30,7 +30,7 @@ public enum ScenarioPreparer {
     ;
 
     public static void main(String[] args) throws MalformedURLException, Exception {
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         run(workingDirectory);
     }
 

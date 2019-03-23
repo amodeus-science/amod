@@ -39,6 +39,7 @@ import ch.ethz.idsc.tensor.sca.Round;
     private static final String ENV_VIDEO_EXPORT = "VIDEO_EXPORT";
 
     public static void main(String[] args) throws Exception {
+        File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         /** open String server and wait for initial command */
         try (StringServerSocket serverSocket = new StringServerSocket(PORT)) {
             StringSocket stringSocket = serverSocket.getSocketWait();
@@ -57,7 +58,7 @@ import ch.ethz.idsc.tensor.sca.Round;
 
             /** download the chosen scenario */
             try {
-                AidoScenarioResource.extract(scenarioTag);
+                AidoScenarioResource.extract(workingDirectory, scenarioTag);
             } catch (Exception exception) {
                 /** send empty tensor "{}" to stop */
                 stringSocket.writeln(Tensors.empty());
@@ -70,7 +71,6 @@ import ch.ethz.idsc.tensor.sca.Round;
             System.setProperty("matsim.preferLocalDtds", "true");
 
             /** scenario preparer */
-            File workingDirectory = MultiFileTools.getWorkingDirectory();
             System.out.println("Using scenario directory: " + workingDirectory);
 
             /** run first part of preparer */
@@ -117,14 +117,14 @@ import ch.ethz.idsc.tensor.sca.Round;
             XmlDispatcherChanger.of(workingDirectory, AidoDispatcherHost.class.getSimpleName());
             XmlNumberOfVehiclesChanger.of(workingDirectory, fleetSize);
             StringServer aidoServer = new StringServer();
-            aidoServer.simulate(stringSocket, numReqDes);
+            aidoServer.simulate(workingDirectory, stringSocket, numReqDes);
 
             /** send empty tensor "{}" to stop */
             stringSocket.writeln(Tensors.empty());
 
             /** analyze and send final score */
-            Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
-                    aidoServer.getOutputDirectory(), preparer.getDatabase());
+            Analysis analysis = Analysis.setup(aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory(), aidoServer.getNetwork(),
+                    preparer.getDatabase());
             AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize, numReqDes, preparer.getDatabase());
             analysis.addAnalysisElement(aidoScoreElement);
             analysis.run();
