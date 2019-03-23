@@ -44,7 +44,7 @@ public enum CustomAnalysis {
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
         /** the analysis is created */
-        Analysis analysis = Analysis.setup(scenOptions, configFile, new File(outputdirectory), network, db);
+        Analysis analysis = Analysis.setup(scenOptions, new File(outputdirectory), network, db);
 
         /** create and add a custom element */
         addTo(analysis);

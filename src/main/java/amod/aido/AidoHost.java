@@ -120,8 +120,8 @@ public enum AidoHost {
             stringSocket.writeln(Tensors.empty());
 
             /** analyze and send final score */
-            Analysis analysis = Analysis.setup(aidoServer.getScenarioOptions(), aidoServer.getConfigFile(), //
-                    aidoServer.getOutputDirectory(), aidoServer.getNetwork(), preparer.getDatabase());
+            Analysis analysis = Analysis.setup(aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory(), aidoServer.getNetwork(),
+                    preparer.getDatabase());
             AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize, numReqDes, preparer.getDatabase());
             analysis.addAnalysisElement(aidoScoreElement);
 
