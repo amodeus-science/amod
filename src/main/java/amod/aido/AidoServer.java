@@ -66,7 +66,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
          * instance viewer client, for fals the ScenarioServer starts the simulation
          * immediately */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
-        configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
+        configFile = new File(scenarioOptions.getSimulationConfigName());
         /** geographic information */
         LocationSpec locationSpec = scenarioOptions.getLocationSpec();
         referenceFrame = locationSpec.referenceFrame();
@@ -92,17 +92,22 @@ import ch.ethz.matsim.av.framework.AVUtils;
         GlobalAssert.that(Objects.nonNull(network));
         GlobalAssert.that(Objects.nonNull(population));
 
-        // load linkSpeedData
-        File linkSpeedDataFile = new File(workingDirectory, scenarioOptions.getLinkSpeedDataName());
-        System.out.println(linkSpeedDataFile.toString());
-        LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
-
         Objects.requireNonNull(network);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
+        /** try to load link speed data and use for speed adaption in network */
+        try {
+            File linkSpeedDataFile = new File(scenarioOptions.getLinkSpeedDataName());
+            System.out.println(linkSpeedDataFile.toString());
+            LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
+            controler.addOverridingModule(new TrafficDataModule(lsData));
+        } catch (Exception exception) {
+            System.err.println("Unable to load linkspeed data, freeflow speeds will be used in the simulation.");
+            exception.printStackTrace();
+        }
+
         controler.addOverridingModule(new DvrpTravelTimeModule());
-        controler.addOverridingModule(new TrafficDataModule(lsData));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
         /** VirtualNetwork shouldn't be necessary */
