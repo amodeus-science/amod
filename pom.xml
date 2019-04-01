@@ -3,7 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.ethz.idsc</groupId>
 	<artifactId>amod</artifactId>
-	<version>1.5.2</version>
+	<version>1.6.7</version>
+	<packaging>jar</packaging>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -15,12 +16,12 @@
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>amodeus</artifactId>
-			<version>1.5.2</version>
+			<version>1.6.7</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>tensor</artifactId>
-			<version>0.6.1</version>
+			<version>0.7.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
@@ -118,7 +119,8 @@
 						<transformer
 							implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 					</transformers>
-					<!-- Exclude all signature files to avoid java.lang.SecurityException: Invalid signature file digest -->
+					<!-- Exclude all signature files to avoid java.lang.SecurityException: 
+						Invalid signature file digest -->
 					<filters>
 						<filter>
 							<artifact>*:*</artifact>

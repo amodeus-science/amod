@@ -11,7 +11,7 @@ import ch.ethz.idsc.amodeus.net.SimulationObjectCompiler;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.matsim.av.passenger.AVRequest;
 
-/* package */ class AidoScoreCompiler {
+public class AidoScoreCompiler {
     private static final String INFO_LINE = "";
     private static final int TOTAL_MATCHED_REQUESTS = -1;
     // ---

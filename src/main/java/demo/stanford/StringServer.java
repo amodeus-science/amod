@@ -1,5 +1,5 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.demo;
+package demo.stanford;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -20,62 +20,59 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
-import amod.demo.analysis.CustomAnalysis;
-import amod.demo.dispatcher.DemoDispatcher;
+import amod.aido.AidoModule;
 import amod.demo.ext.Static;
-import amod.demo.generator.DemoGenerator;
-import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleToVSGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
+import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
+import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.framework.AVUtils;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
-public enum ScenarioServer {
-    ;
+/* package */ class StringServer {
 
-    public static void main(String[] args) throws MalformedURLException, Exception {
-        simulate(MultiFileTools.getDefaultWorkingDirectory());
-    }
+    private File configFile;
+    private File outputDirectory;
+    private Network network;
+    private ReferenceFrame referenceFrame;
+    private ScenarioOptions scenarioOptions;
 
     /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml
      * 
      * @throws MalformedURLException
      * @throws Exception */
-    public static void simulate(File workingDirectory) throws MalformedURLException, Exception {
+
+    public void simulate(File workingDirectory, StringSocket stringSocket, int numReqTot) throws MalformedURLException, Exception {
+
         Static.setup();
 
-        Static.checkGLPKLib();
-
         /** working directory and options */
-        ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
+        scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** set to true in order to make server wait for at least 1 client, for
          * instance viewer client, for fals the ScenarioServer starts the simulation
          * immediately */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
-        File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
+        configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
         /** geographic information */
         LocationSpec locationSpec = scenarioOptions.getLocationSpec();
-        ReferenceFrame referenceFrame = locationSpec.referenceFrame();
+        referenceFrame = locationSpec.referenceFrame();
 
         /** open server port for clients to connect to */
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
@@ -91,12 +88,9 @@ public enum ScenarioServer {
             activityParams.setTypicalDuration(3600.0); // TODO fix this to meaningful values
         }
 
-        /** output directory for saving results */
-        String outputdirectory = config.controler().getOutputDirectory();
-
         /** load MATSim scenario for simulation */
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        Network network = scenario.getNetwork();
+        network = scenario.getNetwork();
         Population population = scenario.getPopulation();
         GlobalAssert.that(Objects.nonNull(network));
         GlobalAssert.that(Objects.nonNull(population));
@@ -106,6 +100,7 @@ public enum ScenarioServer {
         System.out.println(linkSpeedDataFile.toString());
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
 
+        Objects.requireNonNull(network);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
@@ -113,29 +108,9 @@ public enum ScenarioServer {
         controler.addOverridingModule(new TrafficDataModule(lsData));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
-        controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
-        controler.addOverridingModule(new AmodeusDispatcherModule());
+        controler.addOverridingModule(new AidoModule(stringSocket, numReqTot));
         controler.addOverridingModule(new AmodeusDatabaseModule(db));
-
-        /** uncomment to include custom routers
-         * controler.addOverridingModule(new AbstractModule() {
-         * 
-         * @Override
-         *           public void install() {
-         *           bind(CustomRouter.Factory.class);
-         *           AVUtils.bindRouterFactory(binder(),
-         *           CustomRouter.class.getSimpleName()).to(CustomRouter.Factory.class);
-         * 
-         *           }
-         *           }); */
-
-        /** You need to activate this if you want to use a dispatcher that needs a virtual
-         * network! */
         controler.addOverridingModule(new AmodeusVirtualNetworkModule(scenarioOptions));
-        controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
-
-        // ===============================================
-
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -143,33 +118,23 @@ public enum ScenarioServer {
             }
         });
         controler.addOverridingModule(new AmodeusModule());
-
-        /** here an additional user-defined dispatcher is added, functionality in class
-         * DemoDispatcher */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), //
-                        DemoDispatcher.class.getSimpleName(), DemoDispatcher.Factory.class);
+                AVUtils.registerDispatcherFactory(binder(), StringDispatcherHost.class.getSimpleName(), StringDispatcherHost.Factory.class);
             }
         });
-        // TODO check if still causes problems.
-        // controler.addOverridingModule(new AbstractModule() {
-        // @Override
-        // public void install() {
-        // AVUtils.registerDispatcherFactory(binder(), //
-        // DemoDispatcherShared.class.getSimpleName(), DemoDispatcherShared.Factory.class);
-        // }
-        // });
-
-        /** here an additional user-defined initial placement logic called generator is added,
-         * functionality in class DemoGenerator */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerGeneratorFactory(binder(), "DemoGenerator", DemoGenerator.Factory.class);
+                AVUtils.bindGeneratorFactory(binder(), RandomDensityGenerator.class.getSimpleName()).//
+                to(RandomDensityGenerator.Factory.class);
             }
         });
+
+        /** change the standard AidoDispatcherHost setting in av.xml to
+         * StringDispatcherHost */
+        XmlDispatcherChanger.of(workingDirectory, "StringDispatcherHost");
 
         /** run simulation */
         controler.run();
@@ -177,15 +142,30 @@ public enum ScenarioServer {
         /** close port for visualizaiton */
         SimulationServer.INSTANCE.stopAccepting();
 
-        /** perform analysis of simulation, a demo of how to add custom
-         * analysis methods is provided in the package amod.demo.analysis */
-        Analysis analysis = Analysis.setup(scenarioOptions, new File(outputdirectory), network, db);
-        CustomAnalysis.addTo(analysis);
-        analysis.run();
+        /** perform analysis of simulation */
+        /** output directory for saving results */
+        outputDirectory = new File(config.controler().getOutputDirectory());
 
     }
 
-    public static void clearMemory() {
-        // TODO clear memory for the sequential server such that RAM is not limiting
+    /* package */ File getOutputDirectory() {
+        return outputDirectory;
     }
+
+    /* package */ File getConfigFile() {
+        return configFile;
+    }
+
+    /* package */ Network getNetwork() {
+        return network;
+    }
+
+    /* package */ ReferenceFrame getReferenceFrame() {
+        return referenceFrame;
+    }
+
+    /* package */ ScenarioOptions getScenarioOptions() {
+        return scenarioOptions;
+    }
+
 }

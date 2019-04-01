@@ -10,7 +10,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.matsim.av.passenger.AVRequest;
 
-/* package */ class AidoRequestCompiler {
+public class AidoRequestCompiler {
     private final MatsimAmodeusDatabase db;
 
     public AidoRequestCompiler(MatsimAmodeusDatabase db) {

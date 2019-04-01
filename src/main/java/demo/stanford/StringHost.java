@@ -1,9 +1,11 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.aido;
+package demo.stanford;
 
 import java.io.File;
 import java.util.Objects;
 
+import amod.aido.AidoPreparer;
+import amod.aido.AidoScenarioResource;
 import amod.aido.core.AidoDispatcherHost;
 import amod.aido.core.AidoScoreElement;
 import amod.aido.core.ScoreParameters;
@@ -15,9 +17,11 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.amodeus.video.VideoGenerator;
+import ch.ethz.idsc.tensor.DoubleScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
 
@@ -26,7 +30,7 @@ import ch.ethz.idsc.tensor.sca.Round;
  * 
  * Usage:
  * java -cp target/amod-VERSION.jar amod.aido.AidoHost [city] */
-public enum AidoHost {
+/* package */ enum StringHost {
     ;
     public static final int PORT = 9382;
     private static final String ENV_SCENARIO = "SCENARIO";
@@ -35,13 +39,13 @@ public enum AidoHost {
     private static final String ENV_VIDEO_EXPORT = "VIDEO_EXPORT";
 
     public static void main(String[] args) throws Exception {
+        /** scenario preparer */
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         run(workingDirectory);
     }
 
     public static void run(File workingDirectory) throws Exception {
         System.out.println("Using scenario directory: " + workingDirectory);
-
         /** open String server and wait for initial command */
         try (StringServerSocket serverSocket = new StringServerSocket(PORT)) {
             StringSocket stringSocket = serverSocket.getSocketWait();
@@ -65,14 +69,14 @@ public enum AidoHost {
                 /** send empty tensor "{}" to stop */
                 stringSocket.writeln(Tensors.empty());
                 /** send fictitious costs */
-                stringSocket.writeln(StaticHelper.FAILURE_SCORE);
+                stringSocket.writeln(Array.of(l -> DoubleScalar.NEGATIVE_INFINITY, 3).toString());
                 throw exception;
             }
 
             /** setup environment variables */
-            StaticHelper.setup();
+            System.setProperty("matsim.preferLocalDtds", "true");
 
-            /** run first part of scenario preparer */
+            /** run first part of preparer */
             AidoPreparer preparer = new AidoPreparer(workingDirectory);
 
             /** get number of requests in population */
@@ -115,8 +119,8 @@ public enum AidoHost {
             /** run with AIDO dispatcher */
             XmlDispatcherChanger.of(workingDirectory, AidoDispatcherHost.class.getSimpleName());
             XmlNumberOfVehiclesChanger.of(workingDirectory, fleetSize);
-            AidoServer aidoServer = new AidoServer();
-            aidoServer.simulate(stringSocket, numReqDes, workingDirectory);
+            StringServer aidoServer = new StringServer();
+            aidoServer.simulate(workingDirectory, stringSocket, numReqDes);
 
             /** send empty tensor "{}" to stop */
             stringSocket.writeln(Tensors.empty());
@@ -126,12 +130,6 @@ public enum AidoHost {
                     aidoServer.getNetwork(), preparer.getDatabase());
             AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize, numReqDes, preparer.getDatabase());
             analysis.addAnalysisElement(aidoScoreElement);
-
-            AidoExport aidoExport = new AidoExport(aidoScoreElement);
-            analysis.addAnalysisExport(aidoExport);
-
-            AidoHtmlReport aidoHtmlReport = new AidoHtmlReport(aidoScoreElement);
-            analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
 
             { /** create a video if environment variable is set */

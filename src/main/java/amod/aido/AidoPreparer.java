@@ -29,7 +29,7 @@ import ch.ethz.matsim.av.config.AVConfig;
 import ch.ethz.matsim.av.config.AVGeneratorConfig;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 
-/* package */ class AidoPreparer {
+public class AidoPreparer {
 
     private final Population population;
     private final ScenarioOptions scenOpt;
@@ -76,7 +76,7 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
         long apoSeed = 1234;
         AidoPopulationPreparer.run(network, population, scenOpt, config, apoSeed, numReqDes);
 
-        // /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
+        /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
         // int endTime = (int) config.qsim().getEndTime();
         // VirtualNetworkPreparer.INSTANCE.create(network, population, scenOpt, numRt,endTime);
 

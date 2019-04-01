@@ -14,20 +14,21 @@ import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.gfx.AmodeusComponent;
 import ch.ethz.idsc.amodeus.gfx.AmodeusViewerFrame;
+import ch.ethz.idsc.amodeus.gfx.ViewerConfig;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.virtualnetwork.VirtualNetworkGet;
+import ch.ethz.idsc.amodeus.virtualnetwork.core.VirtualNetworkGet;
 
 /** the viewer allows to connect to the scenario server or to view saved simulation results. */
 public enum ScenarioViewer {
     ;
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         run(workingDirectory);
     }
 
@@ -38,19 +39,23 @@ public enum ScenarioViewer {
      * @throws IOException */
     public static void run(File workingDirectory) throws FileNotFoundException, IOException {
         Static.setup();
+        ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** load options */
         ScenarioOptions simOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
         Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
         System.out.println(simOptions.getSimulationConfigName());
         final File outputSubDirectory = new File(config.controler().getOutputDirectory()).getAbsoluteFile();
-        GlobalAssert.that(outputSubDirectory.isDirectory());
+        if (!outputSubDirectory.isDirectory()) {
+            System.err.println("output directory: " + outputSubDirectory.getAbsolutePath() + " not found.");
+            GlobalAssert.that(false);
+        }
         System.out.println("outputSubDirectory=" + outputSubDirectory);
         System.out.println(outputSubDirectory.getAbsolutePath());
         File outputDirectory = outputSubDirectory.getParentFile();
         System.out.println("showing simulation results from outputDirectory=" + outputDirectory);
 
-        /** geopgrahic information, .e.g., coordinate system */
+        /** geographic information, .e.g., coordinate system */
         LocationSpec locationSpec = simOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
 
@@ -65,12 +70,14 @@ public enum ScenarioViewer {
         AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db);
 
         /** virtual network layer, should not cause problems if layer does not exist */
-        amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
+        amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network, scenarioOptions));
 
         /** starting the viewer */
-        AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory, network);
-        amodeusViewerFrame.setDisplayPosition(db.getCenter(), 12);
-        amodeusViewerFrame.jFrame.setSize(900, 900);
+        ViewerConfig viewerConfig = ViewerConfig.fromDefaults(db);
+        System.out.println(viewerConfig);
+        AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory, network, scenarioOptions);
+        amodeusViewerFrame.setDisplayPosition(viewerConfig.settings.coord, viewerConfig.settings.zoom);
+        amodeusViewerFrame.jFrame.setSize(viewerConfig.settings.dimensions);
         amodeusViewerFrame.jFrame.setVisible(true);
     }
 
