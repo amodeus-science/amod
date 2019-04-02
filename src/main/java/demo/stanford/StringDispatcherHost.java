@@ -98,9 +98,11 @@ import ch.ethz.matsim.av.router.AVRouter;
         if (round_now % dispatchPeriod == 0) {
 
             /** bipartite matching is conducted to assign available {@link RoboTaxi}s to
-             * open {@link AVRequest}s. */
+             * open {@link AVRequest}s. 
+             * UPDATE: dispatch is external as well, uncomment to revert
             bipartiteMatchingUtils.executePickup(this, getDivertableRoboTaxis(), //
                     getAVRequests(), distanceFunction, network);
+            */
 
             if (Objects.nonNull(aidoScoreCompiler))
                 try {
@@ -121,9 +123,10 @@ import ch.ethz.matsim.av.router.AVRouter;
                     CommandConsistency.check(commands);
 
                     Tensor pickups = commands.get(0);
-                    /** pickups are simply ignored as they are done via bipartite matching */
                     for (Tensor pickup : pickups) {
-                        // -- deliberately empty, for execution of demands, see class AidoDispatcherHost
+                        RoboTaxi roboTaxi = idRoboTaxiMap.get(pickup.Get(0).number().intValue());
+                        AVRequest avRequest = idRequestMap.get(pickup.Get(1).number().intValue());
+                        setRoboTaxiPickup(roboTaxi, avRequest);
                     }
 
                     Tensor rebalances = commands.get(1);
