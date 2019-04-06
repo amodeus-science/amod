@@ -1,4 +1,4 @@
-FROM maven
+FROM maven:3.6.0-jdk-8
 RUN apt-get update
 RUN apt-get install  -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
