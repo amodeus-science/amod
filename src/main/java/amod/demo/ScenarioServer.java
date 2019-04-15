@@ -41,6 +41,7 @@ import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
+import ch.ethz.idsc.amodeus.routing.DefaultAStarLMRouter;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
@@ -72,7 +73,7 @@ public enum ScenarioServer {
          * instance viewer client, for fals the ScenarioServer starts the simulation
          * immediately */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
-        File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
+        File configFile = new File(scenarioOptions.getSimulationConfigName());
         /** geographic information */
         LocationSpec locationSpec = scenarioOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
@@ -102,13 +103,12 @@ public enum ScenarioServer {
         GlobalAssert.that(Objects.nonNull(population));
 
         // load linkSpeedData
-        File linkSpeedDataFile = new File(workingDirectory, scenarioOptions.getLinkSpeedDataName());
+        File linkSpeedDataFile = new File(scenarioOptions.getLinkSpeedDataName());
         System.out.println(linkSpeedDataFile.toString());
         LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
 
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         Controler controler = new Controler(scenario);
-
         controler.addOverridingModule(new DvrpTravelTimeModule());
         controler.addOverridingModule(new TrafficDataModule(lsData));
         controler.addOverridingModule(new AVModule());
@@ -116,21 +116,6 @@ public enum ScenarioServer {
         controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
         controler.addOverridingModule(new AmodeusDatabaseModule(db));
-
-        /** uncomment to include custom routers
-         * controler.addOverridingModule(new AbstractModule() {
-         * 
-         * @Override
-         *           public void install() {
-         *           bind(CustomRouter.Factory.class);
-         *           AVUtils.bindRouterFactory(binder(),
-         *           CustomRouter.class.getSimpleName()).to(CustomRouter.Factory.class);
-         * 
-         *           }
-         *           }); */
-
-        /** You need to activate this if you want to use a dispatcher that needs a virtual
-         * network! */
         controler.addOverridingModule(new AmodeusVirtualNetworkModule(scenarioOptions));
         controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
 
@@ -153,14 +138,6 @@ public enum ScenarioServer {
                         DemoDispatcher.class.getSimpleName(), DemoDispatcher.Factory.class);
             }
         });
-        // TODO check if still causes problems.
-        // controler.addOverridingModule(new AbstractModule() {
-        // @Override
-        // public void install() {
-        // AVUtils.registerDispatcherFactory(binder(), //
-        // DemoDispatcherShared.class.getSimpleName(), DemoDispatcherShared.Factory.class);
-        // }
-        // });
 
         /** here an additional user-defined initial placement logic called generator is added,
          * functionality in class DemoGenerator */
@@ -168,6 +145,21 @@ public enum ScenarioServer {
             @Override
             public void install() {
                 AVUtils.registerGeneratorFactory(binder(), "DemoGenerator", DemoGenerator.Factory.class);
+            }
+        });
+
+        /** with these lines, another custom router is added, it has to be selected in the av.xml
+         * file with the lines as follows:
+         * <operator id="op1">
+         * <param name="routerName" value="DefaultAStarLMRouter" />
+         * <generator strategy="PopulationDensity">
+         * ... */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(DefaultAStarLMRouter.Factory.class);
+                AVUtils.bindRouterFactory(binder(), DefaultAStarLMRouter.class.getSimpleName())//
+                        .to(DefaultAStarLMRouter.Factory.class);
             }
         });
 
