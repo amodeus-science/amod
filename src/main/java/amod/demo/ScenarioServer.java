@@ -48,8 +48,9 @@ import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.framework.AVUtils;
 
-/** only one ScenarioServer can run at one time, since a fixed network port is
- * reserved to serve the simulation status */
+/** This class runs an AMoDeus simulation based on MATSim. The results can be viewed
+ * if the {@link ScenarioViewer} is executed in the same working directory and the button "Connect"
+ * is pressed. */
 public enum ScenarioServer {
     ;
 
@@ -63,7 +64,6 @@ public enum ScenarioServer {
      * @throws Exception */
     public static void simulate(File workingDirectory) throws MalformedURLException, Exception {
         Static.setup();
-
         Static.checkGLPKLib();
 
         /** working directory and options */
@@ -74,6 +74,7 @@ public enum ScenarioServer {
          * immediately */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
         File configFile = new File(scenarioOptions.getSimulationConfigName());
+
         /** geographic information */
         LocationSpec locationSpec = scenarioOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
@@ -88,8 +89,11 @@ public enum ScenarioServer {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
         config.planCalcScore().addActivityParams(new ActivityParams("activity"));
+        /** MATSim does not allow the typical duration not to be set, therefore for scenarios
+         * generated from taxi data such as the "SanFrancisco" scenario, it is set to 1 hour. */
         for (ActivityParams activityParams : config.planCalcScore().getActivityParams()) {
-            activityParams.setTypicalDuration(3600.0); // TODO fix this to meaningful values
+            // TODO set typical duration in scenario generation and remove
+            activityParams.setTypicalDuration(3600.0);
         }
 
         /** output directory for saving results */
@@ -102,15 +106,19 @@ public enum ScenarioServer {
         GlobalAssert.that(Objects.nonNull(network));
         GlobalAssert.that(Objects.nonNull(population));
 
-        // load linkSpeedData
-        File linkSpeedDataFile = new File(scenarioOptions.getLinkSpeedDataName());
-        System.out.println(linkSpeedDataFile.toString());
-        LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
-
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new DvrpTravelTimeModule());
-        controler.addOverridingModule(new TrafficDataModule(lsData));
+
+        try {
+            // load linkSpeedData if possible
+            File linkSpeedDataFile = new File(scenarioOptions.getLinkSpeedDataName());
+            System.out.println(linkSpeedDataFile.toString());
+            LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
+            controler.addOverridingModule(new TrafficDataModule(lsData));
+        } catch (Exception exception) {
+            System.err.println("Could not load static linkspeed data, running with freespeeds.");
+        }
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
@@ -118,19 +126,18 @@ public enum ScenarioServer {
         controler.addOverridingModule(new AmodeusDatabaseModule(db));
         controler.addOverridingModule(new AmodeusVirtualNetworkModule(scenarioOptions));
         controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
-
-        // ===============================================
-
+        controler.addOverridingModule(new AmodeusModule());
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
             }
         });
-        controler.addOverridingModule(new AmodeusModule());
 
-        /** here an additional user-defined dispatcher is added, functionality in class
-         * DemoDispatcher */
+        /** With the subsequent lines an additional user-defined dispatcher is added, functionality
+         * in class
+         * DemoDispatcher, as long as the dispatcher was not selected in the file av.xml, it is not
+         * used in the simulation. */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -139,8 +146,11 @@ public enum ScenarioServer {
             }
         });
 
-        /** here an additional user-defined initial placement logic called generator is added,
-         * functionality in class DemoGenerator */
+        /** With the subsequent lines, additional user-defined initial placement logic called
+         * generator is added,
+         * functionality in class DemoGenerator. As long as the generator is not selected in the
+         * file av.xml,
+         * it is not used in the simulation. */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -148,12 +158,15 @@ public enum ScenarioServer {
             }
         });
 
-        /** with these lines, another custom router is added, it has to be selected in the av.xml
-         * file with the lines as follows:
+        /** With the subsequent lines, another custom router is added apart from the
+         * {@link DefaultAVRouter},
+         * it has to be selected in the av.xml file with the lines as follows:
          * <operator id="op1">
          * <param name="routerName" value="DefaultAStarLMRouter" />
          * <generator strategy="PopulationDensity">
-         * ... */
+         * ...
+         * 
+         * otherwise the normal {@link DefaultAVRouter} will be used. */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -175,9 +188,5 @@ public enum ScenarioServer {
         CustomAnalysis.addTo(analysis);
         analysis.run();
 
-    }
-
-    public static void clearMemory() {
-        // TODO clear memory for the sequential server such that RAM is not limiting
     }
 }
