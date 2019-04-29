@@ -67,7 +67,7 @@ public enum ScenarioViewer {
 
         /** initializing the viewer */
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
-        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db);
+        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db, workingDirectory);
 
         /** virtual network layer, should not cause problems if layer does not exist */
         amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network, scenarioOptions));
