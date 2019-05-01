@@ -3,8 +3,7 @@ package amod.demo;
 
 import java.net.MalformedURLException;
 
-/** only one ScenarioServer can run at one time, since a fixed network port is
- * reserved to serve the simulation status */
+/** Helper class to run a default preparer and server. */
 public enum ScenarioStandalone {
     ;
 

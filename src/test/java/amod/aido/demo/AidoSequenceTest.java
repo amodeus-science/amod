@@ -16,7 +16,7 @@ import ch.ethz.idsc.amodeus.util.io.FileDelete;
 import ch.ethz.idsc.tensor.io.ResourceData;
 import junit.framework.TestCase;
 
-public class AidoStarterHelperTest extends TestCase {
+public class AidoSequenceTest extends TestCase {
     private static AidoGuest guest() throws Exception {
         new Thread(new Runnable() {
             @Override
@@ -28,38 +28,26 @@ public class AidoStarterHelperTest extends TestCase {
                 }
             }
         }).start();
-
         Thread.sleep(1000);
-
         return new AidoGuest("localhost");
-
     }
 
     public void testSanFrancisco() throws UnknownHostException, IOException, Exception {
-
         Properties properties = ResourceData.properties("/aido/scenarios.properties");
-
         List<String> list = new ArrayList<>(properties.stringPropertyNames());
-
         Collections.shuffle(list);
-
         list = list.subList(0, 1);
-
         Random random = new Random();
         for (String index : list) {
-
             guest().run(index, 800 + random.nextInt(200), 6 + random.nextInt(10));
-
             /** files */
             CleanAidoScenarios.now();
-
             { // folder should not exist
                 /** virtual network file "virtualNetwork" should not exist for AIDO */
                 File file = new File("virtualNetwork");
                 if (file.exists())
                     FileDelete.of(file, 1, 4);
             }
-
             {
                 /** output folder */
                 File file = new File("output");

@@ -22,12 +22,12 @@ import ch.ethz.idsc.amodeus.dispatcher.core.DispatcherConfig;
 import ch.ethz.idsc.amodeus.dispatcher.core.RebalancingDispatcher;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.util.BipartiteMatchingUtils;
-import ch.ethz.idsc.amodeus.dispatcher.util.DistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.DistanceHeuristics;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.TensorCoords;
+import ch.ethz.idsc.amodeus.routing.DistanceFunction;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -98,9 +98,11 @@ import ch.ethz.matsim.av.router.AVRouter;
         if (round_now % dispatchPeriod == 0) {
 
             /** bipartite matching is conducted to assign available {@link RoboTaxi}s to
-             * open {@link AVRequest}s. */
+             * open {@link AVRequest}s. 
+             * UPDATE: dispatch is external as well, uncomment to revert
             bipartiteMatchingUtils.executePickup(this, getDivertableRoboTaxis(), //
                     getAVRequests(), distanceFunction, network);
+            */
 
             if (Objects.nonNull(aidoScoreCompiler))
                 try {
@@ -122,7 +124,8 @@ import ch.ethz.matsim.av.router.AVRouter;
 
                     Tensor pickups = commands.get(0);
                     /** pickups are simply ignored as they are done via bipartite matching */
-                    for (Tensor pickup : pickups) {
+                    for (@SuppressWarnings("unused")
+                    Tensor pickup : pickups) {
                         // -- deliberately empty, for execution of demands, see class AidoDispatcherHost
                     }
 
