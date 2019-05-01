@@ -22,12 +22,12 @@ import ch.ethz.idsc.amodeus.dispatcher.core.DispatcherConfig;
 import ch.ethz.idsc.amodeus.dispatcher.core.RebalancingDispatcher;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.util.BipartiteMatchingUtils;
-import ch.ethz.idsc.amodeus.dispatcher.util.DistanceFunction;
 import ch.ethz.idsc.amodeus.dispatcher.util.DistanceHeuristics;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.TensorCoords;
+import ch.ethz.idsc.amodeus.routing.DistanceFunction;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -123,10 +123,10 @@ import ch.ethz.matsim.av.router.AVRouter;
                     CommandConsistency.check(commands);
 
                     Tensor pickups = commands.get(0);
-                    for (Tensor pickup : pickups) {
-                        RoboTaxi roboTaxi = idRoboTaxiMap.get(pickup.Get(0).number().intValue());
-                        AVRequest avRequest = idRequestMap.get(pickup.Get(1).number().intValue());
-                        setRoboTaxiPickup(roboTaxi, avRequest);
+                    /** pickups are simply ignored as they are done via bipartite matching */
+                    for (@SuppressWarnings("unused")
+                    Tensor pickup : pickups) {
+                        // -- deliberately empty, for execution of demands, see class AidoDispatcherHost
                     }
 
                     Tensor rebalances = commands.get(1);

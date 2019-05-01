@@ -28,7 +28,7 @@ public enum ScenarioViewer {
     ;
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         run(workingDirectory);
     }
 
@@ -39,45 +39,43 @@ public enum ScenarioViewer {
      * @throws IOException */
     public static void run(File workingDirectory) throws FileNotFoundException, IOException {
         Static.setup();
+        ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** load options */
-        ScenarioOptions simOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
-        Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
-        System.out.println(simOptions.getSimulationConfigName());
+        Config config = ConfigUtils.loadConfig(scenarioOptions.getSimulationConfigName());
+        System.out.println("MATSim config file: " + scenarioOptions.getSimulationConfigName());
         final File outputSubDirectory = new File(config.controler().getOutputDirectory()).getAbsoluteFile();
         if (!outputSubDirectory.isDirectory()) {
             System.err.println("output directory: " + outputSubDirectory.getAbsolutePath() + " not found.");
             GlobalAssert.that(false);
         }
-        System.out.println("outputSubDirectory=" + outputSubDirectory);
-        System.out.println(outputSubDirectory.getAbsolutePath());
+        System.out.println("outputSubDirectory=" + outputSubDirectory.getAbsolutePath());
         File outputDirectory = outputSubDirectory.getParentFile();
         System.out.println("showing simulation results from outputDirectory=" + outputDirectory);
 
         /** geographic information, .e.g., coordinate system */
-        LocationSpec locationSpec = simOptions.getLocationSpec();
+        LocationSpec locationSpec = scenarioOptions.getLocationSpec();
         ReferenceFrame referenceFrame = locationSpec.referenceFrame();
 
         /** MATSim simulation network */
-        Network network = NetworkLoader.fromConfigFile(new File(workingDirectory, simOptions.getString("simuConfig")));
+        Network network = NetworkLoader.fromConfigFile(new File(workingDirectory, scenarioOptions.getString("simuConfig")));
         System.out.println("INFO network loaded");
         System.out.println("INFO total links " + network.getLinks().size());
         System.out.println("INFO total nodes " + network.getNodes().size());
 
         /** initializing the viewer */
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
-        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db);
+        AmodeusComponent amodeusComponent = AmodeusComponent.createDefault(db, workingDirectory);
 
         /** virtual network layer, should not cause problems if layer does not exist */
-        amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
+        amodeusComponent.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network, scenarioOptions));
 
         /** starting the viewer */
-        ViewerConfig viewerConfig = ViewerConfig.fromDefaults(db);
-        System.out.println(viewerConfig);
-        AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory, network);
+        ViewerConfig viewerConfig = ViewerConfig.from(db, workingDirectory);
+        System.out.println("Used viewer config: " + viewerConfig);
+        AmodeusViewerFrame amodeusViewerFrame = new AmodeusViewerFrame(amodeusComponent, outputDirectory, network, scenarioOptions);
         amodeusViewerFrame.setDisplayPosition(viewerConfig.settings.coord, viewerConfig.settings.zoom);
         amodeusViewerFrame.jFrame.setSize(viewerConfig.settings.dimensions);
         amodeusViewerFrame.jFrame.setVisible(true);
     }
-
 }
