@@ -73,3 +73,5 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# macos files
+.DS_Store

@@ -35,6 +35,13 @@ public enum AidoHost {
     private static final String ENV_VIDEO_EXPORT = "VIDEO_EXPORT";
 
     public static void main(String[] args) throws Exception {
+        File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
+        run(workingDirectory);
+    }
+
+    public static void run(File workingDirectory) throws Exception {
+        System.out.println("Using scenario directory: " + workingDirectory);
+
         /** open String server and wait for initial command */
         try (StringServerSocket serverSocket = new StringServerSocket(PORT)) {
             StringSocket stringSocket = serverSocket.getSocketWait();
@@ -53,7 +60,7 @@ public enum AidoHost {
 
             /** download the chosen scenario */
             try {
-                AidoScenarioResource.extract(scenarioTag);
+                AidoScenarioResource.extract(scenarioTag, workingDirectory);
             } catch (Exception exception) {
                 /** send empty tensor "{}" to stop */
                 stringSocket.writeln(Tensors.empty());
@@ -65,11 +72,7 @@ public enum AidoHost {
             /** setup environment variables */
             StaticHelper.setup();
 
-            /** scenario preparer */
-            File workingDirectory = MultiFileTools.getWorkingDirectory();
-            System.out.println("Using scenario directory: " + workingDirectory);
-
-            /** run first part of preparer */
+            /** run first part of scenario preparer */
             AidoPreparer preparer = new AidoPreparer(workingDirectory);
 
             /** get number of requests in population */
@@ -113,14 +116,14 @@ public enum AidoHost {
             XmlDispatcherChanger.of(workingDirectory, AidoDispatcherHost.class.getSimpleName());
             XmlNumberOfVehiclesChanger.of(workingDirectory, fleetSize);
             AidoServer aidoServer = new AidoServer();
-            aidoServer.simulate(stringSocket, numReqDes);
+            aidoServer.simulate(stringSocket, numReqDes, workingDirectory);
 
             /** send empty tensor "{}" to stop */
             stringSocket.writeln(Tensors.empty());
 
             /** analyze and send final score */
-            Analysis analysis = Analysis.setup(workingDirectory, aidoServer.getConfigFile(), //
-                    aidoServer.getOutputDirectory(), preparer.getDatabase());
+            Analysis analysis = Analysis.setup(aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory(), //
+                    aidoServer.getNetwork(), preparer.getDatabase());
             AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize, numReqDes, preparer.getDatabase());
             analysis.addAnalysisElement(aidoScoreElement);
 

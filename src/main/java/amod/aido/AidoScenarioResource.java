@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.util.List;
 
 import amod.aido.core.AidoScenarioDownload;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.io.Unzip;
 
 public enum AidoScenarioResource {
@@ -18,9 +17,9 @@ public enum AidoScenarioResource {
 
     /** @param key for instance "SanFrancisco.20080518"
      * @throws IOException */
-    public static List<File> extract(final String key) throws IOException {
+    public static List<File> extract(final String key, File workingDirectory) throws IOException {
         /** file name is arbitrary, file will be deleted after un-zipping */
-        final File file = new File(MultiFileTools.getWorkingDirectory(), SCENARIO_ZIP);
+        final File file = new File(workingDirectory, SCENARIO_ZIP);
         String resource = "/scenario/" + key.replace('.', '/') + "/" + SCENARIO_ZIP;
         try (InputStream inputStream = AidoScenarioResource.class.getResourceAsStream(resource)) {
             System.out.println("obtain as resource: [" + resource + "]");
@@ -35,7 +34,7 @@ public enum AidoScenarioResource {
             System.out.println("scenario not fount as resource: [" + resource + "]");
             AidoScenarioDownload.of(key, file);
         }
-        List<File> list = Unzip.of(file, MultiFileTools.getWorkingDirectory(), true);
+        List<File> list = Unzip.of(file, workingDirectory, true);
         file.delete();
         return list;
     }

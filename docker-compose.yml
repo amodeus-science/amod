@@ -1,16 +1,55 @@
+#version: '3'
+#services:
+#  aido-host:
+#    build: .
+#    image: duckietown/amod
+#    expose:
+#    - 9382
+#    # TODO: Either omit version from JAR name or pass as ENV variable
+#    # TODO: Set heap size somewhere besides the command line argument?
+#    command: java -Xmx10000m -cp amod-1.4.8.jar amod.aido.AidoHost
+#  aido-guest:
+#    build: .
+#    image: duckietown/amod
+#    links:
+#      - aido-host
+#    command: java -Xmx10000m -cp amod-1.4.8.jar amod.aido.demo.AidoGuest aido-host
+
 version: '3'
+networks:
+  evaluation: {}
 services:
   aido-host:
-    build: .
-    image: duckietown/amod
-    expose:
-    - 9382
-    # TODO: Either omit version from JAR name or pass as ENV variable
-    # TODO: Set heap size somewhere besides the command line argument?
-    command: java -Xmx10000m -cp amod-1.4.8.jar amod.aido.AidoHost
-  aido-guest:
-    build: .
-    image: duckietown/amod
-    links:
-      - aido-host
-    command: java -Xmx10000m -cp amod-1.4.8.jar amod.aido.demo.AidoGuest aido-host
+    environment:
+      FLEET_SIZE: '20'
+      REQUESTS_SIZE: '500'
+      SCENARIO: SanFrancisco.20080519
+      challenge_name: aido2_amod_service_quality_r1-v4
+      challenge_step_name: step1-simulation
+      uid: 502
+      username: andrea
+    build:
+      context: ./aido-host
+    networks:
+      evaluation:
+        aliases:
+        - evaluation
+    volumes:
+    - ./out-challenges:/challenges:rw
+
+#  solution:
+#    environment:
+#      challenge_name: aido2_amod_service_quality_r1-v4
+#      challenge_step_name: step1-simulation
+#      uid: 502
+#      username: andrea
+#    build:
+#      context: ./aido-scorer
+#    networks:
+#      evaluation:
+#        aliases:
+#        - evaluation
+#    volumes:
+#    - ./out-challenges:/challenges:rw
+volumes:
+  fifos: {}
