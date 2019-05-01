@@ -2,22 +2,14 @@
 package amod.aido;
 
 import java.io.File;
-import java.util.Objects;
 
 import amod.aido.core.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.UnitSaveUtils;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.subare.plot.TimedChart;
-import ch.ethz.idsc.subare.plot.VisualRow;
-import ch.ethz.idsc.subare.plot.VisualSet;
+import ch.ethz.idsc.amodeus.analysis.plot.TimeChart;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.img.ColorDataIndexed;
-import ch.ethz.idsc.tensor.img.MeanFilter;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
 
 /* package */ class AidoExport implements AnalysisExport {
 
@@ -27,8 +19,6 @@ import org.jfree.chart.JFreeChart;
     /* package */ static final String FILENAME_SCORE3_INTG = "aidoScore3Intg";
     private static final int FILTERSIZE = 50;
     private static final boolean FILTER_ON = true;
-    private static final int WIDTH = 1000;
-    private static final int HEIGHT = 750;
 
     /** aido score element */
     private final AidoScoreElement aidoScoreElement;
@@ -50,34 +40,43 @@ import org.jfree.chart.JFreeChart;
 
         /** figures for service quality score and efficiency score */
         try {
-            generatePlot(relativeDirectory, FILENAME_SCORE_INCR, time, linCombScoresDiff, null, //
+            TimeChart.of(relativeDirectory, FILENAME_SCORE_INCR, "Service Quality and Efficiency Score Increments", //
+                    FILTER_ON, FILTERSIZE, new double[] { 1.0, 1.0 }, //
                     new String[] { "service quality performance [1]", "efficiency performance [1]" }, //
-                    "Service Quality and Efficiency Score Increments", colorScheme);
-        } catch (Exception e) {
+                    "time of day", "scores increments", //
+                    time, linCombScoresDiff, //
+                    null, colorScheme);
+        } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
-            e.printStackTrace();
+            e1.printStackTrace();
         }
 
         try {
-            generatePlot(relativeDirectory, FILENAME_SCORE_INTG, time, linCombScoresIntg, null, //
+            TimeChart.of(relativeDirectory, FILENAME_SCORE_INTG, "Service Quality and Efficiency Score Integrated", //
+                    FILTER_ON, FILTERSIZE, new double[] { 1.0, 1.0 }, //
                     new String[] { "service quality performance [1]", "efficiency performance [1]" }, //
-                    "Service Quality and Efficiency Score Integrated", colorScheme);
-        } catch (Exception e) {
+                    "time of day", "scores integrated", //
+                    time, linCombScoresIntg, //
+                    null, colorScheme);
+        } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
-            e.printStackTrace();
+            e1.printStackTrace();
         }
 
         /** figures for fleet size score */
         Tensor fleetSizeScoreIntg = Tensor.of(scoreIntgHistory.stream().map(row -> row.extract(3, 4)));
 
         try {
-            generatePlot(relativeDirectory, FILENAME_SCORE3_INTG, time, fleetSizeScoreIntg, //
-                    new Double[] { fleetSizeScoreIntg.get(0).Get(0).number().intValue() * 2., 0. }, //
+            TimeChart.of(relativeDirectory, FILENAME_SCORE3_INTG, "Fleet Size Score Integrated", //
+                    FILTER_ON, FILTERSIZE, new double[] { 1.0 }, //
                     new String[] { "fleet size score integrated" }, //
-                    "Fleet Size Score Integrated", colorScheme);
-        } catch (Exception e) {
+                    "time of day", "scores integrated", //
+                    time, fleetSizeScoreIntg, //
+                    new Double[] { fleetSizeScoreIntg.get(0).Get(0).number().intValue() * 2.0, 0.0 }, colorScheme);
+
+        } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
-            e.printStackTrace();
+            e1.printStackTrace();
         }
 
         /** export incremental and integrated aido scores data */
@@ -88,28 +87,5 @@ import org.jfree.chart.JFreeChart;
             System.err.println("Saving aido score history was unsuccessful.");
             e.printStackTrace();
         }
-    }
-
-    private void generatePlot(File relativeDirectory, String fileName, Tensor time, Tensor vals, Double[] limits, //
-            String[] labels, String title, ColorDataIndexed colorDataIndexed) throws Exception {
-        VisualSet visualSet = new VisualSet(colorDataIndexed);
-        for (int i = 0; i < labels.length; i++) {
-            Tensor values = Transpose.of(vals).get(i);
-            values = FILTER_ON ? MeanFilter.of(values, FILTERSIZE) : values;
-            VisualRow visualRow = visualSet.add(time, values);
-            visualRow.setLabel(labels[i]);
-        }
-
-        visualSet.setPlotLabel(title);
-        visualSet.setAxesLabelX("time of day");
-        visualSet.setAxesLabelY("scores integrated");
-
-        JFreeChart chart = TimedChart.of(visualSet);
-        if (Objects.nonNull(limits))
-            GlobalAssert.that(limits[0] < limits[1]);
-        chart.getXYPlot().getRangeAxis().setRange(limits[0], limits[1]);
-
-        File fileChart = new File(relativeDirectory, fileName + ".png");
-        ChartUtilities.saveChartAsPNG(fileChart, chart, WIDTH, HEIGHT);
     }
 }
