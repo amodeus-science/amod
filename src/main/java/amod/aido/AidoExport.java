@@ -30,7 +30,6 @@ import org.jfree.chart.JFreeChart;
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 750;
 
-
     /** aido score element */
     private final AidoScoreElement aidoScoreElement;
 
@@ -73,8 +72,8 @@ import org.jfree.chart.JFreeChart;
 
         try {
             generatePlot(relativeDirectory, FILENAME_SCORE3_INTG, time, fleetSizeScoreIntg, //
-                    new Double[]{fleetSizeScoreIntg.get(0).Get(0).number().intValue() * 2., 0.}, //
-                    new String[]{"fleet size score integrated"}, //
+                    new Double[] { fleetSizeScoreIntg.get(0).Get(0).number().intValue() * 2., 0. }, //
+                    new String[] { "fleet size score integrated" }, //
                     "Fleet Size Score Integrated", colorScheme);
         } catch (Exception e) {
             System.err.println("Plotting the aido scores was unsuccessful.");
@@ -92,7 +91,7 @@ import org.jfree.chart.JFreeChart;
     }
 
     private void generatePlot(File relativeDirectory, String fileName, Tensor time, Tensor vals, Double[] limits, //
-                             String[] labels, String title, ColorDataIndexed colorDataIndexed) throws Exception {
+            String[] labels, String title, ColorDataIndexed colorDataIndexed) throws Exception {
         VisualSet visualSet = new VisualSet(colorDataIndexed);
         for (int i = 0; i < labels.length; i++) {
             Tensor values = Transpose.of(vals).get(i);
@@ -108,7 +107,7 @@ import org.jfree.chart.JFreeChart;
         JFreeChart chart = TimedChart.of(visualSet);
         if (Objects.nonNull(limits))
             GlobalAssert.that(limits[0] < limits[1]);
-            chart.getXYPlot().getRangeAxis().setRange(limits[0], limits[1]);
+        chart.getXYPlot().getRangeAxis().setRange(limits[0], limits[1]);
 
         File fileChart = new File(relativeDirectory, fileName + ".png");
         ChartUtilities.saveChartAsPNG(fileChart, chart, WIDTH, HEIGHT);

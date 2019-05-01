@@ -98,11 +98,10 @@ import ch.ethz.matsim.av.router.AVRouter;
         if (round_now % dispatchPeriod == 0) {
 
             /** bipartite matching is conducted to assign available {@link RoboTaxi}s to
-             * open {@link AVRequest}s. 
+             * open {@link AVRequest}s.
              * UPDATE: dispatch is external as well, uncomment to revert
-            bipartiteMatchingUtils.executePickup(this, getDivertableRoboTaxis(), //
-                    getAVRequests(), distanceFunction, network);
-            */
+             * bipartiteMatchingUtils.executePickup(this, getDivertableRoboTaxis(), //
+             * getAVRequests(), distanceFunction, network); */
 
             if (Objects.nonNull(aidoScoreCompiler))
                 try {

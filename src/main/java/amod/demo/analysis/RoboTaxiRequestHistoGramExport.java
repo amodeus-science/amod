@@ -46,10 +46,10 @@ import org.jfree.chart.axis.CategoryLabelPositions;
         Tensor histogramEntryPairs = BinCounts.of(requestsPerRoboTaxi, histogramBinSize);
         histogramEntryPairs = histogramEntryPairs.divide(numberOfRoboTaxis).multiply(RealScalar.of(100));
 
-//        VisualRow visualRow = new VisualRow();
+        // VisualRow visualRow = new VisualRow();
         Tensor points = Tensors.empty();
         for (int i = 0; i < histogramEntryPairs.length(); i++) {
-//            visualRow.add(RealScalar.of(i).multiply(histogramBinSize), histogramEntryPairs.Get(i));
+            // visualRow.add(RealScalar.of(i).multiply(histogramBinSize), histogramEntryPairs.Get(i));
             points.append(Tensors.of(RealScalar.of(i).multiply(histogramBinSize), histogramEntryPairs.Get(i)));
         }
         VisualSet visualSet = new VisualSet(colorScheme); // new VisualSet(visualRow);
@@ -57,7 +57,7 @@ import org.jfree.chart.axis.CategoryLabelPositions;
         visualSet.setPlotLabel("Number of Requests Served per RoboTaxi");
         visualSet.setAxesLabelY("% of RoboTaxis");
         visualSet.setAxesLabelX("Requests");
-//        visualSet.setColors(colorScheme);
+        // visualSet.setColors(colorScheme);
 
         final Scalar size = histogramBinSize;
         JFreeChart chart = Histogram.of(visualSet, s -> "[" + s.number() + " , " + s.add(size).number() + ")");

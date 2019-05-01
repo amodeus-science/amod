@@ -22,7 +22,7 @@ import amod.aido.demo.AidoGuest;
                 }
             }
         }).start();
-        /*Thread.sleep(1000);*/
+        /* Thread.sleep(1000); */
         /** {@link AidoGuest} executes the dispatching logic of the user participating
          * in the artificial intelligence driving olympics (AIDO) */
         /* AidoGuest.main(args); */
