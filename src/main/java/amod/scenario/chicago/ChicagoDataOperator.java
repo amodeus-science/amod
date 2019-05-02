@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.scenario.chicago;
 
 import ch.ethz.idsc.amodeus.scenario.DataOperator;
