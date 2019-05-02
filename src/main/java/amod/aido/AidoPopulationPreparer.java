@@ -2,7 +2,6 @@
 package amod.aido;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -36,14 +35,10 @@ public enum AidoPopulationPreparer {
         final File fileExport = new File(scenOptions.getPreparedPopulationName() + ".xml");
 
         /** write the modified population to file */
-        PopulationWriter pw = new PopulationWriter(population);
-        pw.write(fileExportGz.toString());
+        PopulationWriter populationWriter = new PopulationWriter(population);
+        populationWriter.write(fileExportGz.toString());
 
         /** extract the created .gz file */
-        try {
-            GZHandler.extract(fileExportGz, fileExport);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        GZHandler.extract(fileExportGz, fileExport);
     }
 }

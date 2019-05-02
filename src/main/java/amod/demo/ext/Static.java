@@ -18,7 +18,7 @@ public enum Static {
     public static void checkGLPKLib() {
         try {
             System.out.println("Working with GLPK version " + GLPK.glp_version());
-        } catch (Exception e) {
+        } catch (Exception exception) {
             System.err.println("GLPK for java is not installed which is necessary to run the preparer or server. \n "
                     + "In order to install it, follow the instructions provided at\n: " + "http://glpk-java.sourceforge.net/gettingStarted.html \n"
                     + "In order to work properly, either the location of the GLPK library must be  specified in \n" + "the environment variable, using for instance the command"
