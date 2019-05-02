@@ -4,7 +4,7 @@ package amod.demo;
 import java.net.MalformedURLException;
 
 /** Helper class to run a default preparer and server. */
-public enum ScenarioStandalone {
+public enum ScenarioExecutionSequence {
     ;
 
     public static void main(String[] args) throws MalformedURLException, Exception {
