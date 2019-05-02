@@ -72,7 +72,11 @@ public class AidoPreparer {
         this.db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
     }
 
-    public void run2(int numReqDes) throws MalformedURLException, Exception {
+    /** second part of preparer
+     * 
+     * @param numReqDes
+     * @throws Exception */
+    public void run2(int numReqDes) throws Exception {
         long apoSeed = 1234;
         AidoPopulationPreparer.run(network, population, scenOpt, config, apoSeed, numReqDes);
 

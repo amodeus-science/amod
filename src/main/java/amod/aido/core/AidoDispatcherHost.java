@@ -65,8 +65,8 @@ public class AidoDispatcherHost extends RebalancingDispatcher {
         final long round_now = Math.round(now);
 
         if (getRoboTaxis().size() > 0 && idRoboTaxiMap.isEmpty()) {
-            getRoboTaxis().forEach(//
-                    s -> idRoboTaxiMap.put(db.getVehicleIndex(s), s));
+            getRoboTaxis().forEach( //
+                    roboTaxi -> idRoboTaxiMap.put(db.getVehicleIndex(roboTaxi), roboTaxi));
             aidoScoreCompiler = new AidoScoreCompiler(getRoboTaxis(), numReqTot, db);
         }
 
@@ -74,8 +74,8 @@ public class AidoDispatcherHost extends RebalancingDispatcher {
 
             if (Objects.nonNull(aidoScoreCompiler))
                 try {
-                    getAVRequests().forEach(//
-                            r -> idRequestMap.put(db.getRequestIndex(r), r));
+                    getAVRequests().forEach( //
+                            avRequest -> idRequestMap.put(db.getRequestIndex(avRequest), avRequest));
 
                     Tensor status = Tensors.of(RealScalar.of((long) now), //
                             aidoRobTaxComp.compile(getRoboTaxis()), //
@@ -83,9 +83,7 @@ public class AidoDispatcherHost extends RebalancingDispatcher {
                             aidoScoreCompiler.compile(round_now, getRoboTaxis(), getAVRequests()));
                     clientSocket.writeln(status);
 
-                    String fromClient = null;
-
-                    fromClient = clientSocket.readLine();
+                    String fromClient = clientSocket.readLine();
 
                     Tensor commands = Tensors.fromString(fromClient);
                     CommandConsistency.check(commands);
@@ -103,8 +101,8 @@ public class AidoDispatcherHost extends RebalancingDispatcher {
                         Link link = fastLinkLookup.getLinkFromWGS84(TensorCoords.toCoord(rebalance.get(1)));
                         setRoboTaxiRebalance(roboTaxi, link);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
         }
     }

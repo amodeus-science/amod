@@ -52,9 +52,9 @@ import ch.ethz.matsim.av.passenger.AVRequest;
                     "% of RoboTaxis", //
                     "Requests", //
                     DiagramSettings.WIDTH, DiagramSettings.HEIGHT, colorScheme);
-        } catch (Exception e) {
+        } catch (Exception exception) {
             System.err.println("Plot of the Number of Requests per RoboTaxi Failed");
-            e.printStackTrace();
+            exception.printStackTrace();
         }
 
     }

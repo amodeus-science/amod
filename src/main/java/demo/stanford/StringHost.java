@@ -99,8 +99,8 @@ import ch.ethz.idsc.tensor.sca.Round;
                 if (Objects.nonNull(env))
                     try {
                         numReqDes = Integer.parseInt(env);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
                     }
             }
             {
@@ -108,8 +108,8 @@ import ch.ethz.idsc.tensor.sca.Round;
                 if (Objects.nonNull(env))
                     try {
                         fleetSize = Integer.parseInt(env);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
                     }
             }
 

@@ -83,9 +83,9 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
         try {
             UnitSaveUtils.saveFile(aidoScoreElement.getScoreDiffHistory(), "aidoScoresIncr", relativeDirectory);
             UnitSaveUtils.saveFile(aidoScoreElement.getScoreIntgHistory(), "aidoScoresIntg", relativeDirectory);
-        } catch (Exception e) {
+        } catch (Exception exception) {
             System.err.println("Saving aido score history was unsuccessful.");
-            e.printStackTrace();
+            exception.printStackTrace();
         }
     }
 }

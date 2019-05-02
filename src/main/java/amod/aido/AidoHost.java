@@ -95,8 +95,8 @@ public enum AidoHost {
                 if (Objects.nonNull(env))
                     try {
                         numReqDes = Integer.parseInt(env);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
                     }
             }
             {
@@ -104,8 +104,8 @@ public enum AidoHost {
                 if (Objects.nonNull(env))
                     try {
                         fleetSize = Integer.parseInt(env);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
                     }
             }
 

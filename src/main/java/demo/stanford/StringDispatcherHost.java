@@ -18,16 +18,12 @@ import amod.aido.core.AidoRequestCompiler;
 import amod.aido.core.AidoRoboTaxiCompiler;
 import amod.aido.core.AidoScoreCompiler;
 import amod.aido.core.CommandConsistency;
-import ch.ethz.idsc.amodeus.dispatcher.core.DispatcherConfig;
 import ch.ethz.idsc.amodeus.dispatcher.core.RebalancingDispatcher;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
-import ch.ethz.idsc.amodeus.dispatcher.util.BipartiteMatchingUtils;
-import ch.ethz.idsc.amodeus.dispatcher.util.DistanceHeuristics;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.TensorCoords;
-import ch.ethz.idsc.amodeus.routing.DistanceFunction;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -58,9 +54,9 @@ import ch.ethz.matsim.av.router.AVRouter;
     // ---
     private AidoScoreCompiler aidoScoreCompiler;
     // --
-    private final Network network;
-    private final DistanceFunction distanceFunction;
-    private final BipartiteMatchingUtils bipartiteMatchingUtils;
+    // private final Network network;
+    // private final DistanceFunction distanceFunction;
+    // private final BipartiteMatchingUtils bipartiteMatchingUtils;
 
     protected StringDispatcherHost(Network network, Config config, AVDispatcherConfig avDispatcherConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager, //
@@ -70,17 +66,17 @@ import ch.ethz.matsim.av.router.AVRouter;
         this.db = db;
         this.clientSocket = Objects.requireNonNull(clientSocket);
         this.numReqTot = numReqTot;
-        this.network = network;
+        // this.network = network;
         fastLinkLookup = new FastLinkLookup(network, db);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         aidoReqComp = new AidoRequestCompiler(db);
         aidoRobTaxComp = new AidoRoboTaxiCompiler(db);
-        bipartiteMatchingUtils = new BipartiteMatchingUtils(network);
-        DispatcherConfig dispatcherConfig = DispatcherConfig.wrap(avDispatcherConfig);
-        DistanceHeuristics distanceHeuristics = //
-                dispatcherConfig.getDistanceHeuristics(DistanceHeuristics.EUCLIDEAN);
-        distanceFunction = distanceHeuristics.getDistanceFunction(network);
+        // bipartiteMatchingUtils = new BipartiteMatchingUtils(network);
+        // DispatcherConfig dispatcherConfig = DispatcherConfig.wrap(avDispatcherConfig);
+        // DistanceHeuristics distanceHeuristics = //
+        // dispatcherConfig.getDistanceHeuristics(DistanceHeuristics.EUCLIDEAN);
+        // distanceFunction = distanceHeuristics.getDistanceFunction(network);
     }
 
     @Override
@@ -90,7 +86,7 @@ import ch.ethz.matsim.av.router.AVRouter;
         /** once {@link RoboTaxi}s become visible, initialize the map with IDs */
         if (getRoboTaxis().size() > 0 && idRoboTaxiMap.isEmpty()) {
             getRoboTaxis().forEach(//
-                    s -> idRoboTaxiMap.put(db.getVehicleIndex(s), s));
+                    roboTaxi -> idRoboTaxiMap.put(db.getVehicleIndex(roboTaxi), roboTaxi));
             aidoScoreCompiler = new AidoScoreCompiler(getRoboTaxis(), numReqTot, db);
         }
 
@@ -98,16 +94,15 @@ import ch.ethz.matsim.av.router.AVRouter;
         if (round_now % dispatchPeriod == 0) {
 
             /** bipartite matching is conducted to assign available {@link RoboTaxi}s to
-             * open {@link AVRequest}s. 
+             * open {@link AVRequest}s.
              * UPDATE: dispatch is external as well, uncomment to revert
-            bipartiteMatchingUtils.executePickup(this, getDivertableRoboTaxis(), //
-                    getAVRequests(), distanceFunction, network);
-            */
+             * bipartiteMatchingUtils.executePickup(this, getDivertableRoboTaxis(), //
+             * getAVRequests(), distanceFunction, network); */
 
             if (Objects.nonNull(aidoScoreCompiler))
                 try {
-                    getAVRequests().forEach(//
-                            r -> idRequestMap.put(db.getRequestIndex(r), r));
+                    getAVRequests().forEach( //
+                            avRequest -> idRequestMap.put(db.getRequestIndex(avRequest), avRequest));
 
                     Tensor status = Tensors.of(RealScalar.of((long) now), //
                             aidoRobTaxComp.compile(getRoboTaxis()), //
@@ -115,9 +110,7 @@ import ch.ethz.matsim.av.router.AVRouter;
                             aidoScoreCompiler.compile(round_now, getRoboTaxis(), getAVRequests()));
                     clientSocket.writeln(status);
 
-                    String fromClient = null;
-
-                    fromClient = clientSocket.readLine();
+                    String fromClient = clientSocket.readLine();
 
                     Tensor commands = Tensors.fromString(fromClient);
                     CommandConsistency.check(commands);
@@ -135,8 +128,8 @@ import ch.ethz.matsim.av.router.AVRouter;
                         Link link = fastLinkLookup.getLinkFromWGS84(TensorCoords.toCoord(rebalance.get(1)));
                         setRoboTaxiRebalance(roboTaxi, link);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
         }
     }
