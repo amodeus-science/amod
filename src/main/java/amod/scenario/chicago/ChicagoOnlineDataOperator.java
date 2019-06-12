@@ -5,6 +5,7 @@ import ch.ethz.idsc.amodeus.scenario.DataOperator;
 import ch.ethz.idsc.amodeus.scenario.dataclean.CharRemovalDataCorrector;
 import ch.ethz.idsc.amodeus.scenario.dataclean.TripDataCleaner;
 import ch.ethz.idsc.amodeus.scenario.fleetconvert.TripFleetConverter;
+import ch.ethz.idsc.amodeus.scenario.trips.TaxiTrip;
 import ch.ethz.idsc.amodeus.scenario.trips.TripDistanceFilter;
 import ch.ethz.idsc.amodeus.scenario.trips.TripDurationFilter;
 import ch.ethz.idsc.amodeus.scenario.trips.TripNetworkFilter;
@@ -12,7 +13,7 @@ import ch.ethz.idsc.amodeus.scenario.trips.TripStartTimeResampling;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class ChicagoOnlineDataOperator extends DataOperator {
+public class ChicagoOnlineDataOperator extends DataOperator<TaxiTrip> {
 
     public ChicagoOnlineDataOperator() {
         super(new TripFleetConverter(), new CharRemovalDataCorrector("\""), new TripDataCleaner(new OnlineTripsReaderChicago()));

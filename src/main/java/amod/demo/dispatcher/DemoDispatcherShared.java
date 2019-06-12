@@ -19,7 +19,6 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.core.SharedRebalancingDispatcher;
-import ch.ethz.idsc.amodeus.dispatcher.shared.Compatibility;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedCourse;
 import ch.ethz.idsc.amodeus.dispatcher.shared.SharedCourseUtil;
 import ch.ethz.idsc.amodeus.dispatcher.util.AbstractRoboTaxiDestMatcher;
@@ -108,9 +107,6 @@ public class DemoDispatcherShared extends SharedRebalancingDispatcher {
                     addSharedRoboTaxiRedirect(sharedRoboTaxi, redirectCourse);
                     sharedRoboTaxi.moveAVCourseToPrev(redirectCourse);
 
-                    /** check consistency and end */
-                    GlobalAssert.that(//
-                            Compatibility.of(sharedRoboTaxi.getUnmodifiableViewOfCourses()).forCapacity(sharedRoboTaxi.getCapacity()));
                 } else {
                     break;
                 }
