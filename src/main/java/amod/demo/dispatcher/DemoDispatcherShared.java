@@ -107,9 +107,6 @@ public class DemoDispatcherShared extends SharedRebalancingDispatcher {
                     addSharedRoboTaxiRedirect(sharedRoboTaxi, redirectCourse);
                     sharedRoboTaxi.moveAVCourseToPrev(redirectCourse);
 
-                    /** check consistency and end */
-                    // functionality was removed from amodeus
-                    // GlobalAssert.that(RoboTaxiUtils.checkMenuConsistency(sharedRoboTaxi));
                 } else {
                     break;
                 }
