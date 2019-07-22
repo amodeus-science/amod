@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.core.gbl.MatsimRandom;
 
 import com.google.inject.Inject;
@@ -72,9 +72,10 @@ public class DemoGenerator implements AVGenerator {
 
         LOGGER.info("car placed at link " + linkSel);
 
-        Id<Vehicle> id = Id.create("av_" + prefix + String.valueOf(generatedNumberOfVehicles), Vehicle.class);
+        Id<DvrpVehicle> id = Id.create("av_" + prefix + String.valueOf(generatedNumberOfVehicles), DvrpVehicle.class);        
         // TODO SHARED add capacity attribute here
-        return new AVVehicle(id, linkSel, 1.0, 0.0, Double.POSITIVE_INFINITY);
+        AVVehicle vehicle = new AVVehicle(id, linkSel, 1, 0.0, Double.POSITIVE_INFINITY);
+        return vehicle;
     }
 
     /** factory which is called to instatiate the DemoGenerator inside the framework */
