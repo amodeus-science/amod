@@ -7,8 +7,8 @@ import java.util.Arrays;
 import ch.ethz.idsc.amodeus.scenario.Pt2MatsimXML;
 import ch.ethz.idsc.amodeus.scenario.ScenarioLabels;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
-import ch.ethz.idsc.amodeus.util.io.FileDelete;
 import ch.ethz.idsc.amodeus.util.io.LocateUtils;
+import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 /* package */ class StaticHelper {
 
@@ -31,14 +31,14 @@ import ch.ethz.idsc.amodeus.util.io.LocateUtils;
 
     public static void cleanUpTest(File workingDir) throws IOException {
         /** delete unneeded files */
-        FileDelete.of(new File(workingDir, "Scenario"), 2, 14);
-        FileDelete.of(new File(workingDir, ScenarioLabels.amodeusFile), 0, 1);
-        FileDelete.of(new File(workingDir, ScenarioLabels.avFile), 0, 1);
-        FileDelete.of(new File(workingDir, ScenarioLabels.config), 0, 1);
-        FileDelete.of(new File(workingDir, ScenarioLabels.pt2MatSettings), 0, 1);
-        FileDelete.of(new File(workingDir, ScenarioLabels.network), 0, 1);
-        FileDelete.of(new File(workingDir, ScenarioLabels.osmData), 0, 1);
-        FileDelete.of(new File(workingDir, "Taxi_Trips_2014_11_18.csv"), 0, 1);
-        FileDelete.of(new File(workingDir, "CreatedScenario"), 1, 6);
+        DeleteDirectory.of(new File(workingDir, "Scenario"), 2, 14);
+        DeleteDirectory.of(new File(workingDir, ScenarioLabels.amodeusFile), 0, 1);
+        DeleteDirectory.of(new File(workingDir, ScenarioLabels.avFile), 0, 1);
+        DeleteDirectory.of(new File(workingDir, ScenarioLabels.config), 0, 1);
+        DeleteDirectory.of(new File(workingDir, ScenarioLabels.pt2MatSettings), 0, 1);
+        DeleteDirectory.of(new File(workingDir, ScenarioLabels.network), 0, 1);
+        DeleteDirectory.of(new File(workingDir, ScenarioLabels.osmData), 0, 1);
+        DeleteDirectory.of(new File(workingDir, "Taxi_Trips_2014_11_18.csv"), 0, 1);
+        DeleteDirectory.of(new File(workingDir, "CreatedScenario"), 1, 6);
     }
 }
