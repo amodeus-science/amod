@@ -38,7 +38,7 @@ import ch.ethz.idsc.tensor.red.Total;
 
         {
             DistanceElement distanceElement = analysisSummary.getDistanceElement();
-            Scalar sum = distanceElement.totalDistancePicku.add( distanceElement.totalDistanceRebal);
+            Scalar sum = distanceElement.totalDistancePicku.add(distanceElement.totalDistanceRebal);
             // if totalDistance == 0.0, the ratio is NaN
             totalEfficiencyRatio = sum.divide(distanceElement.totalDistance);
         }
