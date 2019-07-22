@@ -38,9 +38,9 @@ import ch.ethz.idsc.tensor.red.Total;
 
         {
             DistanceElement distanceElement = analysisSummary.getDistanceElement();
-            double sum = distanceElement.totalDistancePicku + distanceElement.totalDistanceRebal;
+            Scalar sum = distanceElement.totalDistancePicku.add( distanceElement.totalDistanceRebal);
             // if totalDistance == 0.0, the ratio is NaN
-            totalEfficiencyRatio = RealScalar.of(sum / distanceElement.totalDistance);
+            totalEfficiencyRatio = sum.divide(distanceElement.totalDistance);
         }
 
         numberOfVehicles = RealScalar.of(analysisSummary.getSimulationInformationElement().vehicleSize());
