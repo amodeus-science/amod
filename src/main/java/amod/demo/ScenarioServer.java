@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -46,11 +47,12 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.matsim.av.framework.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.framework.AVQSimModule;
 import ch.ethz.matsim.av.framework.AVUtils;
 
-/** This class runs an AMoDeus simulation based on MATSim. The results can be viewed
- * if the {@link ScenarioViewer} is executed in the same working directory and the button "Connect"
- * is pressed. */
+/** This class runs an AMoDeus simulation based on MATSim. The results can be
+ * viewed if the {@link ScenarioViewer} is executed in the same working
+ * directory and the button "Connect" is pressed. */
 public enum ScenarioServer {
     ;
 
@@ -58,7 +60,8 @@ public enum ScenarioServer {
         simulate(MultiFileTools.getDefaultWorkingDirectory());
     }
 
-    /** runs a simulation run using input data from Amodeus.properties, av.xml and MATSim config.xml
+    /** runs a simulation run using input data from Amodeus.properties, av.xml and
+     * MATSim config.xml
      * 
      * @throws MalformedURLException
      * @throws Exception */
@@ -119,12 +122,15 @@ public enum ScenarioServer {
         } catch (Exception exception) {
             System.err.println("Could not load static linkspeed data, running with freespeeds.");
         }
-        controler.addOverridingModule(new AVModule());
+
+        controler.addOverridingModule(new DvrpModule());
+        controler.addOverridingModule(new DvrpTravelTimeModule());
+        controler.addOverridingModule(new AVModule(false));
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
         controler.addOverridingModule(new AmodeusDispatcherModule());
-        controler.addOverridingModule(new AmodeusDatabaseModule(db));
         controler.addOverridingModule(new AmodeusVirtualNetworkModule(scenarioOptions));
+        controler.addOverridingModule(new AmodeusDatabaseModule(db));
         controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
         controler.addOverridingModule(new AmodeusModule());
         controler.addOverridingModule(new AbstractModule() {
@@ -165,7 +171,7 @@ public enum ScenarioServer {
          * <param name="routerName" value="DefaultAStarLMRouter" />
          * <generator strategy="PopulationDensity">
          * ...
-         * 
+         *
          * otherwise the normal {@link DefaultAVRouter} will be used. */
         controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -177,13 +183,14 @@ public enum ScenarioServer {
         });
 
         /** run simulation */
+        controler.configureQSimComponents(AVQSimModule::configureComponents);
         controler.run();
 
         /** close port for visualizaiton */
         SimulationServer.INSTANCE.stopAccepting();
 
-        /** perform analysis of simulation, a demo of how to add custom
-         * analysis methods is provided in the package amod.demo.analysis */
+        /** perform analysis of simulation, a demo of how to add custom analysis methods
+         * is provided in the package amod.demo.analysis */
         Analysis analysis = Analysis.setup(scenarioOptions, new File(outputdirectory), network, db);
         CustomAnalysis.addTo(analysis);
         analysis.run();
