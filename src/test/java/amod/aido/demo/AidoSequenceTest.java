@@ -12,7 +12,7 @@ import java.util.Random;
 
 import amod.aido.AidoHost;
 import amod.aido.core.CleanAidoScenarios;
-import ch.ethz.idsc.amodeus.util.io.FileDelete;
+import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import ch.ethz.idsc.tensor.io.ResourceData;
 import junit.framework.TestCase;
 
@@ -46,13 +46,13 @@ public class AidoSequenceTest extends TestCase {
                 /** virtual network file "virtualNetwork" should not exist for AIDO */
                 File file = new File("virtualNetwork");
                 if (file.exists())
-                    FileDelete.of(file, 1, 4);
+                    DeleteDirectory.of(file, 1, 4);
             }
             {
                 /** output folder */
                 File file = new File("output");
                 if (file.isDirectory())
-                    FileDelete.of(file, 5, 25000);
+                    DeleteDirectory.of(file, 5, 25000);
             }
         }
     }

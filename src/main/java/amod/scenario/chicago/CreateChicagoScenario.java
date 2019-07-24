@@ -12,8 +12,8 @@ import ch.ethz.idsc.amodeus.scenario.Pt2MatsimXML;
 import ch.ethz.idsc.amodeus.scenario.ScenarioCreator;
 import ch.ethz.idsc.amodeus.scenario.ScenarioLabels;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
-import ch.ethz.idsc.amodeus.util.io.FileDelete;
 import ch.ethz.idsc.amodeus.util.io.LocateUtils;
+import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 /* package */ enum CreateChicagoScenario {
     ;
@@ -64,11 +64,11 @@ import ch.ethz.idsc.amodeus.util.io.LocateUtils;
 
     public static void cleanUp(File workingDir) throws IOException {
         /** delete unneeded files */
-        FileDelete.of(new File(workingDir, "Scenario"), 2, 14);
-        FileDelete.of(new File(workingDir, ScenarioLabels.amodeusFile), 0, 1);
-        FileDelete.of(new File(workingDir, ScenarioLabels.avFile), 0, 1);
-        FileDelete.of(new File(workingDir, ScenarioLabels.config), 0, 1);
-        FileDelete.of(new File(workingDir, ScenarioLabels.pt2MatSettings), 0, 1);
-        FileDelete.of(new File(workingDir, ScenarioLabels.network), 0, 1);
+        DeleteDirectory.of(new File(workingDir, "Scenario"), 2, 14);
+        DeleteDirectory.of(new File(workingDir, ScenarioLabels.amodeusFile), 0, 1);
+        DeleteDirectory.of(new File(workingDir, ScenarioLabels.avFile), 0, 1);
+        DeleteDirectory.of(new File(workingDir, ScenarioLabels.config), 0, 1);
+        DeleteDirectory.of(new File(workingDir, ScenarioLabels.pt2MatSettings), 0, 1);
+        DeleteDirectory.of(new File(workingDir, ScenarioLabels.network), 0, 1);
     }
 }
