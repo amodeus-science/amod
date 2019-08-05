@@ -105,7 +105,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(new DvrpTravelTimeModule());
-        controler.addOverridingModule(new TrafficDataModule(lsData));
+        controler.addOverridingQSimModule(new TrafficDataModule(lsData));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AidoModule(stringSocket, numReqTot));

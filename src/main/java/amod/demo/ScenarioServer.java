@@ -118,7 +118,7 @@ public enum ScenarioServer {
             File linkSpeedDataFile = new File(scenarioOptions.getLinkSpeedDataName());
             System.out.println(linkSpeedDataFile.toString());
             LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
-            controler.addOverridingModule(new TrafficDataModule(lsData));
+            controler.addOverridingQSimModule(new TrafficDataModule(lsData));
         } catch (Exception exception) {
             System.err.println("Could not load static linkspeed data, running with freespeeds.");
         }
