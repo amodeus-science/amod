@@ -103,7 +103,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
             File linkSpeedDataFile = new File(scenarioOptions.getLinkSpeedDataName());
             System.out.println(linkSpeedDataFile.toString());
             LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
-            controler.addOverridingModule(new TrafficDataModule(lsData));
+            controler.addOverridingQSimModule(new TrafficDataModule(lsData));
         } catch (Exception exception) {
             System.err.println("Unable to load linkspeed data, freeflow speeds will be used in the simulation.");
             exception.printStackTrace();
