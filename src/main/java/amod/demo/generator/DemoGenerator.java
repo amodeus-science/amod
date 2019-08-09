@@ -68,7 +68,6 @@ public class DemoGenerator implements AVGenerator {
 		Link linkSel = randomLinks.stream().skip(elemRand).findFirst().get();
 		LOGGER.info("car placed at link " + linkSel);
 		Id<DvrpVehicle> id = Id.create("av_" + prefix + String.valueOf(generatedVehicles), DvrpVehicle.class);
-		// TODO SHARED add capacity attribute here
 		AVVehicle vehicle = new AVVehicle(id, linkSel, numberOfSeats, 0.0, Double.POSITIVE_INFINITY);
 		return vehicle;
 	}
