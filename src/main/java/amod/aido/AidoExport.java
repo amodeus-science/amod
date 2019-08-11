@@ -33,7 +33,8 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
         Tensor scoreDiffHistory = aidoScoreElement.getScoreDiffHistory();
         Tensor scoreIntgHistory = aidoScoreElement.getScoreIntgHistory();
 
-        /** produce charts that show 2 Aido scores during simulation (integrated and increment) */
+        /** produce charts that show 2 Aido scores during simulation (integrated and
+         * increment) */
         Tensor time = scoreDiffHistory.get(Tensor.ALL, 0);
         Tensor linCombScoresDiff = Tensor.of(scoreDiffHistory.stream().map(row -> row.extract(1, 3)));
         Tensor linCombScoresIntg = Tensor.of(scoreIntgHistory.stream().map(row -> row.extract(1, 3)));
