@@ -72,7 +72,7 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
                     new String[] { "fleet size score integrated" }, //
                     "time of day", "scores integrated", //
                     time, fleetSizeScoreIntg, //
-                    new Double[] { fleetSizeScoreIntg.get(0).Get(0).number().intValue() * 2.0, 0.0 }, colorScheme);
+                    new double[] { fleetSizeScoreIntg.get(0).Get(0).number().intValue() * 2.0, 0.0 }, colorScheme);
 
         } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
