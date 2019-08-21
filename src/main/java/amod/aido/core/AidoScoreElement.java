@@ -74,10 +74,10 @@ public class AidoScoreElement implements AnalysisElement {
     }
 
     public Tensor getScoreDiffHistory() {
-        return scoreDiffTable.toTable();
+        return scoreDiffTable.getTable();
     }
 
     public Tensor getScoreIntgHistory() {
-        return scoreIntgTable.toTable();
+        return scoreIntgTable.getTable();
     }
 }

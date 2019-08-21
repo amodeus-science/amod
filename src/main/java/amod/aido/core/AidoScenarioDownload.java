@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.util.Properties;
 
 import ch.ethz.idsc.amodeus.util.io.ContentType;
-import ch.ethz.idsc.amodeus.util.io.HttpDownloader;
 import ch.ethz.idsc.amodeus.util.io.Unzip;
 import ch.ethz.idsc.tensor.io.ResourceData;
+import ch.ethz.idsc.tensor.io.URLFetch;
 
 public enum AidoScenarioDownload {
     ;
@@ -32,7 +32,10 @@ public enum AidoScenarioDownload {
             String value = properties.getProperty(key);
             System.out.println("scenario: " + value);
             /** file name is arbitrary, file will be deleted after un-zipping */
-            HttpDownloader.download(value, ContentType.APPLICATION_ZIP).to(file);
+            try (URLFetch urlFetch = new URLFetch(value)) {
+                ContentType.APPLICATION_ZIP.require(urlFetch.contentType());
+                urlFetch.download(file);
+            }
             return;
         }
         throw new RuntimeException();
