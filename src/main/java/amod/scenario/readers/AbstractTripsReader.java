@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Coord;
 
+import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.util.CsvReader;
 import ch.ethz.idsc.amodeus.util.CsvReader.Row;
 import ch.ethz.idsc.amodeus.util.Duration;
@@ -55,7 +56,8 @@ public abstract class AbstractTripsReader {
                     "computed duration using start and end time: " + //
                     pickupTime + " --> " + dropoffTime + " != " + durationDataset);
 
-                TaxiTrip trip = TaxiTrip.of(tripId, Integer.toString(taxiId), getPickupLocation(row), getDropoffLocation(row), //
+                TaxiTrip trip = TaxiTrip.of(tripId, Integer.toString(taxiId), //
+                        TensorCoords.toTensor(getPickupLocation(row)), TensorCoords.toTensor(getDropoffLocation(row)), //
                         getDistance(row), getWaitingTime(row), pickupTime, dropoffTime);
                 list.add(trip);
 

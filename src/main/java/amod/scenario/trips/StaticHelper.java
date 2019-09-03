@@ -9,6 +9,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.FastAStarLandmarksFactory;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.routing.CachedNetworkTimeDistance;
 import ch.ethz.idsc.amodeus.routing.EasyMinDistPathCalculator;
 import ch.ethz.idsc.amodeus.routing.TimeDistanceProperty;
@@ -19,15 +20,16 @@ import ch.ethz.idsc.tensor.Scalar;
     ;
 
     public static double getEuclideanTripDistance(TaxiTrip trip) {
-        return CoordUtils.calcEuclideanDistance(trip.pickupLoc, trip.dropoffLoc);
+        return CoordUtils.calcEuclideanDistance(TensorCoords.toCoord(trip.pickupLoc), //
+                TensorCoords.toCoord(trip.dropoffLoc));
     }
 
     public static Scalar getMinNetworkTripDistance(TaxiTrip trip, Network network, double timeNow) {
         CachedNetworkTimeDistance lcpc = new CachedNetworkTimeDistance//
         (EasyMinDistPathCalculator.prepPathCalculator(network, new FastAStarLandmarksFactory()), 180000.0, TimeDistanceProperty.INSTANCE);
         // find links
-        Link linkStart = NetworkUtils.getNearestLink(network, trip.pickupLoc);
-        Link linkEnd = NetworkUtils.getNearestLink(network, trip.dropoffLoc);
+        Link linkStart = NetworkUtils.getNearestLink(network, TensorCoords.toCoord(trip.pickupLoc));
+        Link linkEnd = NetworkUtils.getNearestLink(network, TensorCoords.toCoord(trip.dropoffLoc));
         // shortest path
         return lcpc.distance(linkStart, linkEnd, timeNow);
     }

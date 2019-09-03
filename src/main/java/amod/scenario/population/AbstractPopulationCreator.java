@@ -60,7 +60,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
         // Population creation (iterate trough all id's)
         System.out.println("Reading inFile:");
         System.out.println(inFile.getAbsolutePath());
-        new CsvReader(inFile, ",").rows(row -> {
+        new CsvReader(inFile, ";").rows(row -> {
             try {
                 System.err.println("row: " + row);
                 processLine(row, population, populationFactory, tripId);
@@ -91,17 +91,6 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
     public File getPopulation() {
         return populationFile;
-    }
-
-    protected static Coord str2coord(String string) throws IOException {
-        List<Double> numbers = Arrays.stream(string.split("]")).map(str -> //
-        Double.valueOf(str.replaceAll("[^\\.\\-0123456789]", ""))).collect(Collectors.toList());
-        if (numbers.size() == 2)
-            return new Coord(numbers.get(0), numbers.get(1));
-        else if (numbers.size() == 3)
-            return new Coord(numbers.get(0), numbers.get(1), numbers.get(2));
-        else
-            throw new IOException();
     }
 
     protected static double dateToSeconds(LocalDateTime date) {

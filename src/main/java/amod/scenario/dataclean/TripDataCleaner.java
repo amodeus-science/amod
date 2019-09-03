@@ -36,7 +36,7 @@ public class TripDataCleaner extends AbstractDataCleaner {
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outFile))) {
             String headers = Arrays.stream(TaxiTrip.class.getFields()).map(Field::getName) //
-                    .collect(Collectors.joining(","));
+                    .collect(Collectors.joining(";"));
             bufferedWriter.write(headers);
             System.out.println("now entering second part");
             stream.sorted().forEachOrdered(trip -> {
@@ -47,14 +47,14 @@ public class TripDataCleaner extends AbstractDataCleaner {
 
                     String line = "";
                     line = line + trip.localId;
-                    line = line + "," + trip.taxiId;
-                    line = line + "," + trip.pickupLoc;
-                    line = line + "," + trip.dropoffLoc;
-                    line = line + "," + trip.distance;
-                    line = line + "," + trip.waitTime;
-                    line = line + "," + trip.pickupDate;
-                    line = line + "," + trip.dropoffDate;
-                    line = line + "," + trip.duration;
+                    line = line + ";" + trip.taxiId;
+                    line = line + ";" + trip.pickupLoc;
+                    line = line + ";" + trip.dropoffLoc;
+                    line = line + ";" + trip.distance;
+                    line = line + ";" + trip.waitTime;
+                    line = line + ";" + trip.pickupDate;
+                    line = line + ";" + trip.dropoffDate;
+                    line = line + ";" + trip.duration;
                     // FIXME below
                     // String line = Arrays.stream(trip.getClass().getFields()).map(field -> {
                     // try {

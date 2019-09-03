@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
+import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.util.TaxiTrip;
 
@@ -37,6 +38,7 @@ public class TripNetworkFilter implements Predicate<TaxiTrip> {
             System.err.println("WARN network seems to be empty.");
             return true;
         }
-        return inBounds(minCoord, maxCoord, t.pickupLoc) && inBounds(minCoord, maxCoord, t.dropoffLoc);
+        return inBounds(minCoord, maxCoord, TensorCoords.toCoord(t.pickupLoc))//
+                && inBounds(minCoord, maxCoord, TensorCoords.toCoord(t.dropoffLoc));
     }
 }

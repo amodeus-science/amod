@@ -3,6 +3,8 @@ package amod.scenario.chicago;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.network.Network;
@@ -16,6 +18,7 @@ import amod.scenario.ScenarioLabels;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
+import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.OsmLoader;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.io.LocateUtils;
@@ -24,6 +27,8 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 /* package */ enum CreateChicagoScenario {
     ;
+
+    private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
 
     /** in @param args[0] working directory (empty directory), this main function will create
      * an AMoDeus scenario based on the Chicago taxi dataset available online.
@@ -64,7 +69,15 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         /** generate a network using pt2Matsim */
         Osm2MultimodalNetwork.run(workingDir.getAbsolutePath() + "/" + ScenarioLabels.pt2MatSettings);
         /** based on the taxi data, create a population and assemble a AMoDeus scenario */
-        File taxiData = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, workingDir);
+        // FIXME move back to original
+        boolean debug = true;
+        File taxiData;
+        if (!debug) {
+            taxiData = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, workingDir);
+        } else {
+            taxiData = new File("/home/clruch/data/TaxiComparison_ChicagoScCr/Taxi_Trips_2014_11_18.csv");
+        }
+
         File processingdir = new File(workingDir, "Scenario");
         if (processingdir.isDirectory())
             DeleteDirectory.of(processingdir, 2, 12);
@@ -74,14 +87,18 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
                 Arrays.asList(new String[] { "AmodeusOptions.properties", "config_full.xml", "network.xml" }));
         ScenarioOptions scenarioOptions = new ScenarioOptions(processingdir, //
                 ScenarioOptionsBase.getDefault());
+
+        LocalDate simulationDate = LocalDateConvert.ofOptions(scenarioOptions.getString("date"));
+
         File configFile = new File(scenarioOptions.getPreparerConfigName());
         System.out.println(configFile.getAbsolutePath());
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
         Network network = NetworkLoader.fromNetworkFile(new File(processingdir, configFull.network().getInputFile()));
+
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, taxiData, //
                 new ChicagoOnlineDataOperator(scenarioOptions, network), workingDir, //
-                scenarioOptions, processingdir, network, "trip_id");
+                scenarioOptions, processingdir, network, "trip_id", simulationDate, timeConvert);
     }
 
     public static void cleanUp(File workingDir) throws IOException {
