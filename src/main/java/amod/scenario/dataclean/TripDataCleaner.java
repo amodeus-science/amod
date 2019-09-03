@@ -15,7 +15,7 @@ import org.apache.commons.io.FilenameUtils;
 import amod.scenario.readers.AbstractTripsReader;
 import ch.ethz.idsc.amodeus.util.TaxiTrip;
 
-public class TripDataCleaner extends AbstractDataCleaner<TaxiTrip> {
+public class TripDataCleaner extends AbstractDataCleaner {
     private final AbstractTripsReader abstractTripsReader;
 
     public TripDataCleaner(AbstractTripsReader abstractTripsReader) {

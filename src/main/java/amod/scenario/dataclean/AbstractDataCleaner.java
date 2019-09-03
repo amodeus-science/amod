@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import ch.ethz.idsc.amodeus.util.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-public abstract class AbstractDataCleaner<T> {
-    private final List<Predicate<T>> filters = new ArrayList<>();
+public abstract class AbstractDataCleaner {
+    private final List<Predicate<TaxiTrip>> filters = new ArrayList<>();
 
-    public final void addFilter(Predicate<T> filter) {
+    public final void addFilter(Predicate<TaxiTrip> filter) {
         filters.add(filter);
     }
 
@@ -21,9 +22,9 @@ public abstract class AbstractDataCleaner<T> {
             throws IOException {
         GlobalAssert.that(file.exists());
         System.out.println("Start to clean " + file.getAbsolutePath() + " data.");
-        Stream<T> stream = readFile(file);
+        Stream<TaxiTrip> stream = readFile(file);
 
-        for (Predicate<T> dataFilter : filters) {
+        for (Predicate<TaxiTrip> dataFilter : filters) {
             System.out.println("Applying " + dataFilter.getClass().getSimpleName() + " on data.");
             stream = stream.filter(dataFilter);// dataFilter.filter(stream, simOptions, network);
         }
@@ -33,8 +34,8 @@ public abstract class AbstractDataCleaner<T> {
         return outFile;
     }
 
-    public abstract Stream<T> readFile(File file) throws IOException;
+    public abstract Stream<TaxiTrip> readFile(File file) throws IOException;
 
-    public abstract File writeFile(File inFile, Stream<T> stream) throws IOException;
+    public abstract File writeFile(File inFile, Stream<TaxiTrip> stream) throws IOException;
 
 }

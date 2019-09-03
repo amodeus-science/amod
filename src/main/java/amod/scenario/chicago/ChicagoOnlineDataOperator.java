@@ -15,7 +15,7 @@ import ch.ethz.idsc.amodeus.util.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class ChicagoOnlineDataOperator extends DataOperator<TaxiTrip> {
+public class ChicagoOnlineDataOperator extends DataOperator {
 
     public ChicagoOnlineDataOperator(ScenarioOptions scenarioOptions, Network network) {
         super(new TripFleetConverter(), new CharRemovalDataCorrector("\""), //

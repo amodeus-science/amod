@@ -14,10 +14,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import amod.scenario.DataOperator;
 import amod.scenario.population.TripPopulationCreator;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
@@ -26,7 +24,7 @@ public class TripFleetConverter {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = //
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-    public void run(File processingDir, File tripFile, DataOperator<?> dataOperator, //
+    public void run(File processingDir, File tripFile, DataOperator dataOperator, //
             ScenarioOptions simOptions, //
             Network network, String tripId)//
             throws Exception {

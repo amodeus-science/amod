@@ -8,16 +8,16 @@ import amod.scenario.dataclean.DataCorrector;
 import amod.scenario.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 
-public abstract class DataOperator<T> {
+public abstract class DataOperator {
 
     public final TripFleetConverter fleetConverter;
     public final DataCorrector dataCorrector;
-    public final AbstractDataCleaner<T> cleaner;
+    public final AbstractDataCleaner cleaner;
     protected final ScenarioOptions scenarioOptions;
     protected final Network network;
 
     public DataOperator(TripFleetConverter fleetConverter, DataCorrector dataCorrector, //
-            AbstractDataCleaner<T> cleaner, ScenarioOptions scenarioOptions, Network network) {
+            AbstractDataCleaner cleaner, ScenarioOptions scenarioOptions, Network network) {
         this.fleetConverter = fleetConverter;
         this.dataCorrector = dataCorrector;
         this.cleaner = cleaner;

@@ -11,14 +11,14 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 public class ScenarioCreator {
     private final File dataDir;
     private final File taxiData;
-    private final DataOperator<?> dataOperator; // create your own as needed
+    private final DataOperator dataOperator; 
     private final File destinDir;
     private final File processingDir;
     private final ScenarioOptions simOptions;
     private final Network network;
     private final String tripId;
 
-    public ScenarioCreator(File dataDir, File taxiData, DataOperator<?> dataOperator, //
+    public ScenarioCreator(File dataDir, File taxiData, DataOperator dataOperator, //
             File workingDirectory, ScenarioOptions scenarioOptions, File processingDir, //
             Network network, String tripId) throws Exception {
         GlobalAssert.that(dataDir.isDirectory());
