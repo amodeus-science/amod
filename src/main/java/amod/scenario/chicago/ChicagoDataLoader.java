@@ -16,11 +16,6 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 /* package */ enum ChicagoDataLoader {
     ;
 
-    public static File from(String propertiesName, File dir, int entryLimit) throws Exception {
-        GlobalAssert.that(dir.isDirectory());
-        return from(new File(dir, propertiesName), dir, entryLimit);
-    }
-    
     public static File from(File properties, File dir, int entryLimit) throws Exception {
         GlobalAssert.that(properties.isFile());
         Properties props = new Properties();
@@ -28,12 +23,10 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
         return from(props, dir, entryLimit);
     }
 
-
     public static File from(String propertiesName, File dir) throws Exception {
         GlobalAssert.that(dir.isDirectory());
         return from(new File(dir, propertiesName), dir);
     }
-
 
     public static File from(File properties, File dir) throws Exception {
         GlobalAssert.that(properties.isFile());
@@ -75,6 +68,11 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
     }
 
     // --
+
+    private static File from(String propertiesName, File dir, int entryLimit) throws Exception {
+        GlobalAssert.that(dir.isDirectory());
+        return from(new File(dir, propertiesName), dir, entryLimit);
+    }
 
     public static void main(String[] args) throws Exception {
         from("AmodeusOptions.properties", //

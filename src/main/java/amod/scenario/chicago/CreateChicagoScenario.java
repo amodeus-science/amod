@@ -67,7 +67,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         File taxiData = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, workingDir);
         File processingdir = new File(workingDir, "Scenario");
         if (processingdir.isDirectory())
-            DeleteDirectory.of(processingdir, 1, 4);
+            DeleteDirectory.of(processingdir, 2, 12);
         if (!processingdir.isDirectory())
             processingdir.mkdir();
         CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
@@ -78,7 +78,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         System.out.println(configFile.getAbsolutePath());
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
-        Network network = NetworkLoader.fromNetworkFile(new File(processingdir, configFull.network().getInputFile())); // loadNetwork(configFile);
+        Network network = NetworkLoader.fromNetworkFile(new File(processingdir, configFull.network().getInputFile()));
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, taxiData, //
                 new ChicagoOnlineDataOperator(scenarioOptions, network), workingDir, //
                 scenarioOptions, processingdir, network, "trip_id");
@@ -86,11 +86,11 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
     public static void cleanUp(File workingDir) throws IOException {
         /** delete unneeded files */
-        DeleteDirectory.of(new File(workingDir, "Scenario"), 2, 14);
-        DeleteDirectory.of(new File(workingDir, ScenarioLabels.amodeusFile), 0, 1);
-        DeleteDirectory.of(new File(workingDir, ScenarioLabels.avFile), 0, 1);
-        DeleteDirectory.of(new File(workingDir, ScenarioLabels.config), 0, 1);
-        DeleteDirectory.of(new File(workingDir, ScenarioLabels.pt2MatSettings), 0, 1);
-        DeleteDirectory.of(new File(workingDir, ScenarioLabels.network), 0, 1);
+        // DeleteDirectory.of(new File(workingDir, "Scenario"), 2, 14);
+        // DeleteDirectory.of(new File(workingDir, ScenarioLabels.amodeusFile), 0, 1);
+        // DeleteDirectory.of(new File(workingDir, ScenarioLabels.avFile), 0, 1);
+        // DeleteDirectory.of(new File(workingDir, ScenarioLabels.config), 0, 1);
+        // DeleteDirectory.of(new File(workingDir, ScenarioLabels.pt2MatSettings), 0, 1);
+        // DeleteDirectory.of(new File(workingDir, ScenarioLabels.network), 0, 1);
     }
 }

@@ -24,7 +24,7 @@ public class TripDataCleaner extends AbstractDataCleaner {
 
     @Override // from AbstractDataCleaner
     public Stream<TaxiTrip> readFile(File file) throws IOException {
-        System.out.println("Reading: " +  file.getAbsolutePath());
+        System.out.println("Reading: " + file.getAbsolutePath());
         System.out.println("Using:   " + abstractTripsReader.getClass().getSimpleName());
         return abstractTripsReader.getTripStream(file);
     }
@@ -37,13 +37,25 @@ public class TripDataCleaner extends AbstractDataCleaner {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outFile))) {
             String headers = Arrays.stream(TaxiTrip.class.getFields()).map(Field::getName) //
                     .collect(Collectors.joining(","));
-            bufferedWriter.write(headers);            
-            System.out.println("now entering second part");                        
+            bufferedWriter.write(headers);
+            System.out.println("now entering second part");
             stream.sorted().forEachOrdered(trip -> {
                 try {
                     bufferedWriter.newLine();
-                    String line = "disabledBecauseUnreadable.";
-                    // TODO clean up the things below
+
+                    // localId,taxiId,pickupLoc,dropoffLoc,distance,waitTime,pickupDate,dropoffDate,duration
+
+                    String line = "";
+                    line = line + trip.localId;
+                    line = line + "," + trip.taxiId;
+                    line = line + "," + trip.pickupLoc;
+                    line = line + "," + trip.dropoffLoc;
+                    line = line + "," + trip.distance;
+                    line = line + "," + trip.waitTime;
+                    line = line + "," + trip.pickupDate;
+                    line = line + "," + trip.dropoffDate;
+                    line = line + "," + trip.duration;
+                    // FIXME below
                     // String line = Arrays.stream(trip.getClass().getFields()).map(field -> {
                     // try {
                     // if (field.get(trip) instanceof LocalDateTime)

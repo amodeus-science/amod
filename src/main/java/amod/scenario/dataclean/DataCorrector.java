@@ -7,6 +7,6 @@ import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 
 public interface DataCorrector {
 
-    File correctFile(File taxiData, MatsimAmodeusDatabase db) throws Exception;
+    public File correctFile(File taxiData, MatsimAmodeusDatabase db) throws Exception;
 
 }

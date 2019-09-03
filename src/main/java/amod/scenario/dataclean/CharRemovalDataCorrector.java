@@ -20,9 +20,9 @@ public class CharRemovalDataCorrector implements DataCorrector {
     @Override
     public File correctFile(File taxiData, MatsimAmodeusDatabase db) throws Exception {
         File outFile = new File(taxiData.getAbsolutePath().replace(".csv", "_corrected.csv"));
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(taxiData)); BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outFile))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(taxiData)); //
+                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outFile))) {
             System.out.println("INFO start data correction");
-
             bufferedReader.lines().forEachOrdered(line -> {
                 try {
                     bufferedWriter.write(line.replace(string, ""));
@@ -31,7 +31,6 @@ public class CharRemovalDataCorrector implements DataCorrector {
                     e.printStackTrace();
                 }
             });
-
             System.out.println("INFO successfully stored corrected data in " + outFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();

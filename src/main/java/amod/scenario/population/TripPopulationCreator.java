@@ -24,7 +24,6 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 public class TripPopulationCreator extends AbstractPopulationCreator {
 
     private final ClosestLinkSelect linkSelect;
-    private int globalCount = 0;
 
     public TripPopulationCreator(File processingDir, Config config, Network network, //
             MatsimAmodeusDatabase db, DateTimeFormatter dateFormat, QuadTree<Link> qt, //
@@ -37,7 +36,8 @@ public class TripPopulationCreator extends AbstractPopulationCreator {
     protected void processLine(CsvReader.Row line, Population population, //
             PopulationFactory populationFactory, String tripId) throws Exception {
         // Create Person
-        Id<Person> personID = Id.create(++globalCount, Person.class);
+        int tripNum = Integer.parseInt(line.get("localId"));
+        Id<Person> personID = Id.create(tripNum, Person.class);
 
         Person person = populationFactory.createPerson(personID);
         Plan plan = populationFactory.createPlan();
