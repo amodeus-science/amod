@@ -21,6 +21,11 @@ public class TripsReaderChicago extends ChicagoTripsReaderBasic {
     }
 
     @Override
+    public final String getTaxiCode(Row row) {
+        return row.get("Taxi ID");
+    }
+
+    @Override
     public LocalDateTime getStartTime(Row line) throws ParseException {
         return LocalDateTime.parse(line.get("Trip Start Timestamp"), DATE_TIME_FORMATTER);
     }

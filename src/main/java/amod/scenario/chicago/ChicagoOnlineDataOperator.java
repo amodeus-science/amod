@@ -1,6 +1,9 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.scenario.chicago;
 
+import org.matsim.api.core.v01.network.Network;
+
+import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.scenario.DataOperator;
 import ch.ethz.idsc.amodeus.scenario.dataclean.CharRemovalDataCorrector;
 import ch.ethz.idsc.amodeus.scenario.dataclean.TripDataCleaner;
@@ -15,15 +18,19 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class ChicagoOnlineDataOperator extends DataOperator<TaxiTrip> {
 
-    public ChicagoOnlineDataOperator() {
-        super(new TripFleetConverter(), new CharRemovalDataCorrector("\""), new TripDataCleaner(new OnlineTripsReaderChicago()));
+    public ChicagoOnlineDataOperator(ScenarioOptions scenarioOptions, Network network) {
+        super(new TripFleetConverter(), new CharRemovalDataCorrector("\""), //
+                new TripDataCleaner(new OnlineTripsReaderChicago()), //
+                scenarioOptions, network);
     }
 
     @Override
     public void setFilters() {
-        cleaner.addFilter(new TripStartTimeResampling(15)); // start/end times in 15 min resolution
+        // TODO trips were redistributed in 15 minutes interval randomly before,
+        // add this again if necessary...
+        // cleaner.addFilter(new TripStartTimeResampling(15)); // start/end times in 15 min resolution
         // cleaner.addFilter(new TripEndTimeCorrection());
-        cleaner.addFilter(new TripNetworkFilter());
+        cleaner.addFilter(new TripNetworkFilter(scenarioOptions, network));
         // cleaner.addFilter(new TripDistanceRatioFilter(4)); // massive slow down
         cleaner.addFilter(new TripDurationFilter(Quantity.of(20000, SI.SECOND)));
         cleaner.addFilter(new TripDistanceFilter(Quantity.of(500, SI.METER), Quantity.of(50000, SI.METER)));

@@ -7,22 +7,18 @@ import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-/* package */ abstract class ChicagoTripsReaderBasic extends AbstractTripsReader {
-
-    private final double milesToM = 1609.34;
+/* package */ abstract class ChicagoTripsReaderBasic //
+        extends AbstractTripsReader {
 
     public ChicagoTripsReaderBasic(String delim) {
         super(delim);
     }
 
-    @Override
-    public final String getTaxiCode(Row row) {
-        return row.get("Taxi ID");
-    }
 
     @Override
     public final Scalar getDistance(Row row) {
-        return Quantity.of(Double.valueOf(row.get("trip_miles")) * milesToM, SI.METER); // miles to meters
+        return Quantity.of(Double.valueOf(row.get("trip_miles"))//
+                * ScenarioConstants.milesToM, SI.METER);
     }
 
     @Override

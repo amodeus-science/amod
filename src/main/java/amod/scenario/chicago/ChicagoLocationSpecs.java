@@ -13,7 +13,7 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
     ;
 
     private final ReferenceFrame referenceFrame;
-    // increasing the first value goes right
+    // increasing the first value goes east
     // increasing the second value goes north
     private final Coord center;
 

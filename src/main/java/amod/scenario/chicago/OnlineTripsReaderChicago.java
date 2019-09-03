@@ -16,20 +16,24 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class OnlineTripsReaderChicago extends ChicagoTripsReaderBasic {
-    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     public OnlineTripsReaderChicago() {
         super(",");
     }
 
     @Override
+    public final String getTaxiCode(Row row) {
+        return row.get("taxi_id");
+    }
+
+    @Override
     public LocalDateTime getStartTime(Row line) throws ParseException {
-        return LocalDateTime.parse(line.get("trip_start_timestamp"), format);
+        return LocalDateTime.parse(line.get("trip_start_timestamp"), ScenarioConstants.onlineFormat);
     }
 
     @Override
     public LocalDateTime getEndTime(Row line) throws ParseException {
-        return LocalDateTime.parse(line.get("trip_end_timestamp"), format);
+        return LocalDateTime.parse(line.get("trip_end_timestamp"), ScenarioConstants.onlineFormat);
     }
 
     @Override
