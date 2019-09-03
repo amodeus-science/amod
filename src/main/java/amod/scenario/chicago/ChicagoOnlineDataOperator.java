@@ -3,16 +3,15 @@ package amod.scenario.chicago;
 
 import org.matsim.api.core.v01.network.Network;
 
+import amod.scenario.DataOperator;
+import amod.scenario.dataclean.CharRemovalDataCorrector;
+import amod.scenario.dataclean.TripDataCleaner;
+import amod.scenario.fleetconvert.TripFleetConverter;
+import amod.scenario.trips.TripDistanceFilter;
+import amod.scenario.trips.TripDurationFilter;
+import amod.scenario.trips.TripNetworkFilter;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.scenario.DataOperator;
-import ch.ethz.idsc.amodeus.scenario.dataclean.CharRemovalDataCorrector;
-import ch.ethz.idsc.amodeus.scenario.dataclean.TripDataCleaner;
-import ch.ethz.idsc.amodeus.scenario.fleetconvert.TripFleetConverter;
-import ch.ethz.idsc.amodeus.scenario.trips.TaxiTrip;
-import ch.ethz.idsc.amodeus.scenario.trips.TripDistanceFilter;
-import ch.ethz.idsc.amodeus.scenario.trips.TripDurationFilter;
-import ch.ethz.idsc.amodeus.scenario.trips.TripNetworkFilter;
-import ch.ethz.idsc.amodeus.scenario.trips.TripStartTimeResampling;
+import ch.ethz.idsc.amodeus.util.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.qty.Quantity;
 

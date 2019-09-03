@@ -10,7 +10,7 @@ import java.util.Date;
 
 import org.matsim.api.core.v01.Coord;
 
-import ch.ethz.idsc.amodeus.scenario.readers.CsvReader.Row;
+import ch.ethz.idsc.amodeus.util.CsvReader.Row;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;

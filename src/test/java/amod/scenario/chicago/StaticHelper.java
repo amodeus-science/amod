@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import ch.ethz.idsc.amodeus.scenario.Pt2MatsimXML;
-import ch.ethz.idsc.amodeus.scenario.ScenarioLabels;
+import amod.scenario.Pt2MatsimXML;
+import amod.scenario.ScenarioLabels;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.io.LocateUtils;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;

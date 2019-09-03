@@ -10,13 +10,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
+import amod.scenario.Pt2MatsimXML;
+import amod.scenario.ScenarioCreator;
+import amod.scenario.ScenarioLabels;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
-import ch.ethz.idsc.amodeus.scenario.OsmLoader;
-import ch.ethz.idsc.amodeus.scenario.Pt2MatsimXML;
-import ch.ethz.idsc.amodeus.scenario.ScenarioCreator;
-import ch.ethz.idsc.amodeus.scenario.ScenarioLabels;
+import ch.ethz.idsc.amodeus.util.OsmLoader;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.io.LocateUtils;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;

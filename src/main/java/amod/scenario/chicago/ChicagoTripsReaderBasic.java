@@ -1,8 +1,8 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.scenario.chicago;
 
-import ch.ethz.idsc.amodeus.scenario.readers.AbstractTripsReader;
-import ch.ethz.idsc.amodeus.scenario.readers.CsvReader.Row;
+import amod.scenario.readers.AbstractTripsReader;
+import ch.ethz.idsc.amodeus.util.CsvReader.Row;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
