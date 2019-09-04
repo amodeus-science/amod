@@ -4,12 +4,7 @@ package amod.scenario;
 import java.io.File;
 import java.time.LocalDate;
 
-import org.matsim.api.core.v01.network.Network;
-
-import amod.scenario.dataclean.DataCorrector;
-import amod.scenario.dataclean.TripDataCleaner;
 import amod.scenario.fleetconvert.TripFleetConverter;
-import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 

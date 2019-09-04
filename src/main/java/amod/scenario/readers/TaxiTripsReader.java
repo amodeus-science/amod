@@ -37,7 +37,6 @@ public abstract class TaxiTripsReader {
         final AtomicInteger tripIds = new AtomicInteger(0);
         List<TaxiTrip> list = new LinkedList<>();
         new CsvReader(file, delim).rows(row -> {
-
             int tripId = tripIds.getAndIncrement();
             if (tripId % 1000 == 0)
                 System.out.println("trips: " + tripId);

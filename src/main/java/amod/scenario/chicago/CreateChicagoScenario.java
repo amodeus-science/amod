@@ -109,7 +109,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         ChicagoTripFleetConverter converter = new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector);
         // online
         TripDataCleaner cleaner2 = new TripDataCleaner(new OnlineTripsReaderChicago());
-        DataCorrector corrector2 = new CharRemovalDataCorrector("\"");
+        DataCorrector corrector2 = new StandardDataCorrector();//new CharRemovalDataCorrector("\"");
         ChicagoOnlineTripFleetConverter converter2 = new ChicagoOnlineTripFleetConverter(scenarioOptions, network, cleaner2, corrector2);
 
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, taxiData, //

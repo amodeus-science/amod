@@ -43,39 +43,32 @@ public abstract class TripFleetConverter {
             throws Exception {
         GlobalAssert.that(tripFile.isFile());
 
-        // Prepare Environment and load all configuration files
-        // ===================================
-        // ScenarioOptions simOptions = new ScenarioOptions(processingDir, ScenarioOptionsBase.getDefault());
-
+        /** preparation of necessary data */
         File configFile = new File(scenarioOptions.getPreparerConfigName());
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
         GlobalAssert.that(!network.getNodes().isEmpty());
-
         System.out.println("INFO working folder: " + processingDir.getAbsolutePath());
         ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
-        // New folder with tripData
-        // ===================================
+        /** folder for processing stored files, the folder tripData contains
+         * .csv versions of all processing steps for faster debugging. */
         File newWorkingDir = new File(processingDir, "tripData");
         newWorkingDir.mkdirs();
         FileUtils.copyFileToDirectory(tripFile, newWorkingDir);
         File newTripFile = new File(newWorkingDir, tripFile.getName());
         GlobalAssert.that(newTripFile.isFile());
 
-        // Data correction SCENARIO SPECIFIC
-        // ===================================
+        /** correcting the file */
         File correctedTripFile = corrector.correctFile(newTripFile, db);
         GlobalAssert.that(correctedTripFile.isFile());
 
-        // Data cleansing
-        // ===================================
+        /** filtering the file */
         File cleanTripFile = cleaner.clean(correctedTripFile);
         GlobalAssert.that(cleanTripFile.isFile());
 
-        // Create Population
-        // ===================================
+        /** creating population based on corrected, filtered file */
         QuadTree<Link> qt = CreateQuadTree.of(network, db);
         TripPopulationCreator populationCreator = //
                 new TripPopulationCreator(processingDir, configFull, network, db, //
@@ -84,5 +77,4 @@ public abstract class TripFleetConverter {
     }
 
     public abstract void setFilters();
-
 }
