@@ -15,12 +15,12 @@ import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 import amod.scenario.Pt2MatsimXML;
 import amod.scenario.ScenarioCreator;
 import amod.scenario.ScenarioLabels;
-import amod.scenario.dataclean.CharRemovalDataCorrector;
-import amod.scenario.dataclean.DataCorrector;
-import amod.scenario.dataclean.StandardDataCorrector;
-import amod.scenario.dataclean.TripDataCleaner;
+import amod.scenario.dataclean.CharRemovalModifier;
+import amod.scenario.dataclean.TaxiDataModifier;
+import amod.scenario.dataclean.NullModifier;
 import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
 import amod.scenario.fleetconvert.ChicagoTripFleetConverter;
+import amod.scenario.tripfilter.TaxiTripFilter;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
@@ -104,12 +104,12 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
         // TODO clean up, offline version still needed?
         // regular
-        TripDataCleaner cleaner = new TripDataCleaner(new TripsReaderChicago()); //
-        DataCorrector corrector = new StandardDataCorrector();
+        TaxiTripFilter cleaner = new TaxiTripFilter(new TripsReaderChicago()); //
+        TaxiDataModifier corrector = new NullModifier();
         ChicagoTripFleetConverter converter = new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector);
         // online
-        TripDataCleaner cleaner2 = new TripDataCleaner(new OnlineTripsReaderChicago());
-        DataCorrector corrector2 = new StandardDataCorrector();//new CharRemovalDataCorrector("\"");
+        TaxiTripFilter cleaner2 = new TaxiTripFilter(new OnlineTripsReaderChicago());
+        TaxiDataModifier corrector2 = new NullModifier();//new CharRemovalDataCorrector("\"");
         ChicagoOnlineTripFleetConverter converter2 = new ChicagoOnlineTripFleetConverter(scenarioOptions, network, cleaner2, corrector2);
 
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, taxiData, //

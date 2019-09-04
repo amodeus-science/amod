@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.scenario.dataclean;
+package amod.scenario.tripfilter;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,11 +19,11 @@ import amod.scenario.readers.TaxiTripsReader;
 import ch.ethz.idsc.amodeus.util.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-public class TripDataCleaner {
+public class TaxiTripFilter {
     private final TaxiTripsReader tripsReader;
     private final List<Predicate<TaxiTrip>> filters = new ArrayList<>();
 
-    public TripDataCleaner(TaxiTripsReader tripsReader) {
+    public TaxiTripFilter(TaxiTripsReader tripsReader) {
         this.tripsReader = tripsReader;
     }
 
@@ -31,7 +31,7 @@ public class TripDataCleaner {
         filters.add(filter);
     }
 
-    public final File clean(File file)//
+    public final File filter(File file)//
             throws IOException {
         GlobalAssert.that(file.exists());
         System.out.println("Start to clean " + file.getAbsolutePath() + " data.");
@@ -52,7 +52,7 @@ public class TripDataCleaner {
     }
 
     private File writeFile(File inFile, Stream<TaxiTrip> stream) throws IOException {
-        String fileName = FilenameUtils.getBaseName(inFile.getPath()) + "_clean." + FilenameUtils.getExtension(inFile.getPath());
+        String fileName = FilenameUtils.getBaseName(inFile.getPath()) + "_filtered." + FilenameUtils.getExtension(inFile.getPath());
         File outFile = new File(inFile.getParentFile(), fileName);
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outFile))) {
             String headers = Arrays.stream(TaxiTrip.class.getFields()).map(Field::getName) //

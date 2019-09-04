@@ -10,15 +10,15 @@ import java.io.IOException;
 
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 
-public class CharRemovalDataCorrector implements DataCorrector {
+public class CharRemovalModifier implements TaxiDataModifier {
     private final String string;
 
-    public CharRemovalDataCorrector(String string) {
+    public CharRemovalModifier(String string) {
         this.string = string;
     }
 
     @Override
-    public File correctFile(File taxiData, MatsimAmodeusDatabase db) throws Exception {
+    public File modify(File taxiData, MatsimAmodeusDatabase db) throws Exception {
         File outFile = new File(taxiData.getAbsolutePath().replace(".csv", "_corrected.csv"));
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(taxiData)); //
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outFile))) {

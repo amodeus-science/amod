@@ -2,17 +2,17 @@ package amod.scenario.fleetconvert;
 
 import org.matsim.api.core.v01.network.Network;
 
-import amod.scenario.dataclean.DataCorrector;
-import amod.scenario.dataclean.TripDataCleaner;
-import amod.scenario.trips.TripDurationFilter;
+import amod.scenario.dataclean.TaxiDataModifier;
+import amod.scenario.tripfilter.TaxiTripFilter;
+import amod.scenario.tripfilter.TripDurationFilter;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
 
-    public ChicagoOnlineTripFleetConverter(ScenarioOptions scenarioOptions, Network network, TripDataCleaner cleaner, //
-            DataCorrector corrector) {
+    public ChicagoOnlineTripFleetConverter(ScenarioOptions scenarioOptions, Network network, TaxiTripFilter cleaner, //
+            TaxiDataModifier corrector) {
         super(scenarioOptions, network, cleaner, corrector);
     }
 

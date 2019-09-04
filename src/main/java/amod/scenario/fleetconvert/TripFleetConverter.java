@@ -12,9 +12,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
-import amod.scenario.dataclean.DataCorrector;
-import amod.scenario.dataclean.TripDataCleaner;
+import amod.scenario.dataclean.TaxiDataModifier;
 import amod.scenario.population.TripPopulationCreator;
+import amod.scenario.tripfilter.TaxiTripFilter;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
@@ -28,15 +28,15 @@ public abstract class TripFleetConverter {
 
     protected final ScenarioOptions scenarioOptions;
     protected final Network network;
-    protected final TripDataCleaner cleaner;
-    protected final DataCorrector corrector;
+    protected final TaxiTripFilter filter;
+    protected final TaxiDataModifier modifier;
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
-            TripDataCleaner cleaner, DataCorrector corrector) {
+            TaxiTripFilter filter, TaxiDataModifier modifier) {
         this.scenarioOptions = scenarioOptions;
         this.network = network;
-        this.cleaner = cleaner;
-        this.corrector = corrector;
+        this.filter = filter;
+        this.modifier = modifier;
     }
 
     public void run(File processingDir, File tripFile, LocalDate simulationDate, AmodeusTimeConvert timeConvert)//
@@ -61,11 +61,11 @@ public abstract class TripFleetConverter {
         GlobalAssert.that(newTripFile.isFile());
 
         /** correcting the file */
-        File correctedTripFile = corrector.correctFile(newTripFile, db);
+        File correctedTripFile = modifier.modify(newTripFile, db);
         GlobalAssert.that(correctedTripFile.isFile());
 
         /** filtering the file */
-        File cleanTripFile = cleaner.clean(correctedTripFile);
+        File cleanTripFile = filter.filter(correctedTripFile);
         GlobalAssert.that(cleanTripFile.isFile());
 
         /** creating population based on corrected, filtered file */
