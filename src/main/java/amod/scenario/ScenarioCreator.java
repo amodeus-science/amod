@@ -6,6 +6,9 @@ import java.time.LocalDate;
 
 import org.matsim.api.core.v01.network.Network;
 
+import amod.scenario.dataclean.DataCorrector;
+import amod.scenario.dataclean.TripDataCleaner;
+import amod.scenario.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
@@ -13,29 +16,26 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 public class ScenarioCreator {
     private final File dataDir;
     private final File taxiData;
-    private final DataOperator dataOperator;
     private final File destinDir;
     private final File processingDir;
-    private final ScenarioOptions simOptions;
-    private final Network network;
     private final LocalDate simulationDate;
     private final AmodeusTimeConvert timeConvert;
+    public final TripFleetConverter fleetConverter;
 
-    public ScenarioCreator(File dataDir, File taxiData, DataOperator dataOperator, //
-            File workingDirectory, ScenarioOptions scenarioOptions, File processingDir, //
-            Network network, LocalDate simulationDate, //
+    public ScenarioCreator(File dataDir, File taxiData, //
+            TripFleetConverter converter, //
+            File workingDirectory, File processingDir, //
+            LocalDate simulationDate, //
             AmodeusTimeConvert timeConvert) throws Exception {
         GlobalAssert.that(dataDir.isDirectory());
         GlobalAssert.that(taxiData.exists());
         this.dataDir = dataDir;
         this.taxiData = taxiData;
-        this.dataOperator = dataOperator;
         destinDir = new File(workingDirectory, "CreatedScenario");
         this.processingDir = processingDir;
-        simOptions = scenarioOptions;
-        this.network = network;
         this.simulationDate = simulationDate;
         this.timeConvert = timeConvert;
+        this.fleetConverter = converter;
         run();
 
     }
@@ -43,8 +43,8 @@ public class ScenarioCreator {
     private void run() throws Exception {
         ScenarioAssembler.copyInitialFiles(processingDir, dataDir);
         InitialNetworkPreparer.run(processingDir);
-        dataOperator.setFilters();
-        dataOperator.fleetConverter.run(processingDir, taxiData, dataOperator, simOptions, network, //
+        fleetConverter.setFilters();
+        fleetConverter.run(processingDir, taxiData, //
                 simulationDate, timeConvert);
         ScenarioAssembler.copyFinishedScenario(processingDir.getAbsolutePath(), destinDir.getAbsolutePath());
     }

@@ -15,6 +15,12 @@ import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 import amod.scenario.Pt2MatsimXML;
 import amod.scenario.ScenarioCreator;
 import amod.scenario.ScenarioLabels;
+import amod.scenario.dataclean.CharRemovalDataCorrector;
+import amod.scenario.dataclean.DataCorrector;
+import amod.scenario.dataclean.StandardDataCorrector;
+import amod.scenario.dataclean.TripDataCleaner;
+import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
+import amod.scenario.fleetconvert.ChicagoTripFleetConverter;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
@@ -96,9 +102,18 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
         Network network = NetworkLoader.fromNetworkFile(new File(processingdir, configFull.network().getInputFile()));
 
+        // TODO clean up, offline version still needed?
+        // regular
+        TripDataCleaner cleaner = new TripDataCleaner(new TripsReaderChicago()); //
+        DataCorrector corrector = new StandardDataCorrector();
+        ChicagoTripFleetConverter converter = new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector);
+        // online
+        TripDataCleaner cleaner2 = new TripDataCleaner(new OnlineTripsReaderChicago());
+        DataCorrector corrector2 = new CharRemovalDataCorrector("\"");
+        ChicagoOnlineTripFleetConverter converter2 = new ChicagoOnlineTripFleetConverter(scenarioOptions, network, cleaner2, corrector2);
+
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, taxiData, //
-                new ChicagoOnlineDataOperator(scenarioOptions, network), workingDir, //
-                scenarioOptions, processingdir, network, simulationDate, timeConvert);
+                converter2, workingDir, processingdir, simulationDate, timeConvert);
     }
 
     public static void cleanUp(File workingDir) throws IOException {

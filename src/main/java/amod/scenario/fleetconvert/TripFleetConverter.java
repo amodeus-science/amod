@@ -12,7 +12,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
-import amod.scenario.DataOperator;
+import amod.scenario.dataclean.DataCorrector;
+import amod.scenario.dataclean.TripDataCleaner;
 import amod.scenario.population.TripPopulationCreator;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
@@ -21,13 +22,26 @@ import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.CreateQuadTree;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-public class TripFleetConverter {
+public abstract class TripFleetConverter {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = //
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-    public void run(File processingDir, File tripFile, DataOperator dataOperator, //
-            ScenarioOptions simOptions, //
-            Network network, LocalDate simulationDate, AmodeusTimeConvert timeConvert)//
+    protected final ScenarioOptions scenarioOptions;
+    protected final Network network;
+    protected final TripDataCleaner cleaner;
+    protected final DataCorrector corrector;
+    
+    public TripFleetConverter(ScenarioOptions scenarioOptions, Network network,//
+            TripDataCleaner cleaner, DataCorrector corrector) {
+        this.scenarioOptions = scenarioOptions;
+        this.network = network;
+        this.cleaner = cleaner;
+        this.corrector = corrector;
+    }
+    
+    
+    public void run(File processingDir, File tripFile, 
+            LocalDate simulationDate, AmodeusTimeConvert timeConvert)//
             throws Exception {
         GlobalAssert.that(tripFile.isFile());
 
@@ -35,13 +49,13 @@ public class TripFleetConverter {
         // ===================================
         // ScenarioOptions simOptions = new ScenarioOptions(processingDir, ScenarioOptionsBase.getDefault());
 
-        File configFile = new File(simOptions.getPreparerConfigName());
+        File configFile = new File(scenarioOptions.getPreparerConfigName());
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
         GlobalAssert.that(!network.getNodes().isEmpty());
 
         System.out.println("INFO working folder: " + processingDir.getAbsolutePath());
-        ReferenceFrame referenceFrame = simOptions.getLocationSpec().referenceFrame();
+        ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
         // New folder with tripData
@@ -54,12 +68,12 @@ public class TripFleetConverter {
 
         // Data correction SCENARIO SPECIFIC
         // ===================================
-        File correctedTripFile = dataOperator.dataCorrector.correctFile(newTripFile, db);
+        File correctedTripFile = corrector.correctFile(newTripFile, db);
         GlobalAssert.that(correctedTripFile.isFile());
 
         // Data cleansing
         // ===================================
-        File cleanTripFile = dataOperator.cleaner.clean(correctedTripFile);
+        File cleanTripFile = cleaner.clean(correctedTripFile);
         GlobalAssert.that(cleanTripFile.isFile());
 
         // Create Population
@@ -69,4 +83,8 @@ public class TripFleetConverter {
                 DATE_TIME_FORMATTER, qt, simulationDate, timeConvert);
         populationCreator.process(cleanTripFile);
     }
+    
+    
+    public abstract void setFilters();
+
 }
