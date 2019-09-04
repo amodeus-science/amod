@@ -78,9 +78,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         Osm2MultimodalNetwork.run(workingDir.getAbsolutePath() + "/" + ScenarioLabels.pt2MatSettings);
         /** based on the taxi data, create a population and assemble a AMoDeus scenario */
         // FIXME move back to original
-        
-
-        
+                
         boolean debug = false;
         File taxiData;
         if (!debug) {
