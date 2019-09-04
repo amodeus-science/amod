@@ -30,18 +30,16 @@ public abstract class TripFleetConverter {
     protected final Network network;
     protected final TripDataCleaner cleaner;
     protected final DataCorrector corrector;
-    
-    public TripFleetConverter(ScenarioOptions scenarioOptions, Network network,//
+
+    public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TripDataCleaner cleaner, DataCorrector corrector) {
         this.scenarioOptions = scenarioOptions;
         this.network = network;
         this.cleaner = cleaner;
         this.corrector = corrector;
     }
-    
-    
-    public void run(File processingDir, File tripFile, 
-            LocalDate simulationDate, AmodeusTimeConvert timeConvert)//
+
+    public void run(File processingDir, File tripFile, LocalDate simulationDate, AmodeusTimeConvert timeConvert)//
             throws Exception {
         GlobalAssert.that(tripFile.isFile());
 
@@ -79,12 +77,12 @@ public abstract class TripFleetConverter {
         // Create Population
         // ===================================
         QuadTree<Link> qt = CreateQuadTree.of(network, db);
-        TripPopulationCreator populationCreator = new TripPopulationCreator(processingDir, configFull, network, db, //
-                DATE_TIME_FORMATTER, qt, simulationDate, timeConvert);
+        TripPopulationCreator populationCreator = //
+                new TripPopulationCreator(processingDir, configFull, network, db, //
+                        DATE_TIME_FORMATTER, qt, simulationDate, timeConvert);
         populationCreator.process(cleanTripFile);
     }
-    
-    
+
     public abstract void setFilters();
 
 }

@@ -22,13 +22,14 @@ import ch.ethz.idsc.amodeus.util.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
+import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public abstract class AbstractTripsReader {
+public abstract class TaxiTripsReader {
     private final String delim;
     private final Map<String, Integer> taxiIds = new HashMap<>();
 
-    public AbstractTripsReader(String delim) {
+    public TaxiTripsReader(String delim) {
         this.delim = delim;
     }
 
@@ -49,18 +50,21 @@ public abstract class AbstractTripsReader {
                 LocalDateTime dropoffTime = getEndTime(row);
                 Scalar durationCompute = Duration.between(pickupTime, dropoffTime);
                 Scalar durationDataset = getDuration(row);
-
                 if (Scalars.lessEquals(Quantity.of(0.1, SI.SECOND), //
                         durationDataset.subtract(durationCompute).abs()))
                     System.err.println("Mismatch between duration recorded in data and computed duration," + //
                     "computed duration using start and end time: " + //
                     pickupTime + " --> " + dropoffTime + " != " + durationDataset);
-
-                TaxiTrip trip = TaxiTrip.of(tripId, Integer.toString(taxiId), //
-                        TensorCoords.toTensor(getPickupLocation(row)), TensorCoords.toTensor(getDropoffLocation(row)), //
-                        getDistance(row), getWaitingTime(row), pickupTime, dropoffTime);
+                TaxiTrip trip = TaxiTrip.of(//
+                        tripId, //
+                        Integer.toString(taxiId), //
+                        getPickupLocation(row), //
+                        getDropoffLocation(row), //
+                        getDistance(row), //
+                        getWaitingTime(row), //
+                        pickupTime, //
+                        dropoffTime);
                 list.add(trip);
-
             } catch (Exception exception) {
                 exception.printStackTrace();
                 // TODO
@@ -82,9 +86,9 @@ public abstract class AbstractTripsReader {
 
     public abstract LocalDateTime getEndTime(Row row) throws ParseException;
 
-    public abstract Coord getPickupLocation(Row row);
+    public abstract Tensor getPickupLocation(Row row);
 
-    public abstract Coord getDropoffLocation(Row row);
+    public abstract Tensor getDropoffLocation(Row row);
 
     public abstract Scalar getDuration(Row row);
 

@@ -1,14 +1,14 @@
 /* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.scenario.chicago;
 
-import amod.scenario.readers.AbstractTripsReader;
+import amod.scenario.readers.TaxiTripsReader;
 import ch.ethz.idsc.amodeus.util.CsvReader.Row;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ abstract class ChicagoTripsReaderBasic //
-        extends AbstractTripsReader {
+        extends TaxiTripsReader {
 
     public ChicagoTripsReaderBasic(String delim) {
         super(delim);

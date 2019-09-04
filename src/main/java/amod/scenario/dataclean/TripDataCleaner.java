@@ -15,53 +15,45 @@ import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 
-import amod.scenario.readers.AbstractTripsReader;
+import amod.scenario.readers.TaxiTripsReader;
 import ch.ethz.idsc.amodeus.util.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-public class TripDataCleaner  {
-    private final AbstractTripsReader abstractTripsReader;
+public class TripDataCleaner {
+    private final TaxiTripsReader tripsReader;
     private final List<Predicate<TaxiTrip>> filters = new ArrayList<>();
 
-    public TripDataCleaner(AbstractTripsReader abstractTripsReader) {
-        this.abstractTripsReader = abstractTripsReader;
+    public TripDataCleaner(TaxiTripsReader tripsReader) {
+        this.tripsReader = tripsReader;
     }
 
-    
     public final void addFilter(Predicate<TaxiTrip> filter) {
         filters.add(filter);
     }
-    
+
     public final File clean(File file)//
             throws IOException {
         GlobalAssert.that(file.exists());
         System.out.println("Start to clean " + file.getAbsolutePath() + " data.");
         Stream<TaxiTrip> stream = readFile(file);
-
         for (Predicate<TaxiTrip> dataFilter : filters) {
             System.out.println("Applying " + dataFilter.getClass().getSimpleName() + " on data.");
             stream = stream.filter(dataFilter);// dataFilter.filter(stream, simOptions, network);
         }
-
         File outFile = writeFile(file, stream);
         System.out.println("Finished data cleanup.\n\tstored in " + outFile.getAbsolutePath());
         return outFile;
     }
 
-    
-
-
-    public Stream<TaxiTrip> readFile(File file) throws IOException {
+    private Stream<TaxiTrip> readFile(File file) throws IOException {
         System.out.println("Reading: " + file.getAbsolutePath());
-        System.out.println("Using:   " + abstractTripsReader.getClass().getSimpleName());
-        return abstractTripsReader.getTripStream(file);
+        System.out.println("Using:   " + tripsReader.getClass().getSimpleName());
+        return tripsReader.getTripStream(file);
     }
 
-
-    public File writeFile(File inFile, Stream<TaxiTrip> stream) throws IOException {
+    private File writeFile(File inFile, Stream<TaxiTrip> stream) throws IOException {
         String fileName = FilenameUtils.getBaseName(inFile.getPath()) + "_clean." + FilenameUtils.getExtension(inFile.getPath());
         File outFile = new File(inFile.getParentFile(), fileName);
-
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outFile))) {
             String headers = Arrays.stream(TaxiTrip.class.getFields()).map(Field::getName) //
                     .collect(Collectors.joining(";"));
@@ -70,9 +62,7 @@ public class TripDataCleaner  {
             stream.sorted().forEachOrdered(trip -> {
                 try {
                     bufferedWriter.newLine();
-
                     // localId,taxiId,pickupLoc,dropoffLoc,distance,waitTime,pickupDate,dropoffDate,duration
-
                     String line = "";
                     line = line + trip.localId;
                     line = line + ";" + trip.taxiId;
@@ -99,8 +89,6 @@ public class TripDataCleaner  {
                 }
             });
         }
-
         return outFile;
     }
-
 }
