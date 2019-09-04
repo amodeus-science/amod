@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
+@Deprecated // TODO remove eventually
 /* package */ enum PopulationHelper {
     ;
 
