@@ -60,20 +60,20 @@ public abstract class TripFleetConverter {
         File newTripFile = new File(newWorkingDir, tripFile.getName());
         GlobalAssert.that(newTripFile.isFile());
 
-        /** correcting the file */
-        File correctedTripFile = modifier.modify(newTripFile, db);
-        GlobalAssert.that(correctedTripFile.isFile());
-
         /** filtering the file */
-        File cleanTripFile = filter.filter(correctedTripFile);
+        File cleanTripFile = filter.filter(newTripFile);
         GlobalAssert.that(cleanTripFile.isFile());
+
+        /** correcting the file */
+        File correctedTripFile = modifier.modify(cleanTripFile, db);
+        GlobalAssert.that(correctedTripFile.isFile());
 
         /** creating population based on corrected, filtered file */
         QuadTree<Link> qt = CreateQuadTree.of(network, db);
         TripPopulationCreator populationCreator = //
                 new TripPopulationCreator(processingDir, configFull, network, db, //
                         DATE_TIME_FORMATTER, qt, simulationDate, timeConvert);
-        populationCreator.process(cleanTripFile);
+        populationCreator.process(correctedTripFile);
     }
 
     public abstract void setFilters();
