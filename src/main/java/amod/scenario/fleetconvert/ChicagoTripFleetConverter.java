@@ -7,19 +7,16 @@ import amod.scenario.tripfilter.TripDistanceFilter;
 import amod.scenario.tripfilter.TripDurationFilter;
 import amod.scenario.tripfilter.TripNetworkFilter;
 import amod.scenario.tripmodif.TaxiDataModifier;
+import amod.scenario.tripmodif.TripBasedModifier;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class ChicagoTripFleetConverter extends TripFleetConverter {
 
-    
-    
-    
-    
-    public ChicagoTripFleetConverter(ScenarioOptions scenarioOptions, Network network, TaxiTripFilter cleaner,//
-            TaxiDataModifier corrector) {
-        super(scenarioOptions, network, cleaner,corrector);
+    public ChicagoTripFleetConverter(ScenarioOptions scenarioOptions, Network network, TaxiTripFilter cleaner, //
+            TripBasedModifier corrector, TaxiDataModifier generalModifier) {
+        super(scenarioOptions, network, cleaner, corrector, generalModifier);
     }
 
     @Override
@@ -30,7 +27,7 @@ public class ChicagoTripFleetConverter extends TripFleetConverter {
         // cleaner.addFilter(new TripEndTimeCorrection());
         filter.addFilter(new TripNetworkFilter(scenarioOptions, network));
         // cleaner.addFilter(new TripDistanceRatioFilter(4)); // massive slow down
-        filter.addFilter(new TripDurationFilter(Quantity.of(0, SI.SECOND),Quantity.of(20000, SI.SECOND)));
+        filter.addFilter(new TripDurationFilter(Quantity.of(0, SI.SECOND), Quantity.of(20000, SI.SECOND)));
         filter.addFilter(new TripDistanceFilter(Quantity.of(500, SI.METER), Quantity.of(50000, SI.METER)));
     }
 

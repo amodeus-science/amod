@@ -13,12 +13,11 @@ public interface TaxiDataModifier {
      *         necessary changes in the data to produce meaningful scenarios, e.g.,
      *         - distributing trips deparing in 15 minute intervals in these intervals
      *         - distributing trips in geographical areas, e.g., if only the departure zone is known
-     *         Possible parameters: @param db
      * 
      *         Filtering, i.e., removing certain trips according to some criteria is done
      *         with a {@link TaxiTripFilter} and not with classes implementing this interface.
      * 
      * @throws Exception */
-    public File modify(File taxiData, MatsimAmodeusDatabase db) throws Exception;
+    public File modify(File taxiData) throws Exception;
 
 }

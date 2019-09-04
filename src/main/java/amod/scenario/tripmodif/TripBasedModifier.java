@@ -21,7 +21,7 @@ public class TripBasedModifier implements TaxiDataModifier {
     }
 
     @Override
-    public File modify(File taxiData, MatsimAmodeusDatabase db) throws IOException {
+    public File modify(File taxiData) throws IOException {
         List<TaxiTrip> modified = new ArrayList<>();
         ImportTaxiTrips.fromFile(taxiData).forEach(orig -> {
             TaxiTrip changed = orig;

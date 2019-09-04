@@ -18,8 +18,8 @@ public class CharRemovalModifier implements TaxiDataModifier {
     }
 
     @Override
-    public File modify(File taxiData, MatsimAmodeusDatabase db) throws Exception {
-        File outFile = new File(taxiData.getAbsolutePath().replace(".csv", "_corrected.csv"));
+    public File modify(File taxiData) throws Exception {
+        File outFile = new File(taxiData.getAbsolutePath().replace(".csv", "_prepared.csv"));
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(taxiData)); //
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outFile))) {
             System.out.println("INFO start data correction");
@@ -36,5 +36,9 @@ public class CharRemovalModifier implements TaxiDataModifier {
             e.printStackTrace();
         }
         return outFile;
+    }
+    
+    public static void main(String[] args){
+        System.out.println("\"");
     }
 }

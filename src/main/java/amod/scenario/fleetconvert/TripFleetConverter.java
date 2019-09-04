@@ -15,6 +15,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import amod.scenario.population.TripPopulationCreator;
 import amod.scenario.tripfilter.TaxiTripFilter;
 import amod.scenario.tripmodif.TaxiDataModifier;
+import amod.scenario.tripmodif.TripBasedModifier;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
@@ -30,13 +31,16 @@ public abstract class TripFleetConverter {
     protected final Network network;
     protected final TaxiTripFilter filter;
     protected final TaxiDataModifier modifier;
+    protected final TaxiDataModifier generalModifier;
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
-            TaxiTripFilter filter, TaxiDataModifier modifier) {
+            TaxiTripFilter filter, TripBasedModifier tripModifier,//
+            TaxiDataModifier generalModifier) {
         this.scenarioOptions = scenarioOptions;
         this.network = network;
         this.filter = filter;
-        this.modifier = modifier;
+        this.modifier = tripModifier;
+        this.generalModifier = generalModifier;
     }
 
     public void run(File processingDir, File tripFile, LocalDate simulationDate, AmodeusTimeConvert timeConvert)//
@@ -60,12 +64,16 @@ public abstract class TripFleetConverter {
         File newTripFile = new File(newWorkingDir, tripFile.getName());
         GlobalAssert.that(newTripFile.isFile());
 
+        /** initial modifications, e.g., replacing characters, all
+         * other modifications should be done in the third step */
+        File preparedFile = generalModifier.modify(newTripFile);
+
         /** filtering the file */
-        File filteredTripsFile = filter.filter(newTripFile);
+        File filteredTripsFile = filter.filter(preparedFile);
         GlobalAssert.that(filteredTripsFile.isFile());
 
         /** correcting the file */
-        File modifiedTripsFile = modifier.modify(filteredTripsFile, db);
+        File modifiedTripsFile = modifier.modify(filteredTripsFile);
         GlobalAssert.that(modifiedTripsFile.isFile());
 
         /** creating population based on corrected, filtered file */

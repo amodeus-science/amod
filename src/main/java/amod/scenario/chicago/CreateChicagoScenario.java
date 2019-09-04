@@ -21,8 +21,7 @@ import amod.scenario.fleetconvert.ChicagoTripFleetConverter;
 import amod.scenario.tripfilter.TaxiTripFilter;
 import amod.scenario.tripmodif.CharRemovalModifier;
 import amod.scenario.tripmodif.ChicagoOnlineTripBasedModifier;
-import amod.scenario.tripmodif.NullModifier;
-import amod.scenario.tripmodif.TaxiDataModifier;
+import amod.scenario.tripmodif.TripBasedModifier;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
@@ -55,7 +54,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
     public static void setup(File workingDir) throws Exception {
         ChicagoGeoInformation.setup();
         /** copy relevant files containing settings for scenario generation */
-        File settingsDir = new File(LocateUtils.getSuperFolder("amodeus"), "resources/chicagoScenario");
+        File settingsDir = new File(LocateUtils.getSuperFolder(CreateChicagoScenario.class,"amod"), "resources/chicagoScenario");
         CopyFiles.now(settingsDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
                 Arrays.asList(new String[] { ScenarioLabels.avFile, ScenarioLabels.config, //
                         ScenarioLabels.pt2MatSettings }),
@@ -79,7 +78,10 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         Osm2MultimodalNetwork.run(workingDir.getAbsolutePath() + "/" + ScenarioLabels.pt2MatSettings);
         /** based on the taxi data, create a population and assemble a AMoDeus scenario */
         // FIXME move back to original
-        boolean debug = true;
+        
+
+        
+        boolean debug = false;
         File taxiData;
         if (!debug) {
             taxiData = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, workingDir);
@@ -89,7 +91,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
         File processingdir = new File(workingDir, "Scenario");
         if (processingdir.isDirectory())
-            DeleteDirectory.of(processingdir, 2, 12);
+            DeleteDirectory.of(processingdir, 2, 14);
         if (!processingdir.isDirectory())
             processingdir.mkdir();
         CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
@@ -108,13 +110,14 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         // TODO clean up, offline version still needed?
         // regular
         TaxiTripFilter cleaner = new TaxiTripFilter(new TripsReaderChicago()); //
-        TaxiDataModifier corrector = new NullModifier();
-        ChicagoTripFleetConverter converter = new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector);
+        TripBasedModifier corrector = new TripBasedModifier();
+        ChicagoTripFleetConverter converter = //
+                new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector, new CharRemovalModifier("\""));
         // online
         TaxiTripFilter filter2 = new TaxiTripFilter(new OnlineTripsReaderChicago());
-        TaxiDataModifier modifier2 = new ChicagoOnlineTripBasedModifier(random);
+        TripBasedModifier modifier2 = new ChicagoOnlineTripBasedModifier(random);
         ChicagoOnlineTripFleetConverter converter2 = //
-                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2);
+                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2, new CharRemovalModifier("\""));
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, taxiData, //
                 converter2, workingDir, processingdir, simulationDate, timeConvert);
     }

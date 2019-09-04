@@ -39,6 +39,7 @@ public abstract class TaxiTripsReader {
         final AtomicInteger tripIds = new AtomicInteger(0);
         List<TaxiTrip> list = new LinkedList<>();
         CsvReader reader = new CsvReader(file, delim);
+        // TODO currently the headers in the "unreadable file" are in the wrong order
         unreadable.add(reader.headers().stream().collect(Collectors.joining(",")));
         reader.rows(row -> {
             int tripId = tripIds.getAndIncrement();
@@ -70,10 +71,6 @@ public abstract class TaxiTripsReader {
             } catch (Exception exception) {
                 System.err.println("Unable to read row: " + row);
                 unreadable.add(row.toString());
-
-                // System.err.println("discard trip " + tripId + ": [" + IntStream.range(0, headers().size()).mapToObj(i -> //
-                // headers.get(i) + "=" + line[i]).collect(Collectors.joining(", ")) + "]");
-                // return null;
             }
         });
         return list.stream();
