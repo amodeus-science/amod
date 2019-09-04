@@ -30,7 +30,7 @@ public class ChicagoTripFleetConverter extends TripFleetConverter {
         // cleaner.addFilter(new TripEndTimeCorrection());
         filter.addFilter(new TripNetworkFilter(scenarioOptions, network));
         // cleaner.addFilter(new TripDistanceRatioFilter(4)); // massive slow down
-        filter.addFilter(new TripDurationFilter(Quantity.of(20000, SI.SECOND)));
+        filter.addFilter(new TripDurationFilter(Quantity.of(0, SI.SECOND),Quantity.of(20000, SI.SECOND)));
         filter.addFilter(new TripDistanceFilter(Quantity.of(500, SI.METER), Quantity.of(50000, SI.METER)));
     }
 

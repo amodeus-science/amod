@@ -1,15 +1,19 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.scenario.readers;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
@@ -25,6 +29,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 public abstract class TaxiTripsReader {
     private final String delim;
     private final Map<String, Integer> taxiIds = new HashMap<>();
+    private final List<String> unreadable = new ArrayList<>();
 
     public TaxiTripsReader(String delim) {
         this.delim = delim;
@@ -33,7 +38,9 @@ public abstract class TaxiTripsReader {
     public Stream<TaxiTrip> getTripStream(File file) throws IOException {
         final AtomicInteger tripIds = new AtomicInteger(0);
         List<TaxiTrip> list = new LinkedList<>();
-        new CsvReader(file, delim).rows(row -> {
+        CsvReader reader = new CsvReader(file, delim);
+        unreadable.add(reader.headers().stream().collect(Collectors.joining(",")));
+        reader.rows(row -> {
             int tripId = tripIds.getAndIncrement();
             if (tripId % 1000 == 0)
                 System.out.println("trips: " + tripId);
@@ -61,7 +68,8 @@ public abstract class TaxiTripsReader {
                         dropoffTime);
                 list.add(trip);
             } catch (Exception exception) {
-                exception.printStackTrace();
+                System.err.println("Unable to read row: " + row);
+                unreadable.add(row.toString());
 
                 // System.err.println("discard trip " + tripId + ": [" + IntStream.range(0, headers().size()).mapToObj(i -> //
                 // headers.get(i) + "=" + line[i]).collect(Collectors.joining(", ")) + "]");
@@ -73,6 +81,22 @@ public abstract class TaxiTripsReader {
 
     public int getNumberOfTaxis() {
         return taxiIds.size();
+    }
+
+    public void saveUnreadable(File file) {
+        System.err.println("Saving unreadable lines to: " + file.getAbsolutePath());
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
+            unreadable.stream().forEach(s -> {
+                try {
+                    bufferedWriter.write(s + "\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     public abstract String getTaxiCode(Row row);

@@ -111,10 +111,10 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         TaxiDataModifier corrector = new NullModifier();
         ChicagoTripFleetConverter converter = new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector);
         // online
-        TaxiTripFilter cleaner2 = new TaxiTripFilter(new OnlineTripsReaderChicago());
-        TaxiDataModifier corrector2 = new ChicagoOnlineTripBasedModifier(random);
-        ChicagoOnlineTripFleetConverter converter2 = new ChicagoOnlineTripFleetConverter(scenarioOptions, network, cleaner2, corrector2);
-
+        TaxiTripFilter filter2 = new TaxiTripFilter(new OnlineTripsReaderChicago());
+        TaxiDataModifier modifier2 = new ChicagoOnlineTripBasedModifier(random);
+        ChicagoOnlineTripFleetConverter converter2 = //
+                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2);
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, taxiData, //
                 converter2, workingDir, processingdir, simulationDate, timeConvert);
     }

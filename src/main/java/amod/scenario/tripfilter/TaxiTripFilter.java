@@ -38,6 +38,11 @@ public class TaxiTripFilter {
             stream = stream.filter(dataFilter);// dataFilter.filter(stream, simOptions, network);
         }
         File outFile = writeFile(file, stream);
+        /** save unreadable trips somewhere */
+        File unreadable = new File(file.getParentFile(), //
+                FilenameUtils.getBaseName(file.getAbsolutePath()) + "_unreadable." + //
+                        FilenameUtils.getExtension(file.getAbsolutePath()));
+        tripsReader.saveUnreadable(unreadable);
         System.out.println("Finished data cleanup.\n\tstored in " + outFile.getAbsolutePath());
         return outFile;
     }
