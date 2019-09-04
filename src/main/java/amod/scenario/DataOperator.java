@@ -3,8 +3,8 @@ package amod.scenario;
 
 import org.matsim.api.core.v01.network.Network;
 
-import amod.scenario.dataclean.AbstractDataCleaner;
 import amod.scenario.dataclean.DataCorrector;
+import amod.scenario.dataclean.TripDataCleaner;
 import amod.scenario.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 
@@ -12,12 +12,12 @@ public abstract class DataOperator {
 
     public final TripFleetConverter fleetConverter;
     public final DataCorrector dataCorrector;
-    public final AbstractDataCleaner cleaner;
+    public final TripDataCleaner cleaner;
     protected final ScenarioOptions scenarioOptions;
     protected final Network network;
 
     public DataOperator(TripFleetConverter fleetConverter, DataCorrector dataCorrector, //
-            AbstractDataCleaner cleaner, ScenarioOptions scenarioOptions, Network network) {
+            TripDataCleaner cleaner, ScenarioOptions scenarioOptions, Network network) {
         this.fleetConverter = fleetConverter;
         this.dataCorrector = dataCorrector;
         this.cleaner = cleaner;

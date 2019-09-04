@@ -6,7 +6,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,22 +17,47 @@ import org.apache.commons.io.FilenameUtils;
 
 import amod.scenario.readers.AbstractTripsReader;
 import ch.ethz.idsc.amodeus.util.TaxiTrip;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-public class TripDataCleaner extends AbstractDataCleaner {
+public class TripDataCleaner  {
     private final AbstractTripsReader abstractTripsReader;
+    private final List<Predicate<TaxiTrip>> filters = new ArrayList<>();
 
     public TripDataCleaner(AbstractTripsReader abstractTripsReader) {
         this.abstractTripsReader = abstractTripsReader;
     }
 
-    @Override // from AbstractDataCleaner
+    
+    public final void addFilter(Predicate<TaxiTrip> filter) {
+        filters.add(filter);
+    }
+    
+    public final File clean(File file)//
+            throws IOException {
+        GlobalAssert.that(file.exists());
+        System.out.println("Start to clean " + file.getAbsolutePath() + " data.");
+        Stream<TaxiTrip> stream = readFile(file);
+
+        for (Predicate<TaxiTrip> dataFilter : filters) {
+            System.out.println("Applying " + dataFilter.getClass().getSimpleName() + " on data.");
+            stream = stream.filter(dataFilter);// dataFilter.filter(stream, simOptions, network);
+        }
+
+        File outFile = writeFile(file, stream);
+        System.out.println("Finished data cleanup.\n\tstored in " + outFile.getAbsolutePath());
+        return outFile;
+    }
+
+    
+
+
     public Stream<TaxiTrip> readFile(File file) throws IOException {
         System.out.println("Reading: " + file.getAbsolutePath());
         System.out.println("Using:   " + abstractTripsReader.getClass().getSimpleName());
         return abstractTripsReader.getTripStream(file);
     }
 
-    @Override // from AbstractDataCleaner
+
     public File writeFile(File inFile, Stream<TaxiTrip> stream) throws IOException {
         String fileName = FilenameUtils.getBaseName(inFile.getPath()) + "_clean." + FilenameUtils.getExtension(inFile.getPath());
         File outFile = new File(inFile.getParentFile(), fileName);
