@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Random;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -19,6 +20,7 @@ import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
 import amod.scenario.fleetconvert.ChicagoTripFleetConverter;
 import amod.scenario.tripfilter.TaxiTripFilter;
 import amod.scenario.tripmodif.CharRemovalModifier;
+import amod.scenario.tripmodif.ChicagoOnlineTripBasedModifier;
 import amod.scenario.tripmodif.NullModifier;
 import amod.scenario.tripmodif.TaxiDataModifier;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
@@ -35,6 +37,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
     ;
 
     private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
+    private static final Random random = new Random(123);
 
     /** in @param args[0] working directory (empty directory), this main function will create
      * an AMoDeus scenario based on the Chicago taxi dataset available online.
@@ -109,7 +112,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         ChicagoTripFleetConverter converter = new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector);
         // online
         TaxiTripFilter cleaner2 = new TaxiTripFilter(new OnlineTripsReaderChicago());
-        TaxiDataModifier corrector2 = new NullModifier();//new CharRemovalDataCorrector("\"");
+        TaxiDataModifier corrector2 = new ChicagoOnlineTripBasedModifier(random);
         ChicagoOnlineTripFleetConverter converter2 = new ChicagoOnlineTripFleetConverter(scenarioOptions, network, cleaner2, corrector2);
 
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, taxiData, //
