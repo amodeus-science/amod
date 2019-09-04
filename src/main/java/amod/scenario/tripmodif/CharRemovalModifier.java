@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.scenario.dataclean;
+package amod.scenario.tripmodif;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

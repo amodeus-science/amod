@@ -12,9 +12,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
-import amod.scenario.dataclean.TaxiDataModifier;
 import amod.scenario.population.TripPopulationCreator;
 import amod.scenario.tripfilter.TaxiTripFilter;
+import amod.scenario.tripmodif.TaxiDataModifier;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;

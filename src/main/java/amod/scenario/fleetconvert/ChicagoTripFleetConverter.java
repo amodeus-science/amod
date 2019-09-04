@@ -2,11 +2,11 @@ package amod.scenario.fleetconvert;
 
 import org.matsim.api.core.v01.network.Network;
 
-import amod.scenario.dataclean.TaxiDataModifier;
 import amod.scenario.tripfilter.TaxiTripFilter;
 import amod.scenario.tripfilter.TripDistanceFilter;
 import amod.scenario.tripfilter.TripDurationFilter;
 import amod.scenario.tripfilter.TripNetworkFilter;
+import amod.scenario.tripmodif.TaxiDataModifier;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.qty.Quantity;

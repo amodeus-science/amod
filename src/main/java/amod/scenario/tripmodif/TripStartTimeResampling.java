@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.scenario.tripfilter;
+package amod.scenario.tripmodif;
 
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
