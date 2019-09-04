@@ -27,8 +27,7 @@ public class TripFleetConverter {
 
     public void run(File processingDir, File tripFile, DataOperator dataOperator, //
             ScenarioOptions simOptions, //
-            Network network, String tripId, //
-            LocalDate simulationDate, AmodeusTimeConvert timeConvert)//
+            Network network, LocalDate simulationDate, AmodeusTimeConvert timeConvert)//
             throws Exception {
         GlobalAssert.that(tripFile.isFile());
 
@@ -44,21 +43,6 @@ public class TripFleetConverter {
         System.out.println("INFO working folder: " + processingDir.getAbsolutePath());
         ReferenceFrame referenceFrame = simOptions.getLocationSpec().referenceFrame();
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
-
-        // File outputDirectory = new File(processingDir, configFull.controler().getOutputDirectory());
-        //
-        // System.err.println(outputDirectory.getAbsolutePath());
-        // if (processingDir.exists()) {
-        // if (outputDirectory.exists()) {
-        // System.err.println("WARN All files in the that folder will be deleted in:");
-        // for (int i = 2; i > 0; i--) {
-        // Thread.sleep(1000);
-        // System.err.println(i + " seconds");
-        // }
-        // DeleteDirectory.of(outputDirectory, 2, 10);
-        // }
-        // outputDirectory.mkdirs();
-        // }
 
         // New folder with tripData
         // ===================================
@@ -82,7 +66,7 @@ public class TripFleetConverter {
         // ===================================
         QuadTree<Link> qt = CreateQuadTree.of(network, db);
         TripPopulationCreator populationCreator = new TripPopulationCreator(processingDir, configFull, network, db, //
-                DATE_TIME_FORMATTER, qt, tripId, simulationDate, timeConvert);
+                DATE_TIME_FORMATTER, qt, simulationDate, timeConvert);
         populationCreator.process(cleanTripFile);
     }
 }

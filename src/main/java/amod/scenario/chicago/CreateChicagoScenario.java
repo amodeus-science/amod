@@ -98,7 +98,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, taxiData, //
                 new ChicagoOnlineDataOperator(scenarioOptions, network), workingDir, //
-                scenarioOptions, processingdir, network, "trip_id", simulationDate, timeConvert);
+                scenarioOptions, processingdir, network, simulationDate, timeConvert);
     }
 
     public static void cleanUp(File workingDir) throws IOException {

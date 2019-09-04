@@ -30,7 +30,7 @@ import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-public class TripPopulationCreator  {
+public class TripPopulationCreator {
 
     private final String fileName = "population.xml";
     private final ClosestLinkSelect linkSelect;
@@ -40,24 +40,19 @@ public class TripPopulationCreator  {
     private final Network network;
     private final File populationFile;
     private final File populationFileGz;
-    protected final String tripId;
 
     public TripPopulationCreator(File processingDir, Config config, Network network, //
             MatsimAmodeusDatabase db, DateTimeFormatter dateFormat, QuadTree<Link> qt, //
-            String tripId, LocalDate simualtionDate, AmodeusTimeConvert timeConvert) {
-//        super(processingDir, config, network, db, dateFormat, tripId);
+            LocalDate simualtionDate, AmodeusTimeConvert timeConvert) {
         this.linkSelect = new ClosestLinkSelect(db, qt);
         this.simulationDate = simualtionDate;
         this.timeConvert = timeConvert;
         this.config = config;
         this.network = network;
-        this.tripId = tripId;
         populationFile = new File(processingDir, fileName);
         populationFileGz = new File(processingDir, fileName + ".gz");
     }
-    
-    
-    
+
     public void process(File inFile) throws MalformedURLException, Exception {
         System.out.println("INFO start population creation");
         GlobalAssert.that(inFile.isFile());
@@ -72,7 +67,7 @@ public class TripPopulationCreator  {
         new CsvReader(inFile, ";").rows(row -> {
             try {
                 System.err.println("row: " + row);
-                processLine(row, population, populationFactory, tripId);
+                processLine(row, population, populationFactory);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -97,13 +92,8 @@ public class TripPopulationCreator  {
             System.err.println("WARN created population is empty");
     }
 
-    
-    
-    
-
-
     protected void processLine(CsvReader.Row line, Population population, //
-            PopulationFactory populationFactory, String tripId) throws Exception {
+            PopulationFactory populationFactory) throws Exception {
 
         // Possible keys: duration,pickupLoc,distance,dropoffDate,taxiId,pickupDate,dropoffLoc,localId,waitTime,
 
@@ -116,9 +106,8 @@ public class TripPopulationCreator  {
         Scalar waitTime = Scalars.fromString(line.get("waitTime"));
         LocalDateTime pickupDate = LocalDateTime.parse(line.get("pickupDate"));
         Scalar duration = Scalars.fromString(line.get("duration"));
-        
-        System.out.println("duration: " +  duration);
-        
+
+        System.out.println("duration: " + duration);
 
         TaxiTrip taxiTrip = TaxiTrip.of(globalId, taxiId, pickupLoc, dropoffLoc, //
                 distance, waitTime, //
@@ -129,10 +118,6 @@ public class TripPopulationCreator  {
                 linkSelect, simulationDate, timeConvert);
 
         population.addPerson(person);
-    }
-    
-    public File getPopulation() {
-        return populationFile;
     }
 
 }
