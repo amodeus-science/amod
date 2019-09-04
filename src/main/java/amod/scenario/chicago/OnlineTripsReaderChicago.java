@@ -53,18 +53,19 @@ public class OnlineTripsReaderChicago extends ChicagoTripsReaderBasic {
         return Quantity.of(Long.valueOf(line.get("trip_seconds")), SI.SECOND);
     }
 
-    public static void main(String[] args) throws ParseException {
-        String dateString = "2018-01-22T22:17:25.123";
-
-        /** old Date stuff */
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS");
-        Date date = format.parse(dateString);
-        System.out.println(date);
-        /** LocalDateTime */
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        LocalDateTime ldt = LocalDateTime.parse(dateString, dtf);// dtf.parse(dateString).;
-        System.out.println(ldt);
-
-    }
+    // TODO move to tests
+    // public static void main(String[] args) throws ParseException {
+    // String dateString = "2018-01-22T22:17:25.123";
+    //
+    // /** old Date stuff */
+    // DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS");
+    // Date date = format.parse(dateString);
+    // System.out.println(date);
+    // /** LocalDateTime */
+    // DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    // LocalDateTime ldt = LocalDateTime.parse(dateString, dtf);// dtf.parse(dateString).;
+    // System.out.println(ldt);
+    //
+    // }
 
 }

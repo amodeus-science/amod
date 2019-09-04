@@ -21,7 +21,9 @@ import ch.ethz.idsc.amodeus.util.PersonCreate;
 import ch.ethz.idsc.amodeus.util.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 
 public class TripPopulationCreator extends AbstractPopulationCreator {
 
@@ -42,15 +44,20 @@ public class TripPopulationCreator extends AbstractPopulationCreator {
     protected void processLine(CsvReader.Row line, Population population, //
             PopulationFactory populationFactory, String tripId) throws Exception {
 
+        // Possible keys: duration,pickupLoc,distance,dropoffDate,taxiId,pickupDate,dropoffLoc,localId,waitTime,
+
         // create a taxi trip
-        Integer globalId = null;
-        String taxiId = null;
-        Tensor pickupLoc = null;
-        Tensor dropoffLoc = null;
-        Scalar distance = null;
-        Scalar waitTime = null;
-        LocalDateTime pickupDate = null;
-        Scalar duration = null;
+        Integer globalId = Integer.parseInt(line.get("localId"));
+        String taxiId = line.get("taxiId");
+        Tensor pickupLoc = Tensors.fromString(line.get("pickupLoc"));
+        Tensor dropoffLoc = Tensors.fromString(line.get("dropoffLoc"));
+        Scalar distance = Scalars.fromString(line.get("distance"));
+        Scalar waitTime = Scalars.fromString(line.get("waitTime"));
+        LocalDateTime pickupDate = LocalDateTime.parse(line.get("pickupDate"));
+        Scalar duration = Scalars.fromString(line.get("duration"));
+        
+        System.out.println("duration: " +  duration);
+        
 
         TaxiTrip taxiTrip = TaxiTrip.of(globalId, taxiId, pickupLoc, dropoffLoc, //
                 distance, waitTime, //
