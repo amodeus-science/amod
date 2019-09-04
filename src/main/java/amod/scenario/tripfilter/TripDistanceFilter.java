@@ -3,7 +3,7 @@ package amod.scenario.tripfilter;
 
 import java.util.function.Predicate;
 
-import ch.ethz.idsc.amodeus.util.TaxiTrip;
+import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;

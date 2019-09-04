@@ -15,10 +15,10 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.Coord;
 
 import ch.ethz.idsc.amodeus.net.TensorCoords;
+import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.CsvReader;
 import ch.ethz.idsc.amodeus.util.CsvReader.Row;
 import ch.ethz.idsc.amodeus.util.Duration;
-import ch.ethz.idsc.amodeus.util.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -44,7 +44,6 @@ public abstract class TaxiTripsReader {
                 String taxiCode = getTaxiCode(row);
                 int taxiId = taxiIds.getOrDefault(taxiCode, taxiIds.size());
                 taxiIds.put(taxiCode, taxiId);
-
                 LocalDateTime pickupTime = getStartTime(row);
                 LocalDateTime dropoffTime = getEndTime(row);
                 Scalar durationCompute = Duration.between(pickupTime, dropoffTime);
@@ -55,7 +54,7 @@ public abstract class TaxiTripsReader {
                     "computed duration using start and end time: " + //
                     pickupTime + " --> " + dropoffTime + " != " + durationDataset);
                 TaxiTrip trip = TaxiTrip.of(//
-                        tripId, //
+                        tripId, // TODO can I do real trip ID from CSV?
                         Integer.toString(taxiId), //
                         getPickupLocation(row), //
                         getDropoffLocation(row), //
@@ -66,7 +65,7 @@ public abstract class TaxiTripsReader {
                 list.add(trip);
             } catch (Exception exception) {
                 exception.printStackTrace();
-                // TODO
+
                 // System.err.println("discard trip " + tripId + ": [" + IntStream.range(0, headers().size()).mapToObj(i -> //
                 // headers.get(i) + "=" + line[i]).collect(Collectors.joining(", ")) + "]");
                 // return null;

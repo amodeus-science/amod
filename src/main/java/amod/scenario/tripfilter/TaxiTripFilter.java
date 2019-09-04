@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import org.apache.commons.io.FilenameUtils;
 
 import amod.scenario.readers.TaxiTripsReader;
-import ch.ethz.idsc.amodeus.util.TaxiTrip;
+import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
 public class TaxiTripFilter {
@@ -36,6 +36,7 @@ public class TaxiTripFilter {
         GlobalAssert.that(file.exists());
         System.out.println("Start to clean " + file.getAbsolutePath() + " data.");
         Stream<TaxiTrip> stream = readFile(file);
+        System.out.println("Number of filters: " + filters.size());
         for (Predicate<TaxiTrip> dataFilter : filters) {
             System.out.println("Applying " + dataFilter.getClass().getSimpleName() + " on data.");
             stream = stream.filter(dataFilter);// dataFilter.filter(stream, simOptions, network);
@@ -52,7 +53,8 @@ public class TaxiTripFilter {
     }
 
     private File writeFile(File inFile, Stream<TaxiTrip> stream) throws IOException {
-        String fileName = FilenameUtils.getBaseName(inFile.getPath()) + "_filtered." + FilenameUtils.getExtension(inFile.getPath());
+        String fileName = FilenameUtils.getBaseName(inFile.getPath()) + "_filtered." + //
+                FilenameUtils.getExtension(inFile.getPath());
         File outFile = new File(inFile.getParentFile(), fileName);
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outFile))) {
             String headers = Arrays.stream(TaxiTrip.class.getFields()).map(Field::getName) //

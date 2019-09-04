@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 
 import org.matsim.api.core.v01.network.Network;
 
-import ch.ethz.idsc.amodeus.util.TaxiTrip;
+import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 

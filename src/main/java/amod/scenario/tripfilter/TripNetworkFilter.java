@@ -10,7 +10,7 @@ import org.matsim.core.network.NetworkUtils;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.util.TaxiTrip;
+import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 
 public class TripNetworkFilter implements Predicate<TaxiTrip> {
 

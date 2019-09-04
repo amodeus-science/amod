@@ -4,7 +4,7 @@ package amod.scenario.tripfilter;
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
-import ch.ethz.idsc.amodeus.util.TaxiTrip;
+import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 
 /* package */ class TripDateFilter implements Predicate<TaxiTrip> {
     private final LocalDateTime date;
