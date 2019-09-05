@@ -1,5 +1,5 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.scenario;
+package amod.scenario.chicago;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.NetworkWriter;
 
+import amod.scenario.NetworkCutterUtils;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
@@ -19,7 +20,8 @@ import ch.ethz.idsc.amodeus.util.network.LinkModes;
     public static Network run(File processingDir) {
 
         // load the pt2matsim network
-        Network networkpt2Matsim = NetworkLoader.fromNetworkFile(new File(processingDir, "network.xml"));
+        Network networkpt2Matsim = //
+                NetworkLoader.fromNetworkFile(new File(processingDir, "networkPt2Matsim.xml.gz"));
         GlobalAssert.that(!networkpt2Matsim.getNodes().isEmpty());
 
         // remove links on which cars cannot drive

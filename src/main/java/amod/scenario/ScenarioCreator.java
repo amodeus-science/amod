@@ -36,11 +36,10 @@ public class ScenarioCreator {
     }
 
     private void run() throws Exception {
-        ScenarioAssembler.copyInitialFiles(processingDir, dataDir);
-        InitialNetworkPreparer.run(processingDir);
+        InitialFiles.copyToDir(processingDir, dataDir);
         fleetConverter.setFilters();
         fleetConverter.run(processingDir, taxiData, //
                 simulationDate, timeConvert);
-        ScenarioAssembler.copyFinishedScenario(processingDir.getAbsolutePath(), destinDir.getAbsolutePath());
+        FinishedScenario.copyToDir(processingDir.getAbsolutePath(), destinDir.getAbsolutePath());
     }
 }

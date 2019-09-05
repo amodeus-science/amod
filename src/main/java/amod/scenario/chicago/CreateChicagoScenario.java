@@ -54,7 +54,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
     public static void setup(File workingDir) throws Exception {
         ChicagoGeoInformation.setup();
         /** copy relevant files containing settings for scenario generation */
-        File settingsDir = new File(LocateUtils.getSuperFolder(CreateChicagoScenario.class,"amod"), "resources/chicagoScenario");
+        File settingsDir = new File(LocateUtils.getSuperFolder(CreateChicagoScenario.class, "amod"), "resources/chicagoScenario");
         CopyFiles.now(settingsDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
                 Arrays.asList(new String[] { ScenarioLabels.avFile, ScenarioLabels.config, //
                         ScenarioLabels.pt2MatSettings }),
@@ -69,22 +69,27 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
     }
 
     public static void run(File workingDir) throws Exception {
+        // FIXME remove debug loop once done
+        boolean debug = true;
+
         /** download of open street map data to create scenario */
         System.out.println("Downloading open stret map data, this may take a while...");
         File osmFile = new File(workingDir, ScenarioLabels.osmData);
         OsmLoader osm = new OsmLoader(new File(workingDir, ScenarioLabels.amodeusFile));
         osm.saveIfNotAlreadyExists(osmFile);
         /** generate a network using pt2Matsim */
-        Osm2MultimodalNetwork.run(workingDir.getAbsolutePath() + "/" + ScenarioLabels.pt2MatSettings);
+        if (!debug)
+            Osm2MultimodalNetwork.run(workingDir.getAbsolutePath() + "/" + ScenarioLabels.pt2MatSettings);
+        /** prepare the network */
+        InitialNetworkPreparer.run(workingDir);
+
         /** based on the taxi data, create a population and assemble a AMoDeus scenario */
-        // FIXME move back to original
-                
-        boolean debug = false;
+
         File taxiData;
         if (!debug) {
             taxiData = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, workingDir);
         } else {
-            taxiData = new File("/home/clruch/data/TaxiComparison_ChicagoScCr/Taxi_Trips_2014_11_18.csv");
+            taxiData = new File("/home/clruch/data/TaxiComparison_ChicagoScCr/Taxi_Trips_2019_07_19.csv");
         }
 
         File processingdir = new File(workingDir, "Scenario");
@@ -93,7 +98,8 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         if (!processingdir.isDirectory())
             processingdir.mkdir();
         CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
-                Arrays.asList(new String[] { "AmodeusOptions.properties", "config_full.xml", "network.xml" }));
+                Arrays.asList(new String[] { "AmodeusOptions.properties", "config_full.xml", //
+                        "network.xml", "network.xml.gz" }));
         ScenarioOptions scenarioOptions = new ScenarioOptions(processingdir, //
                 ScenarioOptionsBase.getDefault());
 
@@ -103,19 +109,24 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         System.out.println(configFile.getAbsolutePath());
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
+
         Network network = NetworkLoader.fromNetworkFile(new File(processingdir, configFull.network().getInputFile()));
+
+        System.out.println("Link in nw: " + network.getLinks().size());
 
         // TODO clean up, offline version still needed?
         // regular
-        TaxiTripFilter cleaner = new TaxiTripFilter(new TripsReaderChicago()); //
-        TripBasedModifier corrector = new TripBasedModifier();
-        ChicagoTripFleetConverter converter = //
-                new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector, new CharRemovalModifier("\""));
+        // TaxiTripFilter cleaner = new TaxiTripFilter(new TripsReaderChicago()); //
+        // TripBasedModifier corrector = new TripBasedModifier();
+        // ChicagoTripFleetConverter converter = //
+        // new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector, new CharRemovalModifier("\""));
+
         // online
         TaxiTripFilter filter2 = new TaxiTripFilter(new OnlineTripsReaderChicago());
         TripBasedModifier modifier2 = new ChicagoOnlineTripBasedModifier(random);
         ChicagoOnlineTripFleetConverter converter2 = //
-                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2, new CharRemovalModifier("\""));
+                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2, //
+                        new CharRemovalModifier("\""));
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, taxiData, //
                 converter2, workingDir, processingdir, simulationDate, timeConvert);
     }

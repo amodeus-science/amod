@@ -7,7 +7,7 @@
     </module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="network.xml" />
+		<param name="inputNetworkFile" value="network.xml.gz" />
 	</module>
 
 	<module name="plans">

@@ -40,7 +40,7 @@ public abstract class TripFleetConverter {
         this.network = network;
         this.filter = filter;
         this.modifier = tripModifier;
-        this.generalModifier = generalModifier;
+        this.generalModifier = generalModifier;                
     }
 
     public void run(File processingDir, File tripFile, LocalDate simulationDate, AmodeusTimeConvert timeConvert)//
@@ -51,7 +51,6 @@ public abstract class TripFleetConverter {
         File configFile = new File(scenarioOptions.getPreparerConfigName());
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
-        GlobalAssert.that(!network.getNodes().isEmpty());
         System.out.println("INFO working folder: " + processingDir.getAbsolutePath());
         ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
