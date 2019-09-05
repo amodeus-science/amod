@@ -85,11 +85,11 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
         /** based on the taxi data, create a population and assemble a AMoDeus scenario */
 
-        File taxiData;
+        File tripFile;
         if (!debug) {
-            taxiData = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, workingDir);
+            tripFile = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, workingDir);
         } else {
-            taxiData = new File("/home/clruch/data/TaxiComparison_ChicagoScCr/Taxi_Trips_2019_07_19.csv");
+            tripFile = new File("/home/clruch/data/TaxiComparison_ChicagoScCr/Taxi_Trips_2019_07_19.csv");
         }
 
         File processingdir = new File(workingDir, "Scenario");
@@ -109,9 +109,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         System.out.println(configFile.getAbsolutePath());
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
-
         Network network = NetworkLoader.fromNetworkFile(new File(processingdir, configFull.network().getInputFile()));
-
         System.out.println("Link in nw: " + network.getLinks().size());
 
         // TODO clean up, offline version still needed?
@@ -127,7 +125,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         ChicagoOnlineTripFleetConverter converter2 = //
                 new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2, //
                         new CharRemovalModifier("\""));
-        ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, taxiData, //
+        ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, tripFile, //
                 converter2, workingDir, processingdir, simulationDate, timeConvert);
     }
 

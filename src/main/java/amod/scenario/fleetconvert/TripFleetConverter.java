@@ -30,17 +30,22 @@ public abstract class TripFleetConverter {
     protected final ScenarioOptions scenarioOptions;
     protected final Network network;
     protected final TaxiTripFilter filter;
-    protected final TaxiDataModifier modifier;
+    protected final TripBasedModifier modifier;
     protected final TaxiDataModifier generalModifier;
+    protected final MatsimAmodeusDatabase db;
+    protected final QuadTree<Link> qt;
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
-            TaxiTripFilter filter, TripBasedModifier tripModifier,//
+            TaxiTripFilter filter, TripBasedModifier tripModifier, //
             TaxiDataModifier generalModifier) {
         this.scenarioOptions = scenarioOptions;
         this.network = network;
         this.filter = filter;
         this.modifier = tripModifier;
-        this.generalModifier = generalModifier;                
+        this.generalModifier = generalModifier;
+        ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
+        this.db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
+        this.qt = CreateQuadTree.of(network, db);
     }
 
     public void run(File processingDir, File tripFile, LocalDate simulationDate, AmodeusTimeConvert timeConvert)//
@@ -52,8 +57,6 @@ public abstract class TripFleetConverter {
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
         System.out.println("INFO working folder: " + processingDir.getAbsolutePath());
-        ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
-        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
 
         /** folder for processing stored files, the folder tripData contains
          * .csv versions of all processing steps for faster debugging. */
@@ -76,7 +79,6 @@ public abstract class TripFleetConverter {
         GlobalAssert.that(modifiedTripsFile.isFile());
 
         /** creating population based on corrected, filtered file */
-        QuadTree<Link> qt = CreateQuadTree.of(network, db);
         TripPopulationCreator populationCreator = //
                 new TripPopulationCreator(processingDir, configFull, network, db, //
                         DATE_TIME_FORMATTER, qt, simulationDate, timeConvert);

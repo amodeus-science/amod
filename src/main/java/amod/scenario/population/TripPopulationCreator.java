@@ -66,7 +66,6 @@ public class TripPopulationCreator {
         System.out.println(inFile.getAbsolutePath());
         new CsvReader(inFile, ";").rows(row -> {
             try {
-                System.err.println("row: " + row);
                 processLine(row, population, populationFactory);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -92,7 +91,7 @@ public class TripPopulationCreator {
             System.err.println("WARN created population is empty");
     }
 
-    protected void processLine(CsvReader.Row line, Population population, //
+    private void processLine(CsvReader.Row line, Population population, //
             PopulationFactory populationFactory) throws Exception {
 
         // Possible keys: duration,pickupLoc,distance,dropoffDate,taxiId,pickupDate,dropoffLoc,localId,waitTime,
@@ -106,8 +105,6 @@ public class TripPopulationCreator {
         Scalar waitTime = Scalars.fromString(line.get("waitTime"));
         LocalDateTime pickupDate = LocalDateTime.parse(line.get("pickupDate"));
         Scalar duration = Scalars.fromString(line.get("duration"));
-
-        System.out.println("duration: " + duration);
 
         TaxiTrip taxiTrip = TaxiTrip.of(globalId, taxiId, pickupLoc, dropoffLoc, //
                 distance, waitTime, //

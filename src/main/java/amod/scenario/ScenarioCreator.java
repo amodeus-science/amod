@@ -10,22 +10,22 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
 public class ScenarioCreator {
     private final File dataDir;
-    private final File taxiData;
+    private final File tripFile;
     private final File destinDir;
     private final File processingDir;
     private final LocalDate simulationDate;
     private final AmodeusTimeConvert timeConvert;
     public final TripFleetConverter fleetConverter;
 
-    public ScenarioCreator(File dataDir, File taxiData, //
+    public ScenarioCreator(File dataDir, File tripFile, //
             TripFleetConverter converter, //
             File workingDirectory, File processingDir, //
             LocalDate simulationDate, //
             AmodeusTimeConvert timeConvert) throws Exception {
         GlobalAssert.that(dataDir.isDirectory());
-        GlobalAssert.that(taxiData.exists());
+        GlobalAssert.that(tripFile.exists());
         this.dataDir = dataDir;
-        this.taxiData = taxiData;
+        this.tripFile = tripFile;
         destinDir = new File(workingDirectory, "CreatedScenario");
         this.processingDir = processingDir;
         this.simulationDate = simulationDate;
@@ -38,7 +38,7 @@ public class ScenarioCreator {
     private void run() throws Exception {
         InitialFiles.copyToDir(processingDir, dataDir);
         fleetConverter.setFilters();
-        fleetConverter.run(processingDir, taxiData, //
+        fleetConverter.run(processingDir, tripFile, //
                 simulationDate, timeConvert);
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), destinDir.getAbsolutePath());
     }

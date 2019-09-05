@@ -7,6 +7,7 @@ import java.util.Random;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.LocalDateTimes;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.qty.Quantity;
@@ -32,10 +33,10 @@ public class ChicagoTripStartTimeResampling implements TripModifier {
 
         /** get the maximum time shift to have star and end in
          * the same 15 minute interval */
-        int maxShift = maxShift(duration);
+        Scalar maxShift = maxShift(duration);
 
         /** compute a random time shift */
-        Scalar shift = Quantity.of(random.nextDouble() * maxShift, "s");
+        Scalar shift = RealScalar.of(random.nextDouble()).multiply(maxShift);
 
         /** compute updated trip and return */
         return TaxiTrip.of(//
@@ -49,29 +50,20 @@ public class ChicagoTripStartTimeResampling implements TripModifier {
                 tripOrig.duration);
     }
 
-    private int maxShift(Scalar duration) {
+    /** @return given a trip duration and start time at a 15 minute interval,
+     *         0 min, 15 min, 30 min, ... and a trip duration @param duration, this returns
+     *         the maximum possible shift in seconds such that the trip still ends in the
+     *         same interval than originally */
+    private Scalar maxShift(Scalar duration) {
         GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, "s"), duration));
         int durationSec = duration.number().intValue();
         int excess = durationSec - (durationSec / 900) * 900;
         int maxShift = 900 - excess;
-        return maxShift;
+        return Quantity.of(maxShift, "s");
     }
 
+    @Override
+    public void notify(TaxiTrip taxiTrip) {
+        // -- deliberately empty        
+    }
 }
-
-// private final double minuteResolution;
-//
-// public TripStartTimeResampling(double minuteResolution) {
-// this.minuteResolution = minuteResolution;
-// }
-//
-// public Stream<TaxiTrip> filter(Stream<TaxiTrip> stream, ScenarioOptions simOptions, Network network) {
-// return stream.peek(trip -> {
-// int offsetSec = RandomVariate.of(UniformDistribution.of(-30 * minuteResolution, 30 * minuteResolution)).number().intValue();
-// LocalDateTime pickupPrev = trip.pickupDate;
-// LocalDateTime pickupModi = LocalDateTime.of(pickupPrev.getYear(), pickupPrev.getMonth(), //
-// pickupPrev.getDayOfMonth(), pickupPrev.getHour(), pickupPrev.getMinute(), pickupPrev.getSecond() + offsetSec);
-// trip.pickupDate = pickupModi;
-//
-// });
-// }
