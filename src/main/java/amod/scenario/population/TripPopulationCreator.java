@@ -6,6 +6,9 @@ import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -68,13 +71,31 @@ public class TripPopulationCreator {
         // Population creation (iterate trough all id's)
         System.out.println("Reading inFile:");
         System.out.println(inFile.getAbsolutePath());
+        // row to list of trips
+        List<TaxiTrip> trips = new ArrayList<>();
         new CsvReader(inFile, ";").rows(row -> {
             try {
-                processRow(row, population, populationFactory);
+                trips.add(fromRow(row));
+//                rowToPopulation(row, population, populationFactory);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+        
+        
+        
+        // filter the stream
+        Stream<TaxiTrip> filtered = finalFilters.filterStream(trips.stream());
+        
+        
+        
+        // chreate persons
+        filtered.forEach(tt->{
+            rowToPopulation(tt, population, populationFactory);
+        });
+        
+        
+        
 
         // Validity Check
         GlobalAssert.that(PopulationHelper.checkAllActivitiesInNetwork(population, network));
@@ -95,13 +116,12 @@ public class TripPopulationCreator {
             System.err.println("WARN created population is empty");
     }
 
-    private void processRow(CsvReader.Row line, Population population, //
-            PopulationFactory populationFactory) throws Exception {
+    private TaxiTrip fromRow(CsvReader.Row line) {
 
         // Possible keys: duration,pickupLoc,distance,dropoffDate,taxiId,pickupDate,dropoffLoc,localId,waitTime,
 
         // FIXME apply final filter
-        
+
         // create a taxi trip
         Integer globalId = Integer.parseInt(line.get("localId"));
         String taxiId = line.get("taxiId");
@@ -112,14 +132,17 @@ public class TripPopulationCreator {
         LocalDateTime pickupDate = LocalDateTime.parse(line.get("pickupDate"));
         Scalar duration = Scalars.fromString(line.get("duration"));
 
-        TaxiTrip taxiTrip = TaxiTrip.of(globalId, taxiId, pickupLoc, dropoffLoc, //
+        return TaxiTrip.of(globalId, taxiId, pickupLoc, dropoffLoc, //
                 distance, waitTime, //
                 pickupDate, duration);
+    }
 
+    private void rowToPopulation(TaxiTrip taxiTrip, Population population, //
+            PopulationFactory populationFactory)  {
+//        TaxiTrip taxiTrip = fromRow(line);
         // Create Person
-        Person person = PersonCreate.fromTrip(taxiTrip, globalId, populationFactory, //
+        Person person = PersonCreate.fromTrip(taxiTrip, taxiTrip.localId, populationFactory, //
                 linkSelect, simulationDate, timeConvert);
-
         population.addPerson(person);
     }
 
