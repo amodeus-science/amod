@@ -126,9 +126,11 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         TaxiTripFilter filter2 = new TaxiTripFilter(new OnlineTripsReaderChicago());
         TripBasedModifier modifier2 = new ChicagoOnlineTripBasedModifier(random, network, //
                 fll, new File(processingdir, "virtualNetworkChicago"));
+        // FIXMe add real thing, not null
+        TaxiTripFilter finalFilters = new TaxiTripFilter(null);
         ChicagoOnlineTripFleetConverter converter2 = //
                 new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2, //
-                        new CharRemovalModifier("\""));
+                        new CharRemovalModifier("\""), null);
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, tripFile, //
                 converter2, workingDir, processingdir, simulationDate, timeConvert);
     }

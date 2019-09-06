@@ -15,6 +15,8 @@ import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
+/** Contains a set of filters that process an individual {@link TaxiTrip}
+ * and let it pass or not: TaxiTrip -> {true,false} */
 public class TaxiTripFilter {
     private final TaxiTripsReader tripsReader;
     private final List<Predicate<TaxiTrip>> filters = new ArrayList<>();
@@ -31,13 +33,20 @@ public class TaxiTripFilter {
             throws IOException {
         GlobalAssert.that(file.exists());
         System.out.println("Start to clean " + file.getAbsolutePath() + " data.");
-        Stream<TaxiTrip> stream = readFile(file);
-        System.out.println("Number of filters: " + filters.size());
-        for (Predicate<TaxiTrip> dataFilter : filters) {
-            System.out.println("Applying " + dataFilter.getClass().getSimpleName() + " on data.");
-            stream = stream.filter(dataFilter);// dataFilter.filter(stream, simOptions, network);
-        }
-        File outFile = writeFile(file, stream);
+        // read the file
+        System.out.println("Reading: " + file.getAbsolutePath());
+        System.out.println("Using:   " + tripsReader.getClass().getSimpleName());
+        Stream<TaxiTrip> stream = tripsReader.getTripStream(file);
+        Stream<TaxiTrip> filteredStream = filterStream(stream);
+        
+//        System.out.println("Number of filters: " + filters.size());
+//        for (Predicate<TaxiTrip> dataFilter : filters) {
+//            System.out.println("Applying " + dataFilter.getClass().getSimpleName() + " on data.");
+//            stream = stream.filter(dataFilter);
+//        }
+        
+        
+        File outFile = writeFile(file, filteredStream);
         /** save unreadable trips somewhere */
         File unreadable = new File(file.getParentFile(), //
                 FilenameUtils.getBaseName(file.getAbsolutePath()) + "_unreadable." + //
@@ -46,11 +55,14 @@ public class TaxiTripFilter {
         System.out.println("Finished data cleanup.\n\tstored in " + outFile.getAbsolutePath());
         return outFile;
     }
-
-    private Stream<TaxiTrip> readFile(File file) throws IOException {
-        System.out.println("Reading: " + file.getAbsolutePath());
-        System.out.println("Using:   " + tripsReader.getClass().getSimpleName());
-        return tripsReader.getTripStream(file);
+    
+    private final Stream<TaxiTrip> filterStream(Stream<TaxiTrip> inStream){
+        System.out.println("Number of filters: " + filters.size());
+        for (Predicate<TaxiTrip> dataFilter : filters) {
+            System.out.println("Applying " + dataFilter.getClass().getSimpleName() + " on data.");
+            inStream = inStream.filter(dataFilter);
+        }
+        return inStream;        
     }
 
     private File writeFile(File inFile, Stream<TaxiTrip> stream) throws IOException {

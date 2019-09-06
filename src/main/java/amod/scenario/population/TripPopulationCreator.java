@@ -17,6 +17,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.utils.collections.QuadTree;
 
+import amod.scenario.tripfilter.TaxiTripFilter;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.PersonCreate;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
@@ -30,6 +31,7 @@ import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
+// TODO refactor this class
 public class TripPopulationCreator {
 
     private final String fileName = "population.xml";
@@ -40,15 +42,17 @@ public class TripPopulationCreator {
     private final Network network;
     private final File populationFile;
     private final File populationFileGz;
+    private final TaxiTripFilter finalFilters;
 
     public TripPopulationCreator(File processingDir, Config config, Network network, //
             MatsimAmodeusDatabase db, DateTimeFormatter dateFormat, QuadTree<Link> qt, //
-            LocalDate simualtionDate, AmodeusTimeConvert timeConvert) {
+            LocalDate simualtionDate, AmodeusTimeConvert timeConvert, TaxiTripFilter finalFilters) {
         this.linkSelect = new ClosestLinkSelect(db, qt);
         this.simulationDate = simualtionDate;
         this.timeConvert = timeConvert;
         this.config = config;
         this.network = network;
+        this.finalFilters = finalFilters;
         populationFile = new File(processingDir, fileName);
         populationFileGz = new File(processingDir, fileName + ".gz");
     }
@@ -66,7 +70,7 @@ public class TripPopulationCreator {
         System.out.println(inFile.getAbsolutePath());
         new CsvReader(inFile, ";").rows(row -> {
             try {
-                processLine(row, population, populationFactory);
+                processRow(row, population, populationFactory);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -91,11 +95,13 @@ public class TripPopulationCreator {
             System.err.println("WARN created population is empty");
     }
 
-    private void processLine(CsvReader.Row line, Population population, //
+    private void processRow(CsvReader.Row line, Population population, //
             PopulationFactory populationFactory) throws Exception {
 
         // Possible keys: duration,pickupLoc,distance,dropoffDate,taxiId,pickupDate,dropoffLoc,localId,waitTime,
 
+        // FIXME apply final filter
+        
         // create a taxi trip
         Integer globalId = Integer.parseInt(line.get("localId"));
         String taxiId = line.get("taxiId");

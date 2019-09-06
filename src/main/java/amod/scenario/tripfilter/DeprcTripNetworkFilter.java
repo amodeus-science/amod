@@ -12,12 +12,13 @@ import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 
-public class TripNetworkFilter implements Predicate<TaxiTrip> {
+public class DeprcTripNetworkFilter implements Predicate<TaxiTrip> {
 
     private final ScenarioOptions scenarioOptions;
     private final Network network;
 
-    public TripNetworkFilter(ScenarioOptions scenarioOptions, Network network) {
+    @Deprecated // TODO refactor and use or delete
+    public DeprcTripNetworkFilter(ScenarioOptions scenarioOptions, Network network) {
         this.scenarioOptions = scenarioOptions;
         this.network = network;
     }

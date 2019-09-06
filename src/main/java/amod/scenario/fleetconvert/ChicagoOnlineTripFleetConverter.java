@@ -11,6 +11,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.FirstKInitialMeans;
 
 public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
 
@@ -18,8 +19,8 @@ public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
 
     public ChicagoOnlineTripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TaxiTripFilter filter, TripBasedModifier modifier, //
-            TaxiDataModifier generalModifier) {
-        super(scenarioOptions, network, filter, modifier, generalModifier);
+            TaxiDataModifier generalModifier, TaxiTripFilter finalFilters) {
+        super(scenarioOptions, network, filter, modifier, generalModifier, finalFilters);
     }
 
     @Override

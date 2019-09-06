@@ -9,10 +9,11 @@ import ch.ethz.idsc.tensor.Scalars;
 
 /** {@link TaxiTrip} filter used to remove taxi {@link TaxiTrip}s with a maximum wait time
  * which is too long. */
-/* package */ class TripWaitingTimeFilter implements Predicate<TaxiTrip> {
+@Deprecated // TODO refactor and use or delete
+/* package */ class DeprcTripWaitingTimeFilter implements Predicate<TaxiTrip> {
     private final Scalar maxWaitTime;
 
-    public TripWaitingTimeFilter(Scalar maxWaitTime) {
+    public DeprcTripWaitingTimeFilter(Scalar maxWaitTime) {
         this.maxWaitTime = maxWaitTime;
     }
 

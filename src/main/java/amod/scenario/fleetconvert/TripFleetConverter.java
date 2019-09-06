@@ -32,17 +32,19 @@ public abstract class TripFleetConverter {
     protected final TaxiTripFilter filter;
     protected final TripBasedModifier modifier;
     protected final TaxiDataModifier generalModifier;
+    protected final TaxiTripFilter finalFilters;
     protected final MatsimAmodeusDatabase db;
     protected final QuadTree<Link> qt;
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TaxiTripFilter filter, TripBasedModifier tripModifier, //
-            TaxiDataModifier generalModifier) {
+            TaxiDataModifier generalModifier, TaxiTripFilter finalFilters) {
         this.scenarioOptions = scenarioOptions;
         this.network = network;
         this.filter = filter;
         this.modifier = tripModifier;
         this.generalModifier = generalModifier;
+        this.finalFilters = finalFilters;
         ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
         this.db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         this.qt = CreateQuadTree.of(network);
@@ -81,7 +83,7 @@ public abstract class TripFleetConverter {
         /** creating population based on corrected, filtered file */
         TripPopulationCreator populationCreator = //
                 new TripPopulationCreator(processingDir, configFull, network, db, //
-                        DATE_TIME_FORMATTER, qt, simulationDate, timeConvert);
+                        DATE_TIME_FORMATTER, qt, simulationDate, timeConvert, finalFilters);
         populationCreator.process(modifiedTripsFile);
     }
 
