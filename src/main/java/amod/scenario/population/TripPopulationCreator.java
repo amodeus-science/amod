@@ -4,7 +4,6 @@ package amod.scenario.population;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,17 +23,13 @@ import amod.scenario.tripfilter.TaxiTripFilter;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.PersonCreate;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
+import ch.ethz.idsc.amodeus.taxitrip.TaxiTripParse;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.CsvReader;
 import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Scalars;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
 
-// TODO refactor this class
 public class TripPopulationCreator {
 
     private final String fileName = "population.xml";
@@ -74,33 +69,21 @@ public class TripPopulationCreator {
         // row to list of trips
         List<TaxiTrip> trips = new ArrayList<>();
         new CsvReader(inFile, ";").rows(row -> {
-            try {
-                trips.add(fromRow(row));
-//                rowToPopulation(row, population, populationFactory);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            trips.add(TaxiTripParse.fromRow(row));
         });
-        
-        
-        
+
         // filter the stream
         Stream<TaxiTrip> filtered = finalFilters.filterStream(trips.stream());
-        
-        
-        
-        // chreate persons
-        filtered.forEach(tt->{
-            rowToPopulation(tt, population, populationFactory);
+
+        // create persons
+        filtered.forEach(tt -> {
+            Person person = PersonCreate.fromTrip(tt, tt.localId, populationFactory, //
+                    linkSelect, simulationDate, timeConvert);
+            population.addPerson(person);
         });
-        
-        
-        
 
         // Validity Check
         GlobalAssert.that(PopulationHelper.checkAllActivitiesInNetwork(population, network));
-
-        // Write new population to xml
 
         // write the modified population to file
         PopulationWriter populationWriter = new PopulationWriter(population);
@@ -115,35 +98,4 @@ public class TripPopulationCreator {
         else
             System.err.println("WARN created population is empty");
     }
-
-    private TaxiTrip fromRow(CsvReader.Row line) {
-
-        // Possible keys: duration,pickupLoc,distance,dropoffDate,taxiId,pickupDate,dropoffLoc,localId,waitTime,
-
-        // FIXME apply final filter
-
-        // create a taxi trip
-        Integer globalId = Integer.parseInt(line.get("localId"));
-        String taxiId = line.get("taxiId");
-        Tensor pickupLoc = Tensors.fromString(line.get("pickupLoc"));
-        Tensor dropoffLoc = Tensors.fromString(line.get("dropoffLoc"));
-        Scalar distance = Scalars.fromString(line.get("distance"));
-        Scalar waitTime = Scalars.fromString(line.get("waitTime"));
-        LocalDateTime pickupDate = LocalDateTime.parse(line.get("pickupDate"));
-        Scalar duration = Scalars.fromString(line.get("duration"));
-
-        return TaxiTrip.of(globalId, taxiId, pickupLoc, dropoffLoc, //
-                distance, waitTime, //
-                pickupDate, duration);
-    }
-
-    private void rowToPopulation(TaxiTrip taxiTrip, Population population, //
-            PopulationFactory populationFactory)  {
-//        TaxiTrip taxiTrip = fromRow(line);
-        // Create Person
-        Person person = PersonCreate.fromTrip(taxiTrip, taxiTrip.localId, populationFactory, //
-                linkSelect, simulationDate, timeConvert);
-        population.addPerson(person);
-    }
-
 }
