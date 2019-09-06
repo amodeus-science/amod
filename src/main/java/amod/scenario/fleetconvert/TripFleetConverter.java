@@ -45,7 +45,7 @@ public abstract class TripFleetConverter {
         this.generalModifier = generalModifier;
         ReferenceFrame referenceFrame = scenarioOptions.getLocationSpec().referenceFrame();
         this.db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
-        this.qt = CreateQuadTree.of(network, db);
+        this.qt = CreateQuadTree.of(network);
     }
 
     public void run(File processingDir, File tripFile, LocalDate simulationDate, AmodeusTimeConvert timeConvert)//

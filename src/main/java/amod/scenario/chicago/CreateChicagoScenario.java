@@ -17,12 +17,13 @@ import amod.scenario.Pt2MatsimXML;
 import amod.scenario.ScenarioCreator;
 import amod.scenario.ScenarioLabels;
 import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
-import amod.scenario.fleetconvert.ChicagoTripFleetConverter;
 import amod.scenario.tripfilter.TaxiTripFilter;
 import amod.scenario.tripmodif.CharRemovalModifier;
 import amod.scenario.tripmodif.ChicagoOnlineTripBasedModifier;
 import amod.scenario.tripmodif.TripBasedModifier;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
+import ch.ethz.idsc.amodeus.net.FastLinkLookup;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
@@ -94,7 +95,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
         File processingdir = new File(workingDir, "Scenario");
         if (processingdir.isDirectory())
-            DeleteDirectory.of(processingdir, 2, 14);
+            DeleteDirectory.of(processingdir, 2, 15);
         if (!processingdir.isDirectory())
             processingdir.mkdir();
         CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
@@ -110,6 +111,8 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
         Network network = NetworkLoader.fromNetworkFile(new File(processingdir, configFull.network().getInputFile()));
+        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
+        FastLinkLookup fll = new FastLinkLookup(network, db);
         System.out.println("Link in nw: " + network.getLinks().size());
 
         // TODO clean up, offline version still needed?
@@ -121,7 +124,8 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
         // online
         TaxiTripFilter filter2 = new TaxiTripFilter(new OnlineTripsReaderChicago());
-        TripBasedModifier modifier2 = new ChicagoOnlineTripBasedModifier(random);
+        TripBasedModifier modifier2 = new ChicagoOnlineTripBasedModifier(random, network, //
+                fll, new File(processingdir, "virtualNetworkChicago"));
         ChicagoOnlineTripFleetConverter converter2 = //
                 new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2, //
                         new CharRemovalModifier("\""));
