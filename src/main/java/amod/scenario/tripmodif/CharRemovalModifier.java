@@ -8,8 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-
 public class CharRemovalModifier implements TaxiDataModifier {
     private final String string;
 
@@ -37,8 +35,8 @@ public class CharRemovalModifier implements TaxiDataModifier {
         }
         return outFile;
     }
-    
-    public static void main(String[] args){
+
+    public static void main(String[] args) {
         System.out.println("\"");
     }
 }

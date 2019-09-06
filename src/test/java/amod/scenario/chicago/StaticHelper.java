@@ -15,7 +15,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
     public static void setupTest(File workingDir) throws Exception {
         ChicagoGeoInformation.setup();
         /** copy relevant files containing settings for scenario generation */
-        File settingsDir = new File(LocateUtils.getSuperFolder(StaticHelper.class,"amodeus"), "resources/chicagoScenarioTest");
+        File settingsDir = new File(LocateUtils.getSuperFolder(StaticHelper.class, "amodeus"), "resources/chicagoScenarioTest");
         CopyFiles.now(settingsDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
                 Arrays.asList(new String[] { ScenarioLabels.avFile, ScenarioLabels.config, //
                         ScenarioLabels.pt2MatSettings }),

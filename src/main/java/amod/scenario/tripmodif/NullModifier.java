@@ -22,4 +22,3 @@ public class NullModifier implements TaxiDataModifier {
 // File outFile = new File(taxiData.getAbsolutePath().replace(".csv", "_modified.csv"));
 // ExportTaxiTrips.toFile(originals, outFile);
 // return outFile;
-

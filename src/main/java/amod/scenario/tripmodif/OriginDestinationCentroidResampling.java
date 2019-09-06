@@ -1,3 +1,4 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.scenario.tripmodif;
 
 import java.io.File;
@@ -46,7 +47,7 @@ public class OriginDestinationCentroidResampling implements TripModifier {
         this.network = network;
         this.fll = fll;// new FastLinkLookup(network, db);
         this.vNetworkExportFile = vNetworkExportFile;
-        Arrays.asList("64233", "106597", "64235", "161236", "19827", "82589", "65847","143023").stream()//
+        Arrays.asList("64233", "106597", "64235", "161236", "19827", "82589", "65847", "143023").stream()//
                 .forEach(str -> airportBoundaryLinks.add(str));
     }
 

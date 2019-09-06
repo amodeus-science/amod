@@ -4,7 +4,6 @@ package amod.scenario.tripmodif;
 import java.io.File;
 
 import amod.scenario.tripfilter.TaxiTripFilter;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 
 public interface TaxiDataModifier {
 

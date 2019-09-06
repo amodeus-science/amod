@@ -59,7 +59,7 @@ public class ChicagoTripStartTimeResampling implements TripModifier {
      *         0 min, 15 min, 30 min, ... and a trip duration @param duration, this returns
      *         the maximum possible shift in seconds such that the trip still ends in the
      *         same interval than originally */
-    private Scalar maxShift(Scalar duration) {
+    private static Scalar maxShift(Scalar duration) {
         GlobalAssert.that(Scalars.lessEquals(Quantity.of(0, "s"), duration));
         int durationSec = duration.number().intValue();
         int excess = durationSec - (durationSec / 900) * 900;

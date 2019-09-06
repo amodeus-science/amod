@@ -19,7 +19,6 @@ import amod.scenario.ScenarioLabels;
 import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
 import amod.scenario.readers.TaxiTripsReader;
 import amod.scenario.tripfilter.TaxiTripFilter;
-import amod.scenario.tripfilter.TripMaxSpeedFilter;
 import amod.scenario.tripmodif.CharRemovalModifier;
 import amod.scenario.tripmodif.ChicagoOnlineTripBasedModifier;
 import amod.scenario.tripmodif.TripBasedModifier;

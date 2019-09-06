@@ -5,8 +5,6 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import org.matsim.api.core.v01.Coord;
-
 import ch.ethz.idsc.amodeus.util.CsvReader.Row;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
@@ -39,14 +37,14 @@ public class TripsReaderChicago extends ChicagoTripsReaderBasic {
 
     @Override
     public Tensor getPickupLocation(Row line) {
-        Tensor loc = Tensors.vector(Double.valueOf(line.get("Pickup Centroid Longitude")),//
+        Tensor loc = Tensors.vector(Double.valueOf(line.get("Pickup Centroid Longitude")), //
                 Double.valueOf(line.get("Pickup Centroid Latitude")));
         return loc;
     }
 
     @Override
     public Tensor getDropoffLocation(Row line) {
-        Tensor loc = Tensors.vector(Double.valueOf(line.get("Dropoff Centroid Longitude")),//
+        Tensor loc = Tensors.vector(Double.valueOf(line.get("Dropoff Centroid Longitude")), //
                 Double.valueOf(line.get("Dropoff Centroid Latitude")));
         return loc;
     }

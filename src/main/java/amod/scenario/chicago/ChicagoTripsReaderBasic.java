@@ -14,7 +14,6 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         super(delim);
     }
 
-
     @Override
     public final Scalar getDistance(Row row) {
         return Quantity.of(Double.valueOf(row.get("trip_miles"))//
