@@ -31,6 +31,7 @@ public class TaxiTripFilter {
 
     public final File filter(File file)//
             throws IOException {
+
         GlobalAssert.that(file.exists());
         System.out.println("Start to clean " + file.getAbsolutePath() + " data.");
         // read the file
@@ -46,7 +47,15 @@ public class TaxiTripFilter {
 //        }
         
         
-        File outFile = writeFile(file, filteredStream);
+        
+        String fileName = FilenameUtils.getBaseName(file.getPath()) + "_filtered." + //
+                FilenameUtils.getExtension(file.getPath());
+        File outFile = new File(file.getParentFile(), fileName);
+
+        /** export the trips to a new .csv file */
+        ExportTaxiTrips.toFile(filteredStream, outFile);
+        
+        
         /** save unreadable trips somewhere */
         File unreadable = new File(file.getParentFile(), //
                 FilenameUtils.getBaseName(file.getAbsolutePath()) + "_unreadable." + //
@@ -56,7 +65,7 @@ public class TaxiTripFilter {
         return outFile;
     }
     
-    private final Stream<TaxiTrip> filterStream(Stream<TaxiTrip> inStream){
+    public final Stream<TaxiTrip> filterStream(Stream<TaxiTrip> inStream){
         System.out.println("Number of filters: " + filters.size());
         for (Predicate<TaxiTrip> dataFilter : filters) {
             System.out.println("Applying " + dataFilter.getClass().getSimpleName() + " on data.");
@@ -65,13 +74,13 @@ public class TaxiTripFilter {
         return inStream;        
     }
 
-    private File writeFile(File inFile, Stream<TaxiTrip> stream) throws IOException {
-        String fileName = FilenameUtils.getBaseName(inFile.getPath()) + "_filtered." + //
-                FilenameUtils.getExtension(inFile.getPath());
-        File outFile = new File(inFile.getParentFile(), fileName);
-
-        /** export the trips to a new .csv file */
-        ExportTaxiTrips.toFile(stream, outFile);
-        return outFile;
-    }
+//    private File writeFile(File inFile, Stream<TaxiTrip> stream) throws IOException {
+//        String fileName = FilenameUtils.getBaseName(inFile.getPath()) + "_filtered." + //
+//                FilenameUtils.getExtension(inFile.getPath());
+//        File outFile = new File(inFile.getParentFile(), fileName);
+//
+//        /** export the trips to a new .csv file */
+//        ExportTaxiTrips.toFile(stream, outFile);
+//        return outFile;
+//    }
 }
