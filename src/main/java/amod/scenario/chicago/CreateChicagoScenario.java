@@ -19,6 +19,7 @@ import amod.scenario.ScenarioLabels;
 import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
 import amod.scenario.readers.TaxiTripsReader;
 import amod.scenario.tripfilter.TaxiTripFilter;
+import amod.scenario.tripfilter.TripMaxSpeedFilter;
 import amod.scenario.tripmodif.CharRemovalModifier;
 import amod.scenario.tripmodif.ChicagoOnlineTripBasedModifier;
 import amod.scenario.tripmodif.TripBasedModifier;
@@ -130,6 +131,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
                 fll, new File(processingdir, "virtualNetworkChicago"));
         // FIXME add real thing, not null
         TaxiTripFilter finalFilters = new TaxiTripFilter();
+        // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
 
         ChicagoOnlineTripFleetConverter converter2 = //
                 new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2, //
