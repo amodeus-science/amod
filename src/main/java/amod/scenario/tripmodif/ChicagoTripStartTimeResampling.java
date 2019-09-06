@@ -12,6 +12,11 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
+/** This filter is correct in the sense that it keeps trips inside the recorded
+ * interval, but as a result it produces spikes approximatley at minutes 3,18,33,48 of
+ * every hour, therefore a uniform shifting in the interval [0,15] min is used, see
+ * {@link TripStartTimeShiftResampling} */
+@Deprecated // see above explanation
 public class ChicagoTripStartTimeResampling implements TripModifier {
 
     private final Random random;
@@ -64,6 +69,6 @@ public class ChicagoTripStartTimeResampling implements TripModifier {
 
     @Override
     public void notify(TaxiTrip taxiTrip) {
-        // -- deliberately empty        
+        // -- deliberately empty
     }
 }

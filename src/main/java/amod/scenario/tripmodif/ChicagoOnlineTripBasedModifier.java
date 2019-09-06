@@ -5,14 +5,19 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.network.Network;
 
-import amod.scenario.tripfilter.TripMaxSpeedFilter;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
+import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class ChicagoOnlineTripBasedModifier extends TripBasedModifier {
 
     public ChicagoOnlineTripBasedModifier(Random random, Network network, //
             FastLinkLookup fll, File vNetworkExportFile) {
-        addModifier(new ChicagoTripStartTimeResampling(random));
+
+        /** below filter was removed as it causes request spikes at quarter hour intervals,
+         * see class for detailed description */
+        // addModifier(new ChicagoTripStartTimeResampling(random));
+        /** instead the TripStartTimeShiftResampling is used: */
+        addModifier(new TripStartTimeShiftResampling(random, Quantity.of(900, "s")));
         addModifier(new OriginDestinationCentroidResampling(random, network, fll, vNetworkExportFile));
     }
 

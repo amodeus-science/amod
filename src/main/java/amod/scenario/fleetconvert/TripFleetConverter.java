@@ -44,7 +44,7 @@ public abstract class TripFleetConverter {
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TaxiTripFilter filter, TripBasedModifier tripModifier, //
-            TaxiDataModifier generalModifier, TaxiTripFilter finalFilters,//
+            TaxiDataModifier generalModifier, TaxiTripFilter finalFilters, //
             TaxiTripsReader tripsReader) {
         this.scenarioOptions = scenarioOptions;
         this.network = network;
@@ -79,47 +79,24 @@ public abstract class TripFleetConverter {
         /** initial modifications, e.g., replacing characters, all
          * other modifications should be done in the third step */
         File preparedFile = generalModifier.modify(newTripFile);
-
-
-        
-        // BELOW NEW VERSION
-        GlobalAssert.that(preparedFile.exists());
-        System.out.println("Start to clean " + preparedFile.getAbsolutePath() + " data.");
-        // read the file
-        System.out.println("Reading: " + preparedFile.getAbsolutePath());
-        System.out.println("Using:   " + tripsReader.getClass().getSimpleName());
         Stream<TaxiTrip> stream = tripsReader.getTripStream(preparedFile);
-
-
         Stream<TaxiTrip> filteredStream = filter.filterStream(stream);
-
-        
         String fileName = FilenameUtils.getBaseName(preparedFile.getPath()) + "_filtered." + //
                 FilenameUtils.getExtension(preparedFile.getPath());
-        File AAAAAAEEEEOOOoutFile = new File(preparedFile.getParentFile(), fileName);
+        File filteredFile = new File(preparedFile.getParentFile(), fileName);
 
         /** export the trips to a new .csv file */
-        ExportTaxiTrips.toFile(filteredStream, AAAAAAEEEEOOOoutFile);
+        ExportTaxiTrips.toFile(filteredStream, filteredFile);
 
         /** save unreadable trips somewhere */
         File unreadable = new File(preparedFile.getParentFile(), //
                 FilenameUtils.getBaseName(preparedFile.getAbsolutePath()) + "_unreadable." + //
                         FilenameUtils.getExtension(preparedFile.getAbsolutePath()));
         tripsReader.saveUnreadable(unreadable);
-        System.out.println("Finished data cleanup.\n\tstored in " + AAAAAAEEEEOOOoutFile.getAbsolutePath());
-        GlobalAssert.that(AAAAAAEEEEOOOoutFile.isFile());
-        // ABOVE NEW VERSION
-        
-        
-        
-        // BELOW OLD VERSION
-//        /** filtering the file */
-//        File filteredTripsFile = filter.filter(preparedFile);
-//        GlobalAssert.that(filteredTripsFile.isFile());
-        // ABOVE OLD VERSION
+        GlobalAssert.that(filteredFile.isFile());
 
-        /** correcting the file */
-        File modifiedTripsFile = modifier.modify(AAAAAAEEEEOOOoutFile);
+        /** modifying the trip data */
+        File modifiedTripsFile = modifier.modify(filteredFile);
         GlobalAssert.that(modifiedTripsFile.isFile());
 
         /** creating population based on corrected, filtered file */
