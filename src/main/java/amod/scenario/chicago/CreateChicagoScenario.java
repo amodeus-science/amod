@@ -130,6 +130,9 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
                 fll, new File(processingdir, "virtualNetworkChicago"));
         // FIXMe add real thing, not null
         TaxiTripFilter finalFilters = new TaxiTripFilter();
+        
+        
+        
         ChicagoOnlineTripFleetConverter converter2 = //
                 new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2, //
                         new CharRemovalModifier("\""), null,tripsReader);

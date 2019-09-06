@@ -2,6 +2,7 @@ package amod.scenario.fleetconvert;
 
 import org.matsim.api.core.v01.network.Network;
 
+import amod.scenario.chicago.ScenarioConstants;
 import amod.scenario.readers.TaxiTripsReader;
 import amod.scenario.tripfilter.TaxiTripFilter;
 import amod.scenario.tripfilter.TripDurationFilter;
@@ -10,19 +11,15 @@ import amod.scenario.tripmodif.TaxiDataModifier;
 import amod.scenario.tripmodif.TripBasedModifier;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.util.math.SI;
-import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.FirstKInitialMeans;
 
 public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
 
-    private final Scalar maxAllowedSpeed = Quantity.of(37.9984, "m*s^-1");
-
     public ChicagoOnlineTripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TaxiTripFilter filter, TripBasedModifier modifier, //
-            TaxiDataModifier generalModifier, TaxiTripFilter finalFilters,//
+            TaxiDataModifier generalModifier, TaxiTripFilter finalFilters, //
             TaxiTripsReader tripsReader) {
-        super(scenarioOptions, network, filter, modifier, generalModifier, finalFilters,tripsReader);
+        super(scenarioOptions, network, filter, modifier, generalModifier, finalFilters, tripsReader);
     }
 
     @Override
@@ -31,7 +28,7 @@ public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
         filter.addFilter(new TripDurationFilter(Quantity.of(10, SI.SECOND), Quantity.of(Double.MAX_VALUE, SI.SECOND)));
 
         /** trips which are only explainable with speeds well above 85 miles/hour are removed */
-        filter.addFilter(new TripMaxSpeedFilter(network, db, maxAllowedSpeed));
+        filter.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
 
         // TODO add this again if necessary, otherwise remove eventually and delete classes...
         // cleaner.addFilter(new TripStartTimeResampling(15)); // start/end times in 15 min resolution
