@@ -1,0 +1,29 @@
+/* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
+package amod.scenario.tripfilter;
+
+import java.util.function.Predicate;
+
+import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Scalars;
+
+/** This {@link TaxiTrip} filter is used to remove {@link TaxiTrip}s with a recorded distance
+ * smaller than a minimumDistance or larger than a maximum distance. */
+@Deprecated // TODO refactor and use or delete
+public class DeprcTripDistanceFilter implements Predicate<TaxiTrip> {
+    private final Scalar maxTripDistance;
+    private final Scalar minTripDistance;
+
+    public DeprcTripDistanceFilter(Scalar minTripDistance, Scalar maxTripDistance) {
+        GlobalAssert.that(Scalars.lessThan(minTripDistance, maxTripDistance));
+        this.minTripDistance = minTripDistance;
+        this.maxTripDistance = maxTripDistance;
+    }
+
+    @Override
+    public boolean test(TaxiTrip trip) {
+        return Scalars.lessEquals(minTripDistance, trip.distance) && //
+                Scalars.lessEquals(trip.distance, maxTripDistance);
+    }
+}

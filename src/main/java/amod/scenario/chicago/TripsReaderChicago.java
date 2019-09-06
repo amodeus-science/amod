@@ -7,9 +7,11 @@ import java.time.format.DateTimeFormatter;
 
 import org.matsim.api.core.v01.Coord;
 
-import ch.ethz.idsc.amodeus.scenario.readers.CsvReader.Row;
+import ch.ethz.idsc.amodeus.util.CsvReader.Row;
 import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class TripsReaderChicago extends ChicagoTripsReaderBasic {
@@ -18,6 +20,11 @@ public class TripsReaderChicago extends ChicagoTripsReaderBasic {
     public TripsReaderChicago() {
         super(",");
 
+    }
+
+    @Override
+    public final String getTaxiCode(Row row) {
+        return row.get("Taxi ID");
     }
 
     @Override
@@ -31,15 +38,17 @@ public class TripsReaderChicago extends ChicagoTripsReaderBasic {
     }
 
     @Override
-    public Coord getPickupLocation(Row line) {
-        return new Coord(Double.valueOf(line.get("Pickup Centroid Longitude")), //
+    public Tensor getPickupLocation(Row line) {
+        Tensor loc = Tensors.vector(Double.valueOf(line.get("Pickup Centroid Longitude")),//
                 Double.valueOf(line.get("Pickup Centroid Latitude")));
+        return loc;
     }
 
     @Override
-    public Coord getDropoffLocation(Row line) {
-        return new Coord(Double.valueOf(line.get("Dropoff Centroid Longitude")), //
+    public Tensor getDropoffLocation(Row line) {
+        Tensor loc = Tensors.vector(Double.valueOf(line.get("Dropoff Centroid Longitude")),//
                 Double.valueOf(line.get("Dropoff Centroid Latitude")));
+        return loc;
     }
 
     @Override

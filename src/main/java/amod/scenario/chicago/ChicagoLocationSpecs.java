@@ -13,8 +13,8 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
     ;
 
     private final ReferenceFrame referenceFrame;
-    // increasing the first value goes right
-    // increasing the second value goes north
+    /** increasing the first value goes east
+     * increasing the second value goes north */
     private final Coord center;
 
     private ChicagoLocationSpecs(ReferenceFrame referenceFrame, Coord center) {
