@@ -18,69 +18,56 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 /** Contains a set of filters that process an individual {@link TaxiTrip}
  * and let it pass or not: TaxiTrip -> {true,false} */
 public class TaxiTripFilter {
-    private final TaxiTripsReader tripsReader;
+//    private final TaxiTripsReader tripsReader;
     private final List<Predicate<TaxiTrip>> filters = new ArrayList<>();
 
-    public TaxiTripFilter(TaxiTripsReader tripsReader) {
-        this.tripsReader = tripsReader;
+    public TaxiTripFilter() {
+//        public TaxiTripFilter(TaxiTripsReader tripsReader) {
+//        this.tripsReader = tripsReader;
     }
 
     public final void addFilter(Predicate<TaxiTrip> filter) {
         filters.add(filter);
     }
 
-    public final File filter(File file)//
-            throws IOException {
+//    private final File filter(File fileXABJANEDUH)//
+//            throws IOException {
+//
+//        GlobalAssert.that(fileXABJANEDUH.exists());
+//        System.out.println("Start to clean " + fileXABJANEDUH.getAbsolutePath() + " data.");
+//        // read the file
+//        System.out.println("Reading: " + fileXABJANEDUH.getAbsolutePath());
+//        System.out.println("Using:   " + tripsReader.getClass().getSimpleName());
+//        Stream<TaxiTrip> stream = tripsReader.getTripStream(fileXABJANEDUH);
+//        
+//        
+//        // ABOVE MUST GO EXTERNAL
+//        Stream<TaxiTrip> filteredStream = filterStream(stream);
+//        // BELOW MUST GO EXTERNAL
+//
+//        String fileName = FilenameUtils.getBaseName(fileXABJANEDUH.getPath()) + "_filtered." + //
+//                FilenameUtils.getExtension(fileXABJANEDUH.getPath());
+//        File AAAAAAEEEEOOOoutFile = new File(fileXABJANEDUH.getParentFile(), fileName);
+//
+//        /** export the trips to a new .csv file */
+//        ExportTaxiTrips.toFile(filteredStream, AAAAAAEEEEOOOoutFile);
+//
+//        /** save unreadable trips somewhere */
+//        File unreadable = new File(fileXABJANEDUH.getParentFile(), //
+//                FilenameUtils.getBaseName(fileXABJANEDUH.getAbsolutePath()) + "_unreadable." + //
+//                        FilenameUtils.getExtension(fileXABJANEDUH.getAbsolutePath()));
+//        tripsReader.saveUnreadable(unreadable);
+//        System.out.println("Finished data cleanup.\n\tstored in " + AAAAAAEEEEOOOoutFile.getAbsolutePath());
+//        return AAAAAAEEEEOOOoutFile;
+//    }
 
-        GlobalAssert.that(file.exists());
-        System.out.println("Start to clean " + file.getAbsolutePath() + " data.");
-        // read the file
-        System.out.println("Reading: " + file.getAbsolutePath());
-        System.out.println("Using:   " + tripsReader.getClass().getSimpleName());
-        Stream<TaxiTrip> stream = tripsReader.getTripStream(file);
-        Stream<TaxiTrip> filteredStream = filterStream(stream);
-        
-//        System.out.println("Number of filters: " + filters.size());
-//        for (Predicate<TaxiTrip> dataFilter : filters) {
-//            System.out.println("Applying " + dataFilter.getClass().getSimpleName() + " on data.");
-//            stream = stream.filter(dataFilter);
-//        }
-        
-        
-        
-        String fileName = FilenameUtils.getBaseName(file.getPath()) + "_filtered." + //
-                FilenameUtils.getExtension(file.getPath());
-        File outFile = new File(file.getParentFile(), fileName);
-
-        /** export the trips to a new .csv file */
-        ExportTaxiTrips.toFile(filteredStream, outFile);
-        
-        
-        /** save unreadable trips somewhere */
-        File unreadable = new File(file.getParentFile(), //
-                FilenameUtils.getBaseName(file.getAbsolutePath()) + "_unreadable." + //
-                        FilenameUtils.getExtension(file.getAbsolutePath()));
-        tripsReader.saveUnreadable(unreadable);
-        System.out.println("Finished data cleanup.\n\tstored in " + outFile.getAbsolutePath());
-        return outFile;
-    }
-    
-    public final Stream<TaxiTrip> filterStream(Stream<TaxiTrip> inStream){
+    public final Stream<TaxiTrip> filterStream(Stream<TaxiTrip> inStream) {
         System.out.println("Number of filters: " + filters.size());
         for (Predicate<TaxiTrip> dataFilter : filters) {
             System.out.println("Applying " + dataFilter.getClass().getSimpleName() + " on data.");
             inStream = inStream.filter(dataFilter);
         }
-        return inStream;        
+        return inStream;
     }
 
-//    private File writeFile(File inFile, Stream<TaxiTrip> stream) throws IOException {
-//        String fileName = FilenameUtils.getBaseName(inFile.getPath()) + "_filtered." + //
-//                FilenameUtils.getExtension(inFile.getPath());
-//        File outFile = new File(inFile.getParentFile(), fileName);
-//
-//        /** export the trips to a new .csv file */
-//        ExportTaxiTrips.toFile(stream, outFile);
-//        return outFile;
-//    }
 }

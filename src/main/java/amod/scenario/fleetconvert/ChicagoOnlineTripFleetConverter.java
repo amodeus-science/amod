@@ -2,6 +2,7 @@ package amod.scenario.fleetconvert;
 
 import org.matsim.api.core.v01.network.Network;
 
+import amod.scenario.readers.TaxiTripsReader;
 import amod.scenario.tripfilter.TaxiTripFilter;
 import amod.scenario.tripfilter.TripDurationFilter;
 import amod.scenario.tripfilter.TripMaxSpeedFilter;
@@ -19,8 +20,9 @@ public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
 
     public ChicagoOnlineTripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TaxiTripFilter filter, TripBasedModifier modifier, //
-            TaxiDataModifier generalModifier, TaxiTripFilter finalFilters) {
-        super(scenarioOptions, network, filter, modifier, generalModifier, finalFilters);
+            TaxiDataModifier generalModifier, TaxiTripFilter finalFilters,//
+            TaxiTripsReader tripsReader) {
+        super(scenarioOptions, network, filter, modifier, generalModifier, finalFilters,tripsReader);
     }
 
     @Override

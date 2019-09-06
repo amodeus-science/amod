@@ -3,6 +3,7 @@ package amod.scenario.fleetconvert;
 import org.matsim.api.core.v01.network.Network;
 
 import amod.scenario.tripfilter.TaxiTripFilter;
+import amod.scenario.readers.TaxiTripsReader;
 import amod.scenario.tripfilter.DeprcTripDistanceFilter;
 import amod.scenario.tripfilter.TripDurationFilter;
 import amod.scenario.tripfilter.DeprcTripNetworkFilter;
@@ -15,8 +16,9 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 public class ChicagoTripFleetConverter extends TripFleetConverter {
 
     public ChicagoTripFleetConverter(ScenarioOptions scenarioOptions, Network network, TaxiTripFilter cleaner, //
-            TripBasedModifier corrector, TaxiDataModifier generalModifier, TaxiTripFilter finalFilters) {
-        super(scenarioOptions, network, cleaner, corrector, generalModifier, finalFilters);
+            TripBasedModifier corrector, TaxiDataModifier generalModifier, TaxiTripFilter finalFilters, //
+            TaxiTripsReader tripsReader) {
+        super(scenarioOptions, network, cleaner, corrector, generalModifier, finalFilters, tripsReader);
     }
 
     @Override

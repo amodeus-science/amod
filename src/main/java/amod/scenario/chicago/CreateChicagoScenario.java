@@ -17,6 +17,7 @@ import amod.scenario.Pt2MatsimXML;
 import amod.scenario.ScenarioCreator;
 import amod.scenario.ScenarioLabels;
 import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
+import amod.scenario.readers.TaxiTripsReader;
 import amod.scenario.tripfilter.TaxiTripFilter;
 import amod.scenario.tripmodif.CharRemovalModifier;
 import amod.scenario.tripmodif.ChicagoOnlineTripBasedModifier;
@@ -123,14 +124,15 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         // new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector, new CharRemovalModifier("\""));
 
         // online
-        TaxiTripFilter filter2 = new TaxiTripFilter(new OnlineTripsReaderChicago());
+        TaxiTripsReader tripsReader =new OnlineTripsReaderChicago();
+        TaxiTripFilter filter2 = new TaxiTripFilter();
         TripBasedModifier modifier2 = new ChicagoOnlineTripBasedModifier(random, network, //
                 fll, new File(processingdir, "virtualNetworkChicago"));
         // FIXMe add real thing, not null
-        TaxiTripFilter finalFilters = new TaxiTripFilter(null);
+        TaxiTripFilter finalFilters = new TaxiTripFilter();
         ChicagoOnlineTripFleetConverter converter2 = //
                 new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2, //
-                        new CharRemovalModifier("\""), null);
+                        new CharRemovalModifier("\""), null,tripsReader);
         ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, tripFile, //
                 converter2, workingDir, processingdir, simulationDate, timeConvert);
     }
