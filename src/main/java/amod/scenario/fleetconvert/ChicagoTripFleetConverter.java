@@ -1,12 +1,13 @@
+/* amodeus - Copyright (c) 2019, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.scenario.fleetconvert;
 
 import org.matsim.api.core.v01.network.Network;
 
-import amod.scenario.tripfilter.TaxiTripFilter;
 import amod.scenario.readers.TaxiTripsReader;
 import amod.scenario.tripfilter.DeprcTripDistanceFilter;
-import amod.scenario.tripfilter.TripDurationFilter;
 import amod.scenario.tripfilter.DeprcTripNetworkFilter;
+import amod.scenario.tripfilter.TaxiTripFilter;
+import amod.scenario.tripfilter.TripDurationFilter;
 import amod.scenario.tripmodif.TaxiDataModifier;
 import amod.scenario.tripmodif.TripBasedModifier;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;

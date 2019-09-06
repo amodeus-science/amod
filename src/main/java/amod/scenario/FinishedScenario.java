@@ -23,7 +23,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         destinDirFile.mkdir();
 
         String[] fileNames = new String[] { //
-                "av.xml", "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz",//
+                "av.xml", "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //
                 "config_full.xml", "virtualNetworkChicago" };
 
         for (String fileName : fileNames) {
