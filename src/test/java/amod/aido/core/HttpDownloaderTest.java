@@ -1,5 +1,5 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.aido.util;
+package amod.aido.core;
 
 import java.io.File;
 import java.io.IOException;
