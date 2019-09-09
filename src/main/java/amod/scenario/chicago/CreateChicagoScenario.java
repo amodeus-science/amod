@@ -30,7 +30,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.OsmLoader;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
-import ch.ethz.idsc.amodeus.util.io.LocateUtils;
+import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
@@ -56,15 +56,15 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
     public static void setup(File workingDir) throws Exception {
         ChicagoGeoInformation.setup();
         /** copy relevant files containing settings for scenario generation */
-        File settingsDir = new File(LocateUtils.getSuperFolder(CreateChicagoScenario.class, "amod"), "resources/chicagoScenario");
-        CopyFiles.now(settingsDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
+        File resourcesDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amod"), "resources/chicagoScenario");
+        CopyFiles.now(resourcesDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
                 Arrays.asList(new String[] { ScenarioLabels.avFile, ScenarioLabels.config, //
                         ScenarioLabels.pt2MatSettings }),
                 true);
         /** AmodeusOptions.properties is not replaced as it might be changed by user during
          * scenario generation process. */
         if (!new File(workingDir, ScenarioLabels.amodeusFile).exists())
-            CopyFiles.now(settingsDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
+            CopyFiles.now(resourcesDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
                     Arrays.asList(new String[] { ScenarioLabels.amodeusFile }), false);
         Pt2MatsimXML.toLocalFileSystem(new File(workingDir, ScenarioLabels.pt2MatSettings), //
                 workingDir.getAbsolutePath());

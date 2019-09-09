@@ -8,7 +8,7 @@ import java.util.Arrays;
 import amod.scenario.Pt2MatsimXML;
 import amod.scenario.ScenarioLabels;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
-import ch.ethz.idsc.amodeus.util.io.LocateUtils;
+import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 /* package */ class StaticHelper {
@@ -16,7 +16,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
     public static void setupTest(File workingDir) throws Exception {
         ChicagoGeoInformation.setup();
         /** copy relevant files containing settings for scenario generation */
-        File settingsDir = new File(LocateUtils.getSuperFolder(StaticHelper.class, "amodeus"), "resources/chicagoScenarioTest");
+        File settingsDir = new File(Locate.repoFolder(StaticHelper.class, "amodeus"), "resources/chicagoScenarioTest");
         CopyFiles.now(settingsDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
                 Arrays.asList(new String[] { ScenarioLabels.avFile, ScenarioLabels.config, //
                         ScenarioLabels.pt2MatSettings }),
