@@ -53,7 +53,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         cleanUp(workingDir);
     }
 
-    public static void setup(File workingDir) throws Exception {
+    private static void setup(File workingDir) throws Exception {
         ChicagoGeoInformation.setup();
         /** copy relevant files containing settings for scenario generation */
         File resourcesDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amod"), "resources/chicagoScenario");
@@ -70,7 +70,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
                 workingDir.getAbsolutePath());
     }
 
-    public static void run(File workingDir) throws Exception {
+    private static void run(File workingDir) throws Exception {
         // FIXME remove debug loop once done
         boolean debug = false;
 
@@ -130,7 +130,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
                 converter, workingDir, processingdir, simulationDate, timeConvert);
     }
 
-    public static void cleanUp(File workingDir) throws IOException {
+    private static void cleanUp(File workingDir) throws IOException {
         /** delete unneeded files */
         // DeleteDirectory.of(new File(workingDir, "Scenario"), 2, 14);
         // DeleteDirectory.of(new File(workingDir, ScenarioLabels.amodeusFile), 0, 1);
