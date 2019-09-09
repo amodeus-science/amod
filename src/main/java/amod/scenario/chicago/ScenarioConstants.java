@@ -17,5 +17,6 @@ public enum ScenarioConstants {
     public static final DateTimeFormatter onlineFormat //
             = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
     public static final Scalar maxAllowedSpeed = Quantity.of(37.9984, "m*s^-1");
+    public static final Scalar maxEndTime = Quantity.of(107999.9, "s");
 
 }

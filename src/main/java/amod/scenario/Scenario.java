@@ -8,7 +8,21 @@ import amod.scenario.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-public class ScenarioCreator {
+public class Scenario {
+
+    public static void create(File dataDir, File tripFile, //
+            TripFleetConverter converter, //
+            File workingDirectory, File processingDir, //
+            LocalDate simulationDate, //
+            AmodeusTimeConvert timeConvert) throws Exception {
+        Scenario creator = new Scenario(dataDir, tripFile, converter, //
+                workingDirectory, processingDir, simulationDate, timeConvert);
+        creator.run();
+
+    }
+
+    // --
+
     private final File dataDir;
     private final File tripFile;
     private final File destinDir;
@@ -17,7 +31,7 @@ public class ScenarioCreator {
     private final AmodeusTimeConvert timeConvert;
     public final TripFleetConverter fleetConverter;
 
-    public ScenarioCreator(File dataDir, File tripFile, //
+    private Scenario(File dataDir, File tripFile, //
             TripFleetConverter converter, //
             File workingDirectory, File processingDir, //
             LocalDate simulationDate, //
@@ -31,8 +45,6 @@ public class ScenarioCreator {
         this.simulationDate = simulationDate;
         this.timeConvert = timeConvert;
         this.fleetConverter = converter;
-        run();
-
     }
 
     private void run() throws Exception {

@@ -17,13 +17,13 @@ public class TaxiTripFilter {
         filters.add(filter);
     }
 
-    public final Stream<TaxiTrip> filterStream(Stream<TaxiTrip> inStream) {
+    public final Stream<TaxiTrip> filterStream(Stream<TaxiTrip> stream) {
         System.out.println("Number of filters: " + filters.size());
         for (Predicate<TaxiTrip> dataFilter : filters) {
             System.out.println("Applying " + dataFilter.getClass().getSimpleName() + " on data.");
-            inStream = inStream.filter(dataFilter);
+            stream = stream.filter(dataFilter);
         }
-        return inStream;
+        return stream;
     }
 
 }

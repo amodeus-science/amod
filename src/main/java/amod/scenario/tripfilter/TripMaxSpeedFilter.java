@@ -58,8 +58,8 @@ public class TripMaxSpeedFilter implements Predicate<TaxiTrip> {
             ++count;
             // System.out.println("distance: " + distance);
             // System.out.println("duration: " + trip.duration);
-            System.out.println("Total mph removed:      " + count);
-            System.out.println("mph too high:       " + speed.multiply(Quantity.of(2.2369363, "miles *h^-1*s*m^-1")));
+            // System.out.println("Total mph removed: " + count);
+            // System.out.println("mph too high: " + speed.multiply(Quantity.of(2.2369363, "miles *h^-1*s*m^-1")));
             return false;
         }
         return true;

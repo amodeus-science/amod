@@ -20,6 +20,7 @@ import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.utils.collections.QuadTree;
 
 import amod.scenario.tripfilter.TaxiTripFilter;
+import amod.scenario.tripfilter.TripDurationFilter;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.PersonCreate;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
@@ -41,6 +42,7 @@ public class TripPopulationCreator {
     private final File populationFile;
     private final File populationFileGz;
     private final TaxiTripFilter finalFilters;
+    private final TaxiDistanceCalculator distCalc;
 
     public TripPopulationCreator(File processingDir, Config config, Network network, //
             MatsimAmodeusDatabase db, DateTimeFormatter dateFormat, QuadTree<Link> qt, //
@@ -51,6 +53,7 @@ public class TripPopulationCreator {
         this.config = config;
         this.network = network;
         this.finalFilters = finalFilters;
+        this.distCalc = new TaxiDistanceCalculator(processingDir, network, linkSelect);
         populationFile = new File(processingDir, fileName);
         populationFileGz = new File(processingDir, fileName + ".gz");
     }
@@ -76,16 +79,18 @@ public class TripPopulationCreator {
         Stream<TaxiTrip> filtered = finalFilters.filterStream(trips.stream());
 
         // create persons
-        filtered.forEach(tt -> {
-            Person person = PersonCreate.fromTrip(tt, tt.localId, populationFactory, //
+        filtered.forEach(taxiTrip -> {
+            Person person = PersonCreate.fromTrip(taxiTrip, taxiTrip.localId, populationFactory, //
                     linkSelect, simulationDate, timeConvert);
             population.addPerson(person);
+            distCalc.addTrip(taxiTrip);
         });
 
-        // Validity Check
-        GlobalAssert.that(PopulationHelper.checkAllActivitiesInNetwork(population, network));
+        // export taxi trip distance analysis
+        distCalc.exportTotalDistance();
 
         // write the modified population to file
+        System.out.println("Population size: " + population.getPersons().size());
         PopulationWriter populationWriter = new PopulationWriter(population);
         populationWriter.write(populationFileGz.toString());
 

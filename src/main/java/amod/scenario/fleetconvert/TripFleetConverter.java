@@ -34,7 +34,7 @@ public abstract class TripFleetConverter {
 
     protected final ScenarioOptions scenarioOptions;
     protected final Network network;
-    protected final TaxiTripFilter filter;
+    protected final TaxiTripFilter primaryFilter;
     protected final TripBasedModifier modifier;
     protected final TaxiDataModifier generalModifier;
     protected final TaxiTripFilter finalFilters;
@@ -43,12 +43,12 @@ public abstract class TripFleetConverter {
     protected final QuadTree<Link> qt;
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
-            TaxiTripFilter filter, TripBasedModifier tripModifier, //
+            TaxiTripFilter primaryFilter, TripBasedModifier tripModifier, //
             TaxiDataModifier generalModifier, TaxiTripFilter finalFilters, //
             TaxiTripsReader tripsReader) {
         this.scenarioOptions = scenarioOptions;
         this.network = network;
-        this.filter = filter;
+        this.primaryFilter = primaryFilter;
         this.modifier = tripModifier;
         this.generalModifier = generalModifier;
         this.finalFilters = finalFilters;
@@ -66,7 +66,6 @@ public abstract class TripFleetConverter {
         File configFile = new File(scenarioOptions.getPreparerConfigName());
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
-        System.out.println("INFO working folder: " + processingDir.getAbsolutePath());
 
         /** folder for processing stored files, the folder tripData contains
          * .csv versions of all processing steps for faster debugging. */
@@ -76,26 +75,26 @@ public abstract class TripFleetConverter {
         File newTripFile = new File(newWorkingDir, tripFile.getName());
         GlobalAssert.that(newTripFile.isFile());
 
-        /** initial modifications, e.g., replacing characters, all
+        /** initial formal modifications, e.g., replacing certain characters,
          * other modifications should be done in the third step */
         File preparedFile = generalModifier.modify(newTripFile);
         Stream<TaxiTrip> stream = tripsReader.getTripStream(preparedFile);
-        Stream<TaxiTrip> filteredStream = filter.filterStream(stream);
+        
+        /** filtering of trips, e.g., removal of 0 [s] trips */
+        Stream<TaxiTrip> filteredStream = primaryFilter.filterStream(stream);
         String fileName = FilenameUtils.getBaseName(preparedFile.getPath()) + "_filtered." + //
                 FilenameUtils.getExtension(preparedFile.getPath());
         File filteredFile = new File(preparedFile.getParentFile(), fileName);
-
-        /** export the trips to a new .csv file */
         ExportTaxiTrips.toFile(filteredStream, filteredFile);
+        GlobalAssert.that(filteredFile.isFile());
 
-        /** save unreadable trips somewhere */
+        /** save unreadable trips for post-processing, checking */
         File unreadable = new File(preparedFile.getParentFile(), //
                 FilenameUtils.getBaseName(preparedFile.getAbsolutePath()) + "_unreadable." + //
                         FilenameUtils.getExtension(preparedFile.getAbsolutePath()));
         tripsReader.saveUnreadable(unreadable);
-        GlobalAssert.that(filteredFile.isFile());
 
-        /** modifying the trip data */
+        /** modifying the trip data, e.g., distributing in 15 minute steps. */
         File modifiedTripsFile = modifier.modify(filteredFile);
         GlobalAssert.that(modifiedTripsFile.isFile());
 

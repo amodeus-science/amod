@@ -14,7 +14,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
 import amod.scenario.Pt2MatsimXML;
-import amod.scenario.ScenarioCreator;
+import amod.scenario.Scenario;
 import amod.scenario.ScenarioLabels;
 import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
 import amod.scenario.readers.TaxiTripsReader;
@@ -72,7 +72,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
     public static void run(File workingDir) throws Exception {
         // FIXME remove debug loop once done
-        boolean debug = true;
+        boolean debug = false;
 
         /** download of open street map data to create scenario */
         System.out.println("Downloading open stret map data, this may take a while...");
@@ -96,7 +96,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
         File processingdir = new File(workingDir, "Scenario");
         if (processingdir.isDirectory())
-            DeleteDirectory.of(processingdir, 2, 15);
+            DeleteDirectory.of(processingdir, 2, 16);
         if (!processingdir.isDirectory())
             processingdir.mkdir();
         CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
@@ -114,29 +114,20 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         Network network = NetworkLoader.fromNetworkFile(new File(processingdir, configFull.network().getInputFile()));
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
         FastLinkLookup fll = new FastLinkLookup(network, db);
-        System.out.println("Link in nw: " + network.getLinks().size());
 
-        // TODO clean up, offline version still needed?
-        // regular
-        // TaxiTripFilter cleaner = new TaxiTripFilter(new TripsReaderChicago()); //
-        // TripBasedModifier corrector = new TripBasedModifier();
-        // ChicagoTripFleetConverter converter = //
-        // new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector, new CharRemovalModifier("\""));
-
-        // online
+        /** prepare for creation of scenario */
         TaxiTripsReader tripsReader = new OnlineTripsReaderChicago();
-        TaxiTripFilter filter2 = new TaxiTripFilter();
-        TripBasedModifier modifier2 = new ChicagoOnlineTripBasedModifier(random, network, //
+        TaxiTripFilter primaryFilter = new TaxiTripFilter();
+        TripBasedModifier tripModifier = new ChicagoOnlineTripBasedModifier(random, network, //
                 fll, new File(processingdir, "virtualNetworkChicago"));
-        // FIXME add real thing, not null
-        TaxiTripFilter finalFilters = new TaxiTripFilter();
+        TaxiTripFilter finalTripFilter = new TaxiTripFilter();
+        // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
-
-        ChicagoOnlineTripFleetConverter converter2 = //
-                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2, //
-                        new CharRemovalModifier("\""), finalFilters, tripsReader);
-        ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, tripFile, //
-                converter2, workingDir, processingdir, simulationDate, timeConvert);
+        ChicagoOnlineTripFleetConverter converter = //
+                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, primaryFilter, tripModifier, //
+                        new CharRemovalModifier("\""), finalTripFilter, tripsReader);
+        Scenario.create(workingDir, tripFile, //
+                converter, workingDir, processingdir, simulationDate, timeConvert);
     }
 
     public static void cleanUp(File workingDir) throws IOException {
