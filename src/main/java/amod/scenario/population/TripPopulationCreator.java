@@ -20,7 +20,10 @@ import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.utils.collections.QuadTree;
 
 import amod.scenario.tripfilter.TaxiTripFilter;
-import amod.scenario.tripfilter.TripDurationFilter;
+import ch.ethz.idsc.amodeus.linkspeed.create.LinkSpeedsExport;
+import ch.ethz.idsc.amodeus.linkspeed.create.GLPKLinOptDelayCalculator;
+import ch.ethz.idsc.amodeus.linkspeed.create.LeastSquaresTimeInv;
+import ch.ethz.idsc.amodeus.linkspeed.create.TaxiLinkSpeedEstimator;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.PersonCreate;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
@@ -28,6 +31,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTripParse;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.CsvReader;
 import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
+import ch.ethz.idsc.amodeus.util.geo.FastQuadTree;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
@@ -39,8 +43,10 @@ public class TripPopulationCreator {
     private final AmodeusTimeConvert timeConvert;
     private final Config config;
     private final Network network;
+    private final MatsimAmodeusDatabase db;
     private final File populationFile;
     private final File populationFileGz;
+    private final File linkSpeedsFile;// = new File(processingDir + "/linkSpeeds")
     private final TaxiTripFilter finalFilters;
     private final TaxiDistanceCalculator distCalc;
 
@@ -54,8 +60,10 @@ public class TripPopulationCreator {
         this.network = network;
         this.finalFilters = finalFilters;
         this.distCalc = new TaxiDistanceCalculator(processingDir, network, linkSelect);
+        this.db = db;
         populationFile = new File(processingDir, fileName);
         populationFileGz = new File(processingDir, fileName + ".gz");
+        linkSpeedsFile = new File(processingDir, "/linkSpeeds");
     }
 
     public void process(File inFile) throws MalformedURLException, Exception {
@@ -86,9 +94,6 @@ public class TripPopulationCreator {
             distCalc.addTrip(taxiTrip);
         });
 
-        // export taxi trip distance analysis
-        distCalc.exportTotalDistance();
-
         // write the modified population to file
         System.out.println("Population size: " + population.getPersons().size());
         PopulationWriter populationWriter = new PopulationWriter(population);
@@ -102,5 +107,14 @@ public class TripPopulationCreator {
             System.out.println("INFO successfully created population");
         else
             System.err.println("WARN created population is empty");
+
+        // export taxi trip distance analysis
+        distCalc.exportTotalDistance();
+
+        // export link speed estimation
+        QuadTree<Link> qt = FastQuadTree.of(network);
+        TaxiLinkSpeedEstimator lsCalc = new LeastSquaresTimeInv(trips, network, timeConvert, db, qt, //
+                simulationDate, GLPKLinOptDelayCalculator.INSTANCE);
+        LinkSpeedsExport.using(linkSpeedsFile, lsCalc);//
     }
 }

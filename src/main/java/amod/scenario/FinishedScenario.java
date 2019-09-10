@@ -24,7 +24,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
         String[] fileNames = new String[] { //
                 "av.xml", "AmodeusOptions.properties", "network.xml.gz", "population.xml.gz", //
-                "config_full.xml", "virtualNetworkChicago" };
+                "config_full.xml", "virtualNetworkChicago", "linkSpeeds" };
 
         for (String fileName : fileNames) {
             Path source = Paths.get(originDir, fileName);

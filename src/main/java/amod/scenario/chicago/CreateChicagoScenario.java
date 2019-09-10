@@ -72,7 +72,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
     private static void run(File workingDir) throws Exception {
         // FIXME remove debug loop once done
-        boolean debug = false;
+        boolean debug = true;
 
         /** download of open street map data to create scenario */
         System.out.println("Downloading open stret map data, this may take a while...");
@@ -96,7 +96,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
         File processingdir = new File(workingDir, "Scenario");
         if (processingdir.isDirectory())
-            DeleteDirectory.of(processingdir, 2, 16);
+            DeleteDirectory.of(processingdir, 2, 17);
         if (!processingdir.isDirectory())
             processingdir.mkdir();
         CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
