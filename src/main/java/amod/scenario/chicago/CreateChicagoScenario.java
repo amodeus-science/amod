@@ -8,9 +8,11 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Random;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
 import amod.scenario.Pt2MatsimXML;
@@ -22,6 +24,10 @@ import amod.scenario.tripfilter.TaxiTripFilter;
 import amod.scenario.tripmodif.CharRemovalModifier;
 import amod.scenario.tripmodif.ChicagoOnlineTripBasedModifier;
 import amod.scenario.tripmodif.TripBasedModifier;
+import ch.ethz.idsc.amodeus.linkspeed.create.GLPKLinOptDelayCalculator;
+import ch.ethz.idsc.amodeus.linkspeed.create.LeastSquaresTimeInv;
+import ch.ethz.idsc.amodeus.linkspeed.create.LinkSpeedsExport;
+import ch.ethz.idsc.amodeus.linkspeed.create.TaxiLinkSpeedEstimator;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
@@ -29,6 +35,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.OsmLoader;
+import ch.ethz.idsc.amodeus.util.geo.FastQuadTree;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
@@ -50,6 +57,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         File workingDir = new File(args[0]);
         setup(workingDir);
         run(workingDir);
+        runLinkSpeeds(workingDir);
         cleanUp(workingDir);
     }
 
@@ -128,6 +136,17 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
                         new CharRemovalModifier("\""), finalTripFilter, tripsReader);
         Scenario.create(workingDir, tripFile, //
                 converter, workingDir, processingdir, simulationDate, timeConvert);
+
+    }
+
+    private static void runLinkSpeeds(File workingDir) throws Exception {
+
+//        // export link speed estimation
+//        QuadTree<Link> qt = FastQuadTree.of(network);
+//        TaxiLinkSpeedEstimator lsCalc = new LeastSquaresTimeInv(trips, network, timeConvert, db, qt, //
+//                simulationDate, GLPKLinOptDelayCalculator.INSTANCE);
+//        LinkSpeedsExport.using(linkSpeedsFile, lsCalc);//
+
     }
 
     private static void cleanUp(File workingDir) throws IOException {

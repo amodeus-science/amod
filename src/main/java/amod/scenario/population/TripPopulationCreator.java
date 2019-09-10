@@ -25,6 +25,7 @@ import ch.ethz.idsc.amodeus.linkspeed.create.GLPKLinOptDelayCalculator;
 import ch.ethz.idsc.amodeus.linkspeed.create.LeastSquaresTimeInv;
 import ch.ethz.idsc.amodeus.linkspeed.create.TaxiLinkSpeedEstimator;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
+import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.PersonCreate;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTripParse;
@@ -63,7 +64,7 @@ public class TripPopulationCreator {
         this.db = db;
         populationFile = new File(processingDir, fileName);
         populationFileGz = new File(processingDir, fileName + ".gz");
-        linkSpeedsFile = new File(processingDir, "/linkSpeeds");
+        linkSpeedsFile = new File(processingDir, "/linkSpeedData");
     }
 
     public void process(File inFile) throws MalformedURLException, Exception {
@@ -93,6 +94,10 @@ public class TripPopulationCreator {
             population.addPerson(person);
             distCalc.addTrip(taxiTrip);
         });
+
+        // export finally used set of trips
+        File outFile = new File(inFile.getAbsolutePath().replace(".csv", "_final.csv"));
+        ExportTaxiTrips.toFile(trips.stream(), outFile);
 
         // write the modified population to file
         System.out.println("Population size: " + population.getPersons().size());
