@@ -65,7 +65,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
     private File run() throws Exception {
         // FIXME remove debug loop once done
-        boolean debug = true;
+        boolean debug = false;
 
         /** download of open street map data to create scenario */
         System.out.println("Downloading open stret map data, this may take a while...");
