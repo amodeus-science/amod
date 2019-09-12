@@ -8,14 +8,12 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
-import amod.scenario.Pt2MatsimXML;
+import amod.scenario.FinishedScenario;
 import amod.scenario.Scenario;
 import amod.scenario.ScenarioLabels;
 import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
@@ -24,10 +22,6 @@ import amod.scenario.tripfilter.TaxiTripFilter;
 import amod.scenario.tripmodif.CharRemovalModifier;
 import amod.scenario.tripmodif.ChicagoOnlineTripBasedModifier;
 import amod.scenario.tripmodif.TripBasedModifier;
-import ch.ethz.idsc.amodeus.linkspeed.create.GLPKLinOptDelayCalculator;
-import ch.ethz.idsc.amodeus.linkspeed.create.LeastSquaresTimeInv;
-import ch.ethz.idsc.amodeus.linkspeed.create.LinkSpeedsExport;
-import ch.ethz.idsc.amodeus.linkspeed.create.TaxiLinkSpeedEstimator;
 import ch.ethz.idsc.amodeus.matsim.NetworkLoader;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
@@ -35,17 +29,11 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.OsmLoader;
-import ch.ethz.idsc.amodeus.util.geo.FastQuadTree;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
-import ch.ethz.idsc.amodeus.util.io.Locate;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
-/* package */ enum CreateChicagoScenario {
-    ;
-
-    private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
-    private static final Random random = new Random(123);
+/* package */ class CreateChicagoScenario {
 
     /** in @param args[0] working directory (empty directory), this main function will create
      * an AMoDeus scenario based on the Chicago taxi dataset available online.
@@ -55,30 +43,27 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
      * @throws Exception */
     public static void main(String[] args) throws Exception {
         File workingDir = new File(args[0]);
-        setup(workingDir);
-        run(workingDir);
-        runLinkSpeeds(workingDir);
+        new CreateChicagoScenario(workingDir);
+    }
+
+    // --
+    private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
+    private static final Random random = new Random(123);
+    private final File workingDir;
+    private final File processingDir;
+
+    private CreateChicagoScenario(File workingDir) throws Exception {
+        this.workingDir = workingDir;
+        ChicagoSetup.in(workingDir);
+        processingDir = run();
+        File destinDir = new File(workingDir, "CreatedScenario");
+        File finalTripsFile = new File("/home/clruch/data/TaxiComparison_ChicagoScCr/Scenario/tripData/Taxi_Trips_2019_07_19_prepared_filtered_modified_final.csv");
+        ChicagoLinkSpeeds.compute(processingDir, finalTripsFile, timeConvert, 0.625);
+        FinishedScenario.copyToDir(processingDir.getAbsolutePath(), destinDir.getAbsolutePath());
         cleanUp(workingDir);
     }
 
-    private static void setup(File workingDir) throws Exception {
-        ChicagoGeoInformation.setup();
-        /** copy relevant files containing settings for scenario generation */
-        File resourcesDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amod"), "resources/chicagoScenario");
-        CopyFiles.now(resourcesDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
-                Arrays.asList(new String[] { ScenarioLabels.avFile, ScenarioLabels.config, //
-                        ScenarioLabels.pt2MatSettings }),
-                true);
-        /** AmodeusOptions.properties is not replaced as it might be changed by user during
-         * scenario generation process. */
-        if (!new File(workingDir, ScenarioLabels.amodeusFile).exists())
-            CopyFiles.now(resourcesDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
-                    Arrays.asList(new String[] { ScenarioLabels.amodeusFile }), false);
-        Pt2MatsimXML.toLocalFileSystem(new File(workingDir, ScenarioLabels.pt2MatSettings), //
-                workingDir.getAbsolutePath());
-    }
-
-    private static void run(File workingDir) throws Exception {
+    private File run() throws Exception {
         // FIXME remove debug loop once done
         boolean debug = true;
 
@@ -104,7 +89,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
         File processingdir = new File(workingDir, "Scenario");
         if (processingdir.isDirectory())
-            DeleteDirectory.of(processingdir, 2, 17);
+            DeleteDirectory.of(processingdir, 2, 18);
         if (!processingdir.isDirectory())
             processingdir.mkdir();
         CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
@@ -112,7 +97,6 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
                         "network.xml", "network.xml.gz" }));
         ScenarioOptions scenarioOptions = new ScenarioOptions(processingdir, //
                 ScenarioOptionsBase.getDefault());
-
         LocalDate simulationDate = LocalDateConvert.ofOptions(scenarioOptions.getString("date"));
 
         File configFile = new File(scenarioOptions.getPreparerConfigName());
@@ -136,17 +120,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
                         new CharRemovalModifier("\""), finalTripFilter, tripsReader);
         Scenario.create(workingDir, tripFile, //
                 converter, workingDir, processingdir, simulationDate, timeConvert);
-
-    }
-
-    private static void runLinkSpeeds(File workingDir) throws Exception {
-
-//        // export link speed estimation
-//        QuadTree<Link> qt = FastQuadTree.of(network);
-//        TaxiLinkSpeedEstimator lsCalc = new LeastSquaresTimeInv(trips, network, timeConvert, db, qt, //
-//                simulationDate, GLPKLinOptDelayCalculator.INSTANCE);
-//        LinkSpeedsExport.using(linkSpeedsFile, lsCalc);//
-
+        return processingdir;
     }
 
     private static void cleanUp(File workingDir) throws IOException {

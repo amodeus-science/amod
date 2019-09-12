@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
-/* package */ enum FinishedScenario {
+public enum FinishedScenario {
     ;
 
     public static void copyToDir(String originDir, String destinDir) throws IOException {

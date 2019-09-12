@@ -25,7 +25,6 @@ public class Scenario {
 
     private final File dataDir;
     private final File tripFile;
-    private final File destinDir;
     private final File processingDir;
     private final LocalDate simulationDate;
     private final AmodeusTimeConvert timeConvert;
@@ -40,7 +39,6 @@ public class Scenario {
         GlobalAssert.that(tripFile.exists());
         this.dataDir = dataDir;
         this.tripFile = tripFile;
-        destinDir = new File(workingDirectory, "CreatedScenario");
         this.processingDir = processingDir;
         this.simulationDate = simulationDate;
         this.timeConvert = timeConvert;
@@ -50,8 +48,6 @@ public class Scenario {
     private void run() throws Exception {
         InitialFiles.copyToDir(processingDir, dataDir);
         fleetConverter.setFilters();
-        fleetConverter.run(processingDir, tripFile, //
-                simulationDate, timeConvert);
-        FinishedScenario.copyToDir(processingDir.getAbsolutePath(), destinDir.getAbsolutePath());
+        fleetConverter.run(processingDir, tripFile, simulationDate, timeConvert);
     }
 }

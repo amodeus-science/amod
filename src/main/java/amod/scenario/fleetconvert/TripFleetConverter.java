@@ -41,6 +41,7 @@ public abstract class TripFleetConverter {
     protected final TaxiTripsReader tripsReader;
     protected final MatsimAmodeusDatabase db;
     protected final QuadTree<Link> qt;
+    
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TaxiTripFilter primaryFilter, TripBasedModifier tripModifier, //
