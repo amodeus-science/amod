@@ -57,7 +57,8 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         ChicagoSetup.in(workingDir);
         processingDir = run();
         File destinDir = new File(workingDir, "CreatedScenario");
-        File finalTripsFile = new File("/home/clruch/data/TaxiComparison_ChicagoScCr/Scenario/tripData/Taxi_Trips_2019_07_19_prepared_filtered_modified_final.csv");
+        // FIXME remove hard code
+        File finalTripsFile = new File("/home/claudio/data/Chicago_Scenario/Scenario/tripData/Taxi_Trips_2019_07_19_prepared_filtered_modified_final.csv");
         ChicagoLinkSpeeds.compute(processingDir, finalTripsFile, timeConvert, 0.625);
         FinishedScenario.copyToDir(processingDir.getAbsolutePath(), destinDir.getAbsolutePath());
         cleanUp(workingDir);
