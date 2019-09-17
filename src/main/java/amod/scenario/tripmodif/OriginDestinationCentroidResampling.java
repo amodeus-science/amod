@@ -37,7 +37,7 @@ public class OriginDestinationCentroidResampling implements TripModifier {
     private final HashSet<Tensor> uniqueDestins = new HashSet<>();
     private final HashSet<Tensor> uniqueLocations = new HashSet<>();
     private VirtualNetwork<Link> centroidVirtualNetwork;
-    private final Set<String> airportBoundaryLinks = new HashSet<>();
+    private final Set<String> airportBoundaryLinks;
 
     private boolean modificationStarted = false; // flag to detect start of modification process
 
@@ -47,8 +47,7 @@ public class OriginDestinationCentroidResampling implements TripModifier {
         this.network = network;
         this.fll = fll;// new FastLinkLookup(network, db);
         this.vNetworkExportFile = vNetworkExportFile;
-        Arrays.asList("64233", "106597", "64235", "161236", "19827", "82589", "65847", "143023").stream()//
-                .forEach(str -> airportBoundaryLinks.add(str));
+        airportBoundaryLinks = ChicagoAirportBoundaryLinks.get(fll);
     }
 
     @Override

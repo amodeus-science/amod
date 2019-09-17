@@ -17,7 +17,7 @@ import ch.ethz.idsc.amodeus.util.io.Locate;
         File resourcesDir = new File(Locate.repoFolder(CreateChicagoScenario.class, "amod"), "resources/chicagoScenario");
         CopyFiles.now(resourcesDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
                 Arrays.asList(new String[] { ScenarioLabels.avFile, ScenarioLabels.config, //
-                        ScenarioLabels.pt2MatSettings }),
+                        ScenarioLabels.pt2MatSettings, ScenarioLabels.LPFile}),
                 true);
         /** AmodeusOptions.properties is not replaced as it might be changed by user during
          * scenario generation process. */

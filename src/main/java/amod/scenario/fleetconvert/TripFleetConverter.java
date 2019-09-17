@@ -42,6 +42,8 @@ public abstract class TripFleetConverter {
     protected final MatsimAmodeusDatabase db;
     protected final QuadTree<Link> qt;
     
+    private File finalTripsFile = null;
+    
 
     public TripFleetConverter(ScenarioOptions scenarioOptions, Network network, //
             TaxiTripFilter primaryFilter, TripBasedModifier tripModifier, //
@@ -104,6 +106,11 @@ public abstract class TripFleetConverter {
                 new TripPopulationCreator(processingDir, configFull, network, db, //
                         DATE_TIME_FORMATTER, qt, simulationDate, timeConvert, finalFilters);
         populationCreator.process(modifiedTripsFile);
+        finalTripsFile = populationCreator.getFinalTripFile();        
+    }
+    
+    public File getFinalTripFile(){
+        return finalTripsFile;
     }
 
     public abstract void setFilters();

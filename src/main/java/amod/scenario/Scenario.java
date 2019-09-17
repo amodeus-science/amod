@@ -4,13 +4,15 @@ package amod.scenario;
 import java.io.File;
 import java.time.LocalDate;
 
+import org.matsim.core.network.FixedIntervalTimeVariantLinkFactory;
+
 import amod.scenario.fleetconvert.TripFleetConverter;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
 public class Scenario {
 
-    public static void create(File dataDir, File tripFile, //
+    public static File create(File dataDir, File tripFile, //
             TripFleetConverter converter, //
             File workingDirectory, File processingDir, //
             LocalDate simulationDate, //
@@ -18,6 +20,7 @@ public class Scenario {
         Scenario creator = new Scenario(dataDir, tripFile, converter, //
                 workingDirectory, processingDir, simulationDate, timeConvert);
         creator.run();
+        return creator.finalTripsFile;
 
     }
 
@@ -29,6 +32,7 @@ public class Scenario {
     private final LocalDate simulationDate;
     private final AmodeusTimeConvert timeConvert;
     public final TripFleetConverter fleetConverter;
+    private File finalTripsFile = null;
 
     private Scenario(File dataDir, File tripFile, //
             TripFleetConverter converter, //
@@ -49,5 +53,7 @@ public class Scenario {
         InitialFiles.copyToDir(processingDir, dataDir);
         fleetConverter.setFilters();
         fleetConverter.run(processingDir, tripFile, simulationDate, timeConvert);
+        finalTripsFile = fleetConverter.getFinalTripFile();
     }
+
 }

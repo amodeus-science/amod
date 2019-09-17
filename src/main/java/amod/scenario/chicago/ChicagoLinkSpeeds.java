@@ -27,8 +27,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
 /* package */ enum ChicagoLinkSpeeds {
     ;
-    public static void compute(File processingDir, File finalTripsFile, AmodeusTimeConvert timeConvert, //
-            double wLSQ) throws Exception {
+    public static void compute(File processingDir, File finalTripsFile, AmodeusTimeConvert timeConvert) throws Exception {
         // TODO magic const.
         File linkSpeedsFile = new File(processingDir, "/linkSpeedData");
 
@@ -51,7 +50,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
         // export link speed estimation
         QuadTree<Link> qt = FastQuadTree.of(network);
         TaxiLinkSpeedEstimator lsCalc = new FlowTimeInvLinkSpeed(trips, network, timeConvert, db, qt, //
-                simulationDate, GLPKLinOptDelayCalculator.INSTANCE,wLSQ);
+                simulationDate, GLPKLinOptDelayCalculator.INSTANCE);
         LinkSpeedsExport.using(linkSpeedsFile, lsCalc);
 
     }

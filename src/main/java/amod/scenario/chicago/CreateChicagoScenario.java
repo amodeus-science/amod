@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 import org.matsim.api.core.v01.network.Network;
@@ -51,22 +52,23 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
     private static final Random random = new Random(123);
     private final File workingDir;
     private final File processingDir;
+    private File finalTripsFile;
 
     private CreateChicagoScenario(File workingDir) throws Exception {
         this.workingDir = workingDir;
         ChicagoSetup.in(workingDir);
         processingDir = run();
         File destinDir = new File(workingDir, "CreatedScenario");
-        // FIXME remove hard code
-        File finalTripsFile = new File("/home/claudio/data/Chicago_Scenario/Scenario/tripData/Taxi_Trips_2019_07_19_prepared_filtered_modified_final.csv");
-        ChicagoLinkSpeeds.compute(processingDir, finalTripsFile, timeConvert, 0.625);
-        FinishedScenario.copyToDir(processingDir.getAbsolutePath(), destinDir.getAbsolutePath());
+        Objects.requireNonNull(finalTripsFile);
+        ChicagoLinkSpeeds.compute(processingDir, finalTripsFile, timeConvert);
+        FinishedScenario.copyToDir(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
+                destinDir.getAbsolutePath());
         cleanUp(workingDir);
     }
 
     private File run() throws Exception {
         // FIXME remove debug loop once done
-        boolean debug = false;
+        boolean debug = true;
 
         /** download of open street map data to create scenario */
         System.out.println("Downloading open stret map data, this may take a while...");
@@ -95,11 +97,12 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
             processingdir.mkdir();
         CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
                 Arrays.asList(new String[] { "AmodeusOptions.properties", "config_full.xml", //
-                        "network.xml", "network.xml.gz" }));
+                        "network.xml", "network.xml.gz", "LPOptions.properties" }));
         ScenarioOptions scenarioOptions = new ScenarioOptions(processingdir, //
                 ScenarioOptionsBase.getDefault());
         LocalDate simulationDate = LocalDateConvert.ofOptions(scenarioOptions.getString("date"));
 
+        //
         File configFile = new File(scenarioOptions.getPreparerConfigName());
         System.out.println(configFile.getAbsolutePath());
         GlobalAssert.that(configFile.exists());
@@ -119,7 +122,7 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         ChicagoOnlineTripFleetConverter converter = //
                 new ChicagoOnlineTripFleetConverter(scenarioOptions, network, primaryFilter, tripModifier, //
                         new CharRemovalModifier("\""), finalTripFilter, tripsReader);
-        Scenario.create(workingDir, tripFile, //
+        finalTripsFile = Scenario.create(workingDir, tripFile, //
                 converter, workingDir, processingdir, simulationDate, timeConvert);
         return processingdir;
     }

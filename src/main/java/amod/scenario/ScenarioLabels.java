@@ -8,6 +8,7 @@ public enum ScenarioLabels {
     public static String config = "config_full.xml";
     public static String pt2MatSettings = "pt2matsim_settings.xml";
     public static String amodeusFile = "AmodeusOptions.properties";
+    public static String LPFile = "LPOptions.properties";
     public static String osmData = "map.osm";
     public static String network = "network.xml";
     // =======
