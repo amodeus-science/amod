@@ -20,6 +20,7 @@ import amod.scenario.ScenarioLabels;
 import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
 import amod.scenario.readers.TaxiTripsReader;
 import amod.scenario.tripfilter.TaxiTripFilter;
+import amod.scenario.tripfilter.TripNetworkSpeedFilter;
 import amod.scenario.tripmodif.CharRemovalModifier;
 import amod.scenario.tripmodif.ChicagoOnlineTripBasedModifier;
 import amod.scenario.tripmodif.TripBasedModifier;
@@ -33,6 +34,7 @@ import ch.ethz.idsc.amodeus.util.OsmLoader;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
+import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ class CreateChicagoScenario {
 
@@ -60,7 +62,10 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         processingDir = run();
         File destinDir = new File(workingDir, "CreatedScenario");
         Objects.requireNonNull(finalTripsFile);
-        ChicagoLinkSpeeds.compute(processingDir, finalTripsFile, timeConvert);
+
+        System.out.println(finalTripsFile.getAbsolutePath());
+
+        ChicagoLinkSpeeds.compute(processingDir, finalTripsFile);
         FinishedScenario.copyToDir(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath());
         cleanUp(workingDir);
@@ -117,6 +122,9 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         TripBasedModifier tripModifier = new ChicagoOnlineTripBasedModifier(random, network, //
                 fll, new File(processingdir, "virtualNetworkChicago"));
         TaxiTripFilter finalTripFilter = new TaxiTripFilter();
+        /** trips which are faster than the network freeflow speeds would allow are removed */
+        finalTripFilter.addFilter(new TripNetworkSpeedFilter(network, db, Quantity.of(3600, "s")));
+
         // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
         ChicagoOnlineTripFleetConverter converter = //

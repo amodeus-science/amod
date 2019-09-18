@@ -78,6 +78,7 @@ public class TripPopulationCreator {
         });
 
         // filter the stream
+        List<TaxiTrip> finalFilteredTrips = new ArrayList<>();
         Stream<TaxiTrip> filtered = finalFilters.filterStream(trips.stream());
 
         // create persons
@@ -86,11 +87,12 @@ public class TripPopulationCreator {
                     linkSelect, simulationDate, timeConvert);
             population.addPerson(person);
             distCalc.addTrip(taxiTrip);
+            finalFilteredTrips.add(taxiTrip);
         });
 
         // export finally used set of trips
         finalTripFile = new File(inFile.getAbsolutePath().replace(".csv", "_final.csv"));
-        ExportTaxiTrips.toFile(trips.stream(), finalTripFile);
+        ExportTaxiTrips.toFile(finalFilteredTrips.stream(), finalTripFile);
 
         // write the modified population to file
         System.out.println("Population size: " + population.getPersons().size());

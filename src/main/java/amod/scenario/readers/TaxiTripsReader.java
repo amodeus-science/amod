@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.sound.midi.SysexMessage;
+
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.CsvReader;
 import ch.ethz.idsc.amodeus.util.CsvReader.Row;
@@ -69,7 +71,6 @@ public abstract class TaxiTripsReader {
                         dropoffTime);
                 list.add(trip);
             } catch (Exception exception) {
-                System.err.println("Unable to read row: " + row);
                 unreadable.add(row.toString());
             }
         });
@@ -81,6 +82,7 @@ public abstract class TaxiTripsReader {
     }
 
     public void saveUnreadable(File file) {
+        System.err.println("Number of unreadable rows:  " + unreadable.size());
         System.err.println("Saving unreadable lines to: " + file.getAbsolutePath());
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
             unreadable.stream().forEach(s -> {

@@ -1,7 +1,6 @@
 package amod.scenario.chicago;
 
 import java.io.File;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -21,13 +20,12 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.taxitrip.ImportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
-import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.geo.FastQuadTree;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
 /* package */ enum ChicagoLinkSpeeds {
     ;
-    public static void compute(File processingDir, File finalTripsFile, AmodeusTimeConvert timeConvert) throws Exception {
+    public static void compute(File processingDir, File finalTripsFile) throws Exception {
         // TODO magic const.
         File linkSpeedsFile = new File(processingDir, "/linkSpeedData");
 
@@ -40,7 +38,6 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
         Network network = NetworkLoader.fromNetworkFile(new File(processingDir, configFull.network().getInputFile()));
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
-        LocalDate simulationDate = LocalDateConvert.ofOptions(scenarioOptions.getString("date"));
 
         // import final trips
         Collection<TaxiTrip> trips = new ArrayList<>();
@@ -49,8 +46,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
         // export link speed estimation
         QuadTree<Link> qt = FastQuadTree.of(network);
-        TaxiLinkSpeedEstimator lsCalc = new FlowTimeInvLinkSpeed(trips, network, timeConvert, db, qt, //
-                simulationDate, GLPKLinOptDelayCalculator.INSTANCE);
+        TaxiLinkSpeedEstimator lsCalc = new FlowTimeInvLinkSpeed(trips, network, db, GLPKLinOptDelayCalculator.INSTANCE);
         LinkSpeedsExport.using(linkSpeedsFile, lsCalc);
 
     }

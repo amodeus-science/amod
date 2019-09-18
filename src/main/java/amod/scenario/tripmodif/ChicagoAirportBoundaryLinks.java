@@ -30,9 +30,6 @@ import ch.ethz.idsc.tensor.Tensors;
             + "{-87.762,41.7872}" //
             + "}");
 
-    // Arrays.asList("64233", "106597", "64235", "161236", "19827", "82589", "65847", "143023").stream()//
-    // .forEach(str -> airportBoundaryLinks.add(str));
-
     public static Set<String> get(FastLinkLookup fll) {
         Set<String> airportBoundaryLinks = new HashSet<>();
         locations.flatten(0).forEach(location -> {
