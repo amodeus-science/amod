@@ -4,7 +4,7 @@ package amod.scenario.chicago;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.LocationSpecDatabase;
 
-/* package */ class ChicagoGeoInformation {
+public class ChicagoGeoInformation {
 
     public static void setup() {
         for (LocationSpec locationSpec : ChicagoLocationSpecs.values())

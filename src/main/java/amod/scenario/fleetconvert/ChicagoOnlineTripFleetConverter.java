@@ -36,7 +36,7 @@ public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
 
         /** removes a percentage of trips randomly, only used for debugging, for full
          * scale a value > 1.0 is used in the second argument. */
-        primaryFilter.addFilter(new RandomRemoverFilter(new Random(123), 0.05));
+        primaryFilter.addFilter(new RandomRemoverFilter(new Random(123), 0.5));
 
         // TODO add this again if necessary, otherwise remove eventually and delete classes...
         /** trips which are only explainable with speeds well above 85 miles/hour are removed */

@@ -17,6 +17,7 @@ import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 import amod.scenario.FinishedScenario;
 import amod.scenario.Scenario;
 import amod.scenario.ScenarioLabels;
+import amod.scenario.est.IterativeLinkSpeedEstimator;
 import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
 import amod.scenario.readers.TaxiTripsReader;
 import amod.scenario.tripfilter.TaxiTripFilter;
@@ -65,7 +66,11 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         System.out.println(finalTripsFile.getAbsolutePath());
 
-        ChicagoLinkSpeeds.compute(processingDir, finalTripsFile);
+        // this is the old LP-based code
+        // ChicagoLinkSpeeds.compute(processingDir, finalTripsFile);
+        // new code
+        IterativeLinkSpeedEstimator.compute(processingDir, finalTripsFile);
+
         FinishedScenario.copyToDir(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath());
         cleanUp(workingDir);
@@ -123,7 +128,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 fll, new File(processingdir, "virtualNetworkChicago"));
         TaxiTripFilter finalTripFilter = new TaxiTripFilter();
         /** trips which are faster than the network freeflow speeds would allow are removed */
-        finalTripFilter.addFilter(new TripNetworkSpeedFilter(network, db, Quantity.of(3600, "s")));
+        finalTripFilter.addFilter(new TripNetworkSpeedFilter(network, db, Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s")));
 
         // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
