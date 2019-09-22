@@ -69,7 +69,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         // this is the old LP-based code
         // ChicagoLinkSpeeds.compute(processingDir, finalTripsFile);
         // new code
-        IterativeLinkSpeedEstimator.compute(processingDir, finalTripsFile);
+        new IterativeLinkSpeedEstimator().compute(processingDir, finalTripsFile);
 
         FinishedScenario.copyToDir(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath());

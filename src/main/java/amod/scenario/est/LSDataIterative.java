@@ -1,6 +1,7 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amod.scenario.est;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Mean;
 
-/* package */ class LSDataStep {
+/* package */ class LSDataIterative {
 
     // --
     private final Map<TaxiTrip, Scalar> diffMap = new HashMap<>();
@@ -32,6 +33,7 @@ import ch.ethz.idsc.tensor.red.Mean;
     public final Scalar diffEnd;
     private final Scalar tolerance;
     private final Network network;
+    private final File processingDir;
     private final LinkSpeedDataContainer lsData;
     private final MatsimAmodeusDatabase db;
     /** this is a value in (0,1] which determines the convergence
@@ -42,13 +44,14 @@ import ch.ethz.idsc.tensor.red.Mean;
     private final Random random;
     private final int dt;
 
-    public LSDataStep(Network network, MatsimAmodeusDatabase db, //
+    public LSDataIterative(Network network, MatsimAmodeusDatabase db, File processingDir, //
             LinkSpeedDataContainer lsData, List<TaxiTrip> allTrips, //
             int maxIter, Scalar tol, Scalar epsilon, Random random, int dt) {
-        this.tolerance = tol;
         this.network = network;
-        this.lsData = lsData;
         this.db = db;
+        this.processingDir = processingDir;
+        this.tolerance = tol;
+        this.lsData = lsData;
         this.epsilon = epsilon;
         this.random = random;
         this.dt = dt;
@@ -61,6 +64,8 @@ import ch.ethz.idsc.tensor.red.Mean;
         while (iterations < maxIter && !isBelowTolerance()) {
             ++iterations;
             tripIteration(allTrips);
+            /** intermediate export */
+            StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterations));
         }
 
         diffEnd = getDiff();
@@ -68,6 +73,8 @@ import ch.ethz.idsc.tensor.red.Mean;
 
     }
 
+    /** All available {@link TaxiTrip}s in @param allTrips
+     * are used to estimate link speeds. */
     private void tripIteration(List<TaxiTrip> allTrips) {
         /** shuffle trips to have random order */
         Collections.shuffle(allTrips, random);
@@ -87,8 +94,7 @@ import ch.ethz.idsc.tensor.red.Mean;
             Scalar pathDurationratio = comp.nwPathDurationRatio;
             /** rescale factor such that epsilon in [0,1] maps to [f,1] */
             Scalar rescaleFactor = RealScalar.ONE.subtract(//
-                    (RealScalar.ONE.subtract(pathDurationratio)).multiply(epsilon)//
-            );
+                    (RealScalar.ONE.subtract(pathDurationratio)).multiply(epsilon));
 
             /** rescale all links */
             ApplyScaling.to(lsData, trip, comp.path, rescaleFactor, dt);
