@@ -10,6 +10,7 @@
     <param name="dropoffDurationPerPassenger" value="0.0" />
   </timing>
   <operator id="op1">
+    <param name="routerName" value="TaxiTravelTimeRouter" />
     <generator strategy="PopulationDensity">
       <param name="numberOfVehicles" value="500" />
     </generator>

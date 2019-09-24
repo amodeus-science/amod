@@ -33,7 +33,6 @@ import ch.ethz.idsc.tensor.red.Mean;
     public final Scalar diffEnd;
     private final Scalar tolerance;
     private final Network network;
-    private final File processingDir;
     private final LinkSpeedDataContainer lsData;
     private final MatsimAmodeusDatabase db;
     /** this is a value in (0,1] which determines the convergence
@@ -49,7 +48,6 @@ import ch.ethz.idsc.tensor.red.Mean;
             int maxIter, Scalar tol, Scalar epsilon, Random random, int dt) {
         this.network = network;
         this.db = db;
-        this.processingDir = processingDir;
         this.tolerance = tol;
         this.lsData = lsData;
         this.epsilon = epsilon;
@@ -90,8 +88,8 @@ import ch.ethz.idsc.tensor.red.Mean;
 
             /** comupte ratio of network path and trip duration f */
             DurationCompare comp = new DurationCompare(trip, calc);
-            diffMap.put(trip, comp.nwPathDurationRatio);
             Scalar pathDurationratio = comp.nwPathDurationRatio;
+            diffMap.put(trip, pathDurationratio);
             /** rescale factor such that epsilon in [0,1] maps to [f,1] */
             Scalar rescaleFactor = RealScalar.ONE.subtract(//
                     (RealScalar.ONE.subtract(pathDurationratio)).multiply(epsilon));
