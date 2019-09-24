@@ -26,12 +26,12 @@ import ch.ethz.idsc.tensor.Scalar;
 public class IterativeLinkSpeedEstimator {
 
     private final int maxIter = 20;
-    private final Scalar tolerance = RealScalar.of(0.01);
+    private final Scalar tolerance = RealScalar.of(0.005);
     /** this is a value in (0,1] which determines the convergence
      * speed of the algorithm, a value close to 1 may lead to
      * loss of convergence, it is advised o chose slow values for
      * epsilon. No changes are applied for epsilon == 0. */
-    private final Scalar epsilon = RealScalar.of(0.1);
+    private final Scalar epsilon = RealScalar.of(0.3);
     private final Random random = new Random(123);
     private final int dt = 1800;
 
