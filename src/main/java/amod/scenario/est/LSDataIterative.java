@@ -11,6 +11,8 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.function.Function;
 
+import javax.sound.midi.SysexMessage;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
@@ -19,6 +21,7 @@ import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.ShortestDurationCalculator;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.io.SaveFormats;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -37,7 +40,7 @@ import ch.ethz.idsc.tensor.Tensors;
     private final Network network;
     private final LinkSpeedDataContainer lsData;
     private final MatsimAmodeusDatabase db;
-    private final Function<Map<TaxiTrip, Scalar>, Scalar> cost;
+    private final Function<Map<TaxiTrip, Scalar>, Scalar> costFunction;
     /** this is a value in (0,1] which determines the convergence
      * speed of the algorithm, a value close to 1 may lead to
      * loss of convergence, it is adviced o chose slow. No changes
@@ -49,26 +52,44 @@ import ch.ethz.idsc.tensor.Tensors;
     public LSDataIterative(Network network, MatsimAmodeusDatabase db, File processingDir, //
             LinkSpeedDataContainer lsData, List<TaxiTrip> allTrips, //
             int maxIter, Scalar tol, Scalar epsilon, Random random, int dt, //
-            Function<Map<TaxiTrip, Scalar>, Scalar> cost) {
+            Function<Map<TaxiTrip, Scalar>, Scalar> costFunction) {
         this.network = network;
         this.db = db;
-        this.tolerance = tol;
+        this.tolerance = Objects.requireNonNull(tol);
         this.lsData = lsData;
         this.epsilon = epsilon;
         this.random = random;
         this.dt = dt;
-        this.cost = cost;
-
+        this.costFunction = costFunction;
         int iterations = 0;
 
-        while (iterations < maxIter && !isBelowTolerance(costMid, tolerance)) {
+        /** export the initial distribution of ratios */
+
+        // // DEBUGGING
+        // int count = 0;
+        // Collections.shuffle(allTrips, random);
+        // for (TaxiTrip trip : allTrips) {
+        // ++count;
+        // if (count % 20 == 0) {
+        // System.out.println(count);
+        // LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
+        // ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
+        // DurationCompare comp = new DurationCompare(trip, calc);
+        // Scalar pathDurationratio = comp.nwPathDurationRatio;
+        // ratioMap.put(trip, pathDurationratio);
+        // }
+        // }
+        // exportRatioMap();
+        // // DEBUGGING END
+
+        while (iterations < maxIter && Scalars.lessEquals(tolerance, costMid)) {
             ++iterations;
             tripIteration(allTrips);
             /** intermediate export */
             StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterations));
         }
 
-        costEnd = cost.apply(ratioMap);
+        costEnd = costFunction.apply(ratioMap);
         System.out.println("diffEnd: " + costEnd);
 
     }
@@ -99,34 +120,45 @@ import ch.ethz.idsc.tensor.Tensors;
             /** rescale all links */
             ApplyScaling.to(lsData, trip, comp.path, rescaleFactor, dt);
 
+            // DEBUGGING
+            {
+                DurationCompare compNew = new DurationCompare(trip, calc);
+                Scalar pathDurationratioNew = comp.nwPathDurationRatio;
+                if (Scalars.lessEquals(RealScalar.ONE, pathDurationratio)) {
+                    System.err.println("rescaleFactor: " + rescaleFactor);
+                    System.err.println("new ratio:     " + pathDurationratioNew);
+                }
+                // GlobalAssert.that(Scalars.lessEquals(pathDurationratio, RealScalar.ONE));
+                ratioMap.put(trip, pathDurationratioNew);
+            }
+
+            // DEUBBING END
+
             /** assess every 20 trips if ok */
             if (tripCount % 50 == 0) {
-                costMid = cost.apply(ratioMap);
+                costMid = costFunction.apply(ratioMap);
                 System.out.println("trip: " + tripCount + " / " + allTrips.size());
-                System.out.println("costMid: " + costMid);
-                if (isBelowTolerance(costMid, tolerance))
+                System.out.println("cost: " + costMid);
+                if (Scalars.lessEquals(costMid, tolerance))
                     break;
             }
 
+            // DEBUGGING
             /** DEBUGGING every 100 trips, export cost map */
-            if (tripCount % 1000 == 0 || tripCount == 10) {
-                Tensor all = Tensors.empty();
-                ratioMap.values().forEach(s -> all.append(s));
-                try {
-                    SaveFormats.MATHEMATICA.save(all, new File("/home/clruch/Downloads/"), "diff");
-                    // Export.of(new File("/home/clruch/Downloads/diff.mathematica"), all);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+            if (tripCount % 1000 == 0) {
+                exportRatioMap();
             }
+            // DEBUGGING END
         }
     }
 
-    private static boolean isBelowTolerance(Scalar costMid, Scalar tolerance) {
-        Objects.requireNonNull(costMid);
-        Objects.requireNonNull(tolerance);
-        Scalar deviation = costMid.subtract(RealScalar.ONE);
-        return Scalars.lessEquals(deviation.abs(), tolerance);
+    private void exportRatioMap() {
+        Tensor all = Tensors.empty();
+        ratioMap.values().forEach(s -> all.append(s));
+        try {
+            SaveFormats.MATHEMATICA.save(all, new File("/home/clruch/Downloads/"), "diff");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

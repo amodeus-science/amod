@@ -19,6 +19,7 @@ import ch.ethz.idsc.tensor.red.Mean;
     ;
 
     public static void to(LinkSpeedDataContainer lsData, TaxiTrip trip, Path path, Scalar factor, int dt) {
+        int tripEnd = StaticHelper.endTime(trip);
 
         for (Link link : path.links) {
             int linkId = LinkIndex.fromLink(link);
@@ -26,15 +27,14 @@ import ch.ethz.idsc.tensor.red.Mean;
             /** if no recordings are present, initialize with free speed */
             if (Objects.isNull(lsTime)) {
                 double freeSpeed = link.getFreespeed();
-
                 for (int time = 0; time < 108000; time += dt) {
                     lsData.addData(linkId, time, freeSpeed);
                 }
             }
             lsTime = lsData.getLinkSet().get(linkId);
             Objects.requireNonNull(lsTime);
+
             for (int time : lsTime.getRecordedTimes()) {
-                int tripEnd = StaticHelper.endTime(trip);
                 if (time <= tripEnd) {
                     Scalar speedNow = RealScalar.of(link.getFreespeed());
                     Tensor recorded = lsTime.getSpeedsAt(time);
