@@ -69,7 +69,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         // this is the old LP-based code
         // ChicagoLinkSpeeds.compute(processingDir, finalTripsFile);
         // new code
-        // new IterativeLinkSpeedEstimator().compute(processingDir, finalTripsFile);
+        new IterativeLinkSpeedEstimator().compute(processingDir, finalTripsFile);
 
         FinishedScenario.copyToDir(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
                 destinDir.getAbsolutePath());
@@ -102,7 +102,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         File processingdir = new File(workingDir, "Scenario");
         if (processingdir.isDirectory())
-            DeleteDirectory.of(processingdir, 2, 19);
+            DeleteDirectory.of(processingdir, 2, 21);
         if (!processingdir.isDirectory())
             processingdir.mkdir();
         CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //

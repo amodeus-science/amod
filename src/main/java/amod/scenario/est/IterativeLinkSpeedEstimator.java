@@ -25,7 +25,7 @@ import ch.ethz.idsc.tensor.Scalar;
 
 public class IterativeLinkSpeedEstimator {
 
-    private final int maxIter = 20;
+    private final int maxIter = 10;
     private final Scalar tolerance = RealScalar.of(0.005);
     /** this is a value in (0,1] which determines the convergence
      * speed of the algorithm, a value close to 1 may lead to
@@ -57,10 +57,10 @@ public class IterativeLinkSpeedEstimator {
         System.out.println("Number of trips: " + trips.size());
 
         new LSDataIterative(network, db, processingDir, lsData, trips, maxIter, //
-                tolerance, epsilon, random, dt);
+                tolerance, epsilon, random, dt, m -> Cost.max(m));
 
         /** final export */
-        StaticHelper.export(processingDir, lsData,"");
+        StaticHelper.export(processingDir, lsData, "");
 
     }
 
