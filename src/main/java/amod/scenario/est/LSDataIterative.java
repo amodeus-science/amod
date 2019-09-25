@@ -120,19 +120,18 @@ import ch.ethz.idsc.tensor.Tensors;
             /** rescale all links */
             ApplyScaling.to(lsData, trip, comp.path, rescaleFactor, dt);
 
-            // DEBUGGING
-            {
-                DurationCompare compNew = new DurationCompare(trip, calc);
-                Scalar pathDurationratioNew = comp.nwPathDurationRatio;
-                if (Scalars.lessEquals(RealScalar.ONE, pathDurationratio)) {
-                    System.err.println("rescaleFactor: " + rescaleFactor);
-                    System.err.println("new ratio:     " + pathDurationratioNew);
-                }
-                // GlobalAssert.that(Scalars.lessEquals(pathDurationratio, RealScalar.ONE));
-                ratioMap.put(trip, pathDurationratioNew);
-            }
-
-            // DEUBBING END
+            // // DEBUGGING
+            // {
+            // DurationCompare compNew = new DurationCompare(trip, calc);
+            // Scalar pathDurationratioNew = comp.nwPathDurationRatio;
+            // if (Scalars.lessEquals(RealScalar.ONE, pathDurationratio)) {
+            // System.err.println("rescaleFactor: " + rescaleFactor);
+            // System.err.println("new ratio: " + pathDurationratioNew);
+            // }
+            // // GlobalAssert.that(Scalars.lessEquals(pathDurationratio, RealScalar.ONE));
+            // ratioMap.put(trip, pathDurationratioNew);
+            // }
+            // // DEUBBING END
 
             /** assess every 20 trips if ok */
             if (tripCount % 50 == 0) {
@@ -146,17 +145,17 @@ import ch.ethz.idsc.tensor.Tensors;
             // DEBUGGING
             /** DEBUGGING every 100 trips, export cost map */
             if (tripCount % 1000 == 0) {
-                exportRatioMap();
+                exportRatioMap(Integer.toString(tripCount));
             }
             // DEBUGGING END
         }
     }
 
-    private void exportRatioMap() {
+    private void exportRatioMap(String append) {
         Tensor all = Tensors.empty();
         ratioMap.values().forEach(s -> all.append(s));
         try {
-            SaveFormats.MATHEMATICA.save(all, new File("/home/clruch/Downloads/"), "diff");
+            SaveFormats.MATHEMATICA.save(all, new File("/home/clruch/Downloads/"), "diff" + append);
         } catch (IOException e) {
             e.printStackTrace();
         }
