@@ -28,6 +28,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 /* package */ class FindCongestionIterative {
 
     private final TripComparisonMaintainer tripMaintainer;
+    private final ApplyScaling applyScaling = new ApplyScaling();
 
     /** These diff values should converge to 1 */
     public Scalar costMid = RealScalar.of(100); // any high enough number ok as initialization
@@ -79,6 +80,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterations));
         }
 
+        applyScaling.printIncreaseMap();
         System.out.println("cost End: " + costFunction.apply(tripMaintainer.getLookupMap()));
 
     }
@@ -114,7 +116,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                     (RealScalar.ONE.subtract(pathDurationratio)).multiply(epsilon1));
 
             /** rescale all links */
-            ApplyScaling.to(lsData, trip, compare.path, rescaleFactor, dt);
+            applyScaling.to(lsData, trip, compare.path, rescaleFactor, dt);
 
             compare = getPathDurationRatio(trip);
             pathDurationratio = compare.nwPathDurationRatio;
@@ -170,6 +172,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             System.out.println("----");
 
         }
+
     }
 
     private DurationCompare getPathDurationRatio(TaxiTrip trip) {
