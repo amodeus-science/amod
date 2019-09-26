@@ -6,9 +6,11 @@ import java.util.function.Predicate;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
+import amod.scenario.est.DurationCompare;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.ShortestDurationCalculator;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
+import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.qty.Quantity;
@@ -31,15 +33,19 @@ public class TripNetworkSpeedFilter implements Predicate<TaxiTrip> {
 
     @Override
     public boolean test(TaxiTrip trip) {
-        Path freeFlowpath = calc.computePath(trip);
-        Scalar freeFlowTime = Quantity.of(freeFlowpath.travelTime, "s");
+
+        /** getting the data */
+        DurationCompare compare = new DurationCompare(trip, calc);
+        Path freeFlowpath = compare.path;
+
+        /** evaluating criteria */
+        Scalar freeFlowTime = compare.pathTime;
         Scalar dist = Quantity.of(freeFlowpath.links.stream().mapToDouble(l -> l.getLength()).sum(), "m");
-
+        boolean slowerThanNetwork = Scalars.lessEquals(compare.nwPathDurationRatio, RealScalar.ONE);
+        boolean belowMaxDelay = Scalars.lessEquals(trip.duration.subtract(freeFlowTime), maxDelay);
         boolean fasterThanMin = Scalars.lessEquals(minSpeed, dist.divide(trip.duration));
-        boolean fasterThanNetwork = Scalars.lessEquals(trip.duration, freeFlowTime);
-        boolean aboveMaxDelay = Scalars.lessEquals(maxDelay, trip.duration.subtract(freeFlowTime));
 
-        // reject if trip is faster than network allows for or above maximum tolerated delay
-        return !fasterThanNetwork && !aboveMaxDelay && fasterThanMin;
+        /** return true if all ok */
+        return slowerThanNetwork && belowMaxDelay && fasterThanMin;
     }
 }

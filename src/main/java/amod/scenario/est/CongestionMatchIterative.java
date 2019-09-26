@@ -2,16 +2,15 @@
 package amod.scenario.est;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.function.Function;
-
-import javax.sound.midi.SysexMessage;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -20,18 +19,15 @@ import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.ShortestDurationCalculator;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
-import ch.ethz.idsc.amodeus.util.io.SaveFormats;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
 
-/* package */ class LSDataIterative {
+/* package */ class CongestionMatchIterative {
 
     // --
-    private final Map<TaxiTrip, Scalar> ratioMap = new HashMap<>();
+    private final Map<TaxiTrip, Scalar> ratioLookupMap = new HashMap<>();
+    private final NavigableMap<Scalar, TaxiTrip> ratioSortedMap = new TreeMap<>();
     /** These diff values should converge to 1 */
     public Scalar costMid = RealScalar.of(100); // any high enough number ok as initialization
     public final Scalar costEnd;
@@ -45,42 +41,47 @@ import ch.ethz.idsc.tensor.Tensors;
      * speed of the algorithm, a value close to 1 may lead to
      * loss of convergence, it is adviced o chose slow. No changes
      * are applied for epsilon == 0. */
-    private final Scalar epsilon;
+    private final Scalar epsilon1;
+    private final Scalar epsilon2;
     private final Random random;
     private final int dt;
 
-    public LSDataIterative(Network network, MatsimAmodeusDatabase db, File processingDir, //
+    public CongestionMatchIterative(Network network, MatsimAmodeusDatabase db, File processingDir, //
             LinkSpeedDataContainer lsData, List<TaxiTrip> allTrips, //
-            int maxIter, Scalar tol, Scalar epsilon, Random random, int dt, //
+            int maxIter, Scalar tol, Scalar epsilon1, Scalar epsilon2, Random random, int dt, //
             Function<Map<TaxiTrip, Scalar>, Scalar> costFunction) {
         this.network = network;
         this.db = db;
         this.tolerance = Objects.requireNonNull(tol);
         this.lsData = lsData;
-        this.epsilon = epsilon;
+        this.epsilon1 = epsilon1;
+        this.epsilon2 = epsilon2;
         this.random = random;
         this.dt = dt;
         this.costFunction = costFunction;
         int iterations = 0;
 
         /** export the initial distribution of ratios */
+        // DEBUGGING
+        Collections.shuffle(allTrips, random);
+        int count = 0;
+        // ShortestDurationCalculator calc = new ShortestDurationCalculator(network, db);
 
-        // // DEBUGGING
-        // int count = 0;
-        // Collections.shuffle(allTrips, random);
-        // for (TaxiTrip trip : allTrips) {
-        // ++count;
-        // if (count % 20 == 0) {
-        // System.out.println(count);
-        // LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
-        // ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
-        // DurationCompare comp = new DurationCompare(trip, calc);
-        // Scalar pathDurationratio = comp.nwPathDurationRatio;
-        // ratioMap.put(trip, pathDurationratio);
-        // }
-        // }
-        // exportRatioMap();
-        // // DEBUGGING END
+        LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
+        ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
+
+        for (TaxiTrip trip : allTrips) {
+            ++count;
+            if (count % 100 == 0)
+                System.out.println("Freespeed length calculation: " + count);
+            DurationCompare comp = new DurationCompare(trip, calc);
+            Scalar pathDurationratio = comp.nwPathDurationRatio;
+            ratioLookupMap.put(trip, pathDurationratio);
+            ratioSortedMap.put(pathDurationratio.subtract(RealScalar.ONE).abs(), trip);
+        }
+        StaticHelper.exportRatioMap(ratioLookupMap, "Initial");
+        System.exit(1);
+        // DEBUGGING END
 
         while (iterations < maxIter && Scalars.lessEquals(tolerance, costMid)) {
             ++iterations;
@@ -89,7 +90,7 @@ import ch.ethz.idsc.tensor.Tensors;
             StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterations));
         }
 
-        costEnd = costFunction.apply(ratioMap);
+        costEnd = costFunction.apply(ratioLookupMap);
         System.out.println("diffEnd: " + costEnd);
 
     }
@@ -99,10 +100,18 @@ import ch.ethz.idsc.tensor.Tensors;
     private void tripIteration(List<TaxiTrip> allTrips) {
         /** shuffle trips to have random order */
         Collections.shuffle(allTrips, random);
-
         int tripCount = 0;
-        for (TaxiTrip trip : allTrips) {
-            ++tripCount;
+        int totalTrips = allTrips.size();
+        while (tripCount < totalTrips - 1) {
+            /** decide if new random trip or worst of existing trips */
+            Scalar randomS = RealScalar.of(random.nextDouble());
+            TaxiTrip trip = null;
+            if (Scalars.lessEquals(randomS, epsilon2) || ratioSortedMap.size() == 0) { // take next random trip
+                trip = allTrips.get(tripCount);
+                ++tripCount;
+            } else { // take worst of existing trips
+                trip = ratioSortedMap.lastEntry().getValue();
+            }
 
             /** create the shortest duration calculator using the linkSpeed data,
              * must be done again to take into account newest updates */
@@ -112,10 +121,11 @@ import ch.ethz.idsc.tensor.Tensors;
             /** comupte ratio of network path and trip duration f */
             DurationCompare comp = new DurationCompare(trip, calc);
             Scalar pathDurationratio = comp.nwPathDurationRatio;
-            ratioMap.put(trip, pathDurationratio);
+            ratioLookupMap.put(trip, pathDurationratio);
+            ratioSortedMap.put(pathDurationratio.subtract(RealScalar.ONE).abs(), trip);
             /** rescale factor such that epsilon in [0,1] maps to [f,1] */
             Scalar rescaleFactor = RealScalar.ONE.subtract(//
-                    (RealScalar.ONE.subtract(pathDurationratio)).multiply(epsilon));
+                    (RealScalar.ONE.subtract(pathDurationratio)).multiply(epsilon1));
 
             /** rescale all links */
             ApplyScaling.to(lsData, trip, comp.path, rescaleFactor, dt);
@@ -135,7 +145,7 @@ import ch.ethz.idsc.tensor.Tensors;
 
             /** assess every 20 trips if ok */
             if (tripCount % 50 == 0) {
-                costMid = costFunction.apply(ratioMap);
+                costMid = costFunction.apply(ratioLookupMap);
                 System.out.println("trip: " + tripCount + " / " + allTrips.size());
                 System.out.println("cost: " + costMid);
                 if (Scalars.lessEquals(costMid, tolerance))
@@ -143,21 +153,12 @@ import ch.ethz.idsc.tensor.Tensors;
             }
 
             // DEBUGGING
-            /** DEBUGGING every 100 trips, export cost map */
+            /** DEBUGGING every 1000 trips, export cost map */
             if (tripCount % 1000 == 0) {
-                exportRatioMap(Integer.toString(tripCount));
+                StaticHelper.exportRatioMap(ratioLookupMap, Integer.toString(tripCount));
             }
             // DEBUGGING END
         }
     }
 
-    private void exportRatioMap(String append) {
-        Tensor all = Tensors.empty();
-        ratioMap.values().forEach(s -> all.append(s));
-        try {
-            SaveFormats.MATHEMATICA.save(all, new File("/home/clruch/Downloads/"), "diff" + append);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -8,12 +8,18 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-/* package */ class DurationCompare {
+/** Helper class to compare the duration of a taxi trip (from live data)
+ * and a network path. If the nwPathdurationRatio is larger than 1,
+ * the trip is slower in the simulatio network than in the original data. */
+public class DurationCompare {
 
     public final Path path;
     public final Scalar duration;
     public final Scalar pathTime;
-    public final Scalar nwPathDurationRatio; // this is < 1 as long as not enough congestion
+    /** =1 simulation duration identical t.recorded duration
+     * < 1 simulation duration faster than recorded duration
+     * > 1 simulation duration slower than recorded duration */
+    public final Scalar nwPathDurationRatio;
 
     public DurationCompare(TaxiTrip trip, ShortestDurationCalculator calc) {
         path = calc.computePath(trip);

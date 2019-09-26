@@ -31,9 +31,11 @@ public class IterativeLinkSpeedEstimator {
      * speed of the algorithm, a value close to 1 may lead to
      * loss of convergence, it is advised o chose slow values for
      * epsilon. No changes are applied for epsilon == 0. */
-    private final Scalar epsilon = RealScalar.of(0.3);
+    private final Scalar epsilon1 = RealScalar.of(0.3);
+    /** probability of taking a new trip */
+    private final Scalar epsilon2 = RealScalar.of(0.5);
     private final Random random = new Random(123);
-    private final int dt = 1800;
+    private final int dt = 450;
 
     public void compute(File processingDir, File finalTripsFile) throws IOException {
 
@@ -56,8 +58,8 @@ public class IterativeLinkSpeedEstimator {
                 forEach(tt -> trips.add(tt));
         System.out.println("Number of trips: " + trips.size());
 
-        new LSDataIterative(network, db, processingDir, lsData, trips, maxIter, //
-                tolerance, epsilon, random, dt, m -> Cost.max(m));
+        new CongestionMatchIterative(network, db, processingDir, lsData, trips, maxIter, //
+                tolerance, epsilon1, epsilon2, random, dt, m -> Cost.max(m));
 
         /** final export */
         StaticHelper.export(processingDir, lsData, "");
