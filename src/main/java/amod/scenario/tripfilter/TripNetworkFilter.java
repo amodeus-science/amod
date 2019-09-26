@@ -4,7 +4,6 @@ package amod.scenario.tripfilter;
 import java.util.function.Predicate;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import amod.scenario.est.DurationCompare;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
@@ -13,22 +12,23 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
-import ch.ethz.idsc.tensor.qty.Quantity;
 
 /** This filter calculates the min-time-path in the network without traffic.
  * Trips with a duration that is smaller than this value are rejected.
  * Trips which are not above a certain minimum average speed are rejected. */
-public class TripNetworkSpeedFilter implements Predicate<TaxiTrip> {
+public class TripNetworkFilter implements Predicate<TaxiTrip> {
 
     private final ShortestDurationCalculator calc;
     private final Scalar maxDelay;
     private final Scalar minSpeed;
+    private final Scalar minDistance;
 
-    public TripNetworkSpeedFilter(Network network, MatsimAmodeusDatabase db, //
-            Scalar minSpeed, Scalar maxDelay) {
+    public TripNetworkFilter(Network network, MatsimAmodeusDatabase db, //
+            Scalar minSpeed, Scalar maxDelay, Scalar minDistance) {
         calc = new ShortestDurationCalculator(network, db);
         this.maxDelay = maxDelay;
         this.minSpeed = minSpeed;
+        this.minDistance = minDistance;
     }
 
     @Override
@@ -36,16 +36,15 @@ public class TripNetworkSpeedFilter implements Predicate<TaxiTrip> {
 
         /** getting the data */
         DurationCompare compare = new DurationCompare(trip, calc);
-        Path freeFlowpath = compare.path;
 
         /** evaluating criteria */
-        Scalar freeFlowTime = compare.pathTime;
-        Scalar dist = Quantity.of(freeFlowpath.links.stream().mapToDouble(l -> l.getLength()).sum(), "m");
         boolean slowerThanNetwork = Scalars.lessEquals(compare.nwPathDurationRatio, RealScalar.ONE);
-        boolean belowMaxDelay = Scalars.lessEquals(trip.duration.subtract(freeFlowTime), maxDelay);
-        boolean fasterThanMin = Scalars.lessEquals(minSpeed, dist.divide(trip.duration));
+        boolean belowMaxDelay = Scalars.lessEquals(trip.duration.subtract(compare.pathTime), maxDelay);
+        boolean fasterThanMinSpeed = Scalars.lessEquals(minSpeed, compare.pathDist.divide(trip.duration));
+        boolean longerThanMinDistance = Scalars.lessEquals(minDistance, compare.pathDist);
+        boolean hasRealPath = compare.path.links.size() > 1;
 
         /** return true if all ok */
-        return slowerThanNetwork && belowMaxDelay && fasterThanMin;
+        return slowerThanNetwork && belowMaxDelay && fasterThanMinSpeed && longerThanMinDistance && hasRealPath;
     }
 }

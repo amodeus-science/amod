@@ -21,7 +21,7 @@ import amod.scenario.est.IterativeLinkSpeedEstimator;
 import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
 import amod.scenario.readers.TaxiTripsReader;
 import amod.scenario.tripfilter.TaxiTripFilter;
-import amod.scenario.tripfilter.TripNetworkSpeedFilter;
+import amod.scenario.tripfilter.TripNetworkFilter;
 import amod.scenario.tripmodif.CharRemovalModifier;
 import amod.scenario.tripmodif.ChicagoOnlineTripBasedModifier;
 import amod.scenario.tripmodif.TripBasedModifier;
@@ -129,7 +129,8 @@ import ch.ethz.idsc.tensor.qty.Quantity;
                 fll, new File(processingdir, "virtualNetworkChicago"));
         TaxiTripFilter finalTripFilter = new TaxiTripFilter();
         /** trips which are faster than the network freeflow speeds would allow are removed */
-        finalTripFilter.addFilter(new TripNetworkSpeedFilter(network, db, Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s")));
+        finalTripFilter.addFilter(new TripNetworkFilter(network, db,//
+                Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m")));
 
         // TODO eventually remove, this did not improve the fit.
         // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));

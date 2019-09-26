@@ -20,13 +20,14 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class TripMaxSpeedFilter implements Predicate<TaxiTrip> {
+@Deprecated
+public class DeprecTripMaxSpeedFilter implements Predicate<TaxiTrip> {
     private final FastLinkLookup fll;
     private final LeastCostPathCalculator lcpc;
     private final Scalar maxAllowedSpeed;
     private int count = 0;
 
-    public TripMaxSpeedFilter(Network network, MatsimAmodeusDatabase db, Scalar maxAllowedSpeed) {
+    public DeprecTripMaxSpeedFilter(Network network, MatsimAmodeusDatabase db, Scalar maxAllowedSpeed) {
         this.maxAllowedSpeed = maxAllowedSpeed;
         // least cost path calculator
         lcpc = new FastAStarLandmarksFactory()//

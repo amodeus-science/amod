@@ -22,6 +22,7 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
+import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ class FindCongestionIterative {
 
@@ -30,7 +31,7 @@ import ch.ethz.idsc.tensor.Scalars;
     private final NavigableMap<Scalar, TaxiTrip> ratioSortedMap = new TreeMap<>();
     /** These diff values should converge to 1 */
     public Scalar costMid = RealScalar.of(100); // any high enough number ok as initialization
-    public final Scalar costEnd;
+    // public final Scalar costEnd;
     /** settings and data */
     private final Scalar tolerance;
     private final Network network;
@@ -63,22 +64,38 @@ import ch.ethz.idsc.tensor.Scalars;
 
         /** export the initial distribution of ratios */
         Collections.shuffle(allTrips, random);
-        // ShortestDurationCalculator calc = new ShortestDurationCalculator(network, db);
-        LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
-        ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
+        ShortestDurationCalculator calc = new ShortestDurationCalculator(network, db);
+        // LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
+        // ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
         int count = 0;
         for (TaxiTrip trip : allTrips) {
             ++count;
             if (count % 100 == 0)
                 System.out.println("Freespeed length calculation: " + count);
-            DurationCompare comp = new DurationCompare(trip, calc);
-            Scalar pathDurationratio = comp.nwPathDurationRatio;
+            DurationCompare compare = new DurationCompare(trip, calc);
+            Scalar pathDurationratio = compare.nwPathDurationRatio;
             ratioLookupMap.put(trip, pathDurationratio);
             ratioSortedMap.put(pathDurationratio.subtract(RealScalar.ONE).abs(), trip);
+
+            //
+            // if(Scalars.lessEquals(compare.pathTime, Quantity.of(10, "s"))){
+            // System.err.println("Now at trip " + trip.localId);
+            // System.err.println("Now at trip " + trip.pickupLoc);
+            // System.err.println("Now at trip " + trip.dropoffLoc);
+            // System.err.println("compare.path");
+            // compare.path.links.forEach(l->System.err.println(l.getId().toString()));
+            // System.err.println("compare.pathDist " + compare.pathDist);
+            // System.err.println("compare.nwPathDurationRatio " + compare.nwPathDurationRatio);
+            // System.err.println("compare.nwPathDurationRatio " + compare.nwPathDurationRatio);
+            // }
+
         }
+
+        /** export initial distribution */
         StaticHelper.exportRatioMap(ratioLookupMap, "Initial");
 
-
+        /** show initial score */
+        System.out.println("cost initial: " + costFunction.apply(ratioLookupMap));
 
         while (iterations < maxIter && Scalars.lessEquals(tolerance, costMid)) {
             ++iterations;
@@ -87,8 +104,7 @@ import ch.ethz.idsc.tensor.Scalars;
             StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterations));
         }
 
-        costEnd = costFunction.apply(ratioLookupMap);
-        System.out.println("diffEnd: " + costEnd);
+        System.out.println("cost End: " + costFunction.apply(ratioLookupMap));
 
     }
 
@@ -151,7 +167,7 @@ import ch.ethz.idsc.tensor.Scalars;
 
             // DEBUGGING
             /** DEBUGGING every 1000 trips, export cost map */
-            if (tripCount % 1000 == 0) {
+            if (tripCount % 100 == 0) {
                 StaticHelper.exportRatioMap(ratioLookupMap, Integer.toString(tripCount));
             }
             // DEBUGGING END
