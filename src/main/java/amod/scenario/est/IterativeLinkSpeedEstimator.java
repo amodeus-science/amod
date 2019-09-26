@@ -58,7 +58,7 @@ public class IterativeLinkSpeedEstimator {
                 forEach(tt -> trips.add(tt));
         System.out.println("Number of trips: " + trips.size());
 
-        new CongestionMatchIterative(network, db, processingDir, lsData, trips, maxIter, //
+        new FindCongestionIterative(network, db, processingDir, lsData, trips, maxIter, //
                 tolerance, epsilon1, epsilon2, random, dt, m -> Cost.max(m));
 
         /** final export */

@@ -23,7 +23,7 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 
-/* package */ class CongestionMatchIterative {
+/* package */ class FindCongestionIterative {
 
     // --
     private final Map<TaxiTrip, Scalar> ratioLookupMap = new HashMap<>();
@@ -46,7 +46,7 @@ import ch.ethz.idsc.tensor.Scalars;
     private final Random random;
     private final int dt;
 
-    public CongestionMatchIterative(Network network, MatsimAmodeusDatabase db, File processingDir, //
+    public FindCongestionIterative(Network network, MatsimAmodeusDatabase db, File processingDir, //
             LinkSpeedDataContainer lsData, List<TaxiTrip> allTrips, //
             int maxIter, Scalar tol, Scalar epsilon1, Scalar epsilon2, Random random, int dt, //
             Function<Map<TaxiTrip, Scalar>, Scalar> costFunction) {
@@ -62,14 +62,11 @@ import ch.ethz.idsc.tensor.Scalars;
         int iterations = 0;
 
         /** export the initial distribution of ratios */
-        // DEBUGGING
         Collections.shuffle(allTrips, random);
-        int count = 0;
         // ShortestDurationCalculator calc = new ShortestDurationCalculator(network, db);
-
         LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
         ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
-
+        int count = 0;
         for (TaxiTrip trip : allTrips) {
             ++count;
             if (count % 100 == 0)
@@ -80,8 +77,8 @@ import ch.ethz.idsc.tensor.Scalars;
             ratioSortedMap.put(pathDurationratio.subtract(RealScalar.ONE).abs(), trip);
         }
         StaticHelper.exportRatioMap(ratioLookupMap, "Initial");
-        System.exit(1);
-        // DEBUGGING END
+
+
 
         while (iterations < maxIter && Scalars.lessEquals(tolerance, costMid)) {
             ++iterations;

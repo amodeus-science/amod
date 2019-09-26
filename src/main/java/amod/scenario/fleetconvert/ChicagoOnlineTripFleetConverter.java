@@ -29,7 +29,7 @@ public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
     @Override
     public void setFilters() {
         /** trips outside the range [10[s],3[h]] are removed */
-        primaryFilter.addFilter(new TripDurationFilter(Quantity.of(10, SI.SECOND), Quantity.of(10800, SI.SECOND)));
+        primaryFilter.addFilter(new TripDurationFilter(Quantity.of(60, SI.SECOND), Quantity.of(10800, SI.SECOND)));
 
         /** trips which end after the maximum end time are rejected */
         primaryFilter.addFilter(new TripEndTimeFilter(ScenarioConstants.maxEndTime));

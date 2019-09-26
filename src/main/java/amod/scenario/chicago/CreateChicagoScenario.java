@@ -64,6 +64,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         File destinDir = new File(workingDir, "CreatedScenario");
         Objects.requireNonNull(finalTripsFile);
 
+        System.out.println("The final trips file is: ");
         System.out.println(finalTripsFile.getAbsolutePath());
 
         // this is the old LP-based code
