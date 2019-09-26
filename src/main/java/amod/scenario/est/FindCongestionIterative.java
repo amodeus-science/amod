@@ -19,6 +19,7 @@ import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.ShortestDurationCalculator;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -26,12 +27,11 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
 /* package */ class FindCongestionIterative {
 
-    // --
-    private final Map<TaxiTrip, Scalar> ratioLookupMap = new HashMap<>();
-    private final NavigableMap<Scalar, TaxiTrip> ratioSortedMap = new TreeMap<>();
+    private final TripComparisonMaintainer tripMaintainer;
+
     /** These diff values should converge to 1 */
     public Scalar costMid = RealScalar.of(100); // any high enough number ok as initialization
-    // public final Scalar costEnd;
+
     /** settings and data */
     private final Scalar tolerance;
     private final Network network;
@@ -63,39 +63,14 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         int iterations = 0;
 
         /** export the initial distribution of ratios */
-        Collections.shuffle(allTrips, random);
-        ShortestDurationCalculator calc = new ShortestDurationCalculator(network, db);
-        // LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
-        // ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
-        int count = 0;
-        for (TaxiTrip trip : allTrips) {
-            ++count;
-            if (count % 100 == 0)
-                System.out.println("Freespeed length calculation: " + count);
-            DurationCompare compare = new DurationCompare(trip, calc);
-            Scalar pathDurationratio = compare.nwPathDurationRatio;
-            ratioLookupMap.put(trip, pathDurationratio);
-            ratioSortedMap.put(pathDurationratio.subtract(RealScalar.ONE).abs(), trip);
-
-            //
-            // if(Scalars.lessEquals(compare.pathTime, Quantity.of(10, "s"))){
-            // System.err.println("Now at trip " + trip.localId);
-            // System.err.println("Now at trip " + trip.pickupLoc);
-            // System.err.println("Now at trip " + trip.dropoffLoc);
-            // System.err.println("compare.path");
-            // compare.path.links.forEach(l->System.err.println(l.getId().toString()));
-            // System.err.println("compare.pathDist " + compare.pathDist);
-            // System.err.println("compare.nwPathDurationRatio " + compare.nwPathDurationRatio);
-            // System.err.println("compare.nwPathDurationRatio " + compare.nwPathDurationRatio);
-            // }
-
-        }
+        Collections.shuffle(allTrips, random); // <-- necessary? TODO
+        this.tripMaintainer = new TripComparisonMaintainer(allTrips, network, db);
 
         /** export initial distribution */
-        StaticHelper.exportRatioMap(ratioLookupMap, "Initial");
+        StaticHelper.exportRatioMap(tripMaintainer.getLookupMap(), "Initial");
 
         /** show initial score */
-        System.out.println("cost initial: " + costFunction.apply(ratioLookupMap));
+        System.out.println("cost initial: " + costFunction.apply(tripMaintainer.getLookupMap()));
 
         while (iterations < maxIter && Scalars.lessEquals(tolerance, costMid)) {
             ++iterations;
@@ -104,7 +79,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterations));
         }
 
-        System.out.println("cost End: " + costFunction.apply(ratioLookupMap));
+        System.out.println("cost End: " + costFunction.apply(tripMaintainer.getLookupMap()));
 
     }
 
@@ -119,29 +94,47 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             /** decide if new random trip or worst of existing trips */
             Scalar randomS = RealScalar.of(random.nextDouble());
             TaxiTrip trip = null;
-            if (Scalars.lessEquals(randomS, epsilon2) || ratioSortedMap.size() == 0) { // take next random trip
+            if (Scalars.lessEquals(randomS, epsilon2)) { // take next random trip
                 trip = allTrips.get(tripCount);
                 ++tripCount;
             } else { // take worst of existing trips
-                trip = ratioSortedMap.lastEntry().getValue();
+                trip = tripMaintainer.getWorst();
+                System.out.println("reselecting " + trip.localId);
             }
 
             /** create the shortest duration calculator using the linkSpeed data,
              * must be done again to take into account newest updates */
-            LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
-            ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
+            DurationCompare compare = getPathDurationRatio(trip);
+            Scalar pathDurationratio = compare.nwPathDurationRatio;
 
-            /** comupte ratio of network path and trip duration f */
-            DurationCompare comp = new DurationCompare(trip, calc);
-            Scalar pathDurationratio = comp.nwPathDurationRatio;
-            ratioLookupMap.put(trip, pathDurationratio);
-            ratioSortedMap.put(pathDurationratio.subtract(RealScalar.ONE).abs(), trip);
+            Scalar ratioBefore = pathDurationratio;
+
             /** rescale factor such that epsilon in [0,1] maps to [f,1] */
             Scalar rescaleFactor = RealScalar.ONE.subtract(//
                     (RealScalar.ONE.subtract(pathDurationratio)).multiply(epsilon1));
 
             /** rescale all links */
-            ApplyScaling.to(lsData, trip, comp.path, rescaleFactor, dt);
+            ApplyScaling.to(lsData, trip, compare.path, rescaleFactor, dt);
+
+            compare = getPathDurationRatio(trip);
+            pathDurationratio = compare.nwPathDurationRatio;
+
+            if (!ratioDidImprove(ratioBefore, pathDurationratio)) {
+                // if(true){
+                System.err.println("trip:        " + trip.localId);
+                System.err.println("ratioBefore: " + ratioBefore);
+                System.err.println("ratioAfter:  " + pathDurationratio);
+                System.err.println("Now at trip " + trip.localId);
+                System.err.println("Now at trip " + trip.pickupLoc);
+                System.err.println("Now at trip " + trip.dropoffLoc);
+                System.err.println("compare.path");
+                compare.path.links.forEach(l -> System.err.println(l.getId().toString()));
+                System.err.println("compare.pathDist " + compare.pathDist);
+                System.err.println("compare.duration " + compare.duration);
+                System.err.println("compare.pathTime " + compare.pathTime);
+            }
+
+            tripMaintainer.update(trip, pathDurationratio);
 
             // // DEBUGGING
             // {
@@ -157,10 +150,12 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             // // DEUBBING END
 
             /** assess every 20 trips if ok */
-            if (tripCount % 50 == 0) {
-                costMid = costFunction.apply(ratioLookupMap);
-                System.out.println("trip: " + tripCount + " / " + allTrips.size());
-                System.out.println("cost: " + costMid);
+            if (tripCount % 10 == 0) {
+                costMid = costFunction.apply(tripMaintainer.getLookupMap());
+                System.out.println("trip:       " + tripCount + " / " + allTrips.size());
+                System.out.println("cost:       " + costMid);
+                System.out.println("worst cost: " + tripMaintainer.getWorstCost());
+                System.out.println("worst trip: " + tripMaintainer.getWorst().localId);
                 if (Scalars.lessEquals(costMid, tolerance))
                     break;
             }
@@ -168,10 +163,29 @@ import ch.ethz.idsc.tensor.qty.Quantity;
             // DEBUGGING
             /** DEBUGGING every 1000 trips, export cost map */
             if (tripCount % 100 == 0) {
-                StaticHelper.exportRatioMap(ratioLookupMap, Integer.toString(tripCount));
+                StaticHelper.exportRatioMap(tripMaintainer.getLookupMap(), Integer.toString(tripCount));
             }
             // DEBUGGING END
+
+            System.out.println("----");
+
         }
+    }
+
+    private DurationCompare getPathDurationRatio(TaxiTrip trip) {
+        /** create the shortest duration calculator using the linkSpeed data,
+         * must be done again to take into account newest updates */
+        LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
+        ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
+        /** comupte ratio of network path and trip duration f */
+        DurationCompare comp = new DurationCompare(trip, calc);
+        return comp;
+    }
+
+    private boolean ratioDidImprove(Scalar ratioBefore, Scalar ratioAfter) {
+        Scalar s1 = ratioBefore.subtract(RealScalar.ONE).abs();
+        Scalar s2 = ratioAfter.subtract(RealScalar.ONE).abs();
+        return Scalars.lessThan(s2, s1);
     }
 
 }
