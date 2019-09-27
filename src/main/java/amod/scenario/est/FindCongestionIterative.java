@@ -164,7 +164,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
             // DEBUGGING
             /** DEBUGGING every 1000 trips, export cost map */
-            if (tripCount % 100 == 0) {
+            if (tripCount % 500 == 0) {
                 StaticHelper.exportRatioMap(tripMaintainer.getLookupMap(), Integer.toString(tripCount));
             }
             // DEBUGGING END

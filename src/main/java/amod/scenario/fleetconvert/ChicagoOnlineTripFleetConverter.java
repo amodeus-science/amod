@@ -29,14 +29,14 @@ public class ChicagoOnlineTripFleetConverter extends TripFleetConverter {
     @Override
     public void setFilters() {
         /** trips outside the range [10[s],3[h]] are removed */
-        primaryFilter.addFilter(new TripDurationFilter(Quantity.of(60, SI.SECOND), Quantity.of(10800, SI.SECOND)));
+        primaryFilter.addFilter(new TripDurationFilter(Quantity.of(150, SI.SECOND), Quantity.of(10800, SI.SECOND)));
 
         /** trips which end after the maximum end time are rejected */
         primaryFilter.addFilter(new TripEndTimeFilter(ScenarioConstants.maxEndTime));
 
         /** removes a percentage of trips randomly, only used for debugging, for full
          * scale a value > 1.0 is used in the second argument. */
-        primaryFilter.addFilter(new RandomRemoverFilter(new Random(123), 0.2));
+        primaryFilter.addFilter(new RandomRemoverFilter(new Random(123), 1.5));
 
         // TODO add this again if necessary, otherwise remove eventually and delete classes...
         /** trips which are only explainable with speeds well above 85 miles/hour are removed */
