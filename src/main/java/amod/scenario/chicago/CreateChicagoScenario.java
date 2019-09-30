@@ -103,7 +103,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
         File processingdir = new File(workingDir, "Scenario");
         if (processingdir.isDirectory())
-            DeleteDirectory.of(processingdir, 2, 21);
+            DeleteDirectory.of(processingdir, 2, 25);
         if (!processingdir.isDirectory())
             processingdir.mkdir();
         CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
