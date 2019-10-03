@@ -15,8 +15,6 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.red.Mean;
 
 /* package */ enum ApplyScaling {
     ;
@@ -28,7 +26,7 @@ import ch.ethz.idsc.tensor.red.Mean;
 
         for (Link link : path.links) {
             /** get link properties */
-            int linkId = LinkIndex.fromLink(link);
+            String linkId = LinkIndex.fromLink(link);
             double freeSpeed = link.getFreespeed();
             LinkSpeedTimeSeries lsTime = lsData.getLinkSet().get(linkId);
 
