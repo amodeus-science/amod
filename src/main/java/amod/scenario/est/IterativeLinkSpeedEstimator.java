@@ -47,9 +47,10 @@ public class IterativeLinkSpeedEstimator {
         GlobalAssert.that(configFile.exists());
         Config configFull = ConfigUtils.loadConfig(configFile.toString());
         Network network = NetworkLoader.fromNetworkFile(new File(processingDir, configFull.network().getInputFile()));
-        MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
+        MatsimAmodeusDatabase db = //
+                MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
 
-        /** create linkspeeddatacontainer */
+        /** create link speed data container */
         LinkSpeedDataContainer lsData = new LinkSpeedDataContainer();
 
         /** load initial trips */
@@ -59,7 +60,7 @@ public class IterativeLinkSpeedEstimator {
         System.out.println("Number of trips: " + trips.size());
 
         new FindCongestionIterative(network, db, processingDir, lsData, trips, maxIter, //
-                tolerance, epsilon1, epsilon2, random, dt, m -> Cost.max(m));
+                tolerance, epsilon1, epsilon2, random, dt, m -> Cost.max(m),trips.size());
 
         /** final export */
         StaticHelper.export(processingDir, lsData, "");

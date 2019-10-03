@@ -2,9 +2,7 @@
 package amod.scenario.est;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.matsim.api.core.v01.network.Link;
@@ -20,11 +18,11 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.red.Mean;
 
-/* package */ class ApplyScaling {
+/* package */ enum ApplyScaling {
+    ;
 
-    private Map<Integer,Double> increaseMap = new HashMap<>();
 
-    public void to(LinkSpeedDataContainer lsData, TaxiTrip trip, Path path, //
+    public static void to(LinkSpeedDataContainer lsData, TaxiTrip trip, Path path, //
             Scalar rescalefactor, int dt) {
         int tripStart = StaticHelper.startTime(trip);
         int tripEnd = StaticHelper.endTime(trip);
@@ -70,25 +68,7 @@ import ch.ethz.idsc.tensor.red.Mean;
 
                 // NOW
                 lsTime.resetSpeed(time, newSpeed);
-                if (newSpeed > freeSpeed) {
-                    increaseMap.put(linkId, newSpeed/freeSpeed);
-                    // System.err.println("Increased link speed above free speed: ");
-                    // System.err.println(newSpeed + " > " + freeSpeed);
-                }
-                // BEFORE
-                // if (newSpeed < freeSpeed) {
-                // lsTime.resetSpeed(time, newSpeed);
-                // } else {
-                // lsTime.resetSpeed(time, freeSpeed);
-                // }
             }
         }
-    }
-    
-    public void printIncreaseMap(){
-        increaseMap.entrySet().forEach(e->{
-            System.out.println(e.getKey() + ": " +  e.getValue());
-        });
-        
     }
 }
