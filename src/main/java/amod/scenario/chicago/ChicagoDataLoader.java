@@ -23,16 +23,16 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
         return from(props, dir, entryLimit);
     }
 
-    public static File from(String propertiesName, File dir) throws Exception {
-        GlobalAssert.that(dir.isDirectory());
-        return from(new File(dir, propertiesName), dir);
-    }
-
     public static File from(File properties, File dir) throws Exception {
         GlobalAssert.that(properties.isFile());
         Properties props = new Properties();
         props.load(new FileInputStream(properties));
         return from(props, dir, Integer.valueOf(props.getProperty("maxPopulationSize")));
+    }
+
+    public static File from(String propertiesName, File dir) throws Exception {
+        GlobalAssert.that(dir.isDirectory());
+        return from(new File(dir, propertiesName), dir);
     }
 
     public static File from(Properties properties, File dir, int entryLimit) {
@@ -55,28 +55,18 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
         String date1 = ScenarioConstants.outFormat.format(date);
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.add(Calendar.HOUR, 30);
+        cal.add(Calendar.HOUR, 24);
         String date2 = ScenarioConstants.outFormat.format(cal.getTime());
-        return new URL(properties.get("URL") + "?$where=trip_start_timestamp%20between%20%27" + date1 + //
-                "%27%20and%20%27" + date2 + "%27&$limit=" + entryLimit);
+        String urlString = properties.get("URL") + "?$where=trip_start_timestamp%20between%20%27" + date1 + //
+                "%27%20and%20%27" + date2 + "%27&$limit=" + entryLimit;
+        System.out.println("URLString: " + urlString);
+        return new URL(urlString);
     }
 
     private static File createFile(Properties properties, File dir) {
         GlobalAssert.that(dir.isDirectory());
         String date = properties.getProperty("date").replace("/", "_");
         return new File(dir, "Taxi_Trips_" + date + ".csv");
-    }
-
-    // --
-
-    private static File from(String propertiesName, File dir, int entryLimit) throws Exception {
-        GlobalAssert.that(dir.isDirectory());
-        return from(new File(dir, propertiesName), dir, entryLimit);
-    }
-
-    public static void main(String[] args) throws Exception {
-        from("AmodeusOptions.properties", //
-                new File("C:/Users/joelg/Documents/Studium/ETH/IDSC/TaxiData/Chicago/Chicago"), 100000);
     }
 
 }

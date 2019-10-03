@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.network.Link;
@@ -19,9 +20,12 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.utils.collections.QuadTree;
 
+import amod.scenario.est.DurationCompare;
 import amod.scenario.tripfilter.TaxiTripFilter;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
+import ch.ethz.idsc.amodeus.taxitrip.ExportTaxiTrips;
 import ch.ethz.idsc.amodeus.taxitrip.PersonCreate;
+import ch.ethz.idsc.amodeus.taxitrip.ShortestDurationCalculator;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTripParse;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
@@ -29,6 +33,8 @@ import ch.ethz.idsc.amodeus.util.CsvReader;
 import ch.ethz.idsc.amodeus.util.geo.ClosestLinkSelect;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalars;
 
 public class TripPopulationCreator {
 
@@ -38,9 +44,12 @@ public class TripPopulationCreator {
     private final AmodeusTimeConvert timeConvert;
     private final Config config;
     private final Network network;
+    private final MatsimAmodeusDatabase db;
     private final File populationFile;
     private final File populationFileGz;
     private final TaxiTripFilter finalFilters;
+    private final TaxiDistanceCalculator distCalc;
+    private File finalTripFile;
 
     public TripPopulationCreator(File processingDir, Config config, Network network, //
             MatsimAmodeusDatabase db, DateTimeFormatter dateFormat, QuadTree<Link> qt, //
@@ -50,7 +59,9 @@ public class TripPopulationCreator {
         this.timeConvert = timeConvert;
         this.config = config;
         this.network = network;
+        this.db = db;
         this.finalFilters = finalFilters;
+        this.distCalc = new TaxiDistanceCalculator(processingDir, network, linkSelect);
         populationFile = new File(processingDir, fileName);
         populationFileGz = new File(processingDir, fileName + ".gz");
     }
@@ -73,19 +84,24 @@ public class TripPopulationCreator {
         });
 
         // filter the stream
+        List<TaxiTrip> finalFilteredTrips = new ArrayList<>();
         Stream<TaxiTrip> filtered = finalFilters.filterStream(trips.stream());
 
         // create persons
-        filtered.forEach(tt -> {
-            Person person = PersonCreate.fromTrip(tt, tt.localId, populationFactory, //
+        filtered.forEach(taxiTrip -> {
+            Person person = PersonCreate.fromTrip(taxiTrip, taxiTrip.localId, populationFactory, //
                     linkSelect, simulationDate, timeConvert);
             population.addPerson(person);
+            distCalc.addTrip(taxiTrip);
+            finalFilteredTrips.add(taxiTrip);
         });
 
-        // Validity Check
-        GlobalAssert.that(PopulationHelper.checkAllActivitiesInNetwork(population, network));
+        // export finally used set of trips
+        finalTripFile = new File(inFile.getAbsolutePath().replace(".csv", "_final.csv"));
+        ExportTaxiTrips.toFile(finalFilteredTrips.stream(), finalTripFile);
 
         // write the modified population to file
+        System.out.println("Population size: " + population.getPersons().size());
         PopulationWriter populationWriter = new PopulationWriter(population);
         populationWriter.write(populationFileGz.toString());
 
@@ -97,5 +113,14 @@ public class TripPopulationCreator {
             System.out.println("INFO successfully created population");
         else
             System.err.println("WARN created population is empty");
+
+        // export taxi trip distance analysis
+        distCalc.exportTotalDistance();
     }
+
+    public File getFinalTripFile() {
+        Objects.requireNonNull(finalTripFile);
+        return finalTripFile;
+    }
+
 }

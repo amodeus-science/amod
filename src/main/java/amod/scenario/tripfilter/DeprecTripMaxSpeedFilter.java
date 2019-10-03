@@ -20,13 +20,14 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class TripMaxSpeedFilter implements Predicate<TaxiTrip> {
+@Deprecated
+public class DeprecTripMaxSpeedFilter implements Predicate<TaxiTrip> {
     private final FastLinkLookup fll;
     private final LeastCostPathCalculator lcpc;
     private final Scalar maxAllowedSpeed;
     private int count = 0;
 
-    public TripMaxSpeedFilter(Network network, MatsimAmodeusDatabase db, Scalar maxAllowedSpeed) {
+    public DeprecTripMaxSpeedFilter(Network network, MatsimAmodeusDatabase db, Scalar maxAllowedSpeed) {
         this.maxAllowedSpeed = maxAllowedSpeed;
         // least cost path calculator
         lcpc = new FastAStarLandmarksFactory()//
@@ -58,8 +59,8 @@ public class TripMaxSpeedFilter implements Predicate<TaxiTrip> {
             ++count;
             // System.out.println("distance: " + distance);
             // System.out.println("duration: " + trip.duration);
-            System.out.println("Total mph removed:      " + count);
-            System.out.println("mph too high:       " + speed.multiply(Quantity.of(2.2369363, "miles *h^-1*s*m^-1")));
+            // System.out.println("Total mph removed: " + count);
+            // System.out.println("mph too high: " + speed.multiply(Quantity.of(2.2369363, "miles *h^-1*s*m^-1")));
             return false;
         }
         return true;

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 import org.matsim.api.core.v01.network.Network;
@@ -13,12 +14,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt2matsim.run.Osm2MultimodalNetwork;
 
-import amod.scenario.Pt2MatsimXML;
-import amod.scenario.ScenarioCreator;
+import amod.scenario.FinishedScenario;
+import amod.scenario.Scenario;
 import amod.scenario.ScenarioLabels;
+import amod.scenario.est.IterativeLinkSpeedEstimator;
 import amod.scenario.fleetconvert.ChicagoOnlineTripFleetConverter;
 import amod.scenario.readers.TaxiTripsReader;
 import amod.scenario.tripfilter.TaxiTripFilter;
+import amod.scenario.tripfilter.TripNetworkFilter;
 import amod.scenario.tripmodif.CharRemovalModifier;
 import amod.scenario.tripmodif.ChicagoOnlineTripBasedModifier;
 import amod.scenario.tripmodif.TripBasedModifier;
@@ -30,15 +33,11 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.AmodeusTimeConvert;
 import ch.ethz.idsc.amodeus.util.OsmLoader;
 import ch.ethz.idsc.amodeus.util.io.CopyFiles;
-import ch.ethz.idsc.amodeus.util.io.LocateUtils;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
+import ch.ethz.idsc.tensor.qty.Quantity;
 
-/* package */ enum CreateChicagoScenario {
-    ;
-
-    private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
-    private static final Random random = new Random(123);
+/* package */ class CreateChicagoScenario {
 
     /** in @param args[0] working directory (empty directory), this main function will create
      * an AMoDeus scenario based on the Chicago taxi dataset available online.
@@ -48,29 +47,37 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
      * @throws Exception */
     public static void main(String[] args) throws Exception {
         File workingDir = new File(args[0]);
-        setup(workingDir);
-        run(workingDir);
+        new CreateChicagoScenario(workingDir);
+    }
+
+    // --
+    private static final AmodeusTimeConvert timeConvert = new AmodeusTimeConvert(ZoneId.of("America/Chicago"));
+    private static final Random random = new Random(123);
+    private final File workingDir;
+    private final File processingDir;
+    private File finalTripsFile;
+
+    private CreateChicagoScenario(File workingDir) throws Exception {
+        this.workingDir = workingDir;
+        ChicagoSetup.in(workingDir);
+        processingDir = run();
+        File destinDir = new File(workingDir, "CreatedScenario");
+        Objects.requireNonNull(finalTripsFile);
+
+        System.out.println("The final trips file is: ");
+        System.out.println(finalTripsFile.getAbsolutePath());
+
+        // this is the old LP-based code
+        // ChicagoLinkSpeeds.compute(processingDir, finalTripsFile);
+        // new code
+        new IterativeLinkSpeedEstimator().compute(processingDir, finalTripsFile);
+
+        FinishedScenario.copyToDir(workingDir.getAbsolutePath(), processingDir.getAbsolutePath(), //
+                destinDir.getAbsolutePath());
         cleanUp(workingDir);
     }
 
-    public static void setup(File workingDir) throws Exception {
-        ChicagoGeoInformation.setup();
-        /** copy relevant files containing settings for scenario generation */
-        File settingsDir = new File(LocateUtils.getSuperFolder(CreateChicagoScenario.class, "amod"), "resources/chicagoScenario");
-        CopyFiles.now(settingsDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
-                Arrays.asList(new String[] { ScenarioLabels.avFile, ScenarioLabels.config, //
-                        ScenarioLabels.pt2MatSettings }),
-                true);
-        /** AmodeusOptions.properties is not replaced as it might be changed by user during
-         * scenario generation process. */
-        if (!new File(workingDir, ScenarioLabels.amodeusFile).exists())
-            CopyFiles.now(settingsDir.getAbsolutePath(), workingDir.getAbsolutePath(), //
-                    Arrays.asList(new String[] { ScenarioLabels.amodeusFile }), false);
-        Pt2MatsimXML.toLocalFileSystem(new File(workingDir, ScenarioLabels.pt2MatSettings), //
-                workingDir.getAbsolutePath());
-    }
-
-    public static void run(File workingDir) throws Exception {
+    private File run() throws Exception {
         // FIXME remove debug loop once done
         boolean debug = true;
 
@@ -96,17 +103,17 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
         File processingdir = new File(workingDir, "Scenario");
         if (processingdir.isDirectory())
-            DeleteDirectory.of(processingdir, 2, 15);
+            DeleteDirectory.of(processingdir, 2, 25);
         if (!processingdir.isDirectory())
             processingdir.mkdir();
         CopyFiles.now(workingDir.getAbsolutePath(), processingdir.getAbsolutePath(), //
                 Arrays.asList(new String[] { "AmodeusOptions.properties", "config_full.xml", //
-                        "network.xml", "network.xml.gz" }));
+                        "network.xml", "network.xml.gz", "LPOptions.properties" }));
         ScenarioOptions scenarioOptions = new ScenarioOptions(processingdir, //
                 ScenarioOptionsBase.getDefault());
-
         LocalDate simulationDate = LocalDateConvert.ofOptions(scenarioOptions.getString("date"));
 
+        //
         File configFile = new File(scenarioOptions.getPreparerConfigName());
         System.out.println(configFile.getAbsolutePath());
         GlobalAssert.that(configFile.exists());
@@ -114,32 +121,28 @@ import ch.ethz.idsc.tensor.io.DeleteDirectory;
         Network network = NetworkLoader.fromNetworkFile(new File(processingdir, configFull.network().getInputFile()));
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, scenarioOptions.getLocationSpec().referenceFrame());
         FastLinkLookup fll = new FastLinkLookup(network, db);
-        System.out.println("Link in nw: " + network.getLinks().size());
 
-        // TODO clean up, offline version still needed?
-        // regular
-        // TaxiTripFilter cleaner = new TaxiTripFilter(new TripsReaderChicago()); //
-        // TripBasedModifier corrector = new TripBasedModifier();
-        // ChicagoTripFleetConverter converter = //
-        // new ChicagoTripFleetConverter(scenarioOptions, network, cleaner, corrector, new CharRemovalModifier("\""));
-
-        // online
+        /** prepare for creation of scenario */
         TaxiTripsReader tripsReader = new OnlineTripsReaderChicago();
-        TaxiTripFilter filter2 = new TaxiTripFilter();
-        TripBasedModifier modifier2 = new ChicagoOnlineTripBasedModifier(random, network, //
+        TaxiTripFilter primaryFilter = new TaxiTripFilter();
+        TripBasedModifier tripModifier = new ChicagoOnlineTripBasedModifier(random, network, //
                 fll, new File(processingdir, "virtualNetworkChicago"));
-        // FIXME add real thing, not null
-        TaxiTripFilter finalFilters = new TaxiTripFilter();
-        // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
+        TaxiTripFilter finalTripFilter = new TaxiTripFilter();
+        /** trips which are faster than the network freeflow speeds would allow are removed */
+        finalTripFilter.addFilter(new TripNetworkFilter(network, db,//
+                Quantity.of(5.5, "m*s^-1"), Quantity.of(3600, "s"), Quantity.of(200, "m")));
 
-        ChicagoOnlineTripFleetConverter converter2 = //
-                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, filter2, modifier2, //
-                        new CharRemovalModifier("\""), finalFilters, tripsReader);
-        ScenarioCreator scenarioCreator = new ScenarioCreator(workingDir, tripFile, //
-                converter2, workingDir, processingdir, simulationDate, timeConvert);
+        // TODO eventually remove, this did not improve the fit.
+        // finalFilters.addFilter(new TripMaxSpeedFilter(network, db, ScenarioConstants.maxAllowedSpeed));
+        ChicagoOnlineTripFleetConverter converter = //
+                new ChicagoOnlineTripFleetConverter(scenarioOptions, network, primaryFilter, tripModifier, //
+                        new CharRemovalModifier("\""), finalTripFilter, tripsReader);
+        finalTripsFile = Scenario.create(workingDir, tripFile, //
+                converter, workingDir, processingdir, simulationDate, timeConvert);
+        return processingdir;
     }
 
-    public static void cleanUp(File workingDir) throws IOException {
+    private static void cleanUp(File workingDir) throws IOException {
         /** delete unneeded files */
         // DeleteDirectory.of(new File(workingDir, "Scenario"), 2, 14);
         // DeleteDirectory.of(new File(workingDir, ScenarioLabels.amodeusFile), 0, 1);

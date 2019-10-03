@@ -11,8 +11,9 @@ public class ChicagoScenarioCreation {
     public void test() throws IOException, Exception {
         File workingDir = MultiFileTools.getDefaultWorkingDirectory();
         StaticHelper.setupTest(workingDir);
-        CreateChicagoScenario.run(workingDir);
         // TODO add some tests, e.g., running the scenario
+        // CreateChicagoScenario.run(workingDir);
+
 
         StaticHelper.cleanUpTest(workingDir);
     }

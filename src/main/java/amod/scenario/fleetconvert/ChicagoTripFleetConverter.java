@@ -26,9 +26,9 @@ public class ChicagoTripFleetConverter extends TripFleetConverter {
     public void setFilters() {
         // TODO trips were redistributed in 15 minutes interval randomly before,
         // add this again if necessary...
-        filter.addFilter(new DeprcTripNetworkFilter(scenarioOptions, network));
-        filter.addFilter(new TripDurationFilter(Quantity.of(0, SI.SECOND), Quantity.of(20000, SI.SECOND)));
-        filter.addFilter(new DeprcTripDistanceFilter(Quantity.of(500, SI.METER), Quantity.of(50000, SI.METER)));
+        primaryFilter.addFilter(new DeprcTripNetworkFilter(scenarioOptions, network));
+        primaryFilter.addFilter(new TripDurationFilter(Quantity.of(0, SI.SECOND), Quantity.of(20000, SI.SECOND)));
+        primaryFilter.addFilter(new DeprcTripDistanceFilter(Quantity.of(500, SI.METER), Quantity.of(50000, SI.METER)));
     }
 
 }

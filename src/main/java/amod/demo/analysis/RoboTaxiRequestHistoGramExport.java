@@ -38,9 +38,7 @@ import ch.ethz.matsim.av.passenger.AVRequest;
         Scalar histoGrambinSize = Scalars.lessThan(RealScalar.ZERO, totalRequestsServed) ? //
                 totalRequestsServed.divide(numberOfRoboTaxis.multiply(RealScalar.of(10))) : RealScalar.ONE;
 
-        Tensor histoGramEntryPairs = BinCounts.of(//
-                requestsPerRoboTaxi, //
-                histoGrambinSize);
+        Tensor histoGramEntryPairs = BinCounts.of(requestsPerRoboTaxi, histoGrambinSize);
 
         try {
             HistogramPlot.of( //
