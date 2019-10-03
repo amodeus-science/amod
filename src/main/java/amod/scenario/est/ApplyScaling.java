@@ -21,7 +21,6 @@ import ch.ethz.idsc.tensor.red.Mean;
 /* package */ enum ApplyScaling {
     ;
 
-
     public static void to(LinkSpeedDataContainer lsData, TaxiTrip trip, Path path, //
             Scalar rescalefactor, int dt) {
         int tripStart = StaticHelper.startTime(trip);
@@ -60,14 +59,14 @@ import ch.ethz.idsc.tensor.red.Mean;
 
             for (int time : lsTime.getRecordedTimes()) {
                 Scalar speedNow = RealScalar.of(freeSpeed);
-                Tensor recorded = lsTime.getSpeedsAt(time);
+                Double recorded = lsTime.getSpeedsAt(time);
                 if (Objects.nonNull(recorded))
-                    speedNow = (Scalar) Mean.of(recorded);
+                    speedNow = RealScalar.of(recorded);
                 Scalar newSpeedS = speedNow.multiply(rescalefactor);
                 double newSpeed = newSpeedS.number().doubleValue();
 
                 // NOW
-                lsTime.resetSpeed(time, newSpeed);
+                lsTime.setSpeed(time, newSpeed);
             }
         }
     }
