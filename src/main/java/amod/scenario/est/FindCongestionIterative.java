@@ -110,7 +110,7 @@ import ch.ethz.idsc.tensor.Scalars;
                     (RealScalar.ONE.subtract(pathDurationratio)).multiply(epsilon1));
 
             /** rescale links to approach desired link speed */
-            ApplyScaling.to(lsData, trip, compare.path, rescaleFactor, dt);
+            ApplyScaling.to(lsData, db, trip, compare.path, rescaleFactor, dt);
 
             compare = getPathDurationRatio(trip);
             pathDurationratio = compare.nwPathDurationRatio;
@@ -161,7 +161,7 @@ import ch.ethz.idsc.tensor.Scalars;
     private DurationCompare getPathDurationRatio(TaxiTrip trip) {
         /** create the shortest duration calculator using the linkSpeed data,
          * must be done again to take into account newest updates */
-        LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
+        LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, db, lsData);
         ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
         /** comupte ratio of network path and trip duration f */
         DurationCompare comp = new DurationCompare(trip, calc);

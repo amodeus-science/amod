@@ -11,6 +11,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import ch.ethz.idsc.amodeus.linkspeed.LinkIndex;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedTimeSeries;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
@@ -19,14 +20,14 @@ import ch.ethz.idsc.tensor.Scalar;
 /* package */ enum ApplyScaling {
     ;
 
-    public static void to(LinkSpeedDataContainer lsData, TaxiTrip trip, Path path, //
-            Scalar rescalefactor, int dt) {
+    public static void to(LinkSpeedDataContainer lsData, MatsimAmodeusDatabase db, //
+            TaxiTrip trip, Path path, Scalar rescalefactor, int dt) {
         int tripStart = StaticHelper.startTime(trip);
         int tripEnd = StaticHelper.endTime(trip);
 
         for (Link link : path.links) {
             /** get link properties */
-            String linkId = LinkIndex.fromLink(link);
+            Integer linkId = LinkIndex.fromLink(db, link);
             double freeSpeed = link.getFreespeed();
             LinkSpeedTimeSeries lsTime = lsData.getLinkSet().get(linkId);
 
