@@ -31,7 +31,7 @@ public class IterativeLinkSpeedEstimator {
      * speed of the algorithm, a value close to 1 may lead to
      * loss of convergence, it is advised o chose slow values for
      * epsilon. No changes are applied for epsilon == 0. */
-    private final Scalar epsilon1 = RealScalar.of(0.95);
+    private final Scalar epsilon1 = RealScalar.of(0.5);
     /** probability of taking a new trip */
     private final Scalar epsilon2 = RealScalar.of(0.8);
     private final Random random = new Random(123);

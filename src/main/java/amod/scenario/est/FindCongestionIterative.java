@@ -150,7 +150,7 @@ import ch.ethz.idsc.tensor.Scalars;
             // DEBUGGING END
 
             /** intermediate export */
-            if (iterationCount % 10000 == 0) {
+            if (iterationCount % 30000 == 0) {
                 StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterationCount));
             }
         }

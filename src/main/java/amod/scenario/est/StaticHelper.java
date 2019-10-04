@@ -7,7 +7,7 @@ import java.util.Map;
 
 import ch.ethz.idsc.amodeus.analysis.plot.ColorDataAmodeus;
 import ch.ethz.idsc.amodeus.analysis.plot.DiagramSettings;
-import ch.ethz.idsc.amodeus.analysis.plot.HistogramPlot;
+import ch.ethz.idsc.amodeus.analysis.plot.hist.HistogramPlot;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.create.LinkSpeedsExport;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
@@ -69,24 +69,16 @@ import ch.ethz.idsc.tensor.pdf.BinCounts;
         String xLabel = "networkspeed / duration";
         String yLabel = "% of requests";
         ColorDataIndexed colorDataIndexed = ColorDataAmodeus.indexed("097");
-        Scalar totalRequests = RationalScalar.of(ratios.length(), 1);
-        Tensor binValues = BinCounts.of(ratios, RealScalar.of(0.01)).map(s -> s.divide(totalRequests));
         try {
             HistogramPlot.of( //
-                    binValues, relativeDirectory, //
-                    fileName, title, 0.01, yLabel, //
-                    xLabel, DiagramSettings.WIDTH, DiagramSettings.HEIGHT, colorDataIndexed);
+                    ratios, RealScalar.of(0.02), true, relativeDirectory, //
+                    fileName, title, yLabel, //
+                    xLabel, DiagramSettings.WIDTH, DiagramSettings.HEIGHT, colorDataIndexed,//
+                    Tensors.vector(0,100));
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-    }
-
-    public static void main(String[] args) {
-        File relativeDirectory = new File("/home/clruch/data/TaxiComparison_ChicagoScCr/Scenario");
-        Tensor ratios = Tensors.vector(0.5, 0.3, 0.2, 0.9, 1.0, 1.0, 0.8, 0.7, 0.8, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1);
-        plotRatioMap(relativeDirectory, ratios, "jagaharahu");
 
     }
 
