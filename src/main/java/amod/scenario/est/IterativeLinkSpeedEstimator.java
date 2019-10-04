@@ -33,7 +33,7 @@ public class IterativeLinkSpeedEstimator {
      * epsilon. No changes are applied for epsilon == 0. */
     private final Scalar epsilon1 = RealScalar.of(0.95);
     /** probability of taking a new trip */
-    private final Scalar epsilon2 = RealScalar.of(0.2);
+    private final Scalar epsilon2 = RealScalar.of(0.8);
     private final Random random = new Random(123);
     private final int dt = 450;
 

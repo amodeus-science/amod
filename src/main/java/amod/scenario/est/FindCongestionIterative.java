@@ -66,9 +66,6 @@ import ch.ethz.idsc.tensor.Scalars;
         System.out.println("Cost initial: " + randomTrips.getRatioCost());
 
         runTripIterations();
-        /** intermediate export */ // TODO integrate again somewhere?
-        // StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterations));
-        // }
 
         System.out.println("Cost End: " + randomTrips.getRatioCost());
     }
@@ -152,10 +149,12 @@ import ch.ethz.idsc.tensor.Scalars;
             }
             // DEBUGGING END
 
-            System.out.println("----");
-
+            /** intermediate export */
+            if (iterationCount % 10000 == 0) {
+                StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterationCount));
+            }
         }
-
+        System.out.println("---- " + iterationCount + " ----");
     }
 
     private DurationCompare getPathDurationRatio(TaxiTrip trip) {
