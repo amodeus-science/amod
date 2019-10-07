@@ -74,7 +74,7 @@ import ch.ethz.idsc.tensor.pdf.BinCounts;
                     ratios, RealScalar.of(0.02), true, relativeDirectory, //
                     fileName, title, yLabel, //
                     xLabel, DiagramSettings.WIDTH, DiagramSettings.HEIGHT, colorDataIndexed,//
-                    Tensors.vector(0,100));
+                    Tensors.vector(0,20));
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

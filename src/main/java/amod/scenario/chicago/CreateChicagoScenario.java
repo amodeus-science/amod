@@ -98,7 +98,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
         if (!debug) {
             tripFile = ChicagoDataLoader.from(ScenarioLabels.amodeusFile, workingDir);
         } else {
-            tripFile = new File("/home/clruch/data/TaxiComparison_ChicagoScCr/Taxi_Trips_2019_07_19.csv");
+            tripFile = new File(workingDir, "/Taxi_Trips_2019_07_19.csv");
         }
 
         File processingdir = new File(workingDir, "Scenario");
