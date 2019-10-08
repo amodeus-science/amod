@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.function.Function;
 
-import org.hibernate.validator.constraints.Mod11Check.ProcessingDirection;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
@@ -18,7 +17,6 @@ import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
-import ch.ethz.idsc.tensor.Tensor;
 
 /* package */ class FindCongestionIterative {
 
@@ -68,9 +66,6 @@ import ch.ethz.idsc.tensor.Tensor;
         System.out.println("Cost initial: " + randomTrips.getRatioCost());
 
         runTripIterations();
-        /** intermediate export */ // TODO integrate again somewhere?
-        // StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterations));
-        // }
 
         System.out.println("Cost End: " + randomTrips.getRatioCost());
     }
@@ -112,7 +107,7 @@ import ch.ethz.idsc.tensor.Tensor;
                     (RealScalar.ONE.subtract(pathDurationratio)).multiply(epsilon1));
 
             /** rescale links to approach desired link speed */
-            ApplyScaling.to(lsData, trip, compare.path, rescaleFactor, dt);
+            ApplyScaling.to(lsData, db, trip, compare.path, rescaleFactor, dt);
 
             compare = getPathDurationRatio(trip);
             pathDurationratio = compare.nwPathDurationRatio;
@@ -154,16 +149,18 @@ import ch.ethz.idsc.tensor.Tensor;
             }
             // DEBUGGING END
 
-            System.out.println("----");
-
+            /** intermediate export */
+            if (iterationCount % 30000 == 0) {
+                StaticHelper.export(processingDir, lsData, "_" + Integer.toString(iterationCount));
+            }
         }
-
+        System.out.println("---- " + iterationCount + " ----");
     }
 
     private DurationCompare getPathDurationRatio(TaxiTrip trip) {
         /** create the shortest duration calculator using the linkSpeed data,
          * must be done again to take into account newest updates */
-        LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, lsData);
+        LeastCostPathCalculator lcpc = LinkSpeedLeastPathCalculator.from(network, db, lsData);
         ShortestDurationCalculator calc = new ShortestDurationCalculator(lcpc, network, db);
         /** comupte ratio of network path and trip duration f */
         DurationCompare comp = new DurationCompare(trip, calc);

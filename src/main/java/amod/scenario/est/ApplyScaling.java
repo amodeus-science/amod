@@ -11,30 +11,29 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import ch.ethz.idsc.amodeus.linkspeed.LinkIndex;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedTimeSeries;
+import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.taxitrip.TaxiTrip;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.red.Mean;
 
 /* package */ enum ApplyScaling {
     ;
 
+    private static boolean allowIncrease = false;
 
-    public static void to(LinkSpeedDataContainer lsData, TaxiTrip trip, Path path, //
-            Scalar rescalefactor, int dt) {
+    public static void to(LinkSpeedDataContainer lsData, MatsimAmodeusDatabase db, //
+            TaxiTrip trip, Path path, Scalar rescalefactor, int dt) {
         int tripStart = StaticHelper.startTime(trip);
         int tripEnd = StaticHelper.endTime(trip);
 
         for (Link link : path.links) {
             /** get link properties */
-            int linkId = LinkIndex.fromLink(link);
+            Integer linkId = LinkIndex.fromLink(db, link);
             double freeSpeed = link.getFreespeed();
             LinkSpeedTimeSeries lsTime = lsData.getLinkSet().get(linkId);
 
-            /** if no recordings are present, initialize with free speed for
-             * duration of trip */
+            /** if no recordings are present, initialize with free speed for duration of trip */
             if (Objects.isNull(lsTime)) {
                 // for (int time = tripStart; time <= tripEnd; time += dt) {
                 // lsData.addData(linkId, time, freeSpeed);
@@ -60,14 +59,15 @@ import ch.ethz.idsc.tensor.red.Mean;
 
             for (int time : lsTime.getRecordedTimes()) {
                 Scalar speedNow = RealScalar.of(freeSpeed);
-                Tensor recorded = lsTime.getSpeedsAt(time);
+                Double recorded = lsTime.getSpeedsAt(time);
                 if (Objects.nonNull(recorded))
-                    speedNow = (Scalar) Mean.of(recorded);
+                    speedNow = RealScalar.of(recorded);
                 Scalar newSpeedS = speedNow.multiply(rescalefactor);
                 double newSpeed = newSpeedS.number().doubleValue();
 
                 // NOW
-                lsTime.resetSpeed(time, newSpeed);
+                if (newSpeed <= link.getFreespeed() || allowIncrease)
+                    lsTime.setSpeed(time, newSpeed);
             }
         }
     }
