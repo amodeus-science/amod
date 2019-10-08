@@ -20,6 +20,8 @@ import ch.ethz.idsc.tensor.Scalar;
 /* package */ enum ApplyScaling {
     ;
 
+    private static boolean allowIncrease = false;
+
     public static void to(LinkSpeedDataContainer lsData, MatsimAmodeusDatabase db, //
             TaxiTrip trip, Path path, Scalar rescalefactor, int dt) {
         int tripStart = StaticHelper.startTime(trip);
@@ -31,8 +33,7 @@ import ch.ethz.idsc.tensor.Scalar;
             double freeSpeed = link.getFreespeed();
             LinkSpeedTimeSeries lsTime = lsData.getLinkSet().get(linkId);
 
-            /** if no recordings are present, initialize with free speed for
-             * duration of trip */
+            /** if no recordings are present, initialize with free speed for duration of trip */
             if (Objects.isNull(lsTime)) {
                 // for (int time = tripStart; time <= tripEnd; time += dt) {
                 // lsData.addData(linkId, time, freeSpeed);
@@ -65,7 +66,8 @@ import ch.ethz.idsc.tensor.Scalar;
                 double newSpeed = newSpeedS.number().doubleValue();
 
                 // NOW
-                lsTime.setSpeed(time, newSpeed);
+                if (newSpeed <= link.getFreespeed() || allowIncrease)
+                    lsTime.setSpeed(time, newSpeed);
             }
         }
     }

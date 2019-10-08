@@ -57,7 +57,7 @@ import ch.ethz.idsc.tensor.pdf.BinCounts;
         Tensor all = Tensors.empty();
         ratioLookupMap.values().forEach(s -> all.append(s));
         try {
-            SaveFormats.MATHEMATICA.save(all, new File("/home/clruch/Downloads/"), "diff" + append);
+            SaveFormats.MATHEMATICA.save(all, relativeDirectory, "diff" + append);
         } catch (IOException e) {
             e.printStackTrace();
         }
