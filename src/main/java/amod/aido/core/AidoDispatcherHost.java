@@ -24,7 +24,7 @@ import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.config.operator.OperatorConfig;
 import ch.ethz.matsim.av.dispatcher.AVDispatcher;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
@@ -45,16 +45,16 @@ public class AidoDispatcherHost extends RebalancingDispatcher {
     // ---
     private AidoScoreCompiler aidoScoreCompiler;
 
-    protected AidoDispatcherHost(Network network, Config config, AVDispatcherConfig avDispatcherConfig, TravelTime travelTime,
+    protected AidoDispatcherHost(Network network, Config config, OperatorConfig operatorConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager, //
             StringSocket clientSocket, int numReqTot, //
             MatsimAmodeusDatabase db) {
-        super(config, avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager, db);
+        super(config, operatorConfig, travelTime, parallelLeastCostPathCalculator, eventsManager, db);
         this.db = db;
         this.clientSocket = Objects.requireNonNull(clientSocket);
         this.numReqTot = numReqTot;
         this.fastLinkLookup = new FastLinkLookup(network, db);
-        SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
+        SafeConfig safeConfig = SafeConfig.wrap(operatorConfig.getDispatcherConfig());
         this.dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         aidoReqComp = new AidoRequestCompiler(db);
         aidoRobTaxComp = new AidoRoboTaxiCompiler(db);
@@ -116,10 +116,6 @@ public class AidoDispatcherHost extends RebalancingDispatcher {
         private EventsManager eventsManager;
 
         @Inject
-        @Named(AVModule.AV_MODE)
-        private Network network;
-
-        @Inject
         private Config config;
 
         @Inject
@@ -132,8 +128,8 @@ public class AidoDispatcherHost extends RebalancingDispatcher {
         private MatsimAmodeusDatabase db;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
-            return new AidoDispatcherHost(network, config, avconfig, travelTime, router, eventsManager, //
+        public AVDispatcher createDispatcher(OperatorConfig operatorConfig, AVRouter router, Network network) {
+            return new AidoDispatcherHost(network, config, operatorConfig, travelTime, router, eventsManager, //
                     stringSocket, numReqTot, db);
         }
     }

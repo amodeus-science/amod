@@ -19,10 +19,8 @@ import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.amodeus.prep.PopulationPreparer;
 import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.amodeus.util.io.ProvideAVConfig;
-import ch.ethz.matsim.av.config.AVConfig;
-import ch.ethz.matsim.av.config.AVGeneratorConfig;
-import ch.ethz.matsim.av.framework.AVConfigGroup;
+import ch.ethz.matsim.av.config.AVConfigGroup;
+import ch.ethz.matsim.av.config.operator.GeneratorConfig;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of
  * network, population, creation of virtualNetwork and travelData objects. As an example
@@ -57,8 +55,7 @@ public enum ScenarioPreparer {
         AVConfigGroup avConfigGroup = new AVConfigGroup();
         Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName(), avConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        AVConfig avConfig = ProvideAVConfig.with(config, avConfigGroup);
-        AVGeneratorConfig genConfig = avConfig.getOperatorConfigs().iterator().next().getGeneratorConfig();
+        GeneratorConfig genConfig = avConfigGroup.getOperatorConfigs().values().iterator().next().getGeneratorConfig();
         int numRt = (int) genConfig.getNumberOfVehicles();
         System.out.println("NumberOfVehicles=" + numRt);
 

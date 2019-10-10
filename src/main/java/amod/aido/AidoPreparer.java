@@ -22,12 +22,10 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
-import ch.ethz.idsc.amodeus.util.io.ProvideAVConfig;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.matsim.av.config.AVConfig;
-import ch.ethz.matsim.av.config.AVGeneratorConfig;
-import ch.ethz.matsim.av.framework.AVConfigGroup;
+import ch.ethz.matsim.av.config.AVConfigGroup;
+import ch.ethz.matsim.av.config.operator.GeneratorConfig;
 
 public class AidoPreparer {
 
@@ -55,8 +53,7 @@ public class AidoPreparer {
         config = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName(), avConfigGroup);
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        AVConfig avConfig = ProvideAVConfig.with(config, avConfigGroup);
-        AVGeneratorConfig genConfig = avConfig.getOperatorConfigs().iterator().next().getGeneratorConfig();
+        GeneratorConfig genConfig = avConfigGroup.getOperatorConfigs().values().iterator().next().getGeneratorConfig();
         numRt = (int) genConfig.getNumberOfVehicles();
         System.out.println("aidoprep NumberOfVehicles=" + numRt);
 
