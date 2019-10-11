@@ -22,7 +22,7 @@ import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.dispatcher.util.DrivebyRequestStopper;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.config.operator.OperatorConfig;
 import ch.ethz.matsim.av.dispatcher.AVDispatcher;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
@@ -37,13 +37,13 @@ public class DemoDispatcher extends RebalancingDispatcher {
     private final int rebalancingPeriod;
     private int total_abortTrip = 0;
 
-    private DemoDispatcher(Config config, AVDispatcherConfig avconfig, TravelTime travelTime, //
+    private DemoDispatcher(Config config, OperatorConfig operatorConfig, TravelTime travelTime, //
             AVRouter router, EventsManager eventsManager, Network network, //
             MatsimAmodeusDatabase db) {
-        super(config, avconfig, travelTime, router, eventsManager, db);
+        super(config, operatorConfig, travelTime, router, eventsManager, db);
         links = new ArrayList<>(network.getLinks().values());
         Collections.shuffle(links, randGen);
-        SafeConfig safeConfig = SafeConfig.wrap(avconfig);
+        SafeConfig safeConfig = SafeConfig.wrap(operatorConfig.getDispatcherConfig());
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 120);
     }
 
@@ -90,18 +90,14 @@ public class DemoDispatcher extends RebalancingDispatcher {
         private EventsManager eventsManager;
 
         @Inject
-        @Named(AVModule.AV_MODE)
-        private Network network;
-
-        @Inject
         private Config config;
 
         @Inject
         private MatsimAmodeusDatabase db;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
-            return new DemoDispatcher(config, avconfig, travelTime, router, eventsManager, network, db);
+        public AVDispatcher createDispatcher(OperatorConfig operatorConfig, AVRouter router, Network network) {
+            return new DemoDispatcher(config, operatorConfig, travelTime, router, eventsManager, network, db);
         }
     }
 

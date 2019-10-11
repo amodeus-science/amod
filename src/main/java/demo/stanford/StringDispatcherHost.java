@@ -28,7 +28,7 @@ import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.config.operator.OperatorConfig;
 import ch.ethz.matsim.av.dispatcher.AVDispatcher;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
@@ -58,17 +58,17 @@ import ch.ethz.matsim.av.router.AVRouter;
     // private final DistanceFunction distanceFunction;
     // private final BipartiteMatchingUtils bipartiteMatchingUtils;
 
-    protected StringDispatcherHost(Network network, Config config, AVDispatcherConfig avDispatcherConfig, TravelTime travelTime,
+    protected StringDispatcherHost(Network network, Config config, OperatorConfig operatorConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager, //
             StringSocket clientSocket, int numReqTot, //
             MatsimAmodeusDatabase db) {
-        super(config, avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager, db);
+        super(config, operatorConfig, travelTime, parallelLeastCostPathCalculator, eventsManager, db);
         this.db = db;
         this.clientSocket = Objects.requireNonNull(clientSocket);
         this.numReqTot = numReqTot;
         // this.network = network;
         fastLinkLookup = new FastLinkLookup(network, db);
-        SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
+        SafeConfig safeConfig = SafeConfig.wrap(operatorConfig.getDispatcherConfig());
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         aidoReqComp = new AidoRequestCompiler(db);
         aidoRobTaxComp = new AidoRoboTaxiCompiler(db);
@@ -143,10 +143,6 @@ import ch.ethz.matsim.av.router.AVRouter;
         private EventsManager eventsManager;
 
         @Inject
-        @Named(AVModule.AV_MODE)
-        private Network network;
-
-        @Inject
         private Config config;
 
         @Inject
@@ -159,8 +155,8 @@ import ch.ethz.matsim.av.router.AVRouter;
         private MatsimAmodeusDatabase db;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig, AVRouter router) {
-            return new StringDispatcherHost(network, config, avconfig, travelTime, router, eventsManager, //
+        public AVDispatcher createDispatcher(OperatorConfig operatorConfig, AVRouter router, Network network) {
+            return new StringDispatcherHost(network, config, operatorConfig, travelTime, router, eventsManager, //
                     stringSocket, numReqTot, db);
         }
     }

@@ -12,6 +12,8 @@ import org.matsim.vehicles.Vehicle;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.matsim.av.config.operator.OperatorConfig;
+import ch.ethz.matsim.av.config.operator.RouterConfig;
 import ch.ethz.matsim.av.router.AVRouter;
 
 /** This is a nonfunctional sample demonstrating of how to include a custom router
@@ -40,7 +42,7 @@ public class CustomRouter implements AVRouter {
      * example the DefaultAVRouter */
     public static class Factory implements AVRouter.Factory {
         @Override
-        public AVRouter createRouter() {
+        public AVRouter createRouter(RouterConfig routerConfig, Network network) {
             return new CustomRouter();
         }
     }
