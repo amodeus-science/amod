@@ -8,19 +8,21 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 
 /* package */ enum UserReferenceFrames implements ReferenceFrame {
-    BERLIN( //
-            new GeotoolsTransformation("EPSG:31468", "WGS84"), //
-            new GeotoolsTransformation("WGS84", "EPSG:31468")), //
     IDENTITY( //
             new IdentityTransformation(), //
             new IdentityTransformation()), //
     SANFRANCISCO( //
             new GeotoolsTransformation("EPSG:26743", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:26743")), //
+    BERLIN( //
+            new GeotoolsTransformation("EPSG:31468", "WGS84"), //
+            new GeotoolsTransformation("WGS84", "EPSG:31468")), //
     SANTIAGO_DE_CHILE( //
             new GeotoolsTransformation("EPSG:32719", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:32719")), //
-
+    AUCKLAND( //
+            new GeotoolsTransformation("EPSG:3788", "WGS84"), //
+            new GeotoolsTransformation("WGS84", "EPSG:3788")), //
     TEL_AVIV( //
             new GeotoolsTransformation("EPSG:2039", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:2039")),//

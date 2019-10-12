@@ -7,15 +7,18 @@ import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 
 /* package */ enum UserLocationSpecs implements LocationSpec {
-    BERLIN( //
-            UserReferenceFrames.BERLIN, //
-            new Coord(4595438.15, 5821747.77)), //
     SANFRANCISCO( //
             UserReferenceFrames.SANFRANCISCO, //
             new Coord(-122.4363005, 37.7511686)), //
+    BERLIN( //
+            UserReferenceFrames.BERLIN, //
+            new Coord(4595438.15, 5821747.77)), //
     SANTIAGO_DE_CHILE( //
             UserReferenceFrames.SANTIAGO_DE_CHILE, //
             new Coord(-3956418.76, -7864204.17)), //
+    AUCKLAND( //
+            UserReferenceFrames.AUCKLAND, //
+            new Coord(-36.8426, 174.7662)), //
     TEL_AVIV( //
             UserReferenceFrames.TEL_AVIV, //
             new Coord(179549.58, 665848.14)), //

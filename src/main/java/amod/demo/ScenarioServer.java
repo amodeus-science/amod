@@ -30,6 +30,7 @@ import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
+import ch.ethz.idsc.amodeus.linkspeed.TaxiTravelTimeRouter;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
@@ -37,6 +38,7 @@ import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleToVSGeneratorModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
+import ch.ethz.idsc.amodeus.matsim.utils.AddCoordinatesToActivities;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -104,6 +106,7 @@ public enum ScenarioServer {
 
         /** load MATSim scenario for simulation */
         Scenario scenario = ScenarioUtils.loadScenario(config);
+        AddCoordinatesToActivities.run(scenario);
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
         GlobalAssert.that(Objects.nonNull(network));
@@ -179,6 +182,14 @@ public enum ScenarioServer {
                 bind(DefaultAStarLMRouter.Factory.class);
                 AVUtils.bindRouterFactory(binder(), DefaultAStarLMRouter.class.getSimpleName())//
                         .to(DefaultAStarLMRouter.Factory.class);
+            }
+        });
+        /** custom router */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(TaxiTravelTimeRouter.Factory.class);
+                AVUtils.bindRouterFactory(binder(), TaxiTravelTimeRouter.class.getSimpleName()).to(TaxiTravelTimeRouter.Factory.class);
             }
         });
 
