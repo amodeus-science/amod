@@ -184,7 +184,7 @@ public enum ScenarioServer {
                         .to(DefaultAStarLMRouter.Factory.class);
             }
         });
-        /** custom router */
+        /** Custom router that ensures same network speeds as taxis in original data set. */
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
