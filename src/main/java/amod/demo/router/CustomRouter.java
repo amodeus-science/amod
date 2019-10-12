@@ -12,7 +12,6 @@ import org.matsim.vehicles.Vehicle;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.matsim.av.config.operator.OperatorConfig;
 import ch.ethz.matsim.av.config.operator.RouterConfig;
 import ch.ethz.matsim.av.router.AVRouter;
 

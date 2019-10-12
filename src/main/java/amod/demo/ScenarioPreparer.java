@@ -56,7 +56,7 @@ public enum ScenarioPreparer {
         Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName(), avConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         GeneratorConfig genConfig = avConfigGroup.getOperatorConfigs().values().iterator().next().getGeneratorConfig();
-        int numRt = (int) genConfig.getNumberOfVehicles();
+        int numRt = genConfig.getNumberOfVehicles();
         System.out.println("NumberOfVehicles=" + numRt);
 
         /** adaption of MATSim network, e.g., radius cutting */

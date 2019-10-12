@@ -54,7 +54,7 @@ public class AidoPreparer {
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         GeneratorConfig genConfig = avConfigGroup.getOperatorConfigs().values().iterator().next().getGeneratorConfig();
-        numRt = (int) genConfig.getNumberOfVehicles();
+        numRt = genConfig.getNumberOfVehicles();
         System.out.println("aidoprep NumberOfVehicles=" + numRt);
 
         /** adaption of MATSim network, e.g., radius cutting */

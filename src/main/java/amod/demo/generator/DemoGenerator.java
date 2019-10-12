@@ -12,12 +12,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
-
-import com.google.inject.Inject;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
