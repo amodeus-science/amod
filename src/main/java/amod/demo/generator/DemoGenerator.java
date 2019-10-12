@@ -12,12 +12,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
-
-import com.google.inject.Inject;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
@@ -109,7 +104,7 @@ public class DemoGenerator implements AVGenerator {
     public DemoGenerator(OperatorConfig operatorConfig, Network network, VehicleType vehicleType) {
         this.operatorConfig = operatorConfig;
         this.vehicleType = vehicleType;
-        
+
         /** select 10 random links */
         int bound = network.getLinks().size();
         for (int i = 0; i < 10; ++i) {
@@ -118,26 +113,26 @@ public class DemoGenerator implements AVGenerator {
             randomLinks.add(link);
         }
     }
-    
+
     /** this function returns a list of vehicle distributed over the scenario */
-	@Override
-	public List<AVVehicle> generateVehicles() {
-		int generatedVehicles = 0;
-		List<AVVehicle> vehicles = new LinkedList<>();
-		
-		while (generatedVehicles < operatorConfig.getGeneratorConfig().getNumberOfVehicles()) {
-	        ++generatedVehicles;
-	        int bound = randomLinks.size();
-	        int elemRand = MatsimRandom.getRandom().nextInt(bound);
-	        Link linkSel = randomLinks.stream().skip(elemRand).findFirst().get();
-	        LOGGER.info("car placed at link " + linkSel);
-	        Id<DvrpVehicle> id = AVUtils.createId(operatorConfig.getId(), generatedVehicles);
-	        AVVehicle vehicle = new AVVehicle(id, linkSel, 0.0, Double.POSITIVE_INFINITY, vehicleType);
-	        vehicles.add(vehicle);
-		}
-		
-		return vehicles;
-	}
+    @Override
+    public List<AVVehicle> generateVehicles() {
+        int generatedVehicles = 0;
+        List<AVVehicle> vehicles = new LinkedList<>();
+
+        while (generatedVehicles < operatorConfig.getGeneratorConfig().getNumberOfVehicles()) {
+            ++generatedVehicles;
+            int bound = randomLinks.size();
+            int elemRand = MatsimRandom.getRandom().nextInt(bound);
+            Link linkSel = randomLinks.stream().skip(elemRand).findFirst().get();
+            LOGGER.info("car placed at link " + linkSel);
+            Id<DvrpVehicle> id = AVUtils.createId(operatorConfig.getId(), generatedVehicles);
+            AVVehicle vehicle = new AVVehicle(id, linkSel, 0.0, Double.POSITIVE_INFINITY, vehicleType);
+            vehicles.add(vehicle);
+        }
+
+        return vehicles;
+    }
 
     /** factory which is called to instatiate the DemoGenerator inside the framework */
     public static class Factory implements AVGenerator.AVGeneratorFactory {
