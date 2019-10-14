@@ -21,8 +21,8 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
             new GeotoolsTransformation("EPSG:32719", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:32719")), //
     AUCKLAND( //
-            new GeotoolsTransformation("EPSG:3788", "WGS84"), //
-            new GeotoolsTransformation("WGS84", "EPSG:3788")), //
+            new GeotoolsTransformation("EPSG:2193", "WGS84"), //
+            new GeotoolsTransformation("WGS84", "EPSG:2193")), //
     TEL_AVIV( //
             new GeotoolsTransformation("EPSG:2039", "WGS84"), //
             new GeotoolsTransformation("WGS84", "EPSG:2039")),//
