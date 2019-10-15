@@ -55,10 +55,8 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
         return coords_toWGS84;
     }
 
-    /* TODO activate with amodeus update
     @Override
     public Unit unit() {
         return unit;
     }
-    */
 }
