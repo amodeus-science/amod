@@ -31,7 +31,7 @@ import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
-import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
+import ch.ethz.idsc.amodeus.matsim.xml.ConfigDispatcherChanger;
 import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -134,7 +134,8 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
         /** change the standard AidoDispatcherHost setting in av.xml to
          * StringDispatcherHost */
-        XmlDispatcherChanger.of(workingDirectory, "StringDispatcherHost");
+        String configSimPath = scenarioOptions.getSimulationConfigName();
+        ConfigDispatcherChanger.change(configSimPath, "StringDispatcherHost");
 
         /** run simulation */
         controler.run();

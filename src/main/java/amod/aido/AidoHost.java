@@ -8,8 +8,10 @@ import amod.aido.core.AidoDispatcherHost;
 import amod.aido.core.AidoScoreElement;
 import amod.aido.core.ScoreParameters;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
-import ch.ethz.idsc.amodeus.matsim.xml.XmlDispatcherChanger;
-import ch.ethz.idsc.amodeus.matsim.xml.XmlNumberOfVehiclesChanger;
+import ch.ethz.idsc.amodeus.matsim.xml.ConfigDispatcherChanger;
+import ch.ethz.idsc.amodeus.matsim.xml.ConfigVehiclesChanger;
+import ch.ethz.idsc.amodeus.options.ScenarioOptions;
+import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.LegCount;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
@@ -113,8 +115,10 @@ public enum AidoHost {
             preparer.run2(numReqDes);
 
             /** run with AIDO dispatcher */
-            XmlDispatcherChanger.of(workingDirectory, AidoDispatcherHost.class.getSimpleName());
-            XmlNumberOfVehiclesChanger.of(workingDirectory, fleetSize);
+            ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
+            String simConfigPath = scenarioOptions.getSimulationConfigName();
+            ConfigDispatcherChanger.change(simConfigPath, AidoDispatcherHost.class.getSimpleName());
+            ConfigVehiclesChanger.change(simConfigPath, fleetSize);
             AidoServer aidoServer = new AidoServer();
             aidoServer.simulate(stringSocket, numReqDes, workingDirectory);
 
