@@ -6,7 +6,7 @@ import java.util.Properties;
 import ch.ethz.idsc.tensor.io.ResourceData;
 import junit.framework.TestCase;
 
-public class AidoPropertiesTest extends TestCase {
+public class ScoreParametersTest extends TestCase {
     public void testScoreParam() {
         assertNotNull(ScoreParameters.GLOBAL);
     }

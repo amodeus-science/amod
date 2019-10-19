@@ -1,5 +1,5 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
-package amod.aido.demo;
+package amod.aido;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
-import amod.aido.AidoHost;
 import amod.aido.core.CleanAidoScenarios;
+import amod.aido.demo.AidoGuest;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 import ch.ethz.idsc.tensor.io.ResourceData;
 import junit.framework.TestCase;
 
-public class AidoSequenceTest extends TestCase {
+public class AidoHostTest extends TestCase {
     private static AidoGuest guest() throws Exception {
         new Thread(new Runnable() {
             @Override
