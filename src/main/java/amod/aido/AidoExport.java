@@ -7,7 +7,7 @@ import amod.aido.core.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.UnitSaveUtils;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
-import ch.ethz.idsc.amodeus.analysis.plot.TimeChart;
+import ch.ethz.idsc.amodeus.analysis.plot.TimeChart; // TODO replace with ch.ethz.idsc.tensor.fig.TimedChart
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.img.ColorDataIndexed;
 
