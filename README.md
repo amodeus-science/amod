@@ -39,7 +39,7 @@ The code format of the `amod` repository is specified in the `amodeus` profile t
 
 ### Getting Started
 
-Follow these step-by-step instructions or the [video](https://www.youtube.com/watch?v=j2nKGnif5qc) to set up, prepare, and run your first simulation. You can get a sample simulation scenario at http://www.idsc.ethz.ch/research-frazzoli/amodeus.html
+Follow these step-by-step instructions or the [video](https://www.youtube.com/watch?v=hay5VGhQ7S8) to set up, prepare, and run your first simulation. You can get a sample simulation scenario at http://www.idsc.ethz.ch/research-frazzoli/amodeus.html
 1. Clone amod
 2. Import to eclipse as existing maven project (Package Explorer->Import) using the pom.xml in the top folder of this repository.
 3. Set up Run Configurations for: (ScenarioPreparer; ScenarioServer; ScenarioViewer), chose the Working Directory to be the top Simulation Folder directory.
