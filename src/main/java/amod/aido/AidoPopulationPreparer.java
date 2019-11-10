@@ -14,7 +14,6 @@ import ch.ethz.idsc.amodeus.prep.PopulationCutter;
 import ch.ethz.idsc.amodeus.prep.TheRequestApocalypse;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.tensor.RationalScalar;
 
 public enum AidoPopulationPreparer {
     ;
@@ -27,9 +26,9 @@ public enum AidoPopulationPreparer {
         populationCutter.cut(population, network, config);
 
         /** apocalypse reduces the number of requests */
-        TheRequestApocalypse.reducesThe(population).toNoMoreThan(RationalScalar.of(numReqDes, 1), seed);
+        TheRequestApocalypse.reducesThe(population).toNoMoreThan(numReqDes, seed);
         GlobalAssert.that(0 < population.getPersons().size());
-        GlobalAssert.that(LegCount.of(population, "av").number().intValue() == numReqDes);
+        GlobalAssert.that(LegCount.of(population, "av") == numReqDes);
 
         final File fileExportGz = new File(scenOptions.getPreparedPopulationName() + ".xml.gz");
         final File fileExport = new File(scenOptions.getPreparedPopulationName() + ".xml");

@@ -20,6 +20,7 @@ import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.amodeus.video.VideoGenerator;
 import ch.ethz.idsc.tensor.DoubleScalar;
+import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
@@ -82,10 +83,10 @@ import ch.ethz.idsc.tensor.sca.Round;
             AidoPreparer preparer = new AidoPreparer(workingDirectory);
 
             /** get number of requests in population */
-            Scalar numReq = LegCount.of(preparer.getPopulation(), "av");
+            long numReq = LegCount.of(preparer.getPopulation(), "av");
 
-            Scalar nominalFleetSize = Round.of(numReq.multiply(ScoreParameters.GLOBAL.gamma));
-            Tensor initialInfo = Tensors.of(numReq, preparer.getBoundingBox(), nominalFleetSize);
+            Scalar nominalFleetSize = Round.of(RealScalar.of(numReq).multiply(ScoreParameters.GLOBAL.gamma));
+            Tensor initialInfo = Tensors.of(RealScalar.of(numReq), preparer.getBoundingBox(), nominalFleetSize);
 
             /** send initial data: {numberRequests,boundingBox} */
             stringSocket.writeln(initialInfo);
