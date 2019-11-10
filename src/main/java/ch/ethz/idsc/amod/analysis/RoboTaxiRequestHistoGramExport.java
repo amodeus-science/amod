@@ -6,7 +6,7 @@ import java.io.File;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
 import ch.ethz.idsc.amodeus.analysis.plot.DiagramSettings;
-import ch.ethz.idsc.amodeus.analysis.plot.HistogramPlot;
+import ch.ethz.idsc.amodeus.analysis.plot.HistogramPlot; // TODO replace by ch.ethz.idsc.tensor.fig.Histogram
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
