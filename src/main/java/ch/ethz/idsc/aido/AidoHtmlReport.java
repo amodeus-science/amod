@@ -51,9 +51,9 @@ import ch.ethz.idsc.tensor.red.Total;
 
             aRElement.getHTMLGenerator().insertTextLeft(HtmlGenerator.bold("Scores during Simulation"));
             aRElement.getHTMLGenerator().newLine();
-            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE_INCR + ".png", 800, 600);
-            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE_INTG + ".png", 800, 600);
-            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE3_INTG + ".png", 800, 600);
+            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE_INCR, 800, 600);
+            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE_INTG, 800, 600);
+            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE3_INTG, 800, 600);
 
             aRElement.getHTMLGenerator().insertTextLeft(HtmlGenerator.bold("Final Scores") + //
                     "\n\t" + "final service quality score:" + //
