@@ -3,6 +3,9 @@ package ch.ethz.idsc.aido;
 
 import java.io.File;
 
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+
 import ch.ethz.idsc.aido.core.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.UnitSaveUtils;
@@ -15,8 +18,6 @@ import ch.ethz.idsc.tensor.fig.TimedChart;
 import ch.ethz.idsc.tensor.fig.VisualRow;
 import ch.ethz.idsc.tensor.fig.VisualSet;
 import ch.ethz.idsc.tensor.img.ColorDataIndexed;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
 
 /* package */ class AidoExport implements AnalysisExport {
 
