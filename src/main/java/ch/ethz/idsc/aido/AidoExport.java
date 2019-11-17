@@ -7,18 +7,25 @@ import ch.ethz.idsc.aido.core.AidoScoreElement;
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.UnitSaveUtils;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
-import ch.ethz.idsc.amodeus.analysis.plot.TimeChart; // TODO replace with ch.ethz.idsc.tensor.fig.TimedChart
+import ch.ethz.idsc.amodeus.analysis.element.AnalysisMeanFilter;
+import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Unprotect;
+import ch.ethz.idsc.tensor.fig.TimedChart;
+import ch.ethz.idsc.tensor.fig.VisualRow;
+import ch.ethz.idsc.tensor.fig.VisualSet;
 import ch.ethz.idsc.tensor.img.ColorDataIndexed;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
 
 /* package */ class AidoExport implements AnalysisExport {
 
     /** settings for plot */
-    /* package */ static final String FILENAME_SCORE_INCR = "aidoScores1and2Diff";
-    /* package */ static final String FILENAME_SCORE_INTG = "aidoScores1and2Intg";
-    /* package */ static final String FILENAME_SCORE3_INTG = "aidoScore3Intg";
-    private static final int FILTERSIZE = 50;
-    private static final boolean FILTER_ON = true;
+    /* package */ static final String FILENAME_SCORE_INCR = "aidoScores1and2Diff.png";
+    /* package */ static final String FILENAME_SCORE_INTG = "aidoScores1and2Intg.png";
+    /* package */ static final String FILENAME_SCORE3_INTG = "aidoScore3Intg.png";
+    private static final int WIDTH = 1000;
+    private static final int HEIGHT = 750;
 
     /** aido score element */
     private final AidoScoreElement aidoScoreElement;
@@ -41,24 +48,24 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
 
         /** figures for service quality score and efficiency score */
         try {
-            TimeChart.of(relativeDirectory, FILENAME_SCORE_INCR, "Service Quality and Efficiency Score Increments", //
-                    FILTER_ON, FILTERSIZE, new double[] { 1.0, 1.0 }, //
+            JFreeChart chart = timeChart("Service Quality and Efficiency Score Increments", //
                     new String[] { "service quality performance [1]", "efficiency performance [1]" }, //
-                    "time of day", "scores increments", //
-                    time, linCombScoresDiff, //
-                    null, colorScheme);
+                    "time of day", "scores increments", time, linCombScoresDiff, colorScheme);
+            File fileChart = new File(relativeDirectory, FILENAME_SCORE_INCR);
+            ChartUtilities.saveChartAsPNG(fileChart, chart, WIDTH, HEIGHT);
+            GlobalAssert.that(fileChart.isFile());
         } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
             e1.printStackTrace();
         }
 
         try {
-            TimeChart.of(relativeDirectory, FILENAME_SCORE_INTG, "Service Quality and Efficiency Score Integrated", //
-                    FILTER_ON, FILTERSIZE, new double[] { 1.0, 1.0 }, //
+            JFreeChart chart = timeChart("Service Quality and Efficiency Score Integrated", //
                     new String[] { "service quality performance [1]", "efficiency performance [1]" }, //
-                    "time of day", "scores integrated", //
-                    time, linCombScoresIntg, //
-                    null, colorScheme);
+                    "time of day", "scores integrated", time, linCombScoresIntg, colorScheme);
+            File fileChart = new File(relativeDirectory, FILENAME_SCORE_INTG);
+            ChartUtilities.saveChartAsPNG(fileChart, chart, WIDTH, HEIGHT);
+            GlobalAssert.that(fileChart.isFile());
         } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
             e1.printStackTrace();
@@ -68,13 +75,13 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
         Tensor fleetSizeScoreIntg = Tensor.of(scoreIntgHistory.stream().map(row -> row.extract(3, 4)));
 
         try {
-            TimeChart.of(relativeDirectory, FILENAME_SCORE3_INTG, "Fleet Size Score Integrated", //
-                    FILTER_ON, FILTERSIZE, new double[] { 1.0 }, //
+            JFreeChart chart = timeChart("Fleet Size Score Integrated", //
                     new String[] { "fleet size score integrated" }, //
-                    "time of day", "scores integrated", //
-                    time, fleetSizeScoreIntg, //
-                    new double[] { fleetSizeScoreIntg.get(0).Get(0).number().intValue() * 2.0, 0.0 }, colorScheme);
-
+                    "time of day", "scores integrated", time, fleetSizeScoreIntg, colorScheme);
+            File fileChart = new File(relativeDirectory, FILENAME_SCORE_INTG);
+            chart.getXYPlot().getRangeAxis().setRange(fleetSizeScoreIntg.get(0).Get(0).number().intValue() * 2.0, 0.0);
+            ChartUtilities.saveChartAsPNG(fileChart, chart, WIDTH, HEIGHT);
+            GlobalAssert.that(fileChart.isFile());
         } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
             e1.printStackTrace();
@@ -88,5 +95,23 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
             System.err.println("Saving aido score history was unsuccessful.");
             exception.printStackTrace();
         }
+    }
+
+    private JFreeChart timeChart(String title, String[] labels, String xAxisLabel, String yAxisLabel, Tensor time, Tensor values, ColorDataIndexed colorDataIndexed) {
+        GlobalAssert.that(Unprotect.dimension1(values) == labels.length);
+
+        VisualSet visualSet = new VisualSet(colorDataIndexed);
+        for (int i = 0; i < labels.length; ++i) {
+            Tensor vector = values.get(Tensor.ALL, i);
+            vector = AnalysisMeanFilter.of(vector);
+            VisualRow visualRow = visualSet.add(time, vector);
+            visualRow.setLabel(labels[i]);
+        }
+
+        visualSet.setPlotLabel(title);
+        visualSet.setAxesLabelX(xAxisLabel);
+        visualSet.setAxesLabelY(yAxisLabel);
+
+        return TimedChart.of(visualSet);
     }
 }
