@@ -5,6 +5,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Objects;
 
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusRouterModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -168,22 +169,15 @@ public enum ScenarioServer {
         });
 
         /** With the subsequent lines, another custom router is added apart from the
-         * {@link DefaultAVRouter},
+         * {@link DefaultAStarLMRouter},
          * it has to be selected in the av.xml file with the lines as follows:
          * <operator id="op1">
          * <param name="routerName" value="DefaultAStarLMRouter" />
          * <generator strategy="PopulationDensity">
          * ...
          *
-         * otherwise the normal {@link DefaultAVRouter} will be used. */
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bind(DefaultAStarLMRouter.Factory.class);
-                AVUtils.bindRouterFactory(binder(), DefaultAStarLMRouter.class.getSimpleName())//
-                        .to(DefaultAStarLMRouter.Factory.class);
-            }
-        });
+         * otherwise the normal {@link DefaultAStarLMRouter} will be used. */
+        controler.addOverridingModule(new AmodeusRouterModule());
         /** Custom router that ensures same network speeds as taxis in original data set. */
         controler.addOverridingModule(new AbstractModule() {
             @Override
