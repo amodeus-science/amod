@@ -23,7 +23,7 @@ import ch.ethz.idsc.tensor.io.StringScalar;
 public class AidoGuest {
 
     /** default values for demo */
-    static final String SCENARIO = "SanFrancisco.20080518";
+    static final String SCENARIO = "SanFrancisco";
     static final int REQUEST_NUMBER_DESIRED = 500;
     static final int NUMBER_OF_VEHICLES = 20;
     private static final int PRINT_SCORE_PERIOD = 200;

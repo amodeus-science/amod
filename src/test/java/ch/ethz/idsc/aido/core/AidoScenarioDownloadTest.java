@@ -12,7 +12,7 @@ public class AidoScenarioDownloadTest extends TestCase {
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         File file = new File(workingDirectory, "scenario.zip"); // <3MB
         assertFalse(file.exists());
-        AidoScenarioDownload.of("SanFrancisco.20080519", file);
+        AidoScenarioDownload.of("SanFrancisco", file);
         assertTrue(file.isFile());
         file.delete();
     }
