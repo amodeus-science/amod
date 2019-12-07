@@ -44,10 +44,11 @@ public enum AidoHost {
 
     public static void run(File workingDirectory) throws Exception {
         System.out.println("Using scenario directory: " + workingDirectory);
+        StringSocket stringSocket = null;
 
         /** open String server and wait for initial command */
         try (StringServerSocket serverSocket = new StringServerSocket(PORT)) {
-            StringSocket stringSocket = serverSocket.getSocketWait();
+            stringSocket = serverSocket.getSocketWait();
             serverSocket.close(); // only allow one connection
             // ---
             String readLine = stringSocket.readLine();
@@ -62,15 +63,7 @@ public enum AidoHost {
             }
 
             /** download the chosen scenario */
-            try {
-                AidoScenarioResource.extract(scenarioTag, workingDirectory);
-            } catch (Exception exception) {
-                /** send empty tensor "{}" to stop */
-                stringSocket.writeln(Tensors.empty());
-                /** send fictitious costs */
-                stringSocket.writeln(StaticHelper.FAILURE_SCORE);
-                throw exception;
-            }
+            AidoScenarioResource.extract(scenarioTag, workingDirectory);
 
             /** setup environment variables */
             StaticHelper.setup();
@@ -141,9 +134,8 @@ public enum AidoHost {
 
             { /** create a video if environment variable is set */
                 String env = System.getenv(ENV_VIDEO_EXPORT);
-                if (Objects.nonNull(env) && env.equalsIgnoreCase("true")) {
+                if (Objects.nonNull(env) && env.equalsIgnoreCase("true"))
                     new VideoGenerator(workingDirectory).start();
-                }
             }
 
             /** send final score,
@@ -151,8 +143,18 @@ public enum AidoHost {
             stringSocket.writeln(Total.of(aidoScoreElement.getScoreDiffHistory()));
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            // exception.printStackTrace();
+            shutdown(stringSocket);
             throw exception;
+        }
+    }
+
+    private static void shutdown(StringSocket stringSocket) throws Exception {
+        if (Objects.nonNull(stringSocket)) {
+            /** send empty tensor "{}" to stop */
+            stringSocket.writeln(Tensors.empty());
+            /** send fictitious costs */
+            stringSocket.writeln(StaticHelper.FAILURE_SCORE);
         }
     }
 }

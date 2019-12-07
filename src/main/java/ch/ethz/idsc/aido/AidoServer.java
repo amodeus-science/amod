@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import ch.ethz.idsc.amodeus.linkspeed.TaxiTravelTimeRouter;
 import ch.ethz.idsc.amodeus.matsim.mod.AmodeusRouterModule;
+import ch.ethz.idsc.amodeus.matsim.utils.AddCoordinatesToActivities;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -91,6 +92,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
         /** load MATSim scenario for simulation */
         Scenario scenario = ScenarioUtils.loadScenario(config);
+        AddCoordinatesToActivities.run(scenario);
         network = scenario.getNetwork();
         Population population = scenario.getPopulation();
         GlobalAssert.that(Objects.nonNull(network));

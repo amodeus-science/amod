@@ -98,11 +98,11 @@ public class AidoGuest {
                 }
             }
 
-            /** recieve final performance score/stats */
+            /** receive final performance score/stats */
             Tensor finalScores = Tensors.fromString(stringSocket.readLine());
-            System.out.println("final service quality score:  " + finalScores.Get(1));
-            System.out.println("final efficiency score:       " + finalScores.Get(2));
-            System.out.println("final fleet size score:       " + finalScores.Get(3));
+            System.out.println("final service quality score:  " + finalScores.Get(0));
+            System.out.println("final efficiency score:       " + finalScores.Get(1));
+            System.out.println("final fleet size score:       " + finalScores.Get(2));
 
         } // <- closing string socket
     }

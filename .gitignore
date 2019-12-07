@@ -9,6 +9,9 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 
+# matsim output (in case deletion fails)
+output/
+
 # eclipse
 .settings/
 .project

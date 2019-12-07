@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
 
@@ -17,6 +18,8 @@ import ch.ethz.idsc.tensor.io.ResourceData;
 import junit.framework.TestCase;
 
 public class AidoHostTest extends TestCase {
+    private static Exception hostException = null;
+
     private static AidoGuest guest() throws Exception {
         new Thread(new Runnable() {
             @Override
@@ -24,7 +27,8 @@ public class AidoHostTest extends TestCase {
                 try {
                     AidoHost.main(null);
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    // exception.printStackTrace();
+                    hostException = exception;
                 }
             }
         }).start();
@@ -39,20 +43,26 @@ public class AidoHostTest extends TestCase {
         list = list.subList(0, 1);
         Random random = new Random();
         for (String index : list) {
-            guest().run(index, 800 + random.nextInt(200), 6 + random.nextInt(10));
-            /** files */
-            CleanAidoScenarios.now();
-            { // folder should not exist
-                /** virtual network file "virtualNetwork" should not exist for AIDO */
-                File file = new File("virtualNetwork");
-                if (file.exists())
-                    DeleteDirectory.of(file, 1, 4);
-            }
-            {
-                /** output folder */
-                File file = new File("output");
-                if (file.isDirectory())
-                    DeleteDirectory.of(file, 5, 25000);
+            try {
+                guest().run(index, 800 + random.nextInt(200), 6 + random.nextInt(10));
+            } finally {
+                /** files */
+                CleanAidoScenarios.now();
+                { // folder should not exist
+                    /** virtual network file "virtualNetwork" should not exist for AIDO */
+                    File file = new File("virtualNetwork");
+                    if (file.exists())
+                        DeleteDirectory.of(file, 1, 4);
+                }
+                {
+                    /** output folder */
+                    File file = new File("output");
+                    if (file.isDirectory())
+                        DeleteDirectory.of(file, 5, 25000);
+                }
+
+                if (Objects.nonNull(hostException))
+                    throw hostException;
             }
         }
     }
