@@ -18,25 +18,30 @@ public class HttpDownloaderTest extends TestCase {
             ContentType.IMAGE_XICON.require(urlFetch.contentType());
             urlFetch.download(file);
         }
-        assertTrue(file.isFile());
 
-        file.delete();
+        try{
+            assertTrue(file.isFile());
+        } finally {
+            file.delete();
+        }
     }
 
     public void testHttps() throws IOException {
         File file = HomeDirectory.file("scenario.zip");
         assertFalse(file.exists());
 
-        try (URLFetch urlFetch = new URLFetch("https://polybox.ethz.ch/index.php/s/AP9zPPk8wT4KWit/download")) {
+        try (URLFetch urlFetch = new URLFetch("https://polybox.ethz.ch/index.php/s/r6oKzxFcxR4z8Ss/download")) {
             ContentType.APPLICATION_ZIP.require(urlFetch.contentType());
             urlFetch.download(file);
         }
 
-        assertTrue(file.isFile());
-        // System.out.println(file.length());
-        assertEquals(file.length(), 2284774);
-
-        file.delete();
+        try {
+            assertTrue(file.isFile());
+            // System.out.println(file.length());
+            assertEquals(file.length(), 8389762);
+        } finally {
+            file.delete();
+        }
     }
 
     public void testFail() {

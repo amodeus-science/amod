@@ -5,6 +5,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Objects;
 
+import ch.ethz.idsc.amodeus.linkspeed.TaxiTravelTimeRouter;
+import ch.ethz.idsc.amodeus.matsim.mod.AmodeusRouterModule;
+import ch.ethz.idsc.amodeus.matsim.utils.AddCoordinatesToActivities;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -89,6 +92,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
         /** load MATSim scenario for simulation */
         Scenario scenario = ScenarioUtils.loadScenario(config);
+        AddCoordinatesToActivities.run(scenario);
         network = scenario.getNetwork();
         Population population = scenario.getPopulation();
         GlobalAssert.that(Objects.nonNull(network));
@@ -124,6 +128,15 @@ import ch.ethz.matsim.av.framework.AVUtils;
             }
         });
         controler.addOverridingModule(new AmodeusModule());
+        controler.addOverridingModule(new AmodeusRouterModule());
+        /** Custom router that ensures same network speeds as taxis in original data set. */
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(TaxiTravelTimeRouter.Factory.class);
+                AVUtils.bindRouterFactory(binder(), TaxiTravelTimeRouter.class.getSimpleName()).to(TaxiTravelTimeRouter.Factory.class);
+            }
+        });
 
         /** adding the dispatcher to receive and process string fleet commands */
         controler.addOverridingModule(new AbstractModule() {
