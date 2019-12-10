@@ -19,7 +19,7 @@ public class HttpDownloaderTest extends TestCase {
             urlFetch.download(file);
         }
 
-        try{
+        try {
             assertTrue(file.isFile());
         } finally {
             file.delete();
