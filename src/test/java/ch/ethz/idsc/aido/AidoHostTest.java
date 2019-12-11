@@ -36,7 +36,7 @@ public class AidoHostTest extends TestCase {
         return new AidoGuest("localhost");
     }
 
-    public void testSanFrancisco() throws UnknownHostException, IOException, Exception {
+    public void testScenario() throws UnknownHostException, IOException, Exception {
         Properties properties = ResourceData.properties("/aido/scenarios.properties");
         List<String> list = new ArrayList<>(properties.stringPropertyNames());
         Collections.shuffle(list);
