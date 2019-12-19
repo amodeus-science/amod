@@ -1,6 +1,6 @@
 # AIDO client protocol
 
-This file outlines the communication protocol for the Artificial Intelligence Driving Olympics (=AIDO) autonomous mobility-on-demand competition, for assistance please contact [mailto] (clruch@idsc.mavt.ethz.ch) . Documentation on the AIDO mobility-on-demand competition can be found [here](https://www.duckietown.org/research/ai-driving-olympics/ai-do-rules), [here](http://docs.duckietown.org/AIDO/out/amod.html) and [here](http://docs.duckietown.org/AIDO/out/performance.html).
+This file outlines the communication protocol previously for the Artificial Intelligence Driving Olympics (=AIDO) autonomous mobility-on-demand competition, for assistance please contact [mailto] (clruch@idsc.mavt.ethz.ch).
 
 The communication is text based.
 
@@ -8,7 +8,7 @@ Each message is a string that terminates with a line break `\n`. Apart from the 
 
 *Remark:* The notation adheres to the *Mathematica* standard for nested lists, [see here](https://reference.wolfram.com/language/tutorial/NestedLists.html).
 
-The communication takes place between the main processes in [AidoHost](https://github.com/idsc-frazzoli/amod/blob/master/src/main/java/amod/aido/AidoHost.java) and [AidoGuest](https://github.com/idsc-frazzoli/amod/blob/master/src/main/java/amod/aido/demo/AidoGuest.java). AidoHost contains the simulation environment, while a modified version of AidoGuest can be used by the participant of AIDO to place their own fleet operational policy. **AidoHost** is implemented as a **Server** and **AidoGuest** as a **Client**.
+The communication takes place between the main processes in [AidoHost](https://github.com/idsc-frazzoli/amod/blob/master/src/main/java/ch/ethz/idsc/aido/AidoHost.java) and [AidoGuest](https://github.com/idsc-frazzoli/amod/blob/master/src/main/java/ch/ethz/idsc/aido/demo/AidoGuest.java). AidoHost contains the simulation environment, while a modified version of AidoGuest can be used by the participant of AIDO to place their own fleet operational policy. **AidoHost** is implemented as a **Server** and **AidoGuest** as a **Client**.
 
 ## Port of server
 
@@ -18,7 +18,7 @@ The server listens for incoming `TCP/IP` connections at port `9382`.
 
 ### Client -> Server
 
-The server requires information about which scenario to run. The range of options is visible in [this file](https://github.com/idsc-frazzoli/amodeus/blob/master/src/main/resources/aido/scenarios.properties). The client sends the first line for instance as
+The server requires information about which scenario to run. The range of options is visible in [this file](https://github.com/idsc-frazzoli/amod/blob/master/src/main/resources/aido/scenarios.properties). The client sends the first line for instance as
 
     {SanFrancisco.20080518}
 
@@ -147,4 +147,4 @@ The server sends the (undiscounted) sum of all reward vectors. In the last compo
 
     {service score, efficiency score, fleet size score}
 
-In particular, the `fleet size score` takes the value `-n` or `-Infinity`. More information the rewards can be found [here](http://docs.duckietown.org/AIDO/out/performance.html).
+In particular, the `fleet size score` takes the value `-n` or `-Infinity`.
