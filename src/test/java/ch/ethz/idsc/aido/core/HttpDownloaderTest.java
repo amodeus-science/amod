@@ -28,6 +28,7 @@ public class HttpDownloaderTest extends TestCase {
 
     public void testHttps() throws IOException {
         File file = HomeDirectory.file("scenario.zip");
+        System.out.println(file.getAbsolutePath());
         assertFalse(file.exists());
 
         try (URLFetch urlFetch = new URLFetch("https://polybox.ethz.ch/index.php/s/r6oKzxFcxR4z8Ss/download")) {
@@ -37,7 +38,6 @@ public class HttpDownloaderTest extends TestCase {
 
         try {
             assertTrue(file.isFile());
-            // System.out.println(file.length());
             assertEquals(file.length(), 8389762);
         } finally {
             file.delete();
