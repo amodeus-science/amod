@@ -3,7 +3,8 @@ package ch.ethz.idsc.amod;
 
 import java.net.MalformedURLException;
 
-/** Helper class to run a default preparer and server. */
+/** Helper class to run a default preparer and server, the typical 
+ * sequence of execution. */
 public enum ScenarioExecutionSequence {
     ;
 
