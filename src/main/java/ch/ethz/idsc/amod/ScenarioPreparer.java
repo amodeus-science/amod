@@ -23,9 +23,10 @@ import ch.ethz.matsim.av.config.AVConfigGroup;
 import ch.ethz.matsim.av.config.operator.GeneratorConfig;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of
- * network, population, creation of virtualNetwork and travelData objects. As an example
- * a user may want to restrict the population size to few 100s of agents to run simulations
- * quickly during testing, or the network should be reduced to a certain area. */
+ * network, population, creation of virtualNetwork and travelData objects. As an
+ * example a user may want to restrict the population size to few 100s of agents
+ * to run simulations quickly during testing, or the network should be reduced
+ * to a certain area. */
 public enum ScenarioPreparer {
     ;
 
@@ -34,7 +35,8 @@ public enum ScenarioPreparer {
         run(workingDirectory);
     }
 
-    /** loads scenario preparer in the {@link File} workingDirectory @param workingDirectory
+    /** loads scenario preparer in the {@link File} workingDirectory @param
+     * workingDirectory
      * 
      * @throws MalformedURLException
      * @throws Exception */
@@ -42,13 +44,12 @@ public enum ScenarioPreparer {
         Static.setup();
         Static.checkGLPKLib();
 
-        /** The {@link ScenarioOptions} contain amodeus specific options. Currently there are 3
-         * options files:
-         * - MATSim configurations (config.xml)
-         * - AV package configurations (av.xml)
-         * - AMoDeus configurations (AmodeusOptions.properties).
+        /** The {@link ScenarioOptions} contain amodeus specific options. Currently there
+         * are 3 options files: - MATSim configurations (config.xml) - AV package
+         * configurations (av.xml) - AMoDeus configurations (AmodeusOptions.properties).
          * 
-         * The number of configs is planned to be reduced in subsequent refactoring steps. */
+         * The number of configs is planned to be reduced in subsequent refactoring
+         * steps. */
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
 
         /** MATSim config */
@@ -68,8 +69,9 @@ public enum ScenarioPreparer {
         long apoSeed = 1234;
         PopulationPreparer.run(network, population, scenarioOptions, config, apoSeed);
 
-        /** creating a virtual network, e.g., for operational policies requiring a graph structure on the city */
-        int endTime = (int) config.qsim().getEndTime();
+        /** creating a virtual network, e.g., for operational policies requiring a graph
+         * structure on the city */
+        int endTime = (int) config.qsim().getEndTime().seconds();
         VirtualNetworkPreparer.INSTANCE.create(network, population, scenarioOptions, numRt, endTime); //
 
         /** create a simulation MATSim config file linking the created input data */
