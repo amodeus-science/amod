@@ -3,7 +3,6 @@ package ch.ethz.idsc.amod.analysis;
 
 import java.io.File;
 
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAnchor;
 import org.jfree.chart.axis.CategoryLabelPositions;
@@ -11,6 +10,7 @@ import org.jfree.chart.plot.CategoryPlot;
 
 import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
+import ch.ethz.idsc.amodeus.analysis.plot.AmodeusChartUtils;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.RationalScalar;
@@ -70,7 +70,7 @@ import ch.ethz.matsim.av.passenger.AVRequest;
             categoryPlot.setDomainGridlinePosition(CategoryAnchor.START);
 
             File file = new File(relativeDirectory, FILENAME);
-            ChartUtilities.saveChartAsPNG(file, jFreeChart, WIDTH, HEIGHT);
+            AmodeusChartUtils.saveAsPNG(jFreeChart, file.toString(), WIDTH, HEIGHT);
             GlobalAssert.that(file.isFile());
         } catch (Exception exception) {
             System.err.println("Plot of the Number of Requests per RoboTaxi Failed");

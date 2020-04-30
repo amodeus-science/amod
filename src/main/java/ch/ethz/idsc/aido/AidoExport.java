@@ -3,7 +3,6 @@ package ch.ethz.idsc.aido;
 
 import java.io.File;
 
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 
 import ch.ethz.idsc.aido.core.AidoScoreElement;
@@ -11,6 +10,7 @@ import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
 import ch.ethz.idsc.amodeus.analysis.UnitSaveUtils;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisMeanFilter;
+import ch.ethz.idsc.amodeus.analysis.plot.AmodeusChartUtils;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Unprotect;
@@ -53,7 +53,7 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
                     new String[] { "service quality performance [1]", "efficiency performance [1]" }, //
                     "time of day", "scores increments", time, linCombScoresDiff, colorScheme);
             File fileChart = new File(relativeDirectory, FILENAME_SCORE_INCR);
-            ChartUtilities.saveChartAsPNG(fileChart, chart, WIDTH, HEIGHT);
+            AmodeusChartUtils.saveAsPNG(chart, fileChart.toString(), WIDTH, HEIGHT);
             GlobalAssert.that(fileChart.isFile());
         } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
@@ -65,7 +65,7 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
                     new String[] { "service quality performance [1]", "efficiency performance [1]" }, //
                     "time of day", "scores integrated", time, linCombScoresIntg, colorScheme);
             File fileChart = new File(relativeDirectory, FILENAME_SCORE_INTG);
-            ChartUtilities.saveChartAsPNG(fileChart, chart, WIDTH, HEIGHT);
+            AmodeusChartUtils.saveAsPNG(chart, fileChart.toString(), WIDTH, HEIGHT);
             GlobalAssert.that(fileChart.isFile());
         } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
@@ -81,7 +81,7 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
                     "time of day", "scores integrated", time, fleetSizeScoreIntg, colorScheme);
             File fileChart = new File(relativeDirectory, FILENAME_SCORE_INTG);
             chart.getXYPlot().getRangeAxis().setRange(fleetSizeScoreIntg.get(0).Get(0).number().intValue() * 2.0, 0.0);
-            ChartUtilities.saveChartAsPNG(fileChart, chart, WIDTH, HEIGHT);
+            AmodeusChartUtils.saveAsPNG(chart, fileChart.toString(), WIDTH, HEIGHT);
             GlobalAssert.that(fileChart.isFile());
         } catch (Exception e1) {
             System.err.println("Plotting the aido scores was unsuccessful.");
