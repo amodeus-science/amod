@@ -9,17 +9,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 import ch.ethz.idsc.amod.analysis.CustomAnalysis;
 import ch.ethz.idsc.amod.dispatcher.DemoDispatcher;
@@ -32,15 +27,7 @@ import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TaxiTravelTimeRouter;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDispatcherModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusRouterModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleGeneratorModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVehicleToVSGeneratorModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.matsim.utils.AddCoordinatesToActivities;
-import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
@@ -48,9 +35,8 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.matsim.av.config.AVConfigGroup;
-import ch.ethz.matsim.av.framework.AVModule;
-import ch.ethz.matsim.av.framework.AVQSimModule;
 import ch.ethz.matsim.av.framework.AVUtils;
+import ch.ethz.refactoring.AmodeusConfigurator;
 
 /** This class runs an AMoDeus simulation based on MATSim. The results can be
  * viewed if the {@link ScenarioViewer} is executed in the same working
@@ -113,41 +99,24 @@ public enum ScenarioServer {
         GlobalAssert.that(Objects.nonNull(population));
 
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
-        Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new DvrpTravelTimeModule());
+        Controler controller = new Controler(scenario);
+        AmodeusConfigurator.configureController(controller, db, scenarioOptions);
 
         try {
             // load linkSpeedData if possible
             File linkSpeedDataFile = new File(scenarioOptions.getLinkSpeedDataName());
             System.out.println(linkSpeedDataFile.toString());
             LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
-            controler.addOverridingQSimModule(new TrafficDataModule(lsData));
+            controller.addOverridingQSimModule(new TrafficDataModule(lsData));
         } catch (Exception exception) {
             System.err.println("Could not load static linkspeed data, running with freespeeds.");
         }
-
-        controler.addOverridingModule(new DvrpModule());
-        controler.addOverridingModule(new DvrpTravelTimeModule());
-        controler.addOverridingModule(new AVModule(false));
-        controler.addOverridingModule(new DatabaseModule());
-        controler.addOverridingModule(new AmodeusVehicleGeneratorModule());
-        controler.addOverridingModule(new AmodeusDispatcherModule());
-        controler.addOverridingModule(new AmodeusVirtualNetworkModule(scenarioOptions));
-        controler.addOverridingModule(new AmodeusDatabaseModule(db));
-        controler.addOverridingModule(new AmodeusVehicleToVSGeneratorModule());
-        controler.addOverridingModule(new AmodeusModule());
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
-            }
-        });
 
         /** With the subsequent lines an additional user-defined dispatcher is added, functionality
          * in class
          * DemoDispatcher, as long as the dispatcher was not selected in the file av.xml, it is not
          * used in the simulation. */
-        controler.addOverridingModule(new AbstractModule() {
+        controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 AVUtils.registerDispatcherFactory(binder(), //
@@ -160,7 +129,7 @@ public enum ScenarioServer {
          * functionality in class DemoGenerator. As long as the generator is not selected in the
          * file av.xml,
          * it is not used in the simulation. */
-        controler.addOverridingModule(new AbstractModule() {
+        controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 AVUtils.registerGeneratorFactory(binder(), "DemoGenerator", DemoGenerator.Factory.class);
@@ -176,9 +145,8 @@ public enum ScenarioServer {
          * ...
          *
          * otherwise the normal {@link DefaultAStarLMRouter} will be used. */
-        controler.addOverridingModule(new AmodeusRouterModule());
         /** Custom router that ensures same network speeds as taxis in original data set. */
-        controler.addOverridingModule(new AbstractModule() {
+        controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 bind(TaxiTravelTimeRouter.Factory.class);
@@ -187,8 +155,7 @@ public enum ScenarioServer {
         });
 
         /** run simulation */
-        controler.configureQSimComponents(AVQSimModule::configureComponents);
-        controler.run();
+        controller.run();
 
         /** close port for visualizaiton */
         SimulationServer.INSTANCE.stopAccepting();

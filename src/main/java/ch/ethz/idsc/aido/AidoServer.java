@@ -9,17 +9,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 import ch.ethz.idsc.aido.core.AidoDispatcherHost;
 import ch.ethz.idsc.amod.ext.Static;
@@ -29,12 +24,8 @@ import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TaxiTravelTimeRouter;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusRouterModule;
 import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
 import ch.ethz.idsc.amodeus.matsim.utils.AddCoordinatesToActivities;
-import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
@@ -42,9 +33,8 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.matsim.av.config.AVConfigGroup;
-import ch.ethz.matsim.av.framework.AVModule;
-import ch.ethz.matsim.av.framework.AVQSimModule;
 import ch.ethz.matsim.av.framework.AVUtils;
+import ch.ethz.refactoring.AmodeusConfigurator;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
@@ -100,37 +90,24 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
         Objects.requireNonNull(network);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
-        Controler controler = new Controler(scenario);
+        Controler controller = new Controler(scenario);
+        AmodeusConfigurator.configureController(controller, db, scenarioOptions);
 
         /** try to load link speed data and use for speed adaption in network */
         try {
             File linkSpeedDataFile = new File(scenarioOptions.getLinkSpeedDataName());
             System.out.println(linkSpeedDataFile.toString());
             LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
-            controler.addOverridingQSimModule(new TrafficDataModule(lsData));
+            controller.addOverridingQSimModule(new TrafficDataModule(lsData));
         } catch (Exception exception) {
             System.err.println("Unable to load linkspeed data, freeflow speeds will be used in the simulation.");
             exception.printStackTrace();
         }
 
-        controler.addOverridingModule(new DvrpModule());
-        controler.addOverridingModule(new DvrpTravelTimeModule());
-        controler.addOverridingModule(new AVModule(false));
-        controler.addOverridingModule(new DatabaseModule());
-        /** VirtualNetwork shouldn't be necessary */
-        // controler.addOverridingModule(new AmodeusVirtualNetworkModule());
-        controler.addOverridingModule(new AidoModule(stringSocket, numReqTot));
-        controler.addOverridingModule(new AmodeusDatabaseModule(db));
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
-            }
-        });
-        controler.addOverridingModule(new AmodeusModule());
-        controler.addOverridingModule(new AmodeusRouterModule());
+        controller.addOverridingModule(new AidoModule(stringSocket, numReqTot));
+
         /** Custom router that ensures same network speeds as taxis in original data set. */
-        controler.addOverridingModule(new AbstractModule() {
+        controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 bind(TaxiTravelTimeRouter.Factory.class);
@@ -139,7 +116,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         });
 
         /** adding the dispatcher to receive and process string fleet commands */
-        controler.addOverridingModule(new AbstractModule() {
+        controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 AVUtils.registerDispatcherFactory(binder(), "AidoDispatcherHost", AidoDispatcherHost.Factory.class);
@@ -147,7 +124,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         });
 
         /** adding an initial vehicle placer */
-        controler.addOverridingModule(new AbstractModule() {
+        controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 AVUtils.bindGeneratorFactory(binder(), RandomDensityGenerator.class.getSimpleName()).//
@@ -156,8 +133,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         });
 
         /** run simulation */
-        controler.configureQSimComponents(AVQSimModule::configureComponents);
-        controler.run();
+        controller.run();
 
         /** close port for visualizaiton */
         SimulationServer.INSTANCE.stopAccepting();
