@@ -9,16 +9,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 import ch.ethz.idsc.aido.AidoModule;
 import ch.ethz.idsc.amod.ext.Static;
@@ -27,12 +23,8 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusDatabaseModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusModule;
-import ch.ethz.idsc.amodeus.matsim.mod.AmodeusVirtualNetworkModule;
 import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
 import ch.ethz.idsc.amodeus.matsim.xml.ConfigDispatcherChanger;
-import ch.ethz.idsc.amodeus.net.DatabaseModule;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
@@ -40,8 +32,8 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.matsim.av.config.AVConfigGroup;
-import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.framework.AVUtils;
+import ch.ethz.refactoring.AmodeusConfigurator;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
@@ -102,29 +94,18 @@ import ch.ethz.matsim.av.framework.AVUtils;
 
         Objects.requireNonNull(network);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
-        Controler controler = new Controler(scenario);
+        Controler controller = new Controler(scenario);
+        AmodeusConfigurator.configureController(controller, db, scenarioOptions);
 
-        controler.addOverridingModule(new DvrpTravelTimeModule());
-        controler.addOverridingQSimModule(new TrafficDataModule(lsData));
-        controler.addOverridingModule(new AVModule());
-        controler.addOverridingModule(new DatabaseModule());
-        controler.addOverridingModule(new AidoModule(stringSocket, numReqTot));
-        controler.addOverridingModule(new AmodeusDatabaseModule(db));
-        controler.addOverridingModule(new AmodeusVirtualNetworkModule(scenarioOptions));
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
-            }
-        });
-        controler.addOverridingModule(new AmodeusModule());
-        controler.addOverridingModule(new AbstractModule() {
+        controller.addOverridingQSimModule(new TrafficDataModule(lsData));
+        controller.addOverridingModule(new AidoModule(stringSocket, numReqTot));
+        controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 AVUtils.registerDispatcherFactory(binder(), StringDispatcherHost.class.getSimpleName(), StringDispatcherHost.Factory.class);
             }
         });
-        controler.addOverridingModule(new AbstractModule() {
+        controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 AVUtils.bindGeneratorFactory(binder(), RandomDensityGenerator.class.getSimpleName()).//
@@ -138,7 +119,7 @@ import ch.ethz.matsim.av.framework.AVUtils;
         ConfigDispatcherChanger.change(configSimPath, "StringDispatcherHost");
 
         /** run simulation */
-        controler.run();
+        controller.run();
 
         /** close port for visualizaiton */
         SimulationServer.INSTANCE.stopAccepting();
