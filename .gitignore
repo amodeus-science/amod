@@ -78,3 +78,6 @@ fabric.properties
 
 # macos files
 .DS_Store
+
+# temporary
+virtualNetwork/*

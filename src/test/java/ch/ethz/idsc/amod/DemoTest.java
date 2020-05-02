@@ -42,9 +42,11 @@ public class DemoTest {
         DeleteDirectory.of(new File(workingDirectory, "preparedNetwork.xml.gz"), 0, 1);
         DeleteDirectory.of(new File(workingDirectory, "population.xml.gz"), 0, 1);
         DeleteDirectory.of(new File(workingDirectory, "network.xml.gz"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "scenario.zip"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "virtualNetwork"), 1, 4);
+        DeleteDirectory.of(new File(workingDirectory, "virtualNetwork/travelData"), 0,1);
+        DeleteDirectory.of(new File(workingDirectory, "virtualNetwork/virtualNetwork"), 0,1);
+        DeleteDirectory.of(new File(workingDirectory, "virtualNetwork"), 0,1);
         DeleteDirectory.of(new File(workingDirectory, "output"), 5, 15700);
+        DeleteDirectory.of(new File(workingDirectory, "scenario.zip"), 0, 1);
     }
 
 }
