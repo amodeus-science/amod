@@ -28,7 +28,7 @@ import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.router.AVRouter;
 
-// TODO refactor and shorten @clruch
+// TODO @clruch refactor and shorten 
 /** Dispatcher sends vehicles to all links in the network and lets them pickup
  * any customers which are waiting along the road. */
 public class DemoDispatcher extends RebalancingDispatcher {
