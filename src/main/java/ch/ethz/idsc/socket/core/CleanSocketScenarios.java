@@ -7,7 +7,7 @@ import java.util.Arrays;
 /* package */ enum CleanSocketScenarios {
     ;
 
-    /** clean up downloaded files for aido scenaros */
+    /** clean up downloaded files for socket scenaros */
     public static void now() {
         String[] files = new String[] { "AmodeusOptions.properties", "LPOptions.properties", //
                 "av.xml", "matsimConfig.xml", "personAtrributes-with-subpopulation.xml", //

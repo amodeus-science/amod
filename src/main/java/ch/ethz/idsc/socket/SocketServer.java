@@ -121,7 +121,7 @@ import ch.ethz.refactoring.AmodeusConfigurator;
         controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "AidoDispatcherHost", SocketDispatcherHost.Factory.class);
+                AVUtils.registerDispatcherFactory(binder(), "SocketDispatcherHost", SocketDispatcherHost.Factory.class);
             }
         });
 

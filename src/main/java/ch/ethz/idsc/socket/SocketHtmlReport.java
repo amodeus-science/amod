@@ -22,13 +22,13 @@ import ch.ethz.idsc.tensor.red.Total;
     /** relative to report folder */
     private static final String IMAGE_FOLDER = "../data";
     // ---
-    private final SocketScoreElement aidoScoreElement;
+    private final SocketScoreElement socketScoreElement;
     private Scalar totalMeanWaitingTime;
     private Scalar totalEfficiencyRatio; /* empty distance divided by total distance */
     private Scalar numberOfVehicles;
 
-    public SocketHtmlReport(SocketScoreElement aidoScoreElement) {
-        this.aidoScoreElement = aidoScoreElement;
+    public SocketHtmlReport(SocketScoreElement socketScoreElement) {
+        this.socketScoreElement = socketScoreElement;
     }
 
     @Override
@@ -63,13 +63,13 @@ import ch.ethz.idsc.tensor.red.Total;
             );
             aRElement.getHTMLGenerator()
                     .insertTextLeft(" " + //
-                            "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(1)) + //
-                            "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(2)) + //
-                            "\n" + Total.of(Transpose.of(aidoScoreElement.getScoreDiffHistory()).get(3)) //
+                            "\n" + Total.of(Transpose.of(socketScoreElement.getScoreDiffHistory()).get(1)) + //
+                            "\n" + Total.of(Transpose.of(socketScoreElement.getScoreDiffHistory()).get(2)) + //
+                            "\n" + Total.of(Transpose.of(socketScoreElement.getScoreDiffHistory()).get(3)) //
             );
             aRElement.getHTMLGenerator().newLine();
 
-            bodyElements.put("Aido Scores", aRElement);
+            bodyElements.put("Socket Scores", aRElement);
         }
         return bodyElements;
 

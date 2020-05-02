@@ -55,7 +55,7 @@ public class SocketPreparer {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         GeneratorConfig genConfig = avConfigGroup.getOperatorConfigs().values().iterator().next().getGeneratorConfig();
         numRt = genConfig.getNumberOfVehicles();
-        System.out.println("aidoprep NumberOfVehicles=" + numRt);
+        System.out.println("socketPrep NumberOfVehicles=" + numRt);
 
         /** adaption of MATSim network, e.g., radius cutting */
         Network network = scenario.getNetwork();

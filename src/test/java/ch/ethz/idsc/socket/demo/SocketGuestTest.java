@@ -8,7 +8,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.io.StringScalar;
 import junit.framework.TestCase;
 
-public class AidoGuestTest extends TestCase {
+public class SocketGuestTest extends TestCase {
     public void testSimple() {
         Tensor config = Tensors.of( //
                 StringScalar.of(SocketGuest.SCENARIO), // scenario name

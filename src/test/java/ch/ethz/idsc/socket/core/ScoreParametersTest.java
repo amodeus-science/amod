@@ -13,7 +13,7 @@ public class ScoreParametersTest extends TestCase {
     }
 
     public void testScenarios() {
-        Properties properties = ResourceData.properties("/aido/scenarios.properties");
+        Properties properties = ResourceData.properties("/socket/scenarios.properties");
         assertNotNull(properties);
     }
 }

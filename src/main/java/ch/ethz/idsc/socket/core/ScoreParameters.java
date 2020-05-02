@@ -9,13 +9,13 @@ import ch.ethz.idsc.tensor.io.ResourceData;
 import ch.ethz.idsc.tensor.io.TensorProperties;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-/** values in class are required by AidoHost
+/** values in class are required by SocketHost
  * therefore class was made public */
 public class ScoreParameters {
     /** overrides default values defined in class
      * with the values parsed from the properties file */
     public static final ScoreParameters GLOBAL = TensorProperties.wrap(new ScoreParameters()) //
-            .set(ResourceData.properties("/aido/ScoreParameters.properties"));
+            .set(ResourceData.properties("/socket/ScoreParameters.properties"));
 
     /** service quality */
     public Tensor alpha12 = Tensors.fromString("{-0.5[s^-1], -0.7[m^-1]}");

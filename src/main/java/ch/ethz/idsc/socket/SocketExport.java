@@ -22,26 +22,26 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
 /* package */ class SocketExport implements AnalysisExport {
 
     /** settings for plot */
-    /* package */ static final String FILENAME_SCORE_INCR = "aidoScores1and2Diff.png";
-    /* package */ static final String FILENAME_SCORE_INTG = "aidoScores1and2Intg.png";
-    /* package */ static final String FILENAME_SCORE3_INTG = "aidoScore3Intg.png";
+    /* package */ static final String FILENAME_SCORE_INCR = "socketScores1and2Diff.png";
+    /* package */ static final String FILENAME_SCORE_INTG = "socketScores1and2Intg.png";
+    /* package */ static final String FILENAME_SCORE3_INTG = "socketScore3Intg.png";
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 750;
 
-    /** aido score element */
-    private final SocketScoreElement aidoScoreElement;
+    /** socket score element */
+    private final SocketScoreElement socketScoreElement;
 
-    public SocketExport(SocketScoreElement aidoScoreElement) {
-        this.aidoScoreElement = aidoScoreElement;
+    public SocketExport(SocketScoreElement socketScoreElement) {
+        this.socketScoreElement = socketScoreElement;
     }
 
     @Override
     public void summaryTarget(AnalysisSummary analysisSummary, File relativeDirectory, ColorDataIndexed colorScheme) {
 
-        Tensor scoreDiffHistory = aidoScoreElement.getScoreDiffHistory();
-        Tensor scoreIntgHistory = aidoScoreElement.getScoreIntgHistory();
+        Tensor scoreDiffHistory = socketScoreElement.getScoreDiffHistory();
+        Tensor scoreIntgHistory = socketScoreElement.getScoreIntgHistory();
 
-        /** produce charts that show 2 Aido scores during simulation (integrated and
+        /** produce charts that show 2 scores during simulation (integrated and
          * increment) */
         Tensor time = scoreDiffHistory.get(Tensor.ALL, 0);
         Tensor linCombScoresDiff = Tensor.of(scoreDiffHistory.stream().map(row -> row.extract(1, 3)));
@@ -56,7 +56,7 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
             AmodeusChartUtils.saveAsPNG(chart, fileChart.toString(), WIDTH, HEIGHT);
             GlobalAssert.that(fileChart.isFile());
         } catch (Exception e1) {
-            System.err.println("Plotting the aido scores was unsuccessful.");
+            System.err.println("Plotting the scores was unsuccessful.");
             e1.printStackTrace();
         }
 
@@ -68,7 +68,7 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
             AmodeusChartUtils.saveAsPNG(chart, fileChart.toString(), WIDTH, HEIGHT);
             GlobalAssert.that(fileChart.isFile());
         } catch (Exception e1) {
-            System.err.println("Plotting the aido scores was unsuccessful.");
+            System.err.println("Plotting the scores was unsuccessful.");
             e1.printStackTrace();
         }
 
@@ -84,16 +84,16 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
             AmodeusChartUtils.saveAsPNG(chart, fileChart.toString(), WIDTH, HEIGHT);
             GlobalAssert.that(fileChart.isFile());
         } catch (Exception e1) {
-            System.err.println("Plotting the aido scores was unsuccessful.");
+            System.err.println("Plotting the scores was unsuccessful.");
             e1.printStackTrace();
         }
 
-        /** export incremental and integrated aido scores data */
+        /** export incremental and integrated scores data */
         try {
-            UnitSaveUtils.saveFile(aidoScoreElement.getScoreDiffHistory(), "aidoScoresIncr", relativeDirectory);
-            UnitSaveUtils.saveFile(aidoScoreElement.getScoreIntgHistory(), "aidoScoresIntg", relativeDirectory);
+            UnitSaveUtils.saveFile(socketScoreElement.getScoreDiffHistory(), "socketScoresIncr", relativeDirectory);
+            UnitSaveUtils.saveFile(socketScoreElement.getScoreIntgHistory(), "socketScoresIntg", relativeDirectory);
         } catch (Exception exception) {
-            System.err.println("Saving aido score history was unsuccessful.");
+            System.err.println("Saving score history was unsuccessful.");
             exception.printStackTrace();
         }
     }

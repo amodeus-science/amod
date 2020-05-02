@@ -26,7 +26,7 @@ public enum SocketScenarioDownload {
      * @param file local target
      * @throws Exception */
     public static void of(String key, File file) throws IOException {
-        Properties properties = ResourceData.properties("/aido/scenarios.properties");
+        Properties properties = ResourceData.properties("/socket/scenarios.properties");
         if (properties.containsKey(key)) {
             /** chosing scenario */
             String value = properties.getProperty(key);

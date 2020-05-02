@@ -14,7 +14,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
 public class SocketScoreElement implements AnalysisElement {
 
-    private final SocketDistanceRecorder aidoDistanceRecorder;
+    private final SocketDistanceRecorder socketDistanceRecorder;
     private final TableBuilder scoreDiffTable = new TableBuilder();
     private final TableBuilder scoreIntgTable = new TableBuilder();
     private final ServiceQualityScore squScore;
@@ -29,7 +29,7 @@ public class SocketScoreElement implements AnalysisElement {
 
     public SocketScoreElement( //
             int numberRoboTaxis, int totReq, ScoreParameters scoreParameters, MatsimAmodeusDatabase db) {
-        aidoDistanceRecorder = new SocketDistanceRecorder(numberRoboTaxis, db);
+        socketDistanceRecorder = new SocketDistanceRecorder(numberRoboTaxis, db);
         squScore = new ServiceQualityScore(scoreParameters);
         effScore = new EfficiencyScore(scoreParameters);
         fltScore = new FleetSizeScore(scoreParameters, totReq, numberRoboTaxis);
@@ -53,7 +53,7 @@ public class SocketScoreElement implements AnalysisElement {
          * This distance is always accounted when a vehicle leaves a link, so for an individual vehicle
          * it produced a sequence {...,0,0,d1,0,0,d2,0,...} */
 
-        Tensor currDistance = aidoDistanceRecorder.distance(simulationObject);
+        Tensor currDistance = socketDistanceRecorder.distance(simulationObject);
         Scalar distEmpty = currDistance.Get(1);
 
         /** update scores with information */

@@ -8,7 +8,7 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.socket.core.SocketScenarioDownload;
 import junit.framework.TestCase;
 
-public class AidoScenarioDownloadTest extends TestCase {
+public class SocketScenarioDownloadTest extends TestCase {
     public void testSimple() throws IOException {
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         File file = new File(workingDirectory, "scenario.zip"); // <3MB

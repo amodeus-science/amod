@@ -30,7 +30,7 @@ import ch.ethz.idsc.tensor.Tensor;
 
     public Scalar getScoreDiff() {
         Scalar scoreDiff = score.subtract(scorePrev);
-        // the check below is specific to the reward function used in the aido competition
+        // the check below is specific to the reward function used in reenforcement learning
         // the check below is not strictly required in general
         GlobalAssert.that(Scalars.lessEquals(scoreDiff, RealScalar.ZERO));
         return scoreDiff;

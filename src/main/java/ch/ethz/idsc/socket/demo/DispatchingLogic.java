@@ -16,8 +16,8 @@ import ch.ethz.idsc.tensor.pdf.RandomVariate;
 import ch.ethz.idsc.tensor.pdf.UniformDistribution;
 import ch.ethz.idsc.tensor.sca.Round;
 
-/** dispatching logic in the AidoGuest demo to compute dispatching instructions
- * that are forwarded to the AidoHost */
+/** dispatching logic in the SocketGuest demo to compute dispatching instructions
+ * that are forwarded to the SocketHost */
 /* package */ class DispatchingLogic {
 
     private final Set<Scalar> matchedReq = new HashSet<>();

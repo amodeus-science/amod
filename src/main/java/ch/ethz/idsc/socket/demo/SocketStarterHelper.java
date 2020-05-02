@@ -9,7 +9,7 @@ import ch.ethz.idsc.socket.SocketHost;
     ;
 
     public static void main(String[] args) throws Exception {
-        /** {@link AidoHost} runs a simulation of an autonomous mobility-on-demand
+        /** {@link SocketHost} runs a simulation of an autonomous mobility-on-demand
          * system in the AMoDeus framework */
         new Thread(new Runnable() {
             @Override
@@ -24,8 +24,8 @@ import ch.ethz.idsc.socket.SocketHost;
 
         Thread.sleep(1000);
 
-        /** {@link AidoGuest} executes the dispatching logic of the user participating
-         * in the artificial intelligence driving olympics (AIDO) */
+        /** {@link SocketGuest} executes the dispatching logic encoded
+         * in another programming language */
         SocketGuest.main(args);
     }
 }

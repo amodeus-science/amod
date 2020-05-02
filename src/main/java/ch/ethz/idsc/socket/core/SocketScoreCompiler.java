@@ -15,12 +15,12 @@ public class SocketScoreCompiler {
     private static final String INFO_LINE = "";
     private static final int TOTAL_MATCHED_REQUESTS = -1;
     // ---
-    private final SocketScoreElement aidoScoreElement;
+    private final SocketScoreElement socketScoreElement;
     private final MatsimAmodeusDatabase db;
 
     public SocketScoreCompiler(List<RoboTaxi> roboTaxis, int totReq, MatsimAmodeusDatabase db) {
         this.db = db;
-        aidoScoreElement = new SocketScoreElement(roboTaxis.size(), totReq, ScoreParameters.GLOBAL, db);
+        socketScoreElement = new SocketScoreElement(roboTaxis.size(), totReq, ScoreParameters.GLOBAL, db);
     }
 
     public Tensor compile(long timeMatsim, List<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
@@ -31,7 +31,7 @@ public class SocketScoreCompiler {
         simulationObjectCompiler.insertRequests(requests, RequestStatus.EMPTY); // request status not used
 
         /** insert and evaluate */
-        aidoScoreElement.register(simulationObjectCompiler.compile());
-        return aidoScoreElement.getScoreDiff();
+        socketScoreElement.register(simulationObjectCompiler.compile());
+        return socketScoreElement.getScoreDiff();
     }
 }

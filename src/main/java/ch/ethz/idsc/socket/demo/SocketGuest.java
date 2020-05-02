@@ -16,10 +16,10 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.io.StringScalar;
 
-/** AidoGuest is a simple demo client that interacts with AidoHost.
+/** SocketGuest is a simple demo client that interacts with SocketHost.
  * 
  * Usage:
- * java -cp target/amod-VERSION.jar amod.aido.demo.AidoGuest [IP of host] */
+ * java -cp target/amod-VERSION.jar amod.socket.demo.SocketGuest [IP of host] */
 public class SocketGuest {
 
     /** default values for demo */
@@ -31,8 +31,8 @@ public class SocketGuest {
     /** @param args 1 entry which is IP address
      * @throws Exception */
     public static void main(String[] args) throws Exception {
-        SocketGuest aidoGuest = new SocketGuest(args.length == 0 ? "localhost" : args[0]);
-        aidoGuest.run(SCENARIO, REQUEST_NUMBER_DESIRED, NUMBER_OF_VEHICLES);
+        SocketGuest socketGuest = new SocketGuest(args.length == 0 ? "localhost" : args[0]);
+        socketGuest.run(SCENARIO, REQUEST_NUMBER_DESIRED, NUMBER_OF_VEHICLES);
     }
 
     // ---
@@ -44,7 +44,7 @@ public class SocketGuest {
     }
 
     public void run(String scenario, int requestsDesired, int numberOfVehicles) throws UnknownHostException, IOException, Exception {
-        /** connect to AidoGuest */
+        /** connect to SocketGuest */
         try (StringSocket stringSocket = new StringSocket(new Socket(ip, SocketHost.PORT))) {
 
             /** send initial command, e.g., {SanFrancisco.20080518} */

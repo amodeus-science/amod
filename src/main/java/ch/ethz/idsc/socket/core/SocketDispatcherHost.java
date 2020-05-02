@@ -41,10 +41,10 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
     private final StringSocket clientSocket;
     private final int numReqTot;
     private final int dispatchPeriod;
-    private final SocketRequestCompiler aidoReqComp;
-    private final SocketRoboTaxiCompiler aidoRobTaxComp;
+    private final SocketRequestCompiler socketReqComp;
+    private final SocketRoboTaxiCompiler socketRobTaxComp;
     // ---
-    private SocketScoreCompiler aidoScoreCompiler;
+    private SocketScoreCompiler socketScoreCompiler;
 
     protected SocketDispatcherHost(Network network, Config config, OperatorConfig operatorConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager, //
@@ -57,8 +57,8 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
         this.fastLinkLookup = new FastLinkLookup(network, db);
         SafeConfig safeConfig = SafeConfig.wrap(operatorConfig.getDispatcherConfig());
         this.dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
-        aidoReqComp = new SocketRequestCompiler(db);
-        aidoRobTaxComp = new SocketRoboTaxiCompiler(db);
+        socketReqComp = new SocketRequestCompiler(db);
+        socketRobTaxComp = new SocketRoboTaxiCompiler(db);
     }
 
     @Override
@@ -68,20 +68,20 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
         if (getRoboTaxis().size() > 0 && idRoboTaxiMap.isEmpty()) {
             getRoboTaxis().forEach( //
                     roboTaxi -> idRoboTaxiMap.put(db.getVehicleIndex(roboTaxi), roboTaxi));
-            aidoScoreCompiler = new SocketScoreCompiler(getRoboTaxis(), numReqTot, db);
+            socketScoreCompiler = new SocketScoreCompiler(getRoboTaxis(), numReqTot, db);
         }
 
         if (round_now % dispatchPeriod == 0) {
 
-            if (Objects.nonNull(aidoScoreCompiler))
+            if (Objects.nonNull(socketScoreCompiler))
                 try {
                     getAVRequests().forEach( //
                             avRequest -> idRequestMap.put(db.getRequestIndex(avRequest), avRequest));
 
                     Tensor status = Tensors.of(RealScalar.of((long) now), //
-                            aidoRobTaxComp.compile(getRoboTaxis()), //
-                            aidoReqComp.compile(getAVRequests()), //
-                            aidoScoreCompiler.compile(round_now, getRoboTaxis(), getAVRequests()));
+                            socketRobTaxComp.compile(getRoboTaxis()), //
+                            socketReqComp.compile(getAVRequests()), //
+                            socketScoreCompiler.compile(round_now, getRoboTaxis(), getAVRequests()));
                     clientSocket.writeln(status);
 
                     String fromClient = clientSocket.readLine();

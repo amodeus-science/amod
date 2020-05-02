@@ -29,7 +29,7 @@ import ch.ethz.idsc.tensor.sca.Round;
  * a client can connect to a running host via TCP/IP
  * 
  * Usage:
- * java -cp target/amod-VERSION.jar amod.aido.AidoHost [city] */
+ * java -cp target/amod-VERSION.jar amod.socket.SocketHost [city] */
 public enum SocketHost {
     ;
     public static final int PORT = 9382;
@@ -54,7 +54,7 @@ public enum SocketHost {
             // ---
             String readLine = stringSocket.readLine();
             Tensor config = Tensors.fromString(readLine);
-            System.out.println("AidoHost config: " + config);
+            System.out.println("SocketHost config: " + config);
             Thread.sleep(1000);
             String scenarioTag = config.Get(0).toString();
             {
@@ -109,28 +109,28 @@ public enum SocketHost {
             /** run second part of preparer */
             preparer.run2(numReqDes);
 
-            /** run with AIDO dispatcher */
+            /** run with socket dispatcher */
             ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
             String simConfigPath = scenarioOptions.getSimulationConfigName();
             ConfigDispatcherChanger.change(simConfigPath, SocketDispatcherHost.class.getSimpleName());
             ConfigVehiclesChanger.change(simConfigPath, fleetSize);
-            SocketServer aidoServer = new SocketServer();
-            aidoServer.simulate(stringSocket, numReqDes, workingDirectory);
+            SocketServer socketServer = new SocketServer();
+            socketServer.simulate(stringSocket, numReqDes, workingDirectory);
 
             /** send empty tensor "{}" to stop */
             stringSocket.writeln(Tensors.empty());
 
             /** analyze and send final score */
-            Analysis analysis = Analysis.setup(aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory(), //
-                    aidoServer.getNetwork(), preparer.getDatabase());
-            SocketScoreElement aidoScoreElement = new SocketScoreElement(fleetSize, numReqDes, preparer.getDatabase());
-            analysis.addAnalysisElement(aidoScoreElement);
+            Analysis analysis = Analysis.setup(socketServer.getScenarioOptions(), socketServer.getOutputDirectory(), //
+                    socketServer.getNetwork(), preparer.getDatabase());
+            SocketScoreElement socketScoreElement = new SocketScoreElement(fleetSize, numReqDes, preparer.getDatabase());
+            analysis.addAnalysisElement(socketScoreElement);
 
-            SocketExport aidoExport = new SocketExport(aidoScoreElement);
-            analysis.addAnalysisExport(aidoExport);
+            SocketExport socketExport = new SocketExport(socketScoreElement);
+            analysis.addAnalysisExport(socketExport);
 
-            SocketHtmlReport aidoHtmlReport = new SocketHtmlReport(aidoScoreElement);
-            analysis.addHtmlElement(aidoHtmlReport);
+            SocketHtmlReport socketHtmlReport = new SocketHtmlReport(socketScoreElement);
+            analysis.addHtmlElement(socketHtmlReport);
             analysis.run();
 
             { /** create a video if environment variable is set */
@@ -141,7 +141,7 @@ public enum SocketHost {
 
             /** send final score,
              * {total waiting time, total distance with customer, total empty distance} */
-            stringSocket.writeln(Total.of(aidoScoreElement.getScoreDiffHistory()));
+            stringSocket.writeln(Total.of(socketScoreElement.getScoreDiffHistory()));
 
         } catch (Exception exception) {
             // exception.printStackTrace();

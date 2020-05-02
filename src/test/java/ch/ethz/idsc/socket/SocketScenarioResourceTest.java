@@ -9,7 +9,7 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.socket.SocketScenarioResource;
 import junit.framework.TestCase;
 
-public class AidoScenarioResourceTest extends TestCase {
+public class SocketScenarioResourceTest extends TestCase {
     public void testLocal() throws IOException {
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         List<File> list = SocketScenarioResource.extract("SanFrancisco", workingDirectory);
