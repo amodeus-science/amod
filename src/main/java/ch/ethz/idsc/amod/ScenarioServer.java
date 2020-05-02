@@ -23,10 +23,7 @@ import ch.ethz.idsc.amod.generator.DemoGenerator;
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
-import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TaxiTravelTimeRouter;
-import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
 import ch.ethz.idsc.amodeus.matsim.utils.AddCoordinatesToActivities;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
@@ -55,7 +52,7 @@ import ch.ethz.refactoring.AmodeusConfigurator;
      * @throws Exception */
     public static void simulate(File workingDirectory) throws MalformedURLException, Exception {
         Static.setup();
-        Static.checkGLPKLib();
+        System.out.println("\n\n\n" + Static.glpInfo() + "\n\n\n");
 
         /** working directory and options */
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
@@ -102,16 +99,6 @@ import ch.ethz.refactoring.AmodeusConfigurator;
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         Controler controller = new Controler(scenario);
         AmodeusConfigurator.configureController(controller, db, scenarioOptions);
-
-        try {
-            // load linkSpeedData if possible
-            File linkSpeedDataFile = new File(scenarioOptions.getLinkSpeedDataName());
-            System.out.println(linkSpeedDataFile.toString());
-            LinkSpeedDataContainer lsData = LinkSpeedUtils.loadLinkSpeedData(linkSpeedDataFile);
-            controller.addOverridingQSimModule(new TrafficDataModule(lsData));
-        } catch (Exception exception) {
-            System.err.println("Could not load static linkspeed data, running with freespeeds.");
-        }
 
         /** With the subsequent lines an additional user-defined dispatcher is added, functionality
          * in class
