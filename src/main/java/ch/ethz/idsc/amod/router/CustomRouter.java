@@ -18,7 +18,7 @@ import ch.ethz.matsim.av.router.AVRouter;
 /** This is a nonfunctional sample demonstrating of how to include a custom router
  * to AMoDeus which is not the standard choice of the Paralllel Djikstra router used
  * normally to calculate the path for {@link RoboTaxi} */
-public class CustomRouter implements AVRouter {
+/* package */ class CustomRouter implements AVRouter {
 
     @Override
     public Future<Path> calcLeastCostPath(Node fromNode, Node toNode, double starttime, //

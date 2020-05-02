@@ -27,7 +27,7 @@ import ch.ethz.matsim.av.config.operator.GeneratorConfig;
  * example a user may want to restrict the population size to few 100s of agents
  * to run simulations quickly during testing, or the network should be reduced
  * to a certain area. */
-public enum ScenarioPreparer {
+/* package */ enum ScenarioPreparer {
     ;
 
     public static void main(String[] args) throws MalformedURLException, Exception {

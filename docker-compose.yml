@@ -5,8 +5,8 @@
 #    image: duckietown/amod
 #    expose:
 #    - 9382
-#    # TODO: Either omit version from JAR name or pass as ENV variable
-#    # TODO: Set heap size somewhere besides the command line argument?
+#    # TODO: @datahaki Either omit version from JAR name or pass as ENV variable
+#    # TODO: @datahaki Set heap size somewhere besides the command line argument?
 #    command: java -Xmx10000m -cp amod-1.4.8.jar amod.aido.AidoHost
 #  aido-guest:
 #    build: .

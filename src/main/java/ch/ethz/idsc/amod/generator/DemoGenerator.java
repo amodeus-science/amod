@@ -29,7 +29,7 @@ import ch.ethz.matsim.av.generator.AVUtils;
  * and all vehicles are placed on these random links. */
 public class DemoGenerator implements AVGenerator {
 
-    // TODO create Demo2Generator to introduce substantial functionality change
+    // TODO @clruch create Demo2Generator to introduce substantial functionality change including sharec capacity
 
     // private static final Logger LOGGER = Logger.getLogger(DemoGenerator.class);
     // // ---
@@ -77,7 +77,7 @@ public class DemoGenerator implements AVGenerator {
     // LOGGER.info("car placed at link " + linkSel);
     //
     // Id<DvrpVehicle> id = Id.create("av_" + prefix + String.valueOf(generatedNumberOfVehicles), DvrpVehicle.class);
-    // // TODO SHARED add capacity attribute here
+    // // TODO @clruch SHARED add capacity attribute here
     // AVVehicle vehicle = new AVVehicle(id, linkSel, 1, 0.0, Double.POSITIVE_INFINITY);
     // return vehicle;
     // }

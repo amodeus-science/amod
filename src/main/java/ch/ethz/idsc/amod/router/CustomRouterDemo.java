@@ -4,7 +4,7 @@ package ch.ethz.idsc.amod.router;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
 /** Nonfunctional code explaining how a custom router would be incluced to an AMoDeus simulation. */
-public class CustomRouterDemo {
+/* package */ class CustomRouterDemo {
 
     public static void main(String[] args) {
         /** In order to include a custom router, you should add this line in ScenarioServer

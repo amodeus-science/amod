@@ -41,7 +41,7 @@ import ch.ethz.refactoring.AmodeusConfigurator;
 /** This class runs an AMoDeus simulation based on MATSim. The results can be
  * viewed if the {@link ScenarioViewer} is executed in the same working
  * directory and the button "Connect" is pressed. */
-public enum ScenarioServer {
+/* package */ enum ScenarioServer {
     ;
 
     public static void main(String[] args) throws MalformedURLException, Exception {
@@ -82,8 +82,9 @@ public enum ScenarioServer {
         config.planCalcScore().addActivityParams(new ActivityParams("activity"));
         /** MATSim does not allow the typical duration not to be set, therefore for scenarios
          * generated from taxi data such as the "SanFrancisco" scenario, it is set to 1 hour. */
+        // TODO @Sebastian fix this to meaningful values, remove, or add comment
+        // this was added because there are sometimes problems, is there a more elegant option?
         for (ActivityParams activityParams : config.planCalcScore().getActivityParams()) {
-            // TODO set typical duration in scenario generation and remove
             activityParams.setTypicalDuration(3600.0);
         }
 

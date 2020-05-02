@@ -35,6 +35,7 @@ import ch.ethz.matsim.av.config.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVUtils;
 import ch.ethz.refactoring.AmodeusConfigurator;
 
+//TODO @clruch remove redundancy      50 StringServer AidoServer
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
 /* package */ class StringServer {
@@ -76,8 +77,10 @@ import ch.ethz.refactoring.AmodeusConfigurator;
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
         config.planCalcScore().addActivityParams(new ActivityParams("activity"));
+        // TODO @Sebastian fix this to meaningful values, remove, or add comment
+        // this was added because there are sometimes problems, is there a more elegant option?
         for (ActivityParams activityParams : config.planCalcScore().getActivityParams()) {
-            activityParams.setTypicalDuration(3600.0); // TODO fix this to meaningful values
+            activityParams.setTypicalDuration(3600.0); 
         }
 
         /** load MATSim scenario for simulation */

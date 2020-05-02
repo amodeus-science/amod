@@ -5,7 +5,7 @@ import java.net.MalformedURLException;
 
 /** Helper class to run a default preparer and server, the typical 
  * sequence of execution. */
-public enum ScenarioExecutionSequence {
+/* package */ enum ScenarioExecutionSequence {
     ;
 
     public static void main(String[] args) throws MalformedURLException, Exception {

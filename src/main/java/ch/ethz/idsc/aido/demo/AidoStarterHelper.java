@@ -5,7 +5,7 @@ import ch.ethz.idsc.aido.AidoHost;
 
 /** function starts {@link AidoHost} process and {@link AidoGuest} process
  * in different threads for testing. */
-public enum AidoStarterHelper {
+/* package */ enum AidoStarterHelper {
     ;
 
     public static void main(String[] args) throws Exception {

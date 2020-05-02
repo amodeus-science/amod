@@ -4,7 +4,7 @@ package ch.ethz.idsc.aido.core;
 import java.io.File;
 import java.util.Arrays;
 
-public enum CleanAidoScenarios {
+/* package */ enum CleanAidoScenarios {
     ;
 
     /** clean up downloaded files for aido scenaros */
