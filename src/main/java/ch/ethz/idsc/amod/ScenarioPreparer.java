@@ -17,6 +17,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.amodeus.prep.PopulationPreparer;
+import ch.ethz.idsc.amodeus.prep.TheApocalypse;
 import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.matsim.av.config.AVConfigGroup;
@@ -42,7 +43,7 @@ import ch.ethz.matsim.av.config.operator.GeneratorConfig;
      * @throws Exception */
     public static void run(File workingDirectory) throws MalformedURLException, Exception {
         Static.setup();
-        Static.checkGLPKLib();
+        System.out.println("\n\n\n" + Static.glpInfo() + "\n\n\n");
 
         /** The {@link ScenarioOptions} contain amodeus specific options. Currently there
          * are 3 options files: - MATSim configurations (config.xml) - AV package
@@ -51,6 +52,7 @@ import ch.ethz.matsim.av.config.operator.GeneratorConfig;
          * The number of configs is planned to be reduced in subsequent refactoring
          * steps. */
         ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
+        Static.setLPtoNone(workingDirectory);
 
         /** MATSim config */
         AVConfigGroup avConfigGroup = new AVConfigGroup();
@@ -66,6 +68,11 @@ import ch.ethz.matsim.av.config.operator.GeneratorConfig;
 
         /** adaption of MATSim population, e.g., radius cutting */
         Population population = scenario.getPopulation();
+
+        /** this reduced the population size to allow for faster simulation initially,
+         * remove to have bigger simualation */
+        TheApocalypse.reducesThe(population).toNoMoreThan(2000);
+
         long apoSeed = 1234;
         PopulationPreparer.run(network, population, scenarioOptions, config, apoSeed);
 
