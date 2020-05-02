@@ -15,7 +15,7 @@ import ch.ethz.idsc.amodeus.prep.TheRequestApocalypse;
 import ch.ethz.idsc.amodeus.util.io.GZHandler;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
-public enum AidoPopulationPreparer {
+/* package */ enum AidoPopulationPreparer {
     ;
 
     public static void run(Network network, Population population, ScenarioOptions scenOptions, //

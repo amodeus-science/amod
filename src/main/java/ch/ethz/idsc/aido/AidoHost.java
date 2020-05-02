@@ -24,6 +24,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
 
+//TODO refactor and shorten @clruch
 /** host that runs in container.
  * a client can connect to a running host via TCP/IP
  * 

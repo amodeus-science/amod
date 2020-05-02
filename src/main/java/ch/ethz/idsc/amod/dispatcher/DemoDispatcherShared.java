@@ -36,7 +36,7 @@ import ch.ethz.matsim.av.router.AVRouter;
  * it first picks up passengers 1,2,3,4 and then starts to bring passengers 1,2,3 to their destinations.
  * Passenger 4 is less lucky as the {@link RoboTaxi} first visits the city's North pole (northern most link)
  * before passenger 4 is finally dropped of and the procedure starts from beginning. */
-public class DemoDispatcherShared extends SharedRebalancingDispatcher {
+/* package */ class DemoDispatcherShared extends SharedRebalancingDispatcher {
 
     private final int dispatchPeriod;
     private final int rebalancePeriod;

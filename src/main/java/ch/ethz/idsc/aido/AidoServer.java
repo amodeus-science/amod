@@ -76,8 +76,10 @@ import ch.ethz.refactoring.AmodeusConfigurator;
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
         config.planCalcScore().addActivityParams(new ActivityParams("activity"));
+        // TODO @Sebastian fix this to meaningful values, remove, or add comment
+        // this was added because there are sometimes problems, is there a more elegant option?
         for (ActivityParams activityParams : config.planCalcScore().getActivityParams()) {
-            activityParams.setTypicalDuration(3600.0); // TODO fix this to meaningful values
+            activityParams.setTypicalDuration(3600.0);
         }
 
         /** load MATSim scenario for simulation */

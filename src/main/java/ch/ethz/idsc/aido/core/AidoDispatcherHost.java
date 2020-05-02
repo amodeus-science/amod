@@ -31,6 +31,8 @@ import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import ch.ethz.matsim.av.router.AVRouter;
 
+// TODO refactor and shorten @clruch
+// TODO @clruch remove redundancy   57 AidoDispatcherHost StringDispatcherHost
 public class AidoDispatcherHost extends RebalancingDispatcher {
     private final MatsimAmodeusDatabase db;
 

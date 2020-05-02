@@ -28,6 +28,7 @@ import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.router.AVRouter;
 
+// TODO @clruch refactor and shorten 
 /** Dispatcher sends vehicles to all links in the network and lets them pickup
  * any customers which are waiting along the road. */
 public class DemoDispatcher extends RebalancingDispatcher {
@@ -51,7 +52,7 @@ public class DemoDispatcher extends RebalancingDispatcher {
     public void redispatch(double now) {
 
         /** stop all vehicles which are driving by an open request */
-        // TODO CR check again
+        // TODO @clruch check again
         Map<RoboTaxi, AVRequest> stopDrivingBy = DrivebyRequestStopper //
                 .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
         total_abortTrip += stopDrivingBy.size();
