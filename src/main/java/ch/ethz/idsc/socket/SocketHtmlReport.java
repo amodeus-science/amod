@@ -9,7 +9,7 @@ import ch.ethz.idsc.amodeus.analysis.element.DistanceElement;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlBodyElement;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlGenerator;
 import ch.ethz.idsc.amodeus.analysis.report.HtmlReportElement;
-import ch.ethz.idsc.socket.core.AidoScoreElement;
+import ch.ethz.idsc.socket.core.SocketScoreElement;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -17,17 +17,17 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.red.Total;
 
-/* package */ class AidoHtmlReport implements HtmlReportElement {
+/* package */ class SocketHtmlReport implements HtmlReportElement {
 
     /** relative to report folder */
     private static final String IMAGE_FOLDER = "../data";
     // ---
-    private final AidoScoreElement aidoScoreElement;
+    private final SocketScoreElement aidoScoreElement;
     private Scalar totalMeanWaitingTime;
     private Scalar totalEfficiencyRatio; /* empty distance divided by total distance */
     private Scalar numberOfVehicles;
 
-    public AidoHtmlReport(AidoScoreElement aidoScoreElement) {
+    public SocketHtmlReport(SocketScoreElement aidoScoreElement) {
         this.aidoScoreElement = aidoScoreElement;
     }
 
@@ -51,9 +51,9 @@ import ch.ethz.idsc.tensor.red.Total;
 
             aRElement.getHTMLGenerator().insertTextLeft(HtmlGenerator.bold("Scores during Simulation"));
             aRElement.getHTMLGenerator().newLine();
-            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE_INCR, 800, 600);
-            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE_INTG, 800, 600);
-            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + AidoExport.FILENAME_SCORE3_INTG, 800, 600);
+            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + SocketExport.FILENAME_SCORE_INCR, 800, 600);
+            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + SocketExport.FILENAME_SCORE_INTG, 800, 600);
+            aRElement.getHTMLGenerator().insertImg(IMAGE_FOLDER + "/" + SocketExport.FILENAME_SCORE3_INTG, 800, 600);
 
             aRElement.getHTMLGenerator()
                     .insertTextLeft(HtmlGenerator.bold("Final Scores") + //

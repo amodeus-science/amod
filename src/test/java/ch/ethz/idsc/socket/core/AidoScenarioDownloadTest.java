@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.socket.core.AidoScenarioDownload;
+import ch.ethz.idsc.socket.core.SocketScenarioDownload;
 import junit.framework.TestCase;
 
 public class AidoScenarioDownloadTest extends TestCase {
@@ -13,7 +13,7 @@ public class AidoScenarioDownloadTest extends TestCase {
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         File file = new File(workingDirectory, "scenario.zip"); // <3MB
         assertFalse(file.exists());
-        AidoScenarioDownload.of("SanFrancisco", file);
+        SocketScenarioDownload.of("SanFrancisco", file);
         assertTrue(file.isFile());
         file.delete();
     }

@@ -1,7 +1,7 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.socket.demo;
 
-import ch.ethz.idsc.socket.demo.AidoGuest;
+import ch.ethz.idsc.socket.demo.SocketGuest;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
@@ -11,9 +11,9 @@ import junit.framework.TestCase;
 public class AidoGuestTest extends TestCase {
     public void testSimple() {
         Tensor config = Tensors.of( //
-                StringScalar.of(AidoGuest.SCENARIO), // scenario name
-                RealScalar.of(AidoGuest.REQUEST_NUMBER_DESIRED), // ratio of population
-                RealScalar.of(AidoGuest.NUMBER_OF_VEHICLES)); // number of vehicles
+                StringScalar.of(SocketGuest.SCENARIO), // scenario name
+                RealScalar.of(SocketGuest.REQUEST_NUMBER_DESIRED), // ratio of population
+                RealScalar.of(SocketGuest.NUMBER_OF_VEHICLES)); // number of vehicles
         assertEquals(config.toString().indexOf('\"'), -1);
     }
 }

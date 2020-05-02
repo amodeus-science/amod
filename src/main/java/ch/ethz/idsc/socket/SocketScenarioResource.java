@@ -9,9 +9,9 @@ import java.io.OutputStream;
 import java.util.List;
 
 import ch.ethz.idsc.amodeus.util.io.Unzip;
-import ch.ethz.idsc.socket.core.AidoScenarioDownload;
+import ch.ethz.idsc.socket.core.SocketScenarioDownload;
 
-public enum AidoScenarioResource {
+public enum SocketScenarioResource {
     ;
     private static final String SCENARIO_ZIP = "scenario.zip";
 
@@ -21,7 +21,7 @@ public enum AidoScenarioResource {
         /** file name is arbitrary, file will be deleted after un-zipping */
         final File file = new File(workingDirectory, SCENARIO_ZIP);
         String resource = "/scenario/" + key.replace('.', '/') + "/" + SCENARIO_ZIP;
-        try (InputStream inputStream = AidoScenarioResource.class.getResourceAsStream(resource)) {
+        try (InputStream inputStream = SocketScenarioResource.class.getResourceAsStream(resource)) {
             System.out.println("obtain as resource: [" + resource + "]");
             try (OutputStream outputStream = new FileOutputStream(file)) {
                 byte[] buffer = new byte[1024];
@@ -32,7 +32,7 @@ public enum AidoScenarioResource {
 
         } catch (Exception exception) {
             System.out.println("scenario not fount as resource: [" + resource + "]");
-            AidoScenarioDownload.of(key, file);
+            SocketScenarioDownload.of(key, file);
         }
         List<File> list = Unzip.of(file, workingDirectory, true);
         file.delete();

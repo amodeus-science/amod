@@ -1,11 +1,11 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.socket.demo;
 
-import ch.ethz.idsc.socket.AidoHost;
+import ch.ethz.idsc.socket.SocketHost;
 
-/** function starts {@link AidoHost} process and {@link AidoGuest} process
+/** function starts {@link SocketHost} process and {@link SocketGuest} process
  * in different threads for testing. */
-/* package */ enum AidoStarterHelper {
+/* package */ enum SocketStarterHelper {
     ;
 
     public static void main(String[] args) throws Exception {
@@ -15,7 +15,7 @@ import ch.ethz.idsc.socket.AidoHost;
             @Override
             public void run() {
                 try {
-                    AidoHost.main(args);
+                    SocketHost.main(args);
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
@@ -26,6 +26,6 @@ import ch.ethz.idsc.socket.AidoHost;
 
         /** {@link AidoGuest} executes the dispatching logic of the user participating
          * in the artificial intelligence driving olympics (AIDO) */
-        AidoGuest.main(args);
+        SocketGuest.main(args);
     }
 }

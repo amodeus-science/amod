@@ -32,8 +32,7 @@ import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import ch.ethz.matsim.av.router.AVRouter;
 
 // TODO refactor and shorten @clruch
-// TODO @clruch remove redundancy   57 AidoDispatcherHost StringDispatcherHost
-public class AidoDispatcherHost extends RebalancingDispatcher {
+public class SocketDispatcherHost extends RebalancingDispatcher {
     private final MatsimAmodeusDatabase db;
 
     private final Map<Integer, RoboTaxi> idRoboTaxiMap = new HashMap<>();
@@ -42,12 +41,12 @@ public class AidoDispatcherHost extends RebalancingDispatcher {
     private final StringSocket clientSocket;
     private final int numReqTot;
     private final int dispatchPeriod;
-    private final AidoRequestCompiler aidoReqComp;
-    private final AidoRoboTaxiCompiler aidoRobTaxComp;
+    private final SocketRequestCompiler aidoReqComp;
+    private final SocketRoboTaxiCompiler aidoRobTaxComp;
     // ---
-    private AidoScoreCompiler aidoScoreCompiler;
+    private SocketScoreCompiler aidoScoreCompiler;
 
-    protected AidoDispatcherHost(Network network, Config config, OperatorConfig operatorConfig, TravelTime travelTime,
+    protected SocketDispatcherHost(Network network, Config config, OperatorConfig operatorConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager, //
             StringSocket clientSocket, int numReqTot, //
             MatsimAmodeusDatabase db) {
@@ -58,8 +57,8 @@ public class AidoDispatcherHost extends RebalancingDispatcher {
         this.fastLinkLookup = new FastLinkLookup(network, db);
         SafeConfig safeConfig = SafeConfig.wrap(operatorConfig.getDispatcherConfig());
         this.dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
-        aidoReqComp = new AidoRequestCompiler(db);
-        aidoRobTaxComp = new AidoRoboTaxiCompiler(db);
+        aidoReqComp = new SocketRequestCompiler(db);
+        aidoRobTaxComp = new SocketRoboTaxiCompiler(db);
     }
 
     @Override
@@ -69,7 +68,7 @@ public class AidoDispatcherHost extends RebalancingDispatcher {
         if (getRoboTaxis().size() > 0 && idRoboTaxiMap.isEmpty()) {
             getRoboTaxis().forEach( //
                     roboTaxi -> idRoboTaxiMap.put(db.getVehicleIndex(roboTaxi), roboTaxi));
-            aidoScoreCompiler = new AidoScoreCompiler(getRoboTaxis(), numReqTot, db);
+            aidoScoreCompiler = new SocketScoreCompiler(getRoboTaxis(), numReqTot, db);
         }
 
         if (round_now % dispatchPeriod == 0) {
@@ -131,7 +130,7 @@ public class AidoDispatcherHost extends RebalancingDispatcher {
 
         @Override
         public AVDispatcher createDispatcher(OperatorConfig operatorConfig, AVRouter router, Network network) {
-            return new AidoDispatcherHost(network, config, operatorConfig, travelTime, router, eventsManager, //
+            return new SocketDispatcherHost(network, config, operatorConfig, travelTime, router, eventsManager, //
                     stringSocket, numReqTot, db);
         }
     }

@@ -10,7 +10,7 @@ import ch.ethz.idsc.amodeus.util.io.Unzip;
 import ch.ethz.idsc.tensor.io.ResourceData;
 import ch.ethz.idsc.tensor.io.URLFetch;
 
-public enum AidoScenarioDownload {
+public enum SocketScenarioDownload {
     ;
 
     /** @param key for instance "SanFrancisco.20080519"

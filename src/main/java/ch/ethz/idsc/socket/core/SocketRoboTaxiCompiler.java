@@ -11,10 +11,10 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.io.StringScalar;
 import ch.ethz.idsc.tensor.qty.Boole;
 
-public class AidoRoboTaxiCompiler {
+public class SocketRoboTaxiCompiler {
     private final MatsimAmodeusDatabase db;
 
-    public AidoRoboTaxiCompiler(MatsimAmodeusDatabase db) {
+    public SocketRoboTaxiCompiler(MatsimAmodeusDatabase db) {
         this.db = db;
     }
 

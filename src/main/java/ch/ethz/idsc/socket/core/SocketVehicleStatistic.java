@@ -18,10 +18,10 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
 // TODO @joel small rounding errors compared to VehicleStatistic
 // ... find out where the differences come from and adapt
-/* package */ class AidoVehicleStatistic {
+/* package */ class SocketVehicleStatistic {
     private final MatsimAmodeusDatabase db;
 
-    public AidoVehicleStatistic(MatsimAmodeusDatabase db) {
+    public SocketVehicleStatistic(MatsimAmodeusDatabase db) {
         this.db = db;
     }
 

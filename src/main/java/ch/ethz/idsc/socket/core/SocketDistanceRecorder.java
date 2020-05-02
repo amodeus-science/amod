@@ -9,12 +9,12 @@ import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationObject;
 import ch.ethz.idsc.tensor.Tensor;
 
-/* package */ class AidoDistanceRecorder {
-    private final List<AidoVehicleStatistic> list;
+/* package */ class SocketDistanceRecorder {
+    private final List<SocketVehicleStatistic> list;
 
-    public AidoDistanceRecorder(int numVehicles, MatsimAmodeusDatabase db) {
+    public SocketDistanceRecorder(int numVehicles, MatsimAmodeusDatabase db) {
         list = IntStream.range(0, numVehicles) //
-                .mapToObj(i -> new AidoVehicleStatistic(db)) //
+                .mapToObj(i -> new SocketVehicleStatistic(db)) //
                 .collect(Collectors.toList());
     }
 

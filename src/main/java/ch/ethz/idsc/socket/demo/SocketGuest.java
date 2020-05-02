@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
-import ch.ethz.idsc.socket.AidoHost;
+import ch.ethz.idsc.socket.SocketHost;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -20,7 +20,7 @@ import ch.ethz.idsc.tensor.io.StringScalar;
  * 
  * Usage:
  * java -cp target/amod-VERSION.jar amod.aido.demo.AidoGuest [IP of host] */
-public class AidoGuest {
+public class SocketGuest {
 
     /** default values for demo */
     static final String SCENARIO = "SanFrancisco";
@@ -31,7 +31,7 @@ public class AidoGuest {
     /** @param args 1 entry which is IP address
      * @throws Exception */
     public static void main(String[] args) throws Exception {
-        AidoGuest aidoGuest = new AidoGuest(args.length == 0 ? "localhost" : args[0]);
+        SocketGuest aidoGuest = new SocketGuest(args.length == 0 ? "localhost" : args[0]);
         aidoGuest.run(SCENARIO, REQUEST_NUMBER_DESIRED, NUMBER_OF_VEHICLES);
     }
 
@@ -39,13 +39,13 @@ public class AidoGuest {
     private final String ip;
 
     /** @param ip for instance "localhost" */
-    public AidoGuest(String ip) {
+    public SocketGuest(String ip) {
         this.ip = ip;
     }
 
     public void run(String scenario, int requestsDesired, int numberOfVehicles) throws UnknownHostException, IOException, Exception {
         /** connect to AidoGuest */
-        try (StringSocket stringSocket = new StringSocket(new Socket(ip, AidoHost.PORT))) {
+        try (StringSocket stringSocket = new StringSocket(new Socket(ip, SocketHost.PORT))) {
 
             /** send initial command, e.g., {SanFrancisco.20080518} */
             Tensor config = Tensors.of(StringScalar.of(scenario)); /** scenario name */

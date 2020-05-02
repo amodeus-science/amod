@@ -27,7 +27,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.matsim.av.config.AVConfigGroup;
 import ch.ethz.matsim.av.config.operator.GeneratorConfig;
 
-public class AidoPreparer {
+public class SocketPreparer {
 
     private final Population population;
     private final ScenarioOptions scenOpt;
@@ -41,7 +41,7 @@ public class AidoPreparer {
      * @param workingDirectory
      * @throws MalformedURLException
      * @throws Exception */
-    public AidoPreparer(File workingDirectory) throws MalformedURLException, Exception {
+    public SocketPreparer(File workingDirectory) throws MalformedURLException, Exception {
         Static.setup();
 
         /** amodeus options */
@@ -75,7 +75,7 @@ public class AidoPreparer {
      * @throws Exception */
     public void run2(int numReqDes) throws Exception {
         long apoSeed = 1234;
-        AidoPopulationPreparer.run(network, population, scenOpt, config, apoSeed, numReqDes);
+        SocketPopulationPreparer.run(network, population, scenOpt, config, apoSeed, numReqDes);
 
         /** creating a virtual network, e.g., for dispatchers using a graph structure on the city */
         // int endTime = (int) config.qsim().getEndTime();

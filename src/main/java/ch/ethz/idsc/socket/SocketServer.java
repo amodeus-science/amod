@@ -31,14 +31,14 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
-import ch.ethz.idsc.socket.core.AidoDispatcherHost;
+import ch.ethz.idsc.socket.core.SocketDispatcherHost;
 import ch.ethz.matsim.av.config.AVConfigGroup;
 import ch.ethz.matsim.av.framework.AVUtils;
 import ch.ethz.refactoring.AmodeusConfigurator;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
-/* package */ class AidoServer {
+/* package */ class SocketServer {
 
     private File configFile;
     private File outputDirectory;
@@ -106,7 +106,7 @@ import ch.ethz.refactoring.AmodeusConfigurator;
             exception.printStackTrace();
         }
 
-        controller.addOverridingModule(new AidoModule(stringSocket, numReqTot));
+        controller.addOverridingModule(new SocketModule(stringSocket, numReqTot));
 
         /** Custom router that ensures same network speeds as taxis in original data set. */
         controller.addOverridingModule(new AbstractModule() {
@@ -121,7 +121,7 @@ import ch.ethz.refactoring.AmodeusConfigurator;
         controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "AidoDispatcherHost", AidoDispatcherHost.Factory.class);
+                AVUtils.registerDispatcherFactory(binder(), "AidoDispatcherHost", SocketDispatcherHost.Factory.class);
             }
         });
 

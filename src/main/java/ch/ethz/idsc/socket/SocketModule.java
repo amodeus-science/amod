@@ -11,11 +11,11 @@ import com.google.inject.Singleton;
 
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 
-public class AidoModule extends AbstractModule {
+public class SocketModule extends AbstractModule {
     private final StringSocket stringSocket;
     private final int numReqTot;
 
-    public AidoModule(StringSocket stringSocket, int numReqTot) {
+    public SocketModule(StringSocket stringSocket, int numReqTot) {
         this.stringSocket = Objects.requireNonNull(stringSocket);
         this.numReqTot = numReqTot;
     }

@@ -12,9 +12,9 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.io.TableBuilder;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
-public class AidoScoreElement implements AnalysisElement {
+public class SocketScoreElement implements AnalysisElement {
 
-    private final AidoDistanceRecorder aidoDistanceRecorder;
+    private final SocketDistanceRecorder aidoDistanceRecorder;
     private final TableBuilder scoreDiffTable = new TableBuilder();
     private final TableBuilder scoreIntgTable = new TableBuilder();
     private final ServiceQualityScore squScore;
@@ -23,13 +23,13 @@ public class AidoScoreElement implements AnalysisElement {
     // ---
     private Scalar timeBefore = Quantity.of(0, SI.SECOND);
 
-    public AidoScoreElement(int numberRoboTaxis, int totReq, MatsimAmodeusDatabase db) {
+    public SocketScoreElement(int numberRoboTaxis, int totReq, MatsimAmodeusDatabase db) {
         this(numberRoboTaxis, totReq, ScoreParameters.GLOBAL, db);
     }
 
-    public AidoScoreElement( //
+    public SocketScoreElement( //
             int numberRoboTaxis, int totReq, ScoreParameters scoreParameters, MatsimAmodeusDatabase db) {
-        aidoDistanceRecorder = new AidoDistanceRecorder(numberRoboTaxis, db);
+        aidoDistanceRecorder = new SocketDistanceRecorder(numberRoboTaxis, db);
         squScore = new ServiceQualityScore(scoreParameters);
         effScore = new EfficiencyScore(scoreParameters);
         fltScore = new FleetSizeScore(scoreParameters, totReq, numberRoboTaxis);

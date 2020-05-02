@@ -14,8 +14,8 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.amodeus.video.VideoGenerator;
-import ch.ethz.idsc.socket.core.AidoDispatcherHost;
-import ch.ethz.idsc.socket.core.AidoScoreElement;
+import ch.ethz.idsc.socket.core.SocketDispatcherHost;
+import ch.ethz.idsc.socket.core.SocketScoreElement;
 import ch.ethz.idsc.socket.core.ScoreParameters;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -30,7 +30,7 @@ import ch.ethz.idsc.tensor.sca.Round;
  * 
  * Usage:
  * java -cp target/amod-VERSION.jar amod.aido.AidoHost [city] */
-public enum AidoHost {
+public enum SocketHost {
     ;
     public static final int PORT = 9382;
     private static final String ENV_SCENARIO = "SCENARIO";
@@ -64,13 +64,13 @@ public enum AidoHost {
             }
 
             /** download the chosen scenario */
-            AidoScenarioResource.extract(scenarioTag, workingDirectory);
+            SocketScenarioResource.extract(scenarioTag, workingDirectory);
 
             /** setup environment variables */
             StaticHelper.setup();
 
             /** run first part of scenario preparer */
-            AidoPreparer preparer = new AidoPreparer(workingDirectory);
+            SocketPreparer preparer = new SocketPreparer(workingDirectory);
 
             /** get number of requests in population */
             long numReq = LegCount.of(preparer.getPopulation(), "av");
@@ -112,9 +112,9 @@ public enum AidoHost {
             /** run with AIDO dispatcher */
             ScenarioOptions scenarioOptions = new ScenarioOptions(workingDirectory, ScenarioOptionsBase.getDefault());
             String simConfigPath = scenarioOptions.getSimulationConfigName();
-            ConfigDispatcherChanger.change(simConfigPath, AidoDispatcherHost.class.getSimpleName());
+            ConfigDispatcherChanger.change(simConfigPath, SocketDispatcherHost.class.getSimpleName());
             ConfigVehiclesChanger.change(simConfigPath, fleetSize);
-            AidoServer aidoServer = new AidoServer();
+            SocketServer aidoServer = new SocketServer();
             aidoServer.simulate(stringSocket, numReqDes, workingDirectory);
 
             /** send empty tensor "{}" to stop */
@@ -123,13 +123,13 @@ public enum AidoHost {
             /** analyze and send final score */
             Analysis analysis = Analysis.setup(aidoServer.getScenarioOptions(), aidoServer.getOutputDirectory(), //
                     aidoServer.getNetwork(), preparer.getDatabase());
-            AidoScoreElement aidoScoreElement = new AidoScoreElement(fleetSize, numReqDes, preparer.getDatabase());
+            SocketScoreElement aidoScoreElement = new SocketScoreElement(fleetSize, numReqDes, preparer.getDatabase());
             analysis.addAnalysisElement(aidoScoreElement);
 
-            AidoExport aidoExport = new AidoExport(aidoScoreElement);
+            SocketExport aidoExport = new SocketExport(aidoScoreElement);
             analysis.addAnalysisExport(aidoExport);
 
-            AidoHtmlReport aidoHtmlReport = new AidoHtmlReport(aidoScoreElement);
+            SocketHtmlReport aidoHtmlReport = new SocketHtmlReport(aidoScoreElement);
             analysis.addHtmlElement(aidoHtmlReport);
             analysis.run();
 

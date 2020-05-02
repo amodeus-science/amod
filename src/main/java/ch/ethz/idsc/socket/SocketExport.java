@@ -11,7 +11,7 @@ import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
 import ch.ethz.idsc.amodeus.analysis.element.AnalysisMeanFilter;
 import ch.ethz.idsc.amodeus.analysis.plot.AmodeusChartUtils;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.socket.core.AidoScoreElement;
+import ch.ethz.idsc.socket.core.SocketScoreElement;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Unprotect;
 import ch.ethz.idsc.tensor.fig.TimedChart;
@@ -19,7 +19,7 @@ import ch.ethz.idsc.tensor.fig.VisualRow;
 import ch.ethz.idsc.tensor.fig.VisualSet;
 import ch.ethz.idsc.tensor.img.ColorDataIndexed;
 
-/* package */ class AidoExport implements AnalysisExport {
+/* package */ class SocketExport implements AnalysisExport {
 
     /** settings for plot */
     /* package */ static final String FILENAME_SCORE_INCR = "aidoScores1and2Diff.png";
@@ -29,9 +29,9 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
     private static final int HEIGHT = 750;
 
     /** aido score element */
-    private final AidoScoreElement aidoScoreElement;
+    private final SocketScoreElement aidoScoreElement;
 
-    public AidoExport(AidoScoreElement aidoScoreElement) {
+    public SocketExport(SocketScoreElement aidoScoreElement) {
         this.aidoScoreElement = aidoScoreElement;
     }
 

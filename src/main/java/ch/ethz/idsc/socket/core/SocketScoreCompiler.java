@@ -11,16 +11,16 @@ import ch.ethz.idsc.amodeus.net.SimulationObjectCompiler;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.matsim.av.passenger.AVRequest;
 
-public class AidoScoreCompiler {
+public class SocketScoreCompiler {
     private static final String INFO_LINE = "";
     private static final int TOTAL_MATCHED_REQUESTS = -1;
     // ---
-    private final AidoScoreElement aidoScoreElement;
+    private final SocketScoreElement aidoScoreElement;
     private final MatsimAmodeusDatabase db;
 
-    public AidoScoreCompiler(List<RoboTaxi> roboTaxis, int totReq, MatsimAmodeusDatabase db) {
+    public SocketScoreCompiler(List<RoboTaxi> roboTaxis, int totReq, MatsimAmodeusDatabase db) {
         this.db = db;
-        aidoScoreElement = new AidoScoreElement(roboTaxis.size(), totReq, ScoreParameters.GLOBAL, db);
+        aidoScoreElement = new SocketScoreElement(roboTaxis.size(), totReq, ScoreParameters.GLOBAL, db);
     }
 
     public Tensor compile(long timeMatsim, List<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {

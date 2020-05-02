@@ -4,7 +4,7 @@ package ch.ethz.idsc.socket.core;
 import java.io.File;
 import java.util.Arrays;
 
-/* package */ enum CleanAidoScenarios {
+/* package */ enum CleanSocketScenarios {
     ;
 
     /** clean up downloaded files for aido scenaros */
