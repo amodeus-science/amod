@@ -2,7 +2,6 @@
 package ch.ethz.idsc.amod.dispatcher;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -28,7 +27,6 @@ import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.router.AVRouter;
 
-// TODO @clruch refactor and shorten 
 /** Dispatcher sends vehicles to all links in the network and lets them pickup
  * any customers which are waiting along the road. */
 public class DemoDispatcher extends RebalancingDispatcher {
@@ -43,7 +41,6 @@ public class DemoDispatcher extends RebalancingDispatcher {
             MatsimAmodeusDatabase db) {
         super(config, operatorConfig, travelTime, router, eventsManager, db);
         links = new ArrayList<>(network.getLinks().values());
-        Collections.shuffle(links, randGen);
         SafeConfig safeConfig = SafeConfig.wrap(operatorConfig.getDispatcherConfig());
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 120);
     }
@@ -52,9 +49,9 @@ public class DemoDispatcher extends RebalancingDispatcher {
     public void redispatch(double now) {
 
         /** stop all vehicles which are driving by an open request */
-        // TODO @clruch check again
         Map<RoboTaxi, AVRequest> stopDrivingBy = DrivebyRequestStopper //
-                .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
+                .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), //
+                        getDivertableRoboTaxis(), this::setRoboTaxiPickup);
         total_abortTrip += stopDrivingBy.size();
 
         /** send vehicles to travel around the city to random links (random loitering) */
@@ -69,17 +66,13 @@ public class DemoDispatcher extends RebalancingDispatcher {
     }
 
     private Link pollNextDestination() {
-        int index = randGen.nextInt(links.size());
-        Link link = links.get(index);
+        Link link = links.get(randGen.nextInt(links.size()));
         return link;
     }
 
     @Override
     protected String getInfoLine() {
-        return String.format("%s AT=%5d", //
-                super.getInfoLine(), //
-                total_abortTrip //
-        );
+        return String.format("%s AT=%5d", super.getInfoLine(), total_abortTrip);
     }
 
     public static class Factory implements AVDispatcherFactory {
