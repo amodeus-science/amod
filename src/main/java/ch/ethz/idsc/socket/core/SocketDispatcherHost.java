@@ -19,7 +19,6 @@ import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
 import ch.ethz.idsc.amodeus.net.FastLinkLookup;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -99,7 +98,7 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
                     Tensor rebalances = commands.get(1);
                     for (Tensor rebalance : rebalances) {
                         RoboTaxi roboTaxi = idRoboTaxiMap.get(rebalance.Get(0).number().intValue());
-                        Link link = fastLinkLookup.getLinkFromWGS84(TensorCoords.toCoord(rebalance.get(1)));
+                        Link link = fastLinkLookup.linkFromWGS84(rebalance.get(1));
                         setRoboTaxiRebalance(roboTaxi, link);
                     }
                 } catch (Exception exception) {
@@ -134,5 +133,4 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
                     stringSocket, numReqTot, db);
         }
     }
-
 }
