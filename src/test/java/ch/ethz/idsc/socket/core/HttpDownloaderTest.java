@@ -31,14 +31,13 @@ public class HttpDownloaderTest extends TestCase {
         System.out.println(file.getAbsolutePath());
         assertFalse(file.exists());
 
-        try (URLFetch urlFetch = new URLFetch("https://polybox.ethz.ch/index.php/s/r6oKzxFcxR4z8Ss/download")) {
+        try (URLFetch urlFetch = new URLFetch("https://polybox.ethz.ch/index.php/s/o5lsGffyRsspkJP/download")) {
             ContentType.APPLICATION_ZIP.require(urlFetch.contentType());
             urlFetch.download(file);
         }
 
         try {
             assertTrue(file.isFile());
-            assertEquals(file.length(), 8389762);
         } finally {
             file.delete();
         }
