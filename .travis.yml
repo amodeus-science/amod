@@ -1,7 +1,27 @@
 language: java
 jdk:
-  - openjdk8
+  - openjdk11
 
 notifications:
   email: false
 
+script:
+  - mkdir dependencies
+
+  # Install tensor master
+  - cd dependencies
+  - git clone https://github.com/amodeus-science/tensor.git
+  - cd tensor
+  - mvn install -DskipTests=True
+  - cd .. && cd ..
+
+  # Install AMoDeus master
+  - cd dependencies
+  - git clone https://github.com/amodeus-science/amodeus.git
+  - cd amodeus
+  - mvn install -DskipTests=True
+  - cd .. && cd ..
+
+  # Test amod
+  - mvn install -DskipTests=true -B -V -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+  - mvn test -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
