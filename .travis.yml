@@ -1,3 +1,7 @@
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install swig
+
 language: java
 jdk:
   - openjdk11
@@ -21,6 +25,7 @@ script:
   - cd amodeus
   - mvn install -DskipTests=True
   - cd .. && cd ..
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:dependencies/amodeus/resources/3rdparty/glpk/lib/jni
 
   # Test amod
   - mvn install -DskipTests=true -B -V -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
