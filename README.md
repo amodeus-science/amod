@@ -1,5 +1,6 @@
 # ch.ethz.idsc.amod <a href="https://travis-ci.org/idsc-frazzoli/amod"><img src="https://travis-ci.org/idsc-frazzoli/amod.svg?branch=master" alt="Build Status"></a>
 
+
 This repository allows to run an autonomous mobility-on-demand scenario using the amodeus library (https://github.com/idsc-frazzoli/amodeus).
 
 Try it, orchestrate your own fleet of amod-taxis! Watch a [visualization](https://www.youtube.com/watch?v=QkFtIQQSHto) of a traffic simulation in San Francisco generated using this repository.
@@ -22,6 +23,12 @@ Try it, orchestrate your own fleet of amod-taxis! Watch a [visualization](https:
 ![p1t2](https://user-images.githubusercontent.com/4012178/38852212-3200c8d8-4219-11e8-9dad-eb0aa33e1357.png)
 
 </tr></table>
+
+## Admins
+
+AMoDeus is jointly maintained and further developed by the Admins and Code Owners Christian Fluri (ETH Zürich), Joel Gächter (ETH Zürich), Sebastian Hörl (ETH  Zürich), Claudio Ruch, Jan Hakenberg, ChengQi Lu (TU Berlin), and Marc Albert (nuTonomy). 
+
+Please let us know if you'd like to contribute!
 
 ## First steps in the amod repository
 
