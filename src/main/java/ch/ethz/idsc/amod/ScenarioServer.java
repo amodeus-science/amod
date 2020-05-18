@@ -31,7 +31,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.matsim.av.config.AVConfigGroup;
+import ch.ethz.matsim.av.config.AmodeusConfigGroup;
 import ch.ethz.matsim.av.framework.AVUtils;
 import ch.ethz.refactoring.AmodeusConfigurator;
 
@@ -75,7 +75,7 @@ import ch.ethz.refactoring.AmodeusConfigurator;
         GlobalAssert.that(configFile.exists());
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new AmodeusConfigGroup(), dvrpConfigGroup);
         config.planCalcScore().addActivityParams(new ActivityParams("activity"));
         /** MATSim does not allow the typical duration not to be set, therefore for scenarios
          * generated from taxi data such as the "SanFrancisco" scenario, it is set to 1 hour. */

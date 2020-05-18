@@ -21,7 +21,7 @@ import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.matsim.av.config.operator.OperatorConfig;
+import ch.ethz.matsim.av.config.AmodeusModeConfig;
 import ch.ethz.matsim.av.dispatcher.AVDispatcher;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
@@ -42,7 +42,7 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
     // ---
     private SocketScoreCompiler socketScoreCompiler;
 
-    protected SocketDispatcherHost(Network network, Config config, OperatorConfig operatorConfig, TravelTime travelTime,
+    protected SocketDispatcherHost(Network network, Config config, AmodeusModeConfig operatorConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager, //
             StringSocket clientSocket, int numReqTot, //
             MatsimAmodeusDatabase db) {
@@ -111,7 +111,7 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
             MatsimAmodeusDatabase db = inject.get(MatsimAmodeusDatabase.class);
             EventsManager eventsManager = inject.get(EventsManager.class);
 
-            OperatorConfig operatorConfig = inject.getModal(OperatorConfig.class);
+            AmodeusModeConfig operatorConfig = inject.getModal(AmodeusModeConfig.class);
             Network network = inject.getModal(Network.class);
             AVRouter router = inject.getModal(AVRouter.class);
             TravelTime travelTime = inject.getModal(TravelTime.class);

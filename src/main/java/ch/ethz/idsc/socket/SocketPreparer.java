@@ -24,8 +24,8 @@ import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.matsim.av.config.AVConfigGroup;
-import ch.ethz.matsim.av.config.operator.GeneratorConfig;
+import ch.ethz.matsim.av.config.AmodeusConfigGroup;
+import ch.ethz.matsim.av.config.modal.GeneratorConfig;
 
 public class SocketPreparer {
 
@@ -49,11 +49,11 @@ public class SocketPreparer {
 
         /** MATSim config */
         // configMatsim = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName());
-        AVConfigGroup avConfigGroup = new AVConfigGroup();
+        AmodeusConfigGroup avConfigGroup = new AmodeusConfigGroup();
         config = ConfigUtils.loadConfig(scenOpt.getPreparerConfigName(), avConfigGroup);
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        GeneratorConfig genConfig = avConfigGroup.getOperatorConfigs().values().iterator().next().getGeneratorConfig();
+        GeneratorConfig genConfig = avConfigGroup.getModes().values().iterator().next().getGeneratorConfig();
         numRt = genConfig.getNumberOfVehicles();
         System.out.println("socketPrep NumberOfVehicles=" + numRt);
 
@@ -89,9 +89,8 @@ public class SocketPreparer {
         /** send initial data (bounding box), {{minX, minY}, {maxX, maxY}} */
         double[] bbox = NetworkUtils.getBoundingBox(network.getNodes().values());
 
-        return Tensors.of(
-                TensorCoords.toTensor( //
-                        scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
+        return Tensors.of(TensorCoords.toTensor( //
+                scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[0], bbox[1]))), //
                 TensorCoords.toTensor( //
                         scenOpt.getLocationSpec().referenceFrame().coords_toWGS84().transform(new Coord(bbox[2], bbox[3]))));
     }

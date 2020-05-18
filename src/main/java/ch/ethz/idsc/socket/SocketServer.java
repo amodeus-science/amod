@@ -32,7 +32,7 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.socket.core.SocketDispatcherHost;
-import ch.ethz.matsim.av.config.AVConfigGroup;
+import ch.ethz.matsim.av.config.AmodeusConfigGroup;
 import ch.ethz.matsim.av.framework.AVUtils;
 import ch.ethz.refactoring.AmodeusConfigurator;
 
@@ -74,7 +74,7 @@ import ch.ethz.refactoring.AmodeusConfigurator;
         GlobalAssert.that(configFile.exists());
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new AmodeusConfigGroup(), dvrpConfigGroup);
         config.planCalcScore().addActivityParams(new ActivityParams("activity"));
         // TODO @Sebastian fix this to meaningful values, remove, or add comment
         // this was added because there are sometimes problems, is there a more elegant option?
