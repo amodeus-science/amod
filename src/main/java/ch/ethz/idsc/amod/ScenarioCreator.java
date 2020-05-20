@@ -10,7 +10,6 @@ import ch.ethz.idsc.amodtaxi.scenario.ScenarioCreation;
 import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoScenarioCreation;
 import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.SanFranciscoScenarioCreation;
 
-// FIXME amodtaxi's resource file handling does not work through jar-file
 /** provides a quick access to the implementations of {@link ScenarioCreation}:
  * {@link ChicagoScenarioCreation}
  * {@link SanFranciscoScenarioCreation} */
