@@ -57,7 +57,7 @@ import ch.ethz.matsim.av.config.modal.GeneratorConfig;
 
         /** MATSim config */
         AmodeusConfigGroup avConfigGroup = new AmodeusConfigGroup();
-        avConfigGroup.addMode(new AmodeusModeConfig("av"));
+        // avConfigGroup.addMode(new AmodeusModeConfig("av"));
         Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName(), avConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         GeneratorConfig genConfig = avConfigGroup.getModes().values().iterator().next().getGeneratorConfig();

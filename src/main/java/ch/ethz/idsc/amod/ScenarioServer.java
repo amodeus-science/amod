@@ -12,6 +12,7 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -77,13 +78,16 @@ import ch.ethz.refactoring.AmodeusConfigurator;
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AmodeusConfigGroup(), dvrpConfigGroup);
         config.planCalcScore().addActivityParams(new ActivityParams("activity"));
+
+        config.qsim().setStartTime(0.0);
+        config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
+
         /** MATSim does not allow the typical duration not to be set, therefore for scenarios
          * generated from taxi data such as the "SanFrancisco" scenario, it is set to 1 hour. */
         // TODO @Sebastian fix this to meaningful values, remove, or add comment
         // this was added because there are sometimes problems, is there a more elegant option?
-        for (ActivityParams activityParams : config.planCalcScore().getActivityParams()) {
+        for (ActivityParams activityParams : config.planCalcScore().getActivityParams())
             activityParams.setTypicalDuration(3600.0);
-        }
 
         /** output directory for saving results */
         String outputdirectory = config.controler().getOutputDirectory();
