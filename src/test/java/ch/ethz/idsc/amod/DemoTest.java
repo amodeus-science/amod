@@ -2,51 +2,41 @@ package ch.ethz.idsc.amod;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 
+import ch.ethz.idsc.amodtaxi.scenario.ScenarioCreation;
 import org.junit.AfterClass;
 import org.junit.Test;
 
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.socket.core.SocketScenarioDownload;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class DemoTest {
 
     @Test
-    public void test() throws MalformedURLException, Exception {
+    public void test() throws Exception {
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         // 1 download scenario
-        try {
-            SocketScenarioDownload.extract(workingDirectory, "SanFrancisco20200502");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ScenarioCreation creation = ScenarioCreator.SAN_FRANCISCO.in(workingDirectory); // slow due to osm download
         // 2 run preparer
-        ScenarioPreparer.main(null);
+        ScenarioPreparer.run(creation.directory());
         // 3 run server
-        ScenarioServer.main(null);
+        ScenarioServer.simulate(creation.directory());
     }
 
     @AfterClass
     public static void cleanUp() throws IOException {
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
-        DeleteDirectory.of(new File(workingDirectory, "AmodeusOptions.properties"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "LPOptions.properties"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "config.xml"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "config_full.xml"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "linkSpeedData"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "preparedNetwork.xml"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "preparedPopulation.xml"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "preparedPopulation.xml.gz"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "preparedNetwork.xml.gz"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "population.xml.gz"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "network.xml.gz"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "virtualNetwork/travelData"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "virtualNetwork/virtualNetwork"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "virtualNetwork"), 0, 1);
-        DeleteDirectory.of(new File(workingDirectory, "output"), 5, 15700);
-        // DeleteDirectory.of(new File(workingDirectory, "scenario.zip"), 0, 1);
+        new File(workingDirectory, "AmodeusOptions.properties").delete();
+        new File(workingDirectory, "LPOptions.properties").delete();
+        new File(workingDirectory, "config_full.xml").delete();
+        new File(workingDirectory, "map.osm").delete();
+        new File(workingDirectory, "network.xml").delete();
+        new File(workingDirectory, "network.xml.gz").delete();
+        new File(workingDirectory, "network_pt2matsim.xml").delete();
+        new File(workingDirectory, "pt2matsim_settings.xml").delete();
+        DeleteDirectory.of(new File(workingDirectory, "default_cabspottingdata"), 1, 5); // was not writable locally
+        DeleteDirectory.of(new File(workingDirectory, "Scenario"), 2, 14);
+        DeleteDirectory.of(new File(workingDirectory, "2008-06-04"), 2, 14);
+        DeleteDirectory.of(new File(workingDirectory, "output"), 5, 11000);
     }
-
 }
