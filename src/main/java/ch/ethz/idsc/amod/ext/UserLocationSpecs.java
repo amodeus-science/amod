@@ -1,7 +1,6 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amod.ext;
 
-import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoReferenceFrames;
 import org.matsim.api.core.v01.Coord;
 
 import ch.ethz.idsc.amodeus.data.LocationSpec;
@@ -24,7 +23,7 @@ import ch.ethz.idsc.amodeus.data.ReferenceFrame;
             UserReferenceFrames.TEL_AVIV, //
             new Coord(179549.58, 665848.14)), //
     CHICAGO( //
-            ChicagoReferenceFrames.CHICAGO, //
+            UserReferenceFrames.CHICAGO, //
             new Coord(-74.005, 40.712))
     ;
 

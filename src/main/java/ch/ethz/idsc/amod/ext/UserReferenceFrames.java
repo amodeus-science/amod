@@ -28,18 +28,21 @@ import ch.ethz.idsc.tensor.qty.Unit;
             new GeotoolsTransformation("WGS84", "EPSG:2193")), //
     TEL_AVIV( //
             new GeotoolsTransformation("EPSG:2039", "WGS84"), //
-            new GeotoolsTransformation("WGS84", "EPSG:2039")),//
+            new GeotoolsTransformation("WGS84", "EPSG:2039")), //
+    CHICAGO( //
+            new GeotoolsTransformation("EPSG:3435", "WGS84"), //
+            new GeotoolsTransformation("WGS84", "EPSG:3435"))
     ;
     // ---
     private final CoordinateTransformation coords_toWGS84;
     private final CoordinateTransformation coords_fromWGS84;
     private final Unit unit;
 
-    private UserReferenceFrames(CoordinateTransformation c1, CoordinateTransformation c2) {
+    UserReferenceFrames(CoordinateTransformation c1, CoordinateTransformation c2) {
         this(c1, c2, SI.METER);
     }
 
-    private UserReferenceFrames(CoordinateTransformation c1, CoordinateTransformation c2, Unit unit) {
+    UserReferenceFrames(CoordinateTransformation c1, CoordinateTransformation c2, Unit unit) {
         coords_toWGS84 = c1;
         coords_fromWGS84 = c2;
         this.unit = unit;
