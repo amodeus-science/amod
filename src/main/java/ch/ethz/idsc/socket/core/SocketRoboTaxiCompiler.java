@@ -24,7 +24,7 @@ public class SocketRoboTaxiCompiler {
 
     private Tensor ofTaxi(RoboTaxi roboTaxi) {
         // id
-        Tensor info = Tensors.vector(db.getVehicleIndex(roboTaxi));
+        Tensor info = Tensors.vector(roboTaxi.getId().index());
         // divertable location
         info.append(TensorCoords.toTensor(db.referenceFrame.coords_toWGS84().transform( //
                 roboTaxi.getDivertableLocation().getCoord())));
