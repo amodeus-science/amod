@@ -63,7 +63,7 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
 
         if (getRoboTaxis().size() > 0 && idRoboTaxiMap.isEmpty()) {
             getRoboTaxis().forEach( //
-                    roboTaxi -> idRoboTaxiMap.put(db.getVehicleIndex(roboTaxi), roboTaxi));
+                    roboTaxi -> idRoboTaxiMap.put(roboTaxi.getId().index(), roboTaxi));
             socketScoreCompiler = new SocketScoreCompiler(getRoboTaxis(), numReqTot, db);
         }
 
@@ -72,7 +72,7 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
             if (Objects.nonNull(socketScoreCompiler))
                 try {
                     getAVRequests().forEach( //
-                            avRequest -> idRequestMap.put(db.getRequestIndex(avRequest), avRequest));
+                            avRequest -> idRequestMap.put(avRequest.getId().index(), avRequest));
 
                     Tensor status = Tensors.of(RealScalar.of((long) now), //
                             socketRobTaxComp.compile(getRoboTaxis()), //

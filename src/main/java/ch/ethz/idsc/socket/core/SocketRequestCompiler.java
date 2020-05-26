@@ -23,14 +23,14 @@ public class SocketRequestCompiler {
 
     private Tensor of(AVRequest request) {
         // id
-        Tensor info = Tensors.vector(db.getRequestIndex(request));
+        Tensor info = Tensors.vector(request.getId().index());
         // submission time
         info.append(RealScalar.of(request.getSubmissionTime()));
         // from location
-        info.append(TensorCoords.toTensor(db.referenceFrame.coords_toWGS84().transform(//
+        info.append(TensorCoords.toTensor(db.referenceFrame.coords_toWGS84().transform( //
                 request.getFromLink().getCoord())));
         // to location
-        info.append(TensorCoords.toTensor(db.referenceFrame.coords_toWGS84().transform(//
+        info.append(TensorCoords.toTensor(db.referenceFrame.coords_toWGS84().transform( //
                 request.getToLink().getCoord())));
         return info;
     }
