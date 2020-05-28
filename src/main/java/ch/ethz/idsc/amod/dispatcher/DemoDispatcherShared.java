@@ -8,6 +8,10 @@ import java.util.NavigableMap;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.matsim.amodeus.components.AVDispatcher;
+import org.matsim.amodeus.components.AVRouter;
+import org.matsim.amodeus.config.AmodeusModeConfig;
+import org.matsim.amodeus.dvrp.request.AVRequest;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.ModalProviders.InstanceGetter;
@@ -22,10 +26,6 @@ import ch.ethz.idsc.amodeus.dispatcher.shared.SharedCourseUtil;
 import ch.ethz.idsc.amodeus.matsim.SafeConfig;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.matsim.av.config.AmodeusModeConfig;
-import ch.ethz.matsim.av.dispatcher.AVDispatcher;
-import ch.ethz.matsim.av.passenger.AVRequest;
-import ch.ethz.matsim.av.router.AVRouter;
 
 /** this is a demo of functionality for the shared dispatchers (> 1 person in {@link RoboTaxi}
  * 
