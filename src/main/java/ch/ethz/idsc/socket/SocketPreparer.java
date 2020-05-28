@@ -4,6 +4,8 @@ package ch.ethz.idsc.socket;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import org.matsim.amodeus.config.AmodeusConfigGroup;
+import org.matsim.amodeus.config.modal.GeneratorConfig;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -24,8 +26,6 @@ import ch.ethz.idsc.amodeus.prep.ConfigCreator;
 import ch.ethz.idsc.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.matsim.av.config.AmodeusConfigGroup;
-import ch.ethz.matsim.av.config.modal.GeneratorConfig;
 
 public class SocketPreparer {
 

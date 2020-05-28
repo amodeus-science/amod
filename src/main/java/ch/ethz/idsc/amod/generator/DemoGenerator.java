@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.amodeus.components.AVGenerator;
+import org.matsim.amodeus.components.generator.AmodeusIdentifiers;
+import org.matsim.amodeus.config.AmodeusModeConfig;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -18,9 +21,6 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
-import ch.ethz.matsim.av.config.AmodeusModeConfig;
-import ch.ethz.matsim.av.generator.AVGenerator;
-import ch.ethz.matsim.av.generator.AmodeusIdentifiers;
 
 /** the initial placement of {@link RoboTaxi} in the {@link Network} is determined
  * with an {@link AVGenerator}. In most cases it is sufficient to use the

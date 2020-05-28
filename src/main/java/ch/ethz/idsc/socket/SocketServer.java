@@ -5,6 +5,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Objects;
 
+import org.matsim.amodeus.AmodeusConfigurator;
+import org.matsim.amodeus.config.AmodeusConfigGroup;
+import org.matsim.amodeus.framework.AVUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -32,9 +35,6 @@ import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.socket.core.SocketDispatcherHost;
-import ch.ethz.matsim.av.config.AmodeusConfigGroup;
-import ch.ethz.matsim.av.framework.AVUtils;
-import ch.ethz.refactoring.AmodeusConfigurator;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */

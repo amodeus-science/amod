@@ -4,6 +4,9 @@ package ch.ethz.idsc.amod;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import org.matsim.amodeus.config.AmodeusConfigGroup;
+import org.matsim.amodeus.config.AmodeusModeConfig;
+import org.matsim.amodeus.config.modal.GeneratorConfig;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -20,9 +23,6 @@ import ch.ethz.idsc.amodeus.prep.PopulationPreparer;
 import ch.ethz.idsc.amodeus.prep.TheApocalypse;
 import ch.ethz.idsc.amodeus.prep.VirtualNetworkPreparer;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.matsim.av.config.AmodeusConfigGroup;
-import ch.ethz.matsim.av.config.AmodeusModeConfig;
-import ch.ethz.matsim.av.config.modal.GeneratorConfig;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of
  * network, population, creation of virtualNetwork and travelData objects. As an

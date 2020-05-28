@@ -4,12 +4,13 @@ package ch.ethz.idsc.socket.core;
 import java.util.Collection;
 import java.util.List;
 
+import org.matsim.amodeus.dvrp.request.AVRequest;
+
 import ch.ethz.idsc.amodeus.dispatcher.core.RequestStatus;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationObjectCompiler;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.matsim.av.passenger.AVRequest;
 
 public class SocketScoreCompiler {
     private static final String INFO_LINE = "";
