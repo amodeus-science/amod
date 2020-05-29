@@ -8,10 +8,10 @@ import java.util.Objects;
 import org.matsim.amodeus.components.AVDispatcher;
 import org.matsim.amodeus.components.AVRouter;
 import org.matsim.amodeus.config.AmodeusModeConfig;
-import org.matsim.amodeus.dvrp.request.AVRequest;
 import org.matsim.amodeus.plpc.ParallelLeastCostPathCalculator;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.run.ModalProviders.InstanceGetter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -32,7 +32,7 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
     private final MatsimAmodeusDatabase db;
 
     private final Map<Integer, RoboTaxi> idRoboTaxiMap = new HashMap<>();
-    private final Map<Integer, AVRequest> idRequestMap = new HashMap<>();
+    private final Map<Integer, PassengerRequest> idRequestMap = new HashMap<>();
     private final FastLinkLookup fastLinkLookup;
     private final StringSocket clientSocket;
     private final int numReqTot;
@@ -71,13 +71,13 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
 
             if (Objects.nonNull(socketScoreCompiler))
                 try {
-                    getAVRequests().forEach( //
+                    getPassengerRequests().forEach( //
                             avRequest -> idRequestMap.put(avRequest.getId().index(), avRequest));
 
                     Tensor status = Tensors.of(RealScalar.of((long) now), //
                             socketRobTaxComp.compile(getRoboTaxis()), //
-                            socketReqComp.compile(getAVRequests()), //
-                            socketScoreCompiler.compile(round_now, getRoboTaxis(), getAVRequests()));
+                            socketReqComp.compile(getPassengerRequests()), //
+                            socketScoreCompiler.compile(round_now, getRoboTaxis(), getPassengerRequests()));
                     clientSocket.writeln(status);
 
                     String fromClient = clientSocket.readLine();
@@ -88,7 +88,7 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
                     Tensor pickups = commands.get(0);
                     for (Tensor pickup : pickups) {
                         RoboTaxi roboTaxi = idRoboTaxiMap.get(pickup.Get(0).number().intValue());
-                        AVRequest avRequest = idRequestMap.get(pickup.Get(1).number().intValue());
+                        PassengerRequest avRequest = idRequestMap.get(pickup.Get(1).number().intValue());
                         setRoboTaxiPickup(roboTaxi, avRequest);
                     }
 
