@@ -3,7 +3,7 @@ package ch.ethz.idsc.socket.core;
 
 import java.util.Collection;
 
-import org.matsim.amodeus.dvrp.request.AVRequest;
+import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.TensorCoords;
@@ -18,11 +18,11 @@ public class SocketRequestCompiler {
         this.db = db;
     }
 
-    public Tensor compile(Collection<AVRequest> requests) {
+    public Tensor compile(Collection<PassengerRequest> requests) {
         return Tensor.of(requests.stream().map(this::of));
     }
 
-    private Tensor of(AVRequest request) {
+    private Tensor of(PassengerRequest request) {
         // id
         Tensor info = Tensors.vector(request.getId().index());
         // submission time
