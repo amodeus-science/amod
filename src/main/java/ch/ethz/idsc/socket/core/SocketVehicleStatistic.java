@@ -4,6 +4,7 @@ package ch.ethz.idsc.socket.core;
 import java.util.LinkedList;
 import java.util.List;
 
+import ch.ethz.idsc.amodeus.net.VehicleContainerUtils;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
@@ -57,11 +58,11 @@ import ch.ethz.idsc.tensor.qty.Quantity;
              * in the list. */
             Scalar distance = Quantity.of(distanceLink.getLength(), SI.METER);
 
-            int part = Math.toIntExact(list.stream().filter(vc -> vc.roboTaxiStatus.isDriving()).count());
+            int part = Math.toIntExact(list.stream().filter(VehicleContainerUtils::isDriving).count());
             Scalar stepDistcontrib = distance.divide(RationalScalar.of(part, 1));
 
             for (VehicleContainer vehicleContainer : list) {
-                switch (vehicleContainer.roboTaxiStatus) {
+                switch (VehicleContainerUtils.finalStatus(vehicleContainer)) {
                 case DRIVEWITHCUSTOMER:
                     distDrive = distDrive.add(stepDistcontrib);
                     break;
