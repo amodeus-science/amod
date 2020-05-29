@@ -3,6 +3,7 @@ package ch.ethz.idsc.socket;
 
 import java.io.File;
 
+import org.matsim.amodeus.config.AmodeusModeConfig;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -28,7 +29,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
         /** apocalypse reduces the number of requests */
         TheRequestApocalypse.reducesThe(population).toNoMoreThan(numReqDes, seed);
         GlobalAssert.that(0 < population.getPersons().size());
-        GlobalAssert.that(LegCount.of(population, "av") == numReqDes);
+        GlobalAssert.that(LegCount.of(population, AmodeusModeConfig.DEFAULT_MODE) == numReqDes);
 
         final File fileExportGz = new File(scenOptions.getPreparedPopulationName() + ".xml.gz");
         final File fileExport = new File(scenOptions.getPreparedPopulationName() + ".xml");

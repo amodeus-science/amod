@@ -4,6 +4,8 @@ package ch.ethz.idsc.socket;
 import java.io.File;
 import java.util.Objects;
 
+import org.matsim.amodeus.config.AmodeusModeConfig;
+
 import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.matsim.xml.ConfigDispatcherChanger;
 import ch.ethz.idsc.amodeus.matsim.xml.ConfigVehiclesChanger;
@@ -14,9 +16,9 @@ import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.amodeus.video.VideoGenerator;
+import ch.ethz.idsc.socket.core.ScoreParameters;
 import ch.ethz.idsc.socket.core.SocketDispatcherHost;
 import ch.ethz.idsc.socket.core.SocketScoreElement;
-import ch.ethz.idsc.socket.core.ScoreParameters;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -73,7 +75,7 @@ public enum SocketHost {
             SocketPreparer preparer = new SocketPreparer(workingDirectory);
 
             /** get number of requests in population */
-            long numReq = LegCount.of(preparer.getPopulation(), "av");
+            long numReq = LegCount.of(preparer.getPopulation(), AmodeusModeConfig.DEFAULT_MODE);
 
             Scalar nominalFleetSize = Round.of(RealScalar.of(numReq).multiply(ScoreParameters.GLOBAL.gamma));
             Tensor initialInfo = Tensors.of(RealScalar.of(numReq), preparer.getBoundingBox(), nominalFleetSize);
