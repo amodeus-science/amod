@@ -9,9 +9,9 @@ import java.util.Random;
 import org.matsim.amodeus.components.AVDispatcher;
 import org.matsim.amodeus.components.AVRouter;
 import org.matsim.amodeus.config.AmodeusModeConfig;
-import org.matsim.amodeus.dvrp.request.AVRequest;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.run.ModalProviders.InstanceGetter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -46,14 +46,14 @@ public class DemoDispatcher extends RebalancingDispatcher {
     public void redispatch(double now) {
 
         /** stop all vehicles which are driving by an open request */
-        Map<RoboTaxi, AVRequest> stopDrivingBy = DrivebyRequestStopper //
-                .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), //
+        Map<RoboTaxi, PassengerRequest> stopDrivingBy = DrivebyRequestStopper //
+                .stopDrivingBy(DispatcherUtils.getPassengerRequestsAtLinks(getPassengerRequests()), //
                         getDivertableRoboTaxis(), this::setRoboTaxiPickup);
         total_abortTrip += stopDrivingBy.size();
 
         /** send vehicles to travel around the city to random links (random loitering) */
         final long round_now = Math.round(now);
-        if (round_now % rebalancingPeriod == 0 && 0 < getAVRequests().size()) {
+        if (round_now % rebalancingPeriod == 0 && 0 < getPassengerRequests().size()) {
             for (RoboTaxi roboTaxi : getDivertableRoboTaxis()) {
                 if (rebPos > randGen.nextDouble()) {
                     setRoboTaxiRebalance(roboTaxi, pollNextDestination());

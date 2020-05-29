@@ -4,7 +4,7 @@ package ch.ethz.idsc.socket.core;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.amodeus.dvrp.request.AVRequest;
+import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RequestStatus;
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
@@ -24,7 +24,7 @@ public class SocketScoreCompiler {
         socketScoreElement = new SocketScoreElement(roboTaxis.size(), totReq, ScoreParameters.GLOBAL, db);
     }
 
-    public Tensor compile(long timeMatsim, List<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
+    public Tensor compile(long timeMatsim, List<RoboTaxi> roboTaxis, Collection<PassengerRequest> requests) {
         /** create a {@link SimulationObject} */
         SimulationObjectCompiler simulationObjectCompiler = //
                 SimulationObjectCompiler.create(timeMatsim, INFO_LINE, TOTAL_MATCHED_REQUESTS, db);
