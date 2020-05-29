@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.amodeus.components.AVGenerator;
+import org.matsim.amodeus.components.AmodeusGenerator;
 import org.matsim.amodeus.components.generator.AmodeusIdentifiers;
 import org.matsim.amodeus.config.AmodeusModeConfig;
 import org.matsim.api.core.v01.Id;
@@ -23,12 +23,12 @@ import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
 import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
 
 /** the initial placement of {@link RoboTaxi} in the {@link Network} is determined
- * with an {@link AVGenerator}. In most cases it is sufficient to use the
+ * with an {@link AmodeusGenerator}. In most cases it is sufficient to use the
  * {@link RandomDensityGenerator} provided in AMoDeus, however, users may wish
  * to have an initial placement of {@link RoboTaxi} determined by themselves.
  * This class demonstrates such a placement in which 10 random links are chosen
  * and all vehicles are placed on these random links. */
-public class DemoGenerator implements AVGenerator {
+public class DemoGenerator implements AmodeusGenerator {
     private static final Logger LOGGER = Logger.getLogger(DemoGenerator.class);
     // ---
     private final int capacity;
@@ -74,9 +74,9 @@ public class DemoGenerator implements AVGenerator {
         return vehicles;
     }
 
-    public static class Factory implements AVGenerator.AVGeneratorFactory {
+    public static class Factory implements AmodeusGenerator.AVGeneratorFactory {
         @Override
-        public AVGenerator createGenerator(InstanceGetter inject) {
+        public AmodeusGenerator createGenerator(InstanceGetter inject) {
             AmodeusModeConfig operatorConfig = inject.getModal(AmodeusModeConfig.class);
             Network network = inject.getModal(Network.class);
             int capacity = operatorConfig.getGeneratorConfig().getCapacity();
