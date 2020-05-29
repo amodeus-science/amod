@@ -29,7 +29,7 @@ public class SocketScoreElement implements AnalysisElement {
 
     public SocketScoreElement( //
             int numberRoboTaxis, int totReq, ScoreParameters scoreParameters, MatsimAmodeusDatabase db) {
-        socketDistanceRecorder = new SocketDistanceRecorder(numberRoboTaxis, db);
+        socketDistanceRecorder = new SocketDistanceRecorder(db);
         squScore = new ServiceQualityScore(scoreParameters);
         effScore = new EfficiencyScore(scoreParameters);
         fltScore = new FleetSizeScore(scoreParameters, totReq, numberRoboTaxis);
