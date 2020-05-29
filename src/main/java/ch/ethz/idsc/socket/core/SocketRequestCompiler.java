@@ -3,12 +3,13 @@ package ch.ethz.idsc.socket.core;
 
 import java.util.Collection;
 
+import org.matsim.amodeus.dvrp.request.AVRequest;
+
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.TensorCoords;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.matsim.av.passenger.AVRequest;
 
 public class SocketRequestCompiler {
     private final MatsimAmodeusDatabase db;
