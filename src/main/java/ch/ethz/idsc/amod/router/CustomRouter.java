@@ -4,7 +4,7 @@ package ch.ethz.idsc.amod.router;
 import java.io.IOException;
 import java.util.concurrent.Future;
 
-import org.matsim.amodeus.components.AVRouter;
+import org.matsim.amodeus.components.AmodeusRouter;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -18,7 +18,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 /** This is a nonfunctional sample demonstrating of how to include a custom router
  * to AMoDeus which is not the standard choice of the Paralllel Djikstra router used
  * normally to calculate the path for {@link RoboTaxi} */
-/* package */ class CustomRouter implements AVRouter {
+/* package */ class CustomRouter implements AmodeusRouter {
 
     @Override
     public Future<Path> calcLeastCostPath(Node fromNode, Node toNode, double starttime, //
@@ -39,9 +39,9 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
     /** here it is possible to inject objects such as the {@link Network}, see as
      * example the DefaultAVRouter */
-    public static class Factory implements AVRouter.Factory {
+    public static class Factory implements AmodeusRouter.Factory {
         @Override
-        public AVRouter createRouter(InstanceGetter inject) {
+        public AmodeusRouter createRouter(InstanceGetter inject) {
             return new CustomRouter();
         }
     }

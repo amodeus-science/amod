@@ -8,8 +8,8 @@ import java.util.NavigableMap;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.matsim.amodeus.components.AVDispatcher;
-import org.matsim.amodeus.components.AVRouter;
+import org.matsim.amodeus.components.AmodeusDispatcher;
+import org.matsim.amodeus.components.AmodeusRouter;
 import org.matsim.amodeus.config.AmodeusModeConfig;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -44,7 +44,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
     protected DemoDispatcherShared(Network network, //
             Config config, AmodeusModeConfig operatorConfig, //
-            TravelTime travelTime, AVRouter router, EventsManager eventsManager, //
+            TravelTime travelTime, AmodeusRouter router, EventsManager eventsManager, //
             MatsimAmodeusDatabase db) {
         super(config, operatorConfig, travelTime, router, eventsManager, db);
         this.cityNorthPole = getNorthPole(network);
@@ -155,14 +155,14 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 
     public static class Factory implements AVDispatcherFactory {
         @Override
-        public AVDispatcher createDispatcher(InstanceGetter inject) {
+        public AmodeusDispatcher createDispatcher(InstanceGetter inject) {
             Config config = inject.get(Config.class);
             MatsimAmodeusDatabase db = inject.get(MatsimAmodeusDatabase.class);
             EventsManager eventsManager = inject.get(EventsManager.class);
 
             AmodeusModeConfig operatorConfig = inject.getModal(AmodeusModeConfig.class);
             Network network = inject.getModal(Network.class);
-            AVRouter router = inject.getModal(AVRouter.class);
+            AmodeusRouter router = inject.getModal(AmodeusRouter.class);
             TravelTime travelTime = inject.getModal(TravelTime.class);
 
             return new DemoDispatcherShared(network, config, operatorConfig, travelTime, router, eventsManager, db);
