@@ -20,7 +20,7 @@ import org.matsim.contrib.dvrp.run.ModalProviders.InstanceGetter;
 import org.matsim.core.gbl.MatsimRandom;
 
 import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
-import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
+import ch.ethz.idsc.amodeus.generator.RandomDensityGenerator;
 
 /** the initial placement of {@link RoboTaxi} in the {@link Network} is determined
  * with an {@link AmodeusGenerator}. In most cases it is sufficient to use the
