@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import org.matsim.amodeus.AmodeusConfigurator;
 import org.matsim.amodeus.config.AmodeusConfigGroup;
-import org.matsim.amodeus.framework.AVUtils;
+import org.matsim.amodeus.framework.AmodeusUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -22,17 +22,17 @@ import org.matsim.core.scenario.ScenarioUtils;
 import ch.ethz.idsc.amod.ext.Static;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
+import ch.ethz.idsc.amodeus.generator.RandomDensityGenerator;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
 import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
 import ch.ethz.idsc.amodeus.linkspeed.TaxiTravelTimeRouter;
 import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
-import ch.ethz.idsc.amodeus.matsim.mod.RandomDensityGenerator;
-import ch.ethz.idsc.amodeus.matsim.utils.AddCoordinatesToActivities;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.matsim.AddCoordinatesToActivities;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.socket.core.SocketDispatcherHost;
 
@@ -113,7 +113,7 @@ import ch.ethz.idsc.socket.core.SocketDispatcherHost;
             @Override
             public void install() {
                 bind(TaxiTravelTimeRouter.Factory.class);
-                AVUtils.bindRouterFactory(binder(), TaxiTravelTimeRouter.class.getSimpleName()).to(TaxiTravelTimeRouter.Factory.class);
+                AmodeusUtils.bindRouterFactory(binder(), TaxiTravelTimeRouter.class.getSimpleName()).to(TaxiTravelTimeRouter.Factory.class);
             }
         });
 
@@ -121,7 +121,7 @@ import ch.ethz.idsc.socket.core.SocketDispatcherHost;
         controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), "SocketDispatcherHost", SocketDispatcherHost.Factory.class);
+                AmodeusUtils.registerDispatcherFactory(binder(), "SocketDispatcherHost", SocketDispatcherHost.Factory.class);
             }
         });
 
@@ -129,7 +129,7 @@ import ch.ethz.idsc.socket.core.SocketDispatcherHost;
         controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.bindGeneratorFactory(binder(), RandomDensityGenerator.class.getSimpleName()).//
+                AmodeusUtils.bindGeneratorFactory(binder(), RandomDensityGenerator.class.getSimpleName()).//
                 to(RandomDensityGenerator.Factory.class);
             }
         });

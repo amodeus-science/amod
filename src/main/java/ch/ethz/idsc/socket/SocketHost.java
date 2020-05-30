@@ -7,12 +7,12 @@ import java.util.Objects;
 import org.matsim.amodeus.config.AmodeusModeConfig;
 
 import ch.ethz.idsc.amodeus.analysis.Analysis;
-import ch.ethz.idsc.amodeus.matsim.xml.ConfigDispatcherChanger;
-import ch.ethz.idsc.amodeus.matsim.xml.ConfigVehiclesChanger;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.prep.LegCount;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
+import ch.ethz.idsc.amodeus.util.matsim.xml.ConfigDispatcherChanger;
+import ch.ethz.idsc.amodeus.util.matsim.xml.ConfigVehiclesChanger;
 import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
 import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.amodeus.video.VideoGenerator;

@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import org.matsim.amodeus.AmodeusConfigurator;
 import org.matsim.amodeus.config.AmodeusConfigGroup;
-import org.matsim.amodeus.framework.AVUtils;
+import org.matsim.amodeus.framework.AmodeusUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -28,13 +28,13 @@ import ch.ethz.idsc.amodeus.analysis.Analysis;
 import ch.ethz.idsc.amodeus.data.LocationSpec;
 import ch.ethz.idsc.amodeus.data.ReferenceFrame;
 import ch.ethz.idsc.amodeus.linkspeed.TaxiTravelTimeRouter;
-import ch.ethz.idsc.amodeus.matsim.utils.AddCoordinatesToActivities;
 import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
 import ch.ethz.idsc.amodeus.net.SimulationServer;
 import ch.ethz.idsc.amodeus.options.ScenarioOptions;
 import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
 import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import ch.ethz.idsc.amodeus.util.matsim.AddCoordinatesToActivities;
 
 /** This class runs an AMoDeus simulation based on MATSim. The results can be
  * viewed if the {@link ScenarioViewer} is executed in the same working
@@ -111,7 +111,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
         controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerDispatcherFactory(binder(), //
+                AmodeusUtils.registerDispatcherFactory(binder(), //
                         DemoDispatcher.class.getSimpleName(), DemoDispatcher.Factory.class);
             }
         });
@@ -124,7 +124,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
         controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                AVUtils.registerGeneratorFactory(binder(), "DemoGenerator", DemoGenerator.Factory.class);
+                AmodeusUtils.registerGeneratorFactory(binder(), "DemoGenerator", DemoGenerator.Factory.class);
             }
         });
 
@@ -142,7 +142,7 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
             @Override
             public void install() {
                 bind(TaxiTravelTimeRouter.Factory.class);
-                AVUtils.bindRouterFactory(binder(), TaxiTravelTimeRouter.class.getSimpleName()).to(TaxiTravelTimeRouter.Factory.class);
+                AmodeusUtils.bindRouterFactory(binder(), TaxiTravelTimeRouter.class.getSimpleName()).to(TaxiTravelTimeRouter.Factory.class);
             }
         });
 
