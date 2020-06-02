@@ -1,7 +1,6 @@
-# amodeus.amod <a href="https://travis-ci.org/idsc-frazzoli/amod"><img src="https://travis-ci.org/idsc-frazzoli/amod.svg?branch=master" alt="Build Status"></a>
+# amodeus.amod <a href="https://travis-ci.org/amodeus-science/amod"><img src="https://travis-ci.org/amodeus-science/amod.svg?branch=master" alt="Build Status"></a>
 
-
-This repository allows to run an autonomous mobility-on-demand scenario using the amodeus library (https://github.com/idsc-frazzoli/amodeus).
+This repository allows to run an autonomous mobility-on-demand scenario using the [amodeus library](https://github.com/amodeus-science/amodeus).
 
 Try it, orchestrate your own fleet of amod-taxis! Watch a [visualization](https://www.youtube.com/watch?v=QkFtIQQSHto) of a traffic simulation in San Francisco generated using this repository.
 
@@ -42,7 +41,7 @@ Please let us know if you'd like to contribute!
 	- Prerequisites are: GCC, Libtool, Swig and Subversion
 - Install Git and connect to GitHub with [SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 
-The code format of the `amod` repository is specified in the `amodeus` profile that you can import from [amodeus-code-style.xml](https://raw.githubusercontent.com/idsc-frazzoli/amodeus/master/amodeus-code-style.xml).
+The code format of the `amod` repository is specified in the `amodeus` profile that you can import from [amodeus-code-style.xml](https://raw.githubusercontent.com/amodeus-science/amodeus/master/amodeus-code-style.xml).
 
 ### Getting Started
 
@@ -84,7 +83,7 @@ San Francisco
 TODO improve and adapt documentation, de-dockerize
 Run `docker-compose up` to run the San Fransisco simulation. This will run two services, `aido-host` and `aido-guest`, which will communicate over port `9382`.
 
-The protocol is specified [here](https://github.com/idsc-frazzoli/amod/blob/master/doc/aido-client-protocol.md).
+The protocol is specified [here](https://github.com/amodeus-science/amod/blob/master/doc/aido-client-protocol.md).
 
 ---
 
