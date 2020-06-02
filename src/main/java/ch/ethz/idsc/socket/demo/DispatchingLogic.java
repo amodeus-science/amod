@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
+import amodeus.amodeus.dispatcher.core.RoboTaxiStatus;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -19,7 +19,6 @@ import ch.ethz.idsc.tensor.sca.Round;
 /** dispatching logic in the SocketGuest demo to compute dispatching instructions
  * that are forwarded to the SocketHost */
 /* package */ class DispatchingLogic {
-
     private final Set<Scalar> matchedReq = new HashSet<>();
     private final Set<Scalar> matchedTax = new HashSet<>();
     private final Distribution dist_lng;

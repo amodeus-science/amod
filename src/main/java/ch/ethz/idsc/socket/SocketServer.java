@@ -5,6 +5,20 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Objects;
 
+import amodeus.amodeus.data.LocationSpec;
+import amodeus.amodeus.data.ReferenceFrame;
+import amodeus.amodeus.generator.RandomDensityGenerator;
+import amodeus.amodeus.linkspeed.LinkSpeedDataContainer;
+import amodeus.amodeus.linkspeed.LinkSpeedUtils;
+import amodeus.amodeus.linkspeed.TaxiTravelTimeRouter;
+import amodeus.amodeus.linkspeed.TrafficDataModule;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.net.SimulationServer;
+import amodeus.amodeus.options.ScenarioOptions;
+import amodeus.amodeus.options.ScenarioOptionsBase;
+import amodeus.amodeus.util.math.GlobalAssert;
+import amodeus.amodeus.util.matsim.AddCoordinatesToActivities;
+import amodeus.amodeus.util.net.StringSocket;
 import org.matsim.amodeus.AmodeusConfigurator;
 import org.matsim.amodeus.config.AmodeusConfigGroup;
 import org.matsim.amodeus.framework.AmodeusUtils;
@@ -20,20 +34,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.amod.ext.Static;
-import ch.ethz.idsc.amodeus.data.LocationSpec;
-import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-import ch.ethz.idsc.amodeus.generator.RandomDensityGenerator;
-import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedDataContainer;
-import ch.ethz.idsc.amodeus.linkspeed.LinkSpeedUtils;
-import ch.ethz.idsc.amodeus.linkspeed.TaxiTravelTimeRouter;
-import ch.ethz.idsc.amodeus.linkspeed.TrafficDataModule;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.net.SimulationServer;
-import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.util.matsim.AddCoordinatesToActivities;
-import ch.ethz.idsc.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.socket.core.SocketDispatcherHost;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
@@ -165,5 +165,4 @@ import ch.ethz.idsc.socket.core.SocketDispatcherHost;
     /* package */ ScenarioOptions getScenarioOptions() {
         return scenarioOptions;
     }
-
 }

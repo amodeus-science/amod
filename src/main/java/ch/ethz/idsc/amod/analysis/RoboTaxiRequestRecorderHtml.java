@@ -4,9 +4,9 @@ package ch.ethz.idsc.amod.analysis;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
-import ch.ethz.idsc.amodeus.analysis.report.HtmlBodyElement;
-import ch.ethz.idsc.amodeus.analysis.report.HtmlReportElement;
+import amodeus.amodeus.analysis.AnalysisSummary;
+import amodeus.amodeus.analysis.report.HtmlBodyElement;
+import amodeus.amodeus.analysis.report.HtmlReportElement;
 
 /** This class adds a histogram image to the AMoDeus HTML report which was previously
  * compiled in the class {@link RoboTaxiRequestHistoGramExport} */

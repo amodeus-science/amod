@@ -6,6 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import amodeus.amodeus.dispatcher.core.DispatcherUtils;
+import amodeus.amodeus.dispatcher.core.RebalancingDispatcher;
+import amodeus.amodeus.dispatcher.core.RoboTaxi;
+import amodeus.amodeus.dispatcher.util.DrivebyRequestStopper;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.util.matsim.SafeConfig;
 import org.matsim.amodeus.components.AmodeusDispatcher;
 import org.matsim.amodeus.components.AmodeusRouter;
 import org.matsim.amodeus.config.AmodeusModeConfig;
@@ -17,13 +23,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
-import ch.ethz.idsc.amodeus.dispatcher.core.DispatcherUtils;
-import ch.ethz.idsc.amodeus.dispatcher.core.RebalancingDispatcher;
-import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
-import ch.ethz.idsc.amodeus.dispatcher.util.DrivebyRequestStopper;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.util.matsim.SafeConfig;
-
 /** Dispatcher sends vehicles to all links in the network and lets them pickup
  * any customers which are waiting along the road. */
 public class DemoDispatcher extends RebalancingDispatcher {
@@ -34,8 +33,7 @@ public class DemoDispatcher extends RebalancingDispatcher {
     private int total_abortTrip = 0;
 
     private DemoDispatcher(Config config, AmodeusModeConfig operatorConfig, TravelTime travelTime, //
-            AmodeusRouter router, EventsManager eventsManager, Network network, //
-            MatsimAmodeusDatabase db) {
+            AmodeusRouter router, EventsManager eventsManager, Network network, MatsimAmodeusDatabase db) {
         super(config, operatorConfig, travelTime, router, eventsManager, db);
         links = new ArrayList<>(network.getLinks().values());
         SafeConfig safeConfig = SafeConfig.wrap(operatorConfig.getDispatcherConfig());
@@ -44,7 +42,6 @@ public class DemoDispatcher extends RebalancingDispatcher {
 
     @Override
     public void redispatch(double now) {
-
         /** stop all vehicles which are driving by an open request */
         Map<RoboTaxi, PassengerRequest> stopDrivingBy = DrivebyRequestStopper //
                 .stopDrivingBy(DispatcherUtils.getPassengerRequestsAtLinks(getPassengerRequests()), //
@@ -53,18 +50,14 @@ public class DemoDispatcher extends RebalancingDispatcher {
 
         /** send vehicles to travel around the city to random links (random loitering) */
         final long round_now = Math.round(now);
-        if (round_now % rebalancingPeriod == 0 && 0 < getPassengerRequests().size()) {
-            for (RoboTaxi roboTaxi : getDivertableRoboTaxis()) {
-                if (rebPos > randGen.nextDouble()) {
+        if (round_now % rebalancingPeriod == 0 && 0 < getPassengerRequests().size())
+            for (RoboTaxi roboTaxi : getDivertableRoboTaxis())
+                if (rebPos > randGen.nextDouble())
                     setRoboTaxiRebalance(roboTaxi, pollNextDestination());
-                }
-            }
-        }
     }
 
     private Link pollNextDestination() {
-        Link link = links.get(randGen.nextInt(links.size()));
-        return link;
+        return links.get(randGen.nextInt(links.size()));
     }
 
     @Override
@@ -87,5 +80,4 @@ public class DemoDispatcher extends RebalancingDispatcher {
             return new DemoDispatcher(config, operatorConfig, travelTime, router, eventsManager, network, db);
         }
     }
-
 }

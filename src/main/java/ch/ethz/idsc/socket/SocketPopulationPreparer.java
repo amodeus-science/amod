@@ -3,25 +3,23 @@ package ch.ethz.idsc.socket;
 
 import java.io.File;
 
+import amodeus.amodeus.options.ScenarioOptions;
+import amodeus.amodeus.prep.LegCount;
+import amodeus.amodeus.prep.PopulationCutter;
+import amodeus.amodeus.prep.TheRequestApocalypse;
+import amodeus.amodeus.util.io.GZHandler;
+import amodeus.amodeus.util.math.GlobalAssert;
 import org.matsim.amodeus.config.AmodeusModeConfig;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.io.PopulationWriter;
 
-import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.prep.LegCount;
-import ch.ethz.idsc.amodeus.prep.PopulationCutter;
-import ch.ethz.idsc.amodeus.prep.TheRequestApocalypse;
-import ch.ethz.idsc.amodeus.util.io.GZHandler;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-
 /* package */ enum SocketPopulationPreparer {
     ;
 
     public static void run(Network network, Population population, ScenarioOptions scenOptions, //
             Config config, long seed, int numReqDes) throws Exception {
-
         /** ensure population contained in network */
         PopulationCutter populationCutter = scenOptions.getPopulationCutter();
         populationCutter.cut(population, network, config);

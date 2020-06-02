@@ -4,8 +4,7 @@ package ch.ethz.idsc.socket.core;
 import java.io.File;
 import java.io.IOException;
 
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.socket.core.SocketScenarioDownload;
+import amodeus.amodeus.util.io.MultiFileTools;
 import junit.framework.TestCase;
 
 public class SocketScenarioDownloadTest extends TestCase {

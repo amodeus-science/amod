@@ -3,25 +3,25 @@ package ch.ethz.idsc.amod.analysis;
 
 import java.io.File;
 
+import amodeus.amodeus.analysis.AnalysisSummary;
+import amodeus.amodeus.analysis.element.AnalysisExport;
+import amodeus.amodeus.analysis.plot.AmodeusChartUtils;
+import amodeus.amodeus.dispatcher.core.RoboTaxi;
+import amodeus.amodeus.util.math.GlobalAssert;
+import amodeus.tensor.fig.Histogram;
+import amodeus.tensor.fig.VisualSet;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAnchor;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.plot.CategoryPlot;
 import org.matsim.amodeus.dvrp.request.AmodeusRequest;
 
-import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
-import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
-import ch.ethz.idsc.amodeus.analysis.plot.AmodeusChartUtils;
-import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Range;
-import ch.ethz.idsc.tensor.fig.Histogram;
-import ch.ethz.idsc.tensor.fig.VisualSet;
 import ch.ethz.idsc.tensor.img.ColorDataIndexed;
 import ch.ethz.idsc.tensor.pdf.BinCounts;
 import ch.ethz.idsc.tensor.red.Total;

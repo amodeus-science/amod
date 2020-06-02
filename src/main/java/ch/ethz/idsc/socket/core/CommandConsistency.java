@@ -4,7 +4,7 @@ package ch.ethz.idsc.socket.core;
 import java.util.HashSet;
 import java.util.Set;
 
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
+import amodeus.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 
@@ -19,7 +19,6 @@ public enum CommandConsistency {
      * 
      * @param commands */
     public static void check(Tensor commands) {
-
         // GlobalAssert.that(ExactScalarQ.all(commands));
 
         /** 1) ensure every RoboTaxi should be in {0,1} of the commands
@@ -36,7 +35,5 @@ public enum CommandConsistency {
         Tensor rebalances = commands.get(1);
         for (Tensor rebalance : rebalances)
             GlobalAssert.that(usdRobTaxis.add(rebalance.Get(0)));
-
     }
-
 }

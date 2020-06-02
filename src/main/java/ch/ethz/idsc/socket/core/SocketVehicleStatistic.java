@@ -4,13 +4,13 @@ package ch.ethz.idsc.socket.core;
 import java.util.LinkedList;
 import java.util.List;
 
-import ch.ethz.idsc.amodeus.net.VehicleContainerUtils;
+import amodeus.amodeus.dispatcher.core.RoboTaxi;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.net.VehicleContainer;
+import amodeus.amodeus.net.VehicleContainerUtils;
+import amodeus.amodeus.util.math.SI;
 import org.matsim.api.core.v01.network.Link;
 
-import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.net.VehicleContainer;
-import ch.ethz.idsc.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;

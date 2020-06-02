@@ -16,5 +16,4 @@ import java.net.MalformedURLException;
         // viewing results, the viewer can also connect to a running simulation.
         ScenarioViewer.main(args);
     }
-
 }

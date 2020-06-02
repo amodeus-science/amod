@@ -6,8 +6,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Objects;
 
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.util.net.StringSocket;
+import amodeus.amodeus.util.math.GlobalAssert;
+import amodeus.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.socket.SocketHost;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -36,6 +36,7 @@ public class SocketGuest {
     }
 
     // ---
+
     private final String ip;
 
     /** @param ip for instance "localhost" */
@@ -46,7 +47,6 @@ public class SocketGuest {
     public void run(String scenario, int requestsDesired, int numberOfVehicles) throws UnknownHostException, IOException, Exception {
         /** connect to SocketGuest */
         try (StringSocket stringSocket = new StringSocket(new Socket(ip, SocketHost.PORT))) {
-
             /** send initial command, e.g., {SanFrancisco.20080518} */
             Tensor config = Tensors.of(StringScalar.of(scenario)); /** scenario name */
             stringSocket.writeln(config);
@@ -103,7 +103,6 @@ public class SocketGuest {
             System.out.println("final service quality score:  " + finalScores.Get(0));
             System.out.println("final efficiency score:       " + finalScores.Get(1));
             System.out.println("final fleet size score:       " + finalScores.Get(2));
-
         } // <- closing string socket
     }
 }

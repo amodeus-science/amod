@@ -8,11 +8,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import ch.ethz.idsc.amodeus.util.io.Unzip;
+import amodeus.amodeus.util.io.Unzip;
 import ch.ethz.idsc.socket.core.SocketScenarioDownload;
 
 public enum SocketScenarioResource {
     ;
+
     private static final String SCENARIO_ZIP = "scenario.zip";
 
     /** @param key for instance "SanFrancisco.20080518"

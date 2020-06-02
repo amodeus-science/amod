@@ -1,12 +1,11 @@
-// code by jph
+/* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.socket;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.socket.SocketScenarioResource;
+import amodeus.amodeus.util.io.MultiFileTools;
 import junit.framework.TestCase;
 
 public class SocketScenarioResourceTest extends TestCase {

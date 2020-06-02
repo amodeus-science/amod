@@ -3,11 +3,16 @@ package ch.ethz.idsc.amod.dispatcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.NavigableMap;
 import java.util.Random;
-import java.util.TreeMap;
 
+import amodeus.amodeus.dispatcher.core.RoboTaxi;
+import amodeus.amodeus.dispatcher.core.SharedRebalancingDispatcher;
+import amodeus.amodeus.dispatcher.shared.SharedCourse;
+import amodeus.amodeus.dispatcher.shared.SharedCourseUtil;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.util.matsim.SafeConfig;
 import org.matsim.amodeus.components.AmodeusDispatcher;
 import org.matsim.amodeus.components.AmodeusRouter;
 import org.matsim.amodeus.config.AmodeusModeConfig;
@@ -19,14 +24,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
-import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
-import ch.ethz.idsc.amodeus.dispatcher.core.SharedRebalancingDispatcher;
-import ch.ethz.idsc.amodeus.dispatcher.shared.SharedCourse;
-import ch.ethz.idsc.amodeus.dispatcher.shared.SharedCourseUtil;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.util.matsim.SafeConfig;
-
 /** this is a demo of functionality for the shared dispatchers (> 1 person in {@link RoboTaxi}
  * 
  * whenever 4 {@link PassengerRequest}s are open, a {@link RoboTaxi} is assigned to pickup all of them,
@@ -34,10 +31,8 @@ import ch.ethz.idsc.amodeus.util.matsim.SafeConfig;
  * Passenger 4 is less lucky as the {@link RoboTaxi} first visits the city's North pole (northern most link)
  * before passenger 4 is finally dropped of and the procedure starts from beginning. */
 /* package */ class DemoDispatcherShared extends SharedRebalancingDispatcher {
-
     private final int dispatchPeriod;
     private final int rebalancePeriod;
-    private final List<Link> links;
     private final Random randGen = new Random(1234);
     private final Link cityNorthPole;
     private final List<Link> equatorLinks;
@@ -52,8 +47,7 @@ import ch.ethz.idsc.amodeus.util.matsim.SafeConfig;
         SafeConfig safeConfig = SafeConfig.wrap(operatorConfig.getDispatcherConfig());
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         rebalancePeriod = safeConfig.getInteger("rebalancingPeriod", 1800);
-        links = new ArrayList<>(network.getLinks().values());
-        Collections.shuffle(links, randGen);
+        Collections.shuffle(new ArrayList<>(network.getLinks().values()), randGen);
     }
 
     @Override
@@ -97,7 +91,6 @@ import ch.ethz.idsc.amodeus.util.matsim.SafeConfig;
                     SharedCourse redirectCourse = SharedCourse.redirectCourse(redirectLink, Double.toString(now) + sharedRoboTaxi.getId().toString());
                     addSharedRoboTaxiRedirect(sharedRoboTaxi, redirectCourse);
                     sharedRoboTaxi.moveAVCourseToPrev(redirectCourse);
-
                 } else {
                     break;
                 }
@@ -105,35 +98,26 @@ import ch.ethz.idsc.amodeus.util.matsim.SafeConfig;
         }
 
         /** dispatching of available {@link RoboTaxi}s to the equator */
-        if (round_now % rebalancePeriod == 0) {
+        if (round_now % rebalancePeriod == 0)
             /** relocation of empty {@link RoboTaxi}s to a random link on the equator */
             for (RoboTaxi roboTaxi : getDivertableUnassignedRoboTaxis()) {
                 Link rebalanceLink = equatorLinks.get(randGen.nextInt(equatorLinks.size()));
                 setRoboTaxiRebalance(roboTaxi, rebalanceLink);
             }
-        }
     }
 
     /** @param network
      * @return northern most {@link Link} in the {@link Network} */
     private static Link getNorthPole(Network network) {
-        NavigableMap<Double, Link> links = new TreeMap<>();
-        network.getLinks().values().stream().forEach(l -> {
-            links.put(l.getCoord().getY(), l);
-        });
-        return links.lastEntry().getValue();
+        return network.getLinks().values().stream().max(Comparator.comparingDouble(l -> l.getCoord().getY())).get();
     }
 
     /** @param network
      * @return all {@link Link}s crossing the equator of the city {@link Network} , starting
      *         with links on the equator, if no links found, the search radius is increased by 1 m */
     private static List<Link> getEquator(Network network) {
-        NavigableMap<Double, Link> links = new TreeMap<>();
-        network.getLinks().values().stream().forEach(l -> {
-            links.put(l.getCoord().getY(), l);
-        });
-        double northX = links.lastEntry().getValue().getCoord().getY();
-        double southX = links.firstEntry().getValue().getCoord().getY();
+        double northX = network.getLinks().values().stream().mapToDouble(l -> l.getCoord().getY()).max().getAsDouble();
+        double southX = network.getLinks().values().stream().mapToDouble(l -> l.getCoord().getY()).min().getAsDouble();
         double equator = southX + (northX - southX) / 2;
 
         List<Link> equatorLinks = new ArrayList<>();
@@ -149,7 +133,6 @@ import ch.ethz.idsc.amodeus.util.matsim.SafeConfig;
             }
             margin += 1.0;
         }
-        GlobalAssert.that(equatorLinks.size() > 0);
         return equatorLinks;
     }
 

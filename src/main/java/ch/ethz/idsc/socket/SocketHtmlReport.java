@@ -4,11 +4,11 @@ package ch.ethz.idsc.socket;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
-import ch.ethz.idsc.amodeus.analysis.element.DistanceElement;
-import ch.ethz.idsc.amodeus.analysis.report.HtmlBodyElement;
-import ch.ethz.idsc.amodeus.analysis.report.HtmlGenerator;
-import ch.ethz.idsc.amodeus.analysis.report.HtmlReportElement;
+import amodeus.amodeus.analysis.AnalysisSummary;
+import amodeus.amodeus.analysis.element.DistanceElement;
+import amodeus.amodeus.analysis.report.HtmlBodyElement;
+import amodeus.amodeus.analysis.report.HtmlGenerator;
+import amodeus.amodeus.analysis.report.HtmlReportElement;
 import ch.ethz.idsc.socket.core.SocketScoreElement;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -79,5 +79,4 @@ import ch.ethz.idsc.tensor.red.Total;
     public Tensor getFinalScore() {
         return Tensors.of(totalMeanWaitingTime, totalEfficiencyRatio, numberOfVehicles);
     }
-
 }

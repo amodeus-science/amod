@@ -1,9 +1,7 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.socket.core;
 
-import ch.ethz.idsc.amodeus.util.math.SI;
-import ch.ethz.idsc.socket.core.FleetSizeScore;
-import ch.ethz.idsc.socket.core.ScoreParameters;
+import amodeus.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
@@ -37,13 +35,13 @@ public class FleetSizeScoreTest extends TestCase {
         FleetSizeScore fsc = new FleetSizeScore(ScoreParameters.GLOBAL, 10, 27);
         try {
             fsc.update(Quantity.of(-2, SI.SECOND), Quantity.of(2, SI.SECOND));
-            assertTrue(false);
+            fail();
         } catch (Exception exception) {
             // ---
         }
         try {
             fsc.update(Quantity.of(2, SI.SECOND), Quantity.of(-2, SI.SECOND));
-            assertTrue(false);
+            fail();
         } catch (Exception exception) {
             // ---
         }

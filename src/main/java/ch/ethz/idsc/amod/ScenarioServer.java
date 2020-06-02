@@ -5,6 +5,17 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Objects;
 
+import amodeus.amodeus.analysis.Analysis;
+import amodeus.amodeus.data.LocationSpec;
+import amodeus.amodeus.data.ReferenceFrame;
+import amodeus.amodeus.linkspeed.TaxiTravelTimeRouter;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.net.SimulationServer;
+import amodeus.amodeus.options.ScenarioOptions;
+import amodeus.amodeus.options.ScenarioOptionsBase;
+import amodeus.amodeus.util.io.MultiFileTools;
+import amodeus.amodeus.util.math.GlobalAssert;
+import amodeus.amodeus.util.matsim.AddCoordinatesToActivities;
 import org.matsim.amodeus.AmodeusConfigurator;
 import org.matsim.amodeus.config.AmodeusConfigGroup;
 import org.matsim.amodeus.framework.AmodeusUtils;
@@ -24,17 +35,6 @@ import ch.ethz.idsc.amod.analysis.CustomAnalysis;
 import ch.ethz.idsc.amod.dispatcher.DemoDispatcher;
 import ch.ethz.idsc.amod.ext.Static;
 import ch.ethz.idsc.amod.generator.DemoGenerator;
-import ch.ethz.idsc.amodeus.analysis.Analysis;
-import ch.ethz.idsc.amodeus.data.LocationSpec;
-import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-import ch.ethz.idsc.amodeus.linkspeed.TaxiTravelTimeRouter;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.net.SimulationServer;
-import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.util.matsim.AddCoordinatesToActivities;
 
 /** This class runs an AMoDeus simulation based on MATSim. The results can be
  * viewed if the {@link ScenarioViewer} is executed in the same working
@@ -157,6 +157,5 @@ import ch.ethz.idsc.amodeus.util.matsim.AddCoordinatesToActivities;
         Analysis analysis = Analysis.setup(scenarioOptions, new File(outputdirectory), network, db);
         CustomAnalysis.addTo(analysis);
         analysis.run();
-
     }
 }

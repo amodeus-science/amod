@@ -5,23 +5,22 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import amodeus.amodeus.data.LocationSpec;
+import amodeus.amodeus.data.ReferenceFrame;
+import amodeus.amodeus.gfx.AmodeusComponent;
+import amodeus.amodeus.gfx.AmodeusViewerFrame;
+import amodeus.amodeus.gfx.ViewerConfig;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.options.ScenarioOptions;
+import amodeus.amodeus.options.ScenarioOptionsBase;
+import amodeus.amodeus.util.io.MultiFileTools;
+import amodeus.amodeus.util.matsim.NetworkLoader;
+import amodeus.amodeus.virtualnetwork.core.VirtualNetworkGet;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
 import ch.ethz.idsc.amod.ext.Static;
-import ch.ethz.idsc.amodeus.data.LocationSpec;
-import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-import ch.ethz.idsc.amodeus.gfx.AmodeusComponent;
-import ch.ethz.idsc.amodeus.gfx.AmodeusViewerFrame;
-import ch.ethz.idsc.amodeus.gfx.ViewerConfig;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodeus.util.matsim.NetworkLoader;
-import ch.ethz.idsc.amodeus.virtualnetwork.core.VirtualNetworkGet;
 
 /** the viewer allows to connect to the scenario server or to view saved simulation results. */
 /* package */ enum ScenarioViewer {
@@ -34,7 +33,7 @@ import ch.ethz.idsc.amodeus.virtualnetwork.core.VirtualNetworkGet;
 
     /** Execute in simulation folder to view past results or connect to simulation server
      * 
-     * @param args not used
+     * @param workingDirectory
      * @throws FileNotFoundException
      * @throws IOException */
     public static void run(File workingDirectory) throws FileNotFoundException, IOException {
@@ -45,10 +44,8 @@ import ch.ethz.idsc.amodeus.virtualnetwork.core.VirtualNetworkGet;
         Config config = ConfigUtils.loadConfig(scenarioOptions.getSimulationConfigName());
         System.out.println("MATSim config file: " + scenarioOptions.getSimulationConfigName());
         final File outputSubDirectory = new File(config.controler().getOutputDirectory()).getAbsoluteFile();
-        if (!outputSubDirectory.isDirectory()) {
-            System.err.println("output directory: " + outputSubDirectory.getAbsolutePath() + " not found.");
-            GlobalAssert.that(false);
-        }
+        if (!outputSubDirectory.isDirectory())
+            throw new RuntimeException("output directory: " + outputSubDirectory.getAbsolutePath() + " not found.");
         System.out.println("outputSubDirectory=" + outputSubDirectory.getAbsolutePath());
         File outputDirectory = outputSubDirectory.getParentFile();
         System.out.println("showing simulation results from outputDirectory=" + outputDirectory);

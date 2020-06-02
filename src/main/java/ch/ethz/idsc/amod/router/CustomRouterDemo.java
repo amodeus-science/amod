@@ -1,8 +1,6 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.amod.router;
 
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-
 /** Nonfunctional code explaining how a custom router would be incluced to an AMoDeus simulation. */
 /* package */ class CustomRouterDemo {
 
@@ -55,6 +53,6 @@ import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
          * 
          *           If no router is specified, then the standard router is chosen. Invalid specifications
          *           lead to exceptions. */
-        GlobalAssert.that(false);
+        throw new RuntimeException();
     }
 }

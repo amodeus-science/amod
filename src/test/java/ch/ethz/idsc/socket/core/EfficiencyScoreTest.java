@@ -1,9 +1,7 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.socket.core;
 
-import ch.ethz.idsc.amodeus.util.math.SI;
-import ch.ethz.idsc.socket.core.EfficiencyScore;
-import ch.ethz.idsc.socket.core.ScoreParameters;
+import amodeus.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.NumberQ;
 import ch.ethz.idsc.tensor.qty.Quantity;
 import junit.framework.TestCase;
@@ -15,7 +13,7 @@ public class EfficiencyScoreTest extends TestCase {
         NumberQ.require(efficiencyScore.alpha.Get(1).multiply(Quantity.of(3, SI.METER)));
         try {
             NumberQ.require(efficiencyScore.alpha.Get(1).multiply(Quantity.of(3, SI.SECOND)));
-            assertTrue(false);
+            fail();
         } catch (Exception exception) {
             // ---
         }

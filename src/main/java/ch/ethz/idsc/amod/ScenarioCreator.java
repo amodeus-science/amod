@@ -4,11 +4,11 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
-import ch.ethz.idsc.amodtaxi.scenario.ScenarioCreation;
-import ch.ethz.idsc.amodtaxi.scenario.chicago.ChicagoScenarioCreation;
-import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.SanFranciscoScenarioCreation;
+import amodeus.amodeus.util.io.MultiFileTools;
+import amodeus.amodeus.util.math.GlobalAssert;
+import amodeus.amodtaxi.scenario.ScenarioCreation;
+import amodeus.amodtaxi.scenario.chicago.ChicagoScenarioCreation;
+import amodeus.amodtaxi.scenario.sanfrancisco.SanFranciscoScenarioCreation;
 
 /** provides a quick access to the implementations of {@link ScenarioCreation}:
  * {@link ChicagoScenarioCreation}

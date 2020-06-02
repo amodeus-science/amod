@@ -3,12 +3,12 @@ package ch.ethz.idsc.amod;
 import java.io.File;
 import java.io.IOException;
 
-import ch.ethz.idsc.amodtaxi.scenario.ScenarioCreation;
-import ch.ethz.idsc.amodtaxi.scenario.sanfrancisco.TraceFileChoice;
+import amodeus.amodeus.util.io.MultiFileTools;
+import amodeus.amodtaxi.scenario.ScenarioCreation;
+import amodeus.amodtaxi.scenario.sanfrancisco.TraceFileChoice;
 import org.junit.AfterClass;
 import org.junit.Test;
 
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
 import ch.ethz.idsc.tensor.io.DeleteDirectory;
 
 public class DemoTest {

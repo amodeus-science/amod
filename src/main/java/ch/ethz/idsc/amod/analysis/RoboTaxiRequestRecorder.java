@@ -4,12 +4,12 @@ package ch.ethz.idsc.amod.analysis;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.ethz.idsc.amodeus.analysis.Analysis;
-import ch.ethz.idsc.amodeus.analysis.element.AnalysisElement;
-import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
-import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxiStatus;
-import ch.ethz.idsc.amodeus.net.SimulationObject;
-import ch.ethz.idsc.amodeus.net.VehicleContainerUtils;
+import amodeus.amodeus.analysis.Analysis;
+import amodeus.amodeus.analysis.element.AnalysisElement;
+import amodeus.amodeus.dispatcher.core.RoboTaxi;
+import amodeus.amodeus.dispatcher.core.RoboTaxiStatus;
+import amodeus.amodeus.net.SimulationObject;
+import amodeus.amodeus.net.VehicleContainerUtils;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 

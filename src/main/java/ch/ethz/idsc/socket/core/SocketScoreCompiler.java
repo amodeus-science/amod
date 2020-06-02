@@ -4,12 +4,12 @@ package ch.ethz.idsc.socket.core;
 import java.util.Collection;
 import java.util.List;
 
+import amodeus.amodeus.dispatcher.core.RequestStatus;
+import amodeus.amodeus.dispatcher.core.RoboTaxi;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.net.SimulationObjectCompiler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
-import ch.ethz.idsc.amodeus.dispatcher.core.RequestStatus;
-import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.net.SimulationObjectCompiler;
 import ch.ethz.idsc.tensor.Tensor;
 
 public class SocketScoreCompiler {

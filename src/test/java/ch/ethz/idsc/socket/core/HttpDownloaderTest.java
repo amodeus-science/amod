@@ -4,7 +4,7 @@ package ch.ethz.idsc.socket.core;
 import java.io.File;
 import java.io.IOException;
 
-import ch.ethz.idsc.amodeus.util.io.ContentType;
+import amodeus.amodeus.util.io.ContentType;
 import ch.ethz.idsc.tensor.io.HomeDirectory;
 import ch.ethz.idsc.tensor.io.URLFetch;
 import junit.framework.TestCase;

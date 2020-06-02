@@ -1,10 +1,10 @@
 /* amodeus - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package ch.ethz.idsc.socket.core;
 
-import ch.ethz.idsc.amodeus.analysis.element.AnalysisElement;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.net.SimulationObject;
-import ch.ethz.idsc.amodeus.util.math.SI;
+import amodeus.amodeus.analysis.element.AnalysisElement;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.net.SimulationObject;
+import amodeus.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -37,7 +37,6 @@ public class SocketScoreElement implements AnalysisElement {
 
     @Override
     public void register(SimulationObject simulationObject) {
-
         /** time */
         Scalar time = Quantity.of(simulationObject.now, SI.SECOND);
         Scalar dt = time.subtract(timeBefore);

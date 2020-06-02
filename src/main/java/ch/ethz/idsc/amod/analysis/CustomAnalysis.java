@@ -3,21 +3,21 @@ package ch.ethz.idsc.amod.analysis;
 
 import java.io.File;
 
+import amodeus.amodeus.analysis.Analysis;
+import amodeus.amodeus.data.LocationSpec;
+import amodeus.amodeus.data.ReferenceFrame;
+import amodeus.amodeus.dispatcher.core.RoboTaxi;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.net.SimulationObject;
+import amodeus.amodeus.options.ScenarioOptions;
+import amodeus.amodeus.options.ScenarioOptionsBase;
+import amodeus.amodeus.util.io.MultiFileTools;
+import amodeus.amodeus.util.matsim.NetworkLoader;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
 import ch.ethz.idsc.amod.ext.Static;
-import ch.ethz.idsc.amodeus.analysis.Analysis;
-import ch.ethz.idsc.amodeus.data.LocationSpec;
-import ch.ethz.idsc.amodeus.data.ReferenceFrame;
-import ch.ethz.idsc.amodeus.dispatcher.core.RoboTaxi;
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.net.SimulationObject;
-import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.amodeus.util.matsim.NetworkLoader;
 
 /** This is a demonstration of the functionality of AMoDeus that customized analysis and reporting
  * elements can be easily added. In this example, we present the case in which for every
@@ -71,7 +71,5 @@ public enum CustomAnalysis {
         analysis.addAnalysisElement(roboTaxiRequestRecorder);
         analysis.addAnalysisExport(roboTaxiRequestExport);
         analysis.addHtmlElement(roboTaxiRequestRecorderHtml);
-
     }
-
 }

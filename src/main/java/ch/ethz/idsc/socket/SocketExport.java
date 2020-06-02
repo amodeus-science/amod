@@ -3,20 +3,20 @@ package ch.ethz.idsc.socket;
 
 import java.io.File;
 
+import amodeus.amodeus.analysis.AnalysisSummary;
+import amodeus.amodeus.analysis.UnitSaveUtils;
+import amodeus.amodeus.analysis.element.AnalysisExport;
+import amodeus.amodeus.analysis.element.AnalysisMeanFilter;
+import amodeus.amodeus.analysis.plot.AmodeusChartUtils;
+import amodeus.amodeus.util.math.GlobalAssert;
+import amodeus.tensor.fig.TimedChart;
+import amodeus.tensor.fig.VisualRow;
+import amodeus.tensor.fig.VisualSet;
 import org.jfree.chart.JFreeChart;
 
-import ch.ethz.idsc.amodeus.analysis.AnalysisSummary;
-import ch.ethz.idsc.amodeus.analysis.UnitSaveUtils;
-import ch.ethz.idsc.amodeus.analysis.element.AnalysisExport;
-import ch.ethz.idsc.amodeus.analysis.element.AnalysisMeanFilter;
-import ch.ethz.idsc.amodeus.analysis.plot.AmodeusChartUtils;
-import ch.ethz.idsc.amodeus.util.math.GlobalAssert;
 import ch.ethz.idsc.socket.core.SocketScoreElement;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Unprotect;
-import ch.ethz.idsc.tensor.fig.TimedChart;
-import ch.ethz.idsc.tensor.fig.VisualRow;
-import ch.ethz.idsc.tensor.fig.VisualSet;
 import ch.ethz.idsc.tensor.img.ColorDataIndexed;
 
 /* package */ class SocketExport implements AnalysisExport {

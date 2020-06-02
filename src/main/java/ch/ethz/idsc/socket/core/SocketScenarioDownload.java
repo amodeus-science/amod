@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-import ch.ethz.idsc.amodeus.util.io.ContentType;
-import ch.ethz.idsc.amodeus.util.io.Unzip;
+import amodeus.amodeus.util.io.ContentType;
+import amodeus.amodeus.util.io.Unzip;
 import ch.ethz.idsc.tensor.io.ResourceData;
 import ch.ethz.idsc.tensor.io.URLFetch;
 
@@ -14,7 +14,7 @@ public enum SocketScenarioDownload {
     ;
 
     /** @param key for instance "SanFrancisco.20080519"
-     * @throws Exception */
+     * @throws IOException */
     public static void extract(File workingDirecotry, String key) throws IOException {
         File file = new File(workingDirecotry, "scenario.zip");
         of(key, file);
@@ -24,7 +24,7 @@ public enum SocketScenarioDownload {
 
     /** @param key for instance "SanFrancisco.20080519"
      * @param file local target
-     * @throws Exception */
+     * @throws IOException */
     public static void of(String key, File file) throws IOException {
         Properties properties = ResourceData.properties("/socket/scenarios.properties");
         if (properties.containsKey(key)) {

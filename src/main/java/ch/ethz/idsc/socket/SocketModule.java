@@ -3,13 +3,12 @@ package ch.ethz.idsc.socket;
 
 import java.util.Objects;
 
+import amodeus.amodeus.util.net.StringSocket;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-
-import ch.ethz.idsc.amodeus.util.net.StringSocket;
 
 public class SocketModule extends AbstractModule {
     private final StringSocket stringSocket;

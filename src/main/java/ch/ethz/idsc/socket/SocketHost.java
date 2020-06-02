@@ -4,18 +4,18 @@ package ch.ethz.idsc.socket;
 import java.io.File;
 import java.util.Objects;
 
+import amodeus.amodeus.analysis.Analysis;
+import amodeus.amodeus.options.ScenarioOptions;
+import amodeus.amodeus.options.ScenarioOptionsBase;
+import amodeus.amodeus.prep.LegCount;
+import amodeus.amodeus.util.io.MultiFileTools;
+import amodeus.amodeus.util.matsim.xml.ConfigDispatcherChanger;
+import amodeus.amodeus.util.matsim.xml.ConfigVehiclesChanger;
+import amodeus.amodeus.util.net.StringServerSocket;
+import amodeus.amodeus.util.net.StringSocket;
+import amodeus.amodeus.video.VideoGenerator;
 import org.matsim.amodeus.config.AmodeusModeConfig;
 
-import ch.ethz.idsc.amodeus.analysis.Analysis;
-import ch.ethz.idsc.amodeus.options.ScenarioOptions;
-import ch.ethz.idsc.amodeus.options.ScenarioOptionsBase;
-import ch.ethz.idsc.amodeus.prep.LegCount;
-import ch.ethz.idsc.amodeus.util.io.MultiFileTools;
-import ch.ethz.idsc.amodeus.util.matsim.xml.ConfigDispatcherChanger;
-import ch.ethz.idsc.amodeus.util.matsim.xml.ConfigVehiclesChanger;
-import ch.ethz.idsc.amodeus.util.net.StringServerSocket;
-import ch.ethz.idsc.amodeus.util.net.StringSocket;
-import ch.ethz.idsc.amodeus.video.VideoGenerator;
 import ch.ethz.idsc.socket.core.ScoreParameters;
 import ch.ethz.idsc.socket.core.SocketDispatcherHost;
 import ch.ethz.idsc.socket.core.SocketScoreElement;

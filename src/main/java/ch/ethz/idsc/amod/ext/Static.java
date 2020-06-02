@@ -10,11 +10,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import amodeus.amodeus.data.LocationSpec;
+import amodeus.amodeus.data.LocationSpecDatabase;
+import amodeus.amodeus.options.LPOptionsBase;
 import org.gnu.glpk.GLPK;
-
-import ch.ethz.idsc.amodeus.data.LocationSpec;
-import ch.ethz.idsc.amodeus.data.LocationSpecDatabase;
-import ch.ethz.idsc.amodeus.options.LPOptionsBase;
 
 public enum Static {
     ;
@@ -22,7 +21,6 @@ public enum Static {
     public static void setup() {
         for (LocationSpec locationSpec : UserLocationSpecs.values())
             LocationSpecDatabase.INSTANCE.put(locationSpec);
-
     }
 
     public static void checkGLPKLib() {

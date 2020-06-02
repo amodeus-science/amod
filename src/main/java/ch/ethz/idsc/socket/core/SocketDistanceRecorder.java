@@ -4,8 +4,8 @@ package ch.ethz.idsc.socket.core;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.ethz.idsc.amodeus.net.MatsimAmodeusDatabase;
-import ch.ethz.idsc.amodeus.net.SimulationObject;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.net.SimulationObject;
 import ch.ethz.idsc.tensor.Tensor;
 
 /* package */ class SocketDistanceRecorder {
