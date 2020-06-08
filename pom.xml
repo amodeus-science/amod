@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>amodeus</groupId>
 	<artifactId>amod</artifactId>
-	<version>1.9.3</version>
+	<version>2.0.0</version>
 	<packaging>jar</packaging>
 
 	<properties>
@@ -17,12 +17,12 @@
 		<dependency>
 			<groupId>amodeus</groupId>
 			<artifactId>amodeus</artifactId>
-			<version>1.9.3</version>
+			<version>2.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>amodeus</groupId>
 			<artifactId>amodtaxi</artifactId>
-			<version>1.9.3</version>
+			<version>2.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -35,7 +35,7 @@
 	<repositories>
 		<repository>
 			<id>tensor-mvn-repo</id>
-			<url>https://raw.github.com/idsc-frazzoli/tensor/mvn-repo/</url>
+			<url>https://raw.github.com/amodeus-science/tensor/mvn-repo/</url>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
@@ -43,7 +43,7 @@
 		</repository>
 		<repository>
 			<id>amodeus-mvn-repo</id>
-			<url>https://raw.github.com/idsc-frazzoli/amodeus/mvn-repo/</url>
+			<url>https://raw.github.com/amodeus-science/amodeus/mvn-repo/</url>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
