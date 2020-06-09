@@ -3,7 +3,9 @@ package amodeus.amod;
 import java.io.File;
 import java.io.IOException;
 
+import amodeus.amodeus.util.io.Locate;
 import amodeus.amodeus.util.io.MultiFileTools;
+import amodeus.amodeus.util.io.Unzip;
 import amodeus.amodtaxi.scenario.ScenarioCreation;
 import amodeus.amodtaxi.scenario.sanfrancisco.TraceFileChoice;
 import org.junit.AfterClass;
@@ -16,8 +18,16 @@ public class DemoTest {
     @Test
     public void test() throws Exception {
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
+
+        try {
+            File map = new File(Locate.repoFolder(ScenarioCreator.class, "amod"), "src/main/resources/scenario/SanFrancisco/network_pt2matsim.zip");
+            Unzip.of(map, workingDirectory, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         // 1 download scenario
-        ScenarioCreation creation = ScenarioCreator.SAN_FRANCISCO.in(workingDirectory); // slow due to osm download
+        ScenarioCreation creation = ScenarioCreator.SAN_FRANCISCO.in(workingDirectory);
         // 2 run preparer
         ScenarioPreparer.run(creation.directory());
         // 3 run server
