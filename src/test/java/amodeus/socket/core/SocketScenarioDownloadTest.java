@@ -12,8 +12,21 @@ public class SocketScenarioDownloadTest extends TestCase {
         File workingDirectory = MultiFileTools.getDefaultWorkingDirectory();
         File file = new File(workingDirectory, "scenario.zip"); // <3MB
         assertFalse(file.exists());
-        SocketScenarioDownload.of("SanFrancisco", file);
-        assertTrue(file.isFile());
-        file.delete();
+
+        boolean inactive = false;
+        try {
+            SocketScenarioDownload.of("SanFrancisco", file);
+        } catch (IOException e) {
+            if (e.getMessage().equals("503")) {
+                System.err.println("currently no active competition");
+                inactive = true;
+            } else throw e;
+        }
+
+        try {
+            assertTrue(inactive || file.isFile());
+        } finally {
+            file.delete();
+        }
     }
 }

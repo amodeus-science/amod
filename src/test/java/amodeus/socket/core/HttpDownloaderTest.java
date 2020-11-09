@@ -31,13 +31,19 @@ public class HttpDownloaderTest extends TestCase {
         System.out.println(file.getAbsolutePath());
         assertFalse(file.exists());
 
+        boolean inactive = false;
         try (URLFetch urlFetch = new URLFetch("https://polybox.ethz.ch/index.php/s/o5lsGffyRsspkJP/download")) {
             ContentType.APPLICATION_ZIP.require(urlFetch.contentType());
             urlFetch.download(file);
+        } catch (IOException e) {
+            if (e.getMessage().equals("503")) {
+                System.err.println("currently no active competition");
+                inactive = true;
+            } else throw e;
         }
 
         try {
-            assertTrue(file.isFile());
+            assertTrue(inactive || file.isFile());
         } finally {
             file.delete();
         }
