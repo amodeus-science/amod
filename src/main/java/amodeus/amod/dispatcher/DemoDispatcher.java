@@ -9,6 +9,7 @@ import java.util.Random;
 import amodeus.amodeus.dispatcher.core.DispatcherUtils;
 import amodeus.amodeus.dispatcher.core.RebalancingDispatcher;
 import amodeus.amodeus.dispatcher.core.RoboTaxi;
+import amodeus.amodeus.dispatcher.core.RoboTaxiUsageType;
 import amodeus.amodeus.dispatcher.util.DrivebyRequestStopper;
 import amodeus.amodeus.net.MatsimAmodeusDatabase;
 import amodeus.amodeus.util.matsim.SafeConfig;
@@ -17,6 +18,7 @@ import org.matsim.amodeus.components.AmodeusRouter;
 import org.matsim.amodeus.config.AmodeusModeConfig;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.run.ModalProviders.InstanceGetter;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -33,8 +35,8 @@ public class DemoDispatcher extends RebalancingDispatcher {
     private int total_abortTrip = 0;
 
     private DemoDispatcher(Config config, AmodeusModeConfig operatorConfig, TravelTime travelTime, //
-            AmodeusRouter router, EventsManager eventsManager, Network network, MatsimAmodeusDatabase db) {
-        super(config, operatorConfig, travelTime, router, eventsManager, db);
+            AmodeusRouter router, EventsManager eventsManager, Network network, MatsimAmodeusDatabase db, RebalancingStrategy drtRebalancing) {
+        super(config, operatorConfig, travelTime, router, eventsManager, db, drtRebalancing, RoboTaxiUsageType.SINGLEUSED);
         links = new ArrayList<>(network.getLinks().values());
         SafeConfig safeConfig = SafeConfig.wrap(operatorConfig.getDispatcherConfig());
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 120);
@@ -76,8 +78,9 @@ public class DemoDispatcher extends RebalancingDispatcher {
             Network network = inject.getModal(Network.class);
             AmodeusRouter router = inject.getModal(AmodeusRouter.class);
             TravelTime travelTime = inject.getModal(TravelTime.class);
+            RebalancingStrategy drtRebalancing = inject.getModal(RebalancingStrategy.class);
 
-            return new DemoDispatcher(config, operatorConfig, travelTime, router, eventsManager, network, db);
+            return new DemoDispatcher(config, operatorConfig, travelTime, router, eventsManager, network, db, drtRebalancing);
         }
     }
 }

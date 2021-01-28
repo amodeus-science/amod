@@ -7,22 +7,24 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-import amodeus.amodeus.dispatcher.core.RoboTaxi;
-import amodeus.amodeus.dispatcher.core.SharedRebalancingDispatcher;
-import amodeus.amodeus.dispatcher.shared.SharedCourse;
-import amodeus.amodeus.dispatcher.shared.SharedCourseUtil;
-import amodeus.amodeus.net.MatsimAmodeusDatabase;
-import amodeus.amodeus.util.matsim.SafeConfig;
 import org.matsim.amodeus.components.AmodeusDispatcher;
 import org.matsim.amodeus.components.AmodeusRouter;
 import org.matsim.amodeus.config.AmodeusModeConfig;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.run.ModalProviders.InstanceGetter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
+
+import amodeus.amodeus.dispatcher.core.RebalancingDispatcher;
+import amodeus.amodeus.dispatcher.core.RoboTaxi;
+import amodeus.amodeus.dispatcher.core.RoboTaxiUsageType;
+import amodeus.amodeus.dispatcher.core.schedule.directives.Directive;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.util.matsim.SafeConfig;
 
 /** this is a demo of functionality for the shared dispatchers (> 1 person in {@link RoboTaxi}
  * 
@@ -30,7 +32,7 @@ import org.matsim.core.router.util.TravelTime;
  * it first picks up passengers 1,2,3,4 and then starts to bring passengers 1,2,3 to their destinations.
  * Passenger 4 is less lucky as the {@link RoboTaxi} first visits the city's North pole (northern most link)
  * before passenger 4 is finally dropped of and the procedure starts from beginning. */
-/* package */ class DemoDispatcherShared extends SharedRebalancingDispatcher {
+/* package */ class DemoDispatcherShared extends RebalancingDispatcher {
     private final int dispatchPeriod;
     private final int rebalancePeriod;
     private final Random randGen = new Random(1234);
@@ -40,8 +42,8 @@ import org.matsim.core.router.util.TravelTime;
     protected DemoDispatcherShared(Network network, //
             Config config, AmodeusModeConfig operatorConfig, //
             TravelTime travelTime, AmodeusRouter router, EventsManager eventsManager, //
-            MatsimAmodeusDatabase db) {
-        super(config, operatorConfig, travelTime, router, eventsManager, db);
+            MatsimAmodeusDatabase db, RebalancingStrategy drtRebalancing) {
+        super(config, operatorConfig, travelTime, router, eventsManager, db, drtRebalancing, RoboTaxiUsageType.SHARED);
         this.cityNorthPole = getNorthPole(network);
         this.equatorLinks = getEquator(network);
         SafeConfig safeConfig = SafeConfig.wrap(operatorConfig.getDispatcherConfig());
@@ -57,40 +59,41 @@ import org.matsim.core.router.util.TravelTime;
         if (round_now % dispatchPeriod == 0) {
             /** assignment of {@link RoboTaxi}s */
             for (RoboTaxi sharedRoboTaxi : getDivertableUnassignedRoboTaxis()) {
-                if (getUnassignedPassengerRequests().size() >= 4) {
+                if (getUnassignedRequests().size() >= 4) {
+                	List<PassengerRequest> unassignedRequests = new ArrayList<>(getUnassignedRequests());
 
                     /** select 4 requests */
-                    PassengerRequest firstRequest = getUnassignedPassengerRequests().get(0);
-                    PassengerRequest secondRequest = getUnassignedPassengerRequests().get(1);
-                    PassengerRequest thirdRequest = getUnassignedPassengerRequests().get(2);
-                    PassengerRequest fourthRequest = getUnassignedPassengerRequests().get(3);
+                    PassengerRequest firstRequest = unassignedRequests.get(0);
+                    PassengerRequest secondRequest = unassignedRequests.get(1);
+                    PassengerRequest thirdRequest = unassignedRequests.get(2);
+                    PassengerRequest fourthRequest = unassignedRequests.get(3);
 
                     /** add pickup for request 1 */
                     addSharedRoboTaxiPickup(sharedRoboTaxi, firstRequest);
 
                     /** add pickup for request 2 and move to first location */
                     addSharedRoboTaxiPickup(sharedRoboTaxi, secondRequest);
-                    SharedCourse sharedAVCourse = SharedCourse.pickupCourse(secondRequest);
-                    sharedRoboTaxi.moveAVCourseToPrev(sharedAVCourse);
+                    Directive sharedAVCourse = Directive.pickup(secondRequest);
+                    sharedRoboTaxi.moveToPrevious(sharedAVCourse);
 
                     /** add pickup for request 3 and move to first location */
                     addSharedRoboTaxiPickup(sharedRoboTaxi, thirdRequest);
-                    SharedCourse sharedAVCourse3 = SharedCourse.pickupCourse(thirdRequest);
-                    sharedRoboTaxi.moveAVCourseToPrev(sharedAVCourse3);
-                    sharedRoboTaxi.moveAVCourseToPrev(sharedAVCourse3);
+                    Directive sharedAVCourse3 = Directive.pickup(thirdRequest);
+                    sharedRoboTaxi.moveToPrevious(sharedAVCourse3);
+                    sharedRoboTaxi.moveToPrevious(sharedAVCourse3);
 
                     /** add pickup for request 4 and reorder the menu based on a list of Shared Courses */
-                    List<SharedCourse> courses = SharedCourseUtil.copy(sharedRoboTaxi.getUnmodifiableViewOfCourses());
-                    courses.add(3, SharedCourse.pickupCourse(fourthRequest));
-                    courses.add(SharedCourse.dropoffCourse(fourthRequest));
+                    List<Directive> courses = new ArrayList<>(sharedRoboTaxi.getUnmodifiableViewOfCourses());
+                    courses.add(3, Directive.pickup(fourthRequest));
+                    courses.add(Directive.dropoff(fourthRequest));
                     addSharedRoboTaxiPickup(sharedRoboTaxi, fourthRequest);
                     sharedRoboTaxi.updateMenu(courses);
 
                     /** add a redirect task (to the north pole) and move to prev */
                     Link redirectLink = cityNorthPole;
-                    SharedCourse redirectCourse = SharedCourse.redirectCourse(redirectLink, Double.toString(now) + sharedRoboTaxi.getId().toString());
+                    Directive redirectCourse = Directive.drive(redirectLink);
                     addSharedRoboTaxiRedirect(sharedRoboTaxi, redirectCourse);
-                    sharedRoboTaxi.moveAVCourseToPrev(redirectCourse);
+                    sharedRoboTaxi.moveToPrevious(redirectCourse);
                 } else {
                     break;
                 }
@@ -147,8 +150,9 @@ import org.matsim.core.router.util.TravelTime;
             Network network = inject.getModal(Network.class);
             AmodeusRouter router = inject.getModal(AmodeusRouter.class);
             TravelTime travelTime = inject.getModal(TravelTime.class);
-
-            return new DemoDispatcherShared(network, config, operatorConfig, travelTime, router, eventsManager, db);
+            RebalancingStrategy drtRebalancing = inject.getModal(RebalancingStrategy.class);
+            
+            return new DemoDispatcherShared(network, config, operatorConfig, travelTime, router, eventsManager, db, drtRebalancing);
         }
     }
 }

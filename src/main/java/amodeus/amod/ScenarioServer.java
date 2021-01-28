@@ -102,7 +102,7 @@ import amodeus.amod.generator.DemoGenerator;
 
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         Controler controller = new Controler(scenario);
-        AmodeusConfigurator.configureController(controller, db, scenarioOptions);
+        AmodeusConfigurator.configureController(controller, scenarioOptions);
 
         /** With the subsequent lines an additional user-defined dispatcher is added, functionality
          * in class
