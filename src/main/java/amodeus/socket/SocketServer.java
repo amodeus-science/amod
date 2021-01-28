@@ -93,7 +93,7 @@ import amodeus.socket.core.SocketDispatcherHost;
         Objects.requireNonNull(network);
         MatsimAmodeusDatabase db = MatsimAmodeusDatabase.initialize(network, referenceFrame);
         Controler controller = new Controler(scenario);
-        AmodeusConfigurator.configureController(controller, db, scenarioOptions);
+        AmodeusConfigurator.configureController(controller, scenarioOptions);
 
         /** try to load link speed data and use for speed adaption in network */
         try {

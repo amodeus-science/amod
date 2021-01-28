@@ -5,24 +5,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import amodeus.amodeus.dispatcher.core.RebalancingDispatcher;
-import amodeus.amodeus.dispatcher.core.RoboTaxi;
-import amodeus.amodeus.net.FastLinkLookup;
-import amodeus.amodeus.net.MatsimAmodeusDatabase;
-import amodeus.amodeus.util.matsim.SafeConfig;
-import amodeus.amodeus.util.net.StringSocket;
 import org.matsim.amodeus.components.AmodeusDispatcher;
 import org.matsim.amodeus.components.AmodeusRouter;
 import org.matsim.amodeus.config.AmodeusModeConfig;
 import org.matsim.amodeus.plpc.ParallelLeastCostPathCalculator;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.run.ModalProviders.InstanceGetter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
+import amodeus.amodeus.dispatcher.core.RebalancingDispatcher;
+import amodeus.amodeus.dispatcher.core.RoboTaxi;
+import amodeus.amodeus.dispatcher.core.RoboTaxiUsageType;
+import amodeus.amodeus.net.FastLinkLookup;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.util.matsim.SafeConfig;
+import amodeus.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
@@ -45,8 +47,8 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
     protected SocketDispatcherHost(Network network, Config config, AmodeusModeConfig operatorConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager, //
             StringSocket clientSocket, int numReqTot, //
-            MatsimAmodeusDatabase db) {
-        super(config, operatorConfig, travelTime, parallelLeastCostPathCalculator, eventsManager, db);
+            MatsimAmodeusDatabase db, RebalancingStrategy drtRebalancing) {
+        super(config, operatorConfig, travelTime, parallelLeastCostPathCalculator, eventsManager, db, drtRebalancing, RoboTaxiUsageType.SINGLEUSED);
         this.db = db;
         this.clientSocket = Objects.requireNonNull(clientSocket);
         this.numReqTot = numReqTot;
@@ -115,13 +117,14 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
             Network network = inject.getModal(Network.class);
             AmodeusRouter router = inject.getModal(AmodeusRouter.class);
             TravelTime travelTime = inject.getModal(TravelTime.class);
+            RebalancingStrategy drtRebalancing = inject.getModal(RebalancingStrategy.class);
 
             // TODO: Probably worth configuring this in some other way (not binding String and int)
             int numReqTot = inject.get(int.class);
             StringSocket stringSocket = inject.get(StringSocket.class);
 
             return new SocketDispatcherHost(network, config, operatorConfig, travelTime, router, eventsManager, //
-                    stringSocket, numReqTot, db);
+                    stringSocket, numReqTot, db, drtRebalancing);
         }
     }
 }
