@@ -23,6 +23,7 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.Unprotect;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
 
@@ -86,8 +87,8 @@ public enum SocketHost {
             /** get additional information */
             String readLine2 = stringSocket.readLine();
             Tensor config2 = Tensors.fromString(readLine2);
-            int numReqDes = config2.Get(0).number().intValue();
-            int fleetSize = config2.Get(1).number().intValue();
+            int numReqDes = Unprotect.withoutUnit(config2.Get(0)).number().intValue();
+            int fleetSize = Unprotect.withoutUnit(config2.Get(1)).number().intValue();
 
             {
                 String env = System.getenv(ENV_REQUESTS_SIZE);

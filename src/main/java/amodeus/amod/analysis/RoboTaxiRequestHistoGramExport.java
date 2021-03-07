@@ -21,6 +21,7 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Unprotect;
 import ch.ethz.idsc.tensor.alg.Range;
 import ch.ethz.idsc.tensor.img.ColorDataIndexed;
 import ch.ethz.idsc.tensor.pdf.BinCounts;
@@ -61,7 +62,7 @@ import ch.ethz.idsc.tensor.red.Total;
             visualSet.setAxesLabelY("% of RoboTaxis");
             visualSet.setAxesLabelX("Requests");
 
-            JFreeChart jFreeChart = Histogram.of(visualSet, s -> "[" + s.number() + " , " + s.add(histoGrambinSize).number() + ")");
+            JFreeChart jFreeChart = Histogram.of(visualSet, s -> "[" + Unprotect.withoutUnit(s).number() + " , " + Unprotect.withoutUnit(s.add(histoGrambinSize)).number() + ")");
             CategoryPlot categoryPlot = jFreeChart.getCategoryPlot();
             categoryPlot.getDomainAxis().setLowerMargin(0.0);
             categoryPlot.getDomainAxis().setUpperMargin(0.0);

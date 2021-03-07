@@ -80,7 +80,7 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
                     new String[] { "fleet size score integrated" }, //
                     "time of day", "scores integrated", time, fleetSizeScoreIntg, colorScheme);
             File fileChart = new File(relativeDirectory, FILENAME_SCORE_INTG);
-            chart.getXYPlot().getRangeAxis().setRange(fleetSizeScoreIntg.get(0).Get(0).number().intValue() * 2.0, 0.0);
+            chart.getXYPlot().getRangeAxis().setRange(Unprotect.withoutUnit(fleetSizeScoreIntg.Get(0,0)).number().intValue() * 2.0, 0.0);
             AmodeusChartUtils.saveAsPNG(chart, fileChart.toString(), WIDTH, HEIGHT);
             GlobalAssert.that(fileChart.isFile());
         } catch (Exception e1) {
