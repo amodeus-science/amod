@@ -3,6 +3,11 @@ package amodeus.amod.analysis;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+
+import amodeus.amod.ext.Static;
 import amodeus.amodeus.analysis.Analysis;
 import amodeus.amodeus.data.LocationSpec;
 import amodeus.amodeus.data.ReferenceFrame;
@@ -13,11 +18,6 @@ import amodeus.amodeus.options.ScenarioOptions;
 import amodeus.amodeus.options.ScenarioOptionsBase;
 import amodeus.amodeus.util.io.MultiFileTools;
 import amodeus.amodeus.util.matsim.NetworkLoader;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-
-import amodeus.amod.ext.Static;
 
 /** This is a demonstration of the functionality of AMoDeus that customized analysis and reporting
  * elements can be easily added. In this example, we present the case in which for every

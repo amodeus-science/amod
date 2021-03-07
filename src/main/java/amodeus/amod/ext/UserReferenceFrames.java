@@ -1,12 +1,12 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amodeus.amod.ext;
 
-import amodeus.amodeus.data.ReferenceFrame;
-import amodeus.amodeus.util.math.SI;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
+import amodeus.amodeus.data.ReferenceFrame;
+import amodeus.amodeus.util.math.SI;
 import ch.ethz.idsc.tensor.qty.Unit;
 
 /* package */ enum UserReferenceFrames implements ReferenceFrame {

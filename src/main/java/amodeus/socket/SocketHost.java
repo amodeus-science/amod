@@ -4,6 +4,8 @@ package amodeus.socket;
 import java.io.File;
 import java.util.Objects;
 
+import org.matsim.amodeus.config.AmodeusModeConfig;
+
 import amodeus.amodeus.analysis.Analysis;
 import amodeus.amodeus.options.ScenarioOptions;
 import amodeus.amodeus.options.ScenarioOptionsBase;
@@ -14,8 +16,6 @@ import amodeus.amodeus.util.matsim.xml.ConfigVehiclesChanger;
 import amodeus.amodeus.util.net.StringServerSocket;
 import amodeus.amodeus.util.net.StringSocket;
 import amodeus.amodeus.video.VideoGenerator;
-import org.matsim.amodeus.config.AmodeusModeConfig;
-
 import amodeus.socket.core.ScoreParameters;
 import amodeus.socket.core.SocketDispatcherHost;
 import amodeus.socket.core.SocketScoreElement;

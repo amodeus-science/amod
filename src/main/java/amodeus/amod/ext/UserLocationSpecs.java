@@ -1,9 +1,10 @@
 /* amod - Copyright (c) 2018, ETH Zurich, Institute for Dynamic Systems and Control */
 package amodeus.amod.ext;
 
+import org.matsim.api.core.v01.Coord;
+
 import amodeus.amodeus.data.LocationSpec;
 import amodeus.amodeus.data.ReferenceFrame;
-import org.matsim.api.core.v01.Coord;
 
 /* package */ enum UserLocationSpecs implements LocationSpec {
     SANFRANCISCO( //

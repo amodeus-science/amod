@@ -3,18 +3,18 @@ package amodeus.socket;
 
 import java.io.File;
 
+import org.jfree.chart.JFreeChart;
+
 import amodeus.amodeus.analysis.AnalysisSummary;
 import amodeus.amodeus.analysis.UnitSaveUtils;
 import amodeus.amodeus.analysis.element.AnalysisExport;
 import amodeus.amodeus.analysis.element.AnalysisMeanFilter;
 import amodeus.amodeus.analysis.plot.AmodeusChartUtils;
 import amodeus.amodeus.util.math.GlobalAssert;
+import amodeus.socket.core.SocketScoreElement;
 import amodeus.tensor.fig.TimedChart;
 import amodeus.tensor.fig.VisualRow;
 import amodeus.tensor.fig.VisualSet;
-import org.jfree.chart.JFreeChart;
-
-import amodeus.socket.core.SocketScoreElement;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Unprotect;
 import ch.ethz.idsc.tensor.img.ColorDataIndexed;

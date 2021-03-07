@@ -9,7 +9,7 @@ import amodeus.amodeus.net.TensorCoords;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.io.StringScalar;
-import ch.ethz.idsc.tensor.qty.Boole;
+import ch.ethz.idsc.tensor.num.Boole;
 
 public class SocketRoboTaxiCompiler {
     private final MatsimAmodeusDatabase db;

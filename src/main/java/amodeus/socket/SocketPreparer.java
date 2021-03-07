@@ -4,14 +4,6 @@ package amodeus.socket;
 import java.io.File;
 import java.net.MalformedURLException;
 
-import amodeus.amodeus.data.LocationSpec;
-import amodeus.amodeus.data.ReferenceFrame;
-import amodeus.amodeus.net.MatsimAmodeusDatabase;
-import amodeus.amodeus.net.TensorCoords;
-import amodeus.amodeus.options.ScenarioOptions;
-import amodeus.amodeus.options.ScenarioOptionsBase;
-import amodeus.amodeus.prep.ConfigCreator;
-import amodeus.amodeus.prep.NetworkPreparer;
 import org.matsim.amodeus.config.AmodeusConfigGroup;
 import org.matsim.amodeus.config.modal.GeneratorConfig;
 import org.matsim.api.core.v01.Coord;
@@ -24,6 +16,14 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import amodeus.amod.ext.Static;
+import amodeus.amodeus.data.LocationSpec;
+import amodeus.amodeus.data.ReferenceFrame;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.net.TensorCoords;
+import amodeus.amodeus.options.ScenarioOptions;
+import amodeus.amodeus.options.ScenarioOptionsBase;
+import amodeus.amodeus.prep.ConfigCreator;
+import amodeus.amodeus.prep.NetworkPreparer;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 

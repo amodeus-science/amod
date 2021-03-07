@@ -3,17 +3,18 @@ package amodeus.socket;
 
 import java.io.File;
 
+import org.matsim.amodeus.config.AmodeusModeConfig;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.population.io.PopulationWriter;
+
 import amodeus.amodeus.options.ScenarioOptions;
 import amodeus.amodeus.prep.LegCount;
 import amodeus.amodeus.prep.PopulationCutter;
 import amodeus.amodeus.prep.TheRequestApocalypse;
 import amodeus.amodeus.util.io.GZHandler;
 import amodeus.amodeus.util.math.GlobalAssert;
-import org.matsim.amodeus.config.AmodeusModeConfig;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.population.io.PopulationWriter;
 
 /* package */ enum SocketPopulationPreparer {
     ;

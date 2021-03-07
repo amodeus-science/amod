@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.IOException;
 
 import amodeus.amodeus.util.io.ContentType;
-import ch.ethz.idsc.tensor.io.HomeDirectory;
-import ch.ethz.idsc.tensor.io.URLFetch;
+import ch.ethz.idsc.tensor.ext.HomeDirectory;
+import ch.ethz.idsc.tensor.ext.URLFetch;
 import junit.framework.TestCase;
 
 public class HttpDownloaderTest extends TestCase {

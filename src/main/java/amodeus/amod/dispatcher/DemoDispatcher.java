@@ -6,13 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import amodeus.amodeus.dispatcher.core.DispatcherUtils;
-import amodeus.amodeus.dispatcher.core.RebalancingDispatcher;
-import amodeus.amodeus.dispatcher.core.RoboTaxi;
-import amodeus.amodeus.dispatcher.core.RoboTaxiUsageType;
-import amodeus.amodeus.dispatcher.util.DrivebyRequestStopper;
-import amodeus.amodeus.net.MatsimAmodeusDatabase;
-import amodeus.amodeus.util.matsim.SafeConfig;
 import org.matsim.amodeus.components.AmodeusDispatcher;
 import org.matsim.amodeus.components.AmodeusRouter;
 import org.matsim.amodeus.config.AmodeusModeConfig;
@@ -24,6 +17,14 @@ import org.matsim.contrib.dvrp.run.ModalProviders.InstanceGetter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
+
+import amodeus.amodeus.dispatcher.core.DispatcherUtils;
+import amodeus.amodeus.dispatcher.core.RebalancingDispatcher;
+import amodeus.amodeus.dispatcher.core.RoboTaxi;
+import amodeus.amodeus.dispatcher.core.RoboTaxiUsageType;
+import amodeus.amodeus.dispatcher.util.DrivebyRequestStopper;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.util.matsim.SafeConfig;
 
 /** Dispatcher sends vehicles to all links in the network and lets them pickup
  * any customers which are waiting along the road. */

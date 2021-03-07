@@ -7,8 +7,8 @@ import java.util.Properties;
 
 import amodeus.amodeus.util.io.ContentType;
 import amodeus.amodeus.util.io.Unzip;
+import ch.ethz.idsc.tensor.ext.URLFetch;
 import ch.ethz.idsc.tensor.io.ResourceData;
-import ch.ethz.idsc.tensor.io.URLFetch;
 
 public enum SocketScenarioDownload {
     ;

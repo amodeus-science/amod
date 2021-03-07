@@ -4,7 +4,6 @@ package amodeus.amod.router;
 import java.io.IOException;
 import java.util.concurrent.Future;
 
-import amodeus.amodeus.dispatcher.core.RoboTaxi;
 import org.matsim.amodeus.components.AmodeusRouter;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -12,6 +11,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.run.ModalProviders.InstanceGetter;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.vehicles.Vehicle;
+
+import amodeus.amodeus.dispatcher.core.RoboTaxi;
 
 /** This is a nonfunctional sample demonstrating of how to include a custom router
  * to AMoDeus which is not the standard choice of the Paralllel Djikstra router used

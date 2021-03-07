@@ -5,20 +5,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Objects;
 
-import amodeus.amodeus.data.LocationSpec;
-import amodeus.amodeus.data.ReferenceFrame;
-import amodeus.amodeus.generator.RandomDensityGenerator;
-import amodeus.amodeus.linkspeed.LinkSpeedDataContainer;
-import amodeus.amodeus.linkspeed.LinkSpeedUtils;
-import amodeus.amodeus.linkspeed.TaxiTravelTimeRouter;
-import amodeus.amodeus.linkspeed.TrafficDataModule;
-import amodeus.amodeus.net.MatsimAmodeusDatabase;
-import amodeus.amodeus.net.SimulationServer;
-import amodeus.amodeus.options.ScenarioOptions;
-import amodeus.amodeus.options.ScenarioOptionsBase;
-import amodeus.amodeus.util.math.GlobalAssert;
-import amodeus.amodeus.util.matsim.AddCoordinatesToActivities;
-import amodeus.amodeus.util.net.StringSocket;
 import org.matsim.amodeus.AmodeusConfigurator;
 import org.matsim.amodeus.config.AmodeusConfigGroup;
 import org.matsim.amodeus.framework.AmodeusUtils;
@@ -34,6 +20,20 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import amodeus.amod.ext.Static;
+import amodeus.amodeus.data.LocationSpec;
+import amodeus.amodeus.data.ReferenceFrame;
+import amodeus.amodeus.generator.RandomDensityGenerator;
+import amodeus.amodeus.linkspeed.LinkSpeedDataContainer;
+import amodeus.amodeus.linkspeed.LinkSpeedUtils;
+import amodeus.amodeus.linkspeed.TaxiTravelTimeRouter;
+import amodeus.amodeus.linkspeed.TrafficDataModule;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.net.SimulationServer;
+import amodeus.amodeus.options.ScenarioOptions;
+import amodeus.amodeus.options.ScenarioOptionsBase;
+import amodeus.amodeus.util.math.GlobalAssert;
+import amodeus.amodeus.util.matsim.AddCoordinatesToActivities;
+import amodeus.amodeus.util.net.StringSocket;
 import amodeus.socket.core.SocketDispatcherHost;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is

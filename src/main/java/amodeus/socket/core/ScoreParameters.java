@@ -6,15 +6,15 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.io.ResourceData;
-import ch.ethz.idsc.tensor.io.TensorProperties;
 import ch.ethz.idsc.tensor.qty.Quantity;
+import ch.ethz.idsc.tensor.ref.ObjectProperties;
 
 /** values in class are required by SocketHost
  * therefore class was made public */
 public class ScoreParameters {
     /** overrides default values defined in class
      * with the values parsed from the properties file */
-    public static final ScoreParameters GLOBAL = TensorProperties.wrap(new ScoreParameters()) //
+    public static final ScoreParameters GLOBAL = ObjectProperties.wrap(new ScoreParameters()) //
             .set(ResourceData.properties("/socket/ScoreParameters.properties"));
 
     /** service quality */
