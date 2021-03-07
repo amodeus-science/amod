@@ -5,6 +5,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+
+import amodeus.amod.ext.Static;
 import amodeus.amodeus.data.LocationSpec;
 import amodeus.amodeus.data.ReferenceFrame;
 import amodeus.amodeus.gfx.AmodeusComponent;
@@ -16,11 +21,6 @@ import amodeus.amodeus.options.ScenarioOptionsBase;
 import amodeus.amodeus.util.io.MultiFileTools;
 import amodeus.amodeus.util.matsim.NetworkLoader;
 import amodeus.amodeus.virtualnetwork.core.VirtualNetworkGet;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-
-import amodeus.amod.ext.Static;
 
 /** the viewer allows to connect to the scenario server or to view saved simulation results. */
 /* package */ enum ScenarioViewer {

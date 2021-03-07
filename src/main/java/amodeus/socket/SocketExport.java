@@ -3,18 +3,18 @@ package amodeus.socket;
 
 import java.io.File;
 
+import org.jfree.chart.JFreeChart;
+
 import amodeus.amodeus.analysis.AnalysisSummary;
 import amodeus.amodeus.analysis.UnitSaveUtils;
 import amodeus.amodeus.analysis.element.AnalysisExport;
 import amodeus.amodeus.analysis.element.AnalysisMeanFilter;
 import amodeus.amodeus.analysis.plot.AmodeusChartUtils;
 import amodeus.amodeus.util.math.GlobalAssert;
+import amodeus.socket.core.SocketScoreElement;
 import amodeus.tensor.fig.TimedChart;
 import amodeus.tensor.fig.VisualRow;
 import amodeus.tensor.fig.VisualSet;
-import org.jfree.chart.JFreeChart;
-
-import amodeus.socket.core.SocketScoreElement;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Unprotect;
 import ch.ethz.idsc.tensor.img.ColorDataIndexed;
@@ -80,7 +80,7 @@ import ch.ethz.idsc.tensor.img.ColorDataIndexed;
                     new String[] { "fleet size score integrated" }, //
                     "time of day", "scores integrated", time, fleetSizeScoreIntg, colorScheme);
             File fileChart = new File(relativeDirectory, FILENAME_SCORE_INTG);
-            chart.getXYPlot().getRangeAxis().setRange(fleetSizeScoreIntg.get(0).Get(0).number().intValue() * 2.0, 0.0);
+            chart.getXYPlot().getRangeAxis().setRange(Unprotect.withoutUnit(fleetSizeScoreIntg.Get(0,0)).number().intValue() * 2.0, 0.0);
             AmodeusChartUtils.saveAsPNG(chart, fileChart.toString(), WIDTH, HEIGHT);
             GlobalAssert.that(fileChart.isFile());
         } catch (Exception e1) {

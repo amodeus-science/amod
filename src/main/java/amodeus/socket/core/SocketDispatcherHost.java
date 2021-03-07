@@ -28,6 +28,7 @@ import amodeus.amodeus.util.net.StringSocket;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.Unprotect;
 
 // TODO refactor and shorten @clruch
 public class SocketDispatcherHost extends RebalancingDispatcher {
@@ -89,14 +90,14 @@ public class SocketDispatcherHost extends RebalancingDispatcher {
 
                     Tensor pickups = commands.get(0);
                     for (Tensor pickup : pickups) {
-                        RoboTaxi roboTaxi = idRoboTaxiMap.get(pickup.Get(0).number().intValue());
-                        PassengerRequest avRequest = idRequestMap.get(pickup.Get(1).number().intValue());
+                        RoboTaxi roboTaxi = idRoboTaxiMap.get(Unprotect.withoutUnit(pickup.Get(0)).number().intValue());
+                        PassengerRequest avRequest = idRequestMap.get(Unprotect.withoutUnit(pickup.Get(1)).number().intValue());
                         setRoboTaxiPickup(roboTaxi, avRequest);
                     }
 
                     Tensor rebalances = commands.get(1);
                     for (Tensor rebalance : rebalances) {
-                        RoboTaxi roboTaxi = idRoboTaxiMap.get(rebalance.Get(0).number().intValue());
+                        RoboTaxi roboTaxi = idRoboTaxiMap.get(Unprotect.withoutUnit(rebalance.Get(0)).number().intValue());
                         Link link = fastLinkLookup.linkFromWGS84(rebalance.get(1));
                         setRoboTaxiRebalance(roboTaxi, link);
                     }

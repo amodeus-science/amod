@@ -5,17 +5,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Objects;
 
-import amodeus.amodeus.analysis.Analysis;
-import amodeus.amodeus.data.LocationSpec;
-import amodeus.amodeus.data.ReferenceFrame;
-import amodeus.amodeus.linkspeed.TaxiTravelTimeRouter;
-import amodeus.amodeus.net.MatsimAmodeusDatabase;
-import amodeus.amodeus.net.SimulationServer;
-import amodeus.amodeus.options.ScenarioOptions;
-import amodeus.amodeus.options.ScenarioOptionsBase;
-import amodeus.amodeus.util.io.MultiFileTools;
-import amodeus.amodeus.util.math.GlobalAssert;
-import amodeus.amodeus.util.matsim.AddCoordinatesToActivities;
 import org.matsim.amodeus.AmodeusConfigurator;
 import org.matsim.amodeus.config.AmodeusConfigGroup;
 import org.matsim.amodeus.framework.AmodeusUtils;
@@ -35,6 +24,17 @@ import amodeus.amod.analysis.CustomAnalysis;
 import amodeus.amod.dispatcher.DemoDispatcher;
 import amodeus.amod.ext.Static;
 import amodeus.amod.generator.DemoGenerator;
+import amodeus.amodeus.analysis.Analysis;
+import amodeus.amodeus.data.LocationSpec;
+import amodeus.amodeus.data.ReferenceFrame;
+import amodeus.amodeus.linkspeed.TaxiTravelTimeRouter;
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.net.SimulationServer;
+import amodeus.amodeus.options.ScenarioOptions;
+import amodeus.amodeus.options.ScenarioOptionsBase;
+import amodeus.amodeus.util.io.MultiFileTools;
+import amodeus.amodeus.util.math.GlobalAssert;
+import amodeus.amodeus.util.matsim.AddCoordinatesToActivities;
 
 /** This class runs an AMoDeus simulation based on MATSim. The results can be
  * viewed if the {@link ScenarioViewer} is executed in the same working

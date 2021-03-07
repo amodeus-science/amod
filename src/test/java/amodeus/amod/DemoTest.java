@@ -3,15 +3,15 @@ package amodeus.amod;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.AfterClass;
+import org.junit.Test;
+
 import amodeus.amodeus.util.io.Locate;
 import amodeus.amodeus.util.io.MultiFileTools;
 import amodeus.amodeus.util.io.Unzip;
 import amodeus.amodtaxi.scenario.ScenarioCreation;
 import amodeus.amodtaxi.scenario.sanfrancisco.TraceFileChoice;
-import org.junit.AfterClass;
-import org.junit.Test;
-
-import ch.ethz.idsc.tensor.io.DeleteDirectory;
+import ch.ethz.idsc.tensor.ext.DeleteDirectory;
 
 public class DemoTest {
 

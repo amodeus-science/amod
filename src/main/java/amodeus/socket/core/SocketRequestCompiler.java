@@ -3,10 +3,10 @@ package amodeus.socket.core;
 
 import java.util.Collection;
 
-import amodeus.amodeus.net.MatsimAmodeusDatabase;
-import amodeus.amodeus.net.TensorCoords;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
+import amodeus.amodeus.net.MatsimAmodeusDatabase;
+import amodeus.amodeus.net.TensorCoords;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;

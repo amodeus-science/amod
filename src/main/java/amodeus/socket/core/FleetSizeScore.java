@@ -7,6 +7,7 @@ import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
+import ch.ethz.idsc.tensor.Unprotect;
 import ch.ethz.idsc.tensor.qty.Quantity;
 
 /** the fleetsize score is defined as following, in the case that the maximum waiting time
@@ -57,7 +58,7 @@ import ch.ethz.idsc.tensor.qty.Quantity;
 
     public Scalar getScoreDiff() {
         Scalar scoreDiff = scoreFinal.subtract(scoreFinalPrev);
-        if (Double.isNaN(scoreDiff.number().doubleValue()))
+        if (Double.isNaN(Unprotect.withoutUnit(scoreDiff).number().doubleValue()))
             return RealScalar.ZERO;
         return scoreDiff;
     }

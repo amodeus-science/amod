@@ -10,10 +10,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import org.gnu.glpk.GLPK;
+
 import amodeus.amodeus.data.LocationSpec;
 import amodeus.amodeus.data.LocationSpecDatabase;
 import amodeus.amodeus.options.LPOptionsBase;
-import org.gnu.glpk.GLPK;
 
 public enum Static {
     ;
